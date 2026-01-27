@@ -1,0 +1,129 @@
+# Chunking Strategies Configuration (ei_auto_doc Adaptation)
+# Version: 1.1.0
+# Purpose: Single ABAP function chunking for EI documentation; output feeds THE_DOCUMENTER
+
+---
+
+# ei_auto_doc: Single-Function EI Mode (Primary)
+abap_function_ei:
+  description: "Chunk one ABAP function for EI doc when it exceeds ~2k lines; output DOCUMENTER_INSTRUCTIONS"
+
+  when_to_use:
+    - "One code file (e.g. Code_*.txt) with one FUNCTION ... ENDFUNCTION"
+    - "File is long (e.g. 1.5k–2k+ lines) or user requests chunking"
+  when_to_skip:
+    - "Function is short (<~1.5k lines) — Documenter can use full file"
+    - "User did not request chunking"
+
+  file_patterns:
+    - "Code_*.txt"
+    - "*.abap"
+
+  outer_boundary:
+    start: "FUNCTION"
+    end: "ENDFUNCTION"
+  expect_single_function: true  # Warn if multiple FUNCTION blocks
+
+  # Logical sections within the function (for EI doc)
+  sections:
+    - id: "signature"
+      ei_doc_use: "Parameters table; Parameter Configuration Guidelines (interface only)"
+      patterns:
+        start: "FUNCTION|\\*\"\\*\"Local Interface:|PARAMETERS|TABLES|CHANGING|IMPORTING|EXPORTING"
+        end: "DATA\\s+|TYPES\\s+|CONSTANTS\\s+|SELECT\\s+|CALL\\s+|IF\\s+|LOOP\\s+|FORM\\s+"
+      fallback: "lines from FUNCTION to first DATA/TYPES/SELECT/CALL/IF/LOOP/FORM"
+
+    - id: "data_init"
+      ei_doc_use: "Default Values and Parameter Options Explicitly Stated in EI Code"
+      patterns:
+        markers:
+          - "DATA\\s+"
+          - "TYPES\\s+"
+          - "CONSTANTS\\s+"
+          - "lv_.*=\\s+|lv_.*\\s+TYPE\\s+"
+          - "CLEAR\\s+"
+        # Look for assignment to parameter-like names or default-style init
+      end_before: "SELECT\\s+|CALL\\s+FUNCTION|LOOP\\s+AT|READ\\s+TABLE"
+      fallback: "block after signature until first major logic (SELECT/CALL/LOOP/READ)"
+
+    - id: "main_logic"
+      ei_doc_use: "General Overview; Problem Description; Suggested Resolution; tables queried; control flow"
+      patterns:
+        markers:
+          - "SELECT\\s+"
+          - "CALL\\s+FUNCTION"
+          - "LOOP\\s+"
+          - "IF\\s+"
+          - "CASE\\s+"
+          - "READ\\s+TABLE"
+      fallback: "rest of implementation after data_init until FORM or ENDFUNCTION"
+
+    - id: "helpers"
+      ei_doc_use: "Reference only; subs for logic called from main_logic"
+      patterns:
+        start: "FORM\\s+"
+        end: "ENDFORM"
+      optional: true
+
+  output:
+    chunks: "CHUNKS/chunks.json"  # or per-chunk .md
+    documenter_instructions: "CHUNKS/DOCUMENTER_INSTRUCTIONS.md"
+  documenter_instructions_template:
+    - "## Code chunks for EI documentation"
+    - "**signature** (lines X–Y): Use for Parameters table and Parameter Configuration. Contains FUNCTION interface, PARAMETERS/TABLES/CHANGING."
+    - "**data_init** (lines A–B): Use for Default Values section. Contains data declarations and parameter default/initialization."
+    - "**main_logic** (lines C–D): Use for General Overview, Problem Description, Suggested Resolution, table usage. Contains SELECT/CALL/LOOP."
+    - "**helpers** (if present): Reference only; called from main_logic."
+
+  metadata_per_chunk:
+    - chunk_id
+    - type
+    - line_range
+    - summary
+    - ei_doc_use
+
+---
+
+# Global Settings (for EI mode)
+global:
+  max_tokens_per_chunk: 4000
+  min_tokens_per_chunk: 300
+  target_tokens_per_chunk: 2000
+  overlap_tokens: 0  # No overlap for EI; clean section boundaries
+
+# ABAP function-level fallback (reused from original strategies)
+abap:
+  file_patterns:
+    - "*.abap"
+    - "*.txt"
+  chunking_strategy:
+    rules:
+      - condition: "is_function_module"
+        strategy: "function_level"
+        boundaries:
+          start: "FUNCTION"
+          end: "ENDFUNCTION"
+        include_context:
+          before: ["function_signature", "data_declarations"]
+          after: []
+  metadata_extraction:
+    dependencies:
+      patterns:
+        - "CALL FUNCTION '([^']+)'"
+    database_tables:
+      patterns:
+        - "SELECT.*FROM\\s+([\\w/]+)"
+        - "INSERT INTO\\s+([\\w/]+)"
+        - "UPDATE\\s+([\\w/]+)"
+        - "DELETE FROM\\s+([\\w/]+)"
+
+---
+
+# Output (EI mode)
+output:
+  json:
+    enabled: true
+    path: "CHUNKS/chunks.json"
+  documenter_instructions:
+    enabled: true
+    path: "CHUNKS/DOCUMENTER_INSTRUCTIONS.md"

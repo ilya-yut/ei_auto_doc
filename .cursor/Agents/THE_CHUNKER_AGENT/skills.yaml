@@ -1,0 +1,131 @@
+# THE_CHUNKER_AGENT - Skills Definition (ei_auto_doc Adaptation)
+# Version: 1.1.0
+# Purpose: Single ABAP function chunking for EI documentation
+
+---
+
+agent:
+  name: "THE_CHUNKER_AGENT"
+  version: "1.1.0"
+  mission: "Chunk one ABAP function for EI doc when it is long; produce DOCUMENTER_INSTRUCTIONS for THE_DOCUMENTER"
+
+  ei_mode:
+    primary: true
+    description: "Single code file (Code_*.txt), one FUNCTION ... ENDFUNCTION; output chunks + Documenter instructions"
+    when: "Function is ~1.5k–2k+ lines or user requests chunking"
+    output: "CHUNKS/chunks.json + CHUNKS/DOCUMENTER_INSTRUCTIONS.md"
+
+  supported_for_ei:
+    - name: "SAP ABAP function module"
+      extensions: ["*.abap", "*.txt"]
+      patterns: ["FUNCTION", "ENDFUNCTION", "PARAMETERS", "TABLES", "CHANGING"]
+
+---
+
+# USER-INVOKED SKILLS (Slash Commands)
+
+user_invoked_skills:
+
+  - skill_id: "CHUNK_EI_001"
+    name: "chunk:ei_function"
+    command: "/chunk:ei_function [path_to_code_file]"
+    type: "main_entry"
+    description: "Chunk one ABAP function for EI documentation; produce Documenter instructions"
+
+    parameters:
+      - name: "path_to_code_file"
+        required: true
+        type: "string"
+        description: "Path to the single code file (e.g. Code_*.txt or input/Code_*.txt)"
+      - name: "--output"
+        required: false
+        type: "string"
+        default: "./CHUNKS/"
+        description: "Output directory for chunks and DOCUMENTER_INSTRUCTIONS"
+      - name: "--force"
+        required: false
+        type: "boolean"
+        default: false
+        description: "Chunk even if file is short (<~1.5k lines)"
+
+    workflow:
+      - step: 1
+        action: "read_code_file"
+        description: "Read the single code file"
+      - step: 2
+        action: "detect_function"
+        description: "Detect one FUNCTION ... ENDFUNCTION; warn if multiple or none"
+      - step: 3
+        action: "split_by_sections"
+        description: "Split by abap_function_ei sections (signature, data_init, main_logic, helpers)"
+      - step: 4
+        action: "summarize_chunks"
+        description: "Brief summary + ei_doc_use per chunk"
+      - step: 5
+        action: "write_documenter_instructions"
+        description: "Write DOCUMENTER_INSTRUCTIONS.md with chunk IDs, line ranges, use-for hints"
+      - step: 6
+        action: "export_chunks"
+        description: "Save chunks (JSON or markdown) to output dir"
+
+    outputs:
+      - "CHUNKS/DOCUMENTER_INSTRUCTIONS.md"
+      - "CHUNKS/chunks.json"  # or CHUNKS/*.md per chunk
+
+    rules:
+      - ".cursor/Agents/THE_CHUNKER_AGENT/agent_specification.md"
+      - ".cursor/Agents/THE_CHUNKER_AGENT/chunking_strategies.yaml (abap_function_ei)"
+
+  - skill_id: "CHUNK_EI_002"
+    name: "chunk:ei_analyze"
+    command: "/chunk:ei_analyze [path_to_code_file]"
+    type: "discovery"
+    description: "Analyze one ABAP function file; report line count, sections, recommend chunk or not"
+
+    parameters:
+      - name: "path_to_code_file"
+        required: true
+        type: "string"
+        description: "Path to the code file"
+
+    outputs:
+      - line_count: "Total lines"
+      - function_detected: "FUNCTION name if found"
+      - estimated_sections: "signature, data_init, main_logic, helpers (approx lines)"
+      - recommendation: "Chunk (if long) or use full file (if short)"
+
+---
+
+# INTERNAL SKILLS (EI Mode)
+
+internal_skills:
+
+  - skill_id: "CHUNK_EI_INT_001"
+    name: "abap_function_section_split"
+    type: "internal"
+    description: "Split one FUNCTION ... ENDFUNCTION into EI-oriented sections"
+
+    uses: "chunking_strategies.yaml > abap_function_ei > sections"
+    output:
+      - chunk_id
+      - type
+      - line_range
+      - summary
+      - ei_doc_use
+
+  - skill_id: "CHUNK_EI_INT_002"
+    name: "documenter_instructions_generation"
+    type: "internal"
+    description: "Generate DOCUMENTER_INSTRUCTIONS.md from chunks"
+
+    template_ref: "chunking_strategies.yaml > abap_function_ei > documenter_instructions_template"
+    output: "CHUNKS/DOCUMENTER_INSTRUCTIONS.md"
+
+---
+
+# CONFIGURATION
+
+configuration:
+  default_output: "./CHUNKS/"
+  long_function_threshold_lines: 1500  # Recommend chunking above this
+  strategy: "abap_function_ei"

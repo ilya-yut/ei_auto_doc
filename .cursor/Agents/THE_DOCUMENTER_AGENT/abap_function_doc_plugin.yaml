@@ -1,0 +1,118 @@
+# ABAP Function (EI) Documentation from User Sample — Plugin
+# Version: 1.1
+# Status: Cursor/agent config only (no app build)
+# Last Updated: 2026-01
+
+plugin_metadata:
+  name: "ABAP_Function_Doc_From_Sample"
+  version: "1.1"
+  status: "config"
+  scope: "EI (Exception Indicator) style ABAP functions only"
+  format_authority: "user_sample"
+  output: "single_file_from_sample_format"
+
+# Folder Conventions (Implementation Phase)
+folders:
+  reference_files: "Planning/verification/debug only — temporary files when verifying .cursor; not used in implementation"
+  input: "Per-function: code, structure, Available fields; add/replace for each next function"
+  reference: "Shared: sample_format, _Parameters.docx; same for any function"
+  output: "Generated documentation (e.g. Explanation_*.md or .docx)"
+
+# Scale (no hard caps)
+scale:
+  parameters: "up to 130+ from parameter list; every parameter from source must be included"
+  structure_fields: "up to 130+ from structure file; every structure field from source must be included"
+  rule: "No dropping or truncation; include all parameters and all structure fields from source files"
+
+# When This Plugin Applies
+when:
+  task_type: "ABAP function (EI) documentation from user inputs"
+  automation: "AI-only (agent uses rules/skills; no script)"
+
+# Input Files (implementation: input/ + reference/)
+input_files:
+  code:
+    description: "ABAP function source code — or CHUNKS/ + DOCUMENTER_INSTRUCTIONS.md when THE_CHUNKER was run first (for long functions, e.g. 2k+ lines)"
+    patterns: ["Code_*.txt", "CHUNKS/chunks.json", "CHUNKS/DOCUMENTER_INSTRUCTIONS.md"]
+    folder: "input/"
+    required: true
+    optional_chunker_prestep: "Run /chunk:ei_function [path] when code is long; then use CHUNKS/ as code input. See .cursor/Agents/THE_CHUNKER_AGENT/"
+
+  structure:
+    description: "Output/structure definition of the function"
+    patterns: ["Structure_*.xlsx"]
+    folder: "input/"
+    required: true
+
+  parameter_list:
+    description: "Fields used as parameters"
+    source: "Available fields_*.xlsx → 'Parameters' sheet"
+    folder: "input/"
+    required: true
+
+  sample_format:
+    description: "One complete example doc in desired output format — FORMAT AUTHORITY"
+    patterns: ["sample_format.*", "Example_*.md", "Example_*.docx"]
+    folder: "reference/"
+    required: true
+    authority: "Output structure (sections, order, tables) must match this file exactly"
+
+  parameter_reference:
+    description: "List of well-explained parameters (e.g. _Parameters.docx)"
+    patterns: ["_Parameters.docx", "*_param_ref*"]
+    folder: "reference/"
+    required: true
+    authority: "Verbatim text for parameters that appear here; generate only for others"
+
+# Output (implementation)
+output:
+  folder: "output/"
+  count: 1
+  format: "from_user_sample"
+  validation: "Structure and table shapes match sample; parameter list fully covered; all parameters and all structure fields from sources included (scale up to 130+ each)"
+  reference_output: "When provided (e.g. Explanation_*.md for same inputs), compare generated output to it for 'output equal to' verification"
+
+# Workflow
+workflow:
+  - step: "parse_sample"
+    action: "Parse user sample (from reference/); extract section titles, levels, order; table shapes"
+    output: "Format spec (sections, order, table column headers)"
+
+  - step: "load_content"
+    action: "Read code file (input/ or CHUNKS/ + DOCUMENTER_INSTRUCTIONS when Chunker was run), structure xlsx (input/), parameter list (input/, Parameters sheet)"
+    output: "Content for filling sections"
+
+  - step: "resolve_parameters"
+    action: "For each parameter from list, look up in parameter reference file (reference/)"
+    rule: "If found → use text verbatim; if not found → generate from code/domain"
+    forbidden: "No code line numbers, no custom function/module names in narrative"
+
+  - step: "fill_sections"
+    action: "Map content to sections using sample's order; use EI domain logic for Overview/Problem/Resolution only where sample includes them"
+
+  - step: "emit"
+    action: "Write one file to output/ that strictly follows parsed format"
+    rule: "Same section count and order; same table structures as sample"
+
+  - step: "verify"
+    action: "Read generated file; confirm structure matches sample; all parameters covered"
+    when_reference_output_provided: "When a reference output file is provided (e.g. Explanation_*.md for the same inputs), verification includes comparing generated output to it (structure and, where applicable, content)"
+
+# Rules to Apply
+rules_reference:
+  format_authority: ".cursor/rules/abap-function-doc-format-authority.md"
+  document_authority_branch: ".cursor/rules/document-authority.md — 'For ABAP Function / EI Documentation'"
+  anti_hallucination: ".cursor/rules/anti-hallucination-rules.md"
+
+# Parameter Documentation (reuse EI conventions where sample includes them)
+parameter_conventions:
+  - "Parameters Reference Table from 'Parameters' sheet — all columns as in source; include every parameter (scale up to 130+)"
+  - "Parameter Configuration Guidelines cover ALL parameters from the table"
+  - "EI Function Structure / structure table — include every structure field from source (scale up to 130+)"
+  - "Default Values section: ONLY parameters with explicit default values in code"
+  - "No implementation details in parameter narrative (no line numbers, no /SKN/... in prose)"
+  - "Structured explanation for complex params; standard concise for simple params"
+
+# No Technology Detection Override
+# This plugin is invoked when user explicitly requests ABAP function (EI) doc from sample,
+# or when inputs match (code + structure + params + sample + param_ref). Not auto-detected from file patterns alone.
