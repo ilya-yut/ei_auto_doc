@@ -7,7 +7,7 @@ Use this in ChatGPT, Claude (web or API), or any LLM. Provide the Parameters (Na
 ```
 You are documenting the Parameters Reference Table section for an SAP Exception Indicator (EI) / function module. You will receive ONE input: the Parameters (Name (Description)) file — typically the "Parameters" sheet from the Available fields Excel or an equivalent file containing the parameters table.
 
-Your task: Output ONLY the "Parameters Reference Table" subsection for the EI document. Use the fixed intro wording from the benchmark and copy the parameters table from the input file exactly. Do not output a document title, other sections, or preamble.
+Your task: Output ONLY the "Parameters Reference Table" subsection for the EI document. Use the fixed intro wording from the benchmark and build the parameters table from the input file. **Group serial-number series** (e.g. KEY1, KEY2, … KEY10) into one table row **only when Type, Length, Decimal, Data Element, and Domain are identical** across the series; otherwise keep separate rows. For grouped rows: first column (#) = **range** (e.g. 3-12); Parameter = "PARAM_FIRST - PARAM_LAST", Description = "Description first - Description last". Next row after a group continues from the end of the range (e.g. 13). Do not output a document title, other sections, or preamble.
 
 OUTPUT FORMAT (follow exactly):
 
@@ -17,14 +17,14 @@ OUTPUT FORMAT (follow exactly):
 This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic.
 
 [Table:]
-Add a first column with the parameter number (1, 2, 3, … n). Then copy the parameters table from the input file: use the same column headers and column order as in the input file, with the number column as the first column. If the input has columns Parameter, Description, Type, Length, Decimal, Data Element, Domain, use a markdown table with headers: # (or No.), Parameter, Description, Type, Length, Decimal, Data Element, Domain. Number each parameter row 1 to n. Include every row from the input — the parameter count may be 120–130 or more; do not omit any rows.
+Add a first column with the parameter number or range (1, 2, 3-12, 13, …). Build the parameters table from the input file: use the same column headers and column order as in the input file, with the number column as the first column. If the input has columns Parameter, Description, Type, Length, Decimal, Data Element, Domain, use a markdown table with headers: # (or No.), Parameter, Description, Type, Length, Decimal, Data Element, Domain. **When a series of parameters differ only by serial number** (e.g. KEY1, KEY2, … KEY10) **and Type, Length, Decimal, Data Element, and Domain are the same for every row in the series**, **group them into one row**: first column = "first–last" (e.g. 3-12), Parameter = "PARAM_FIRST - PARAM_LAST" (e.g. KEY1 - KEY10), Description = "Description first - Description last". For Type, Length, Decimal, Data Element, Domain use the (identical) value from the series. **If any of Type, Length, Decimal, Data Element, or Domain differs across the series, do not group** — keep separate rows with single numbers. For single-parameter rows use a single number (1, 2, 13, 14, …); for grouped rows use the range (e.g. 3-12); the next row after a group continues from the end of the range (e.g. 13). Include every parameter from the input; do not omit any.
 
 Rules:
 - Use the fixed intro sentence exactly as stated above. Do not reword or extend it.
-- Add a first column with sequential numbers 1, 2, 3, … n for each parameter row. Then copy the parameters table from the input file: same columns (Parameter, Description, Type, Length, Decimal, Data Element, Domain), same order, same row count. Include every parameter row (120–130+ if present).
-- Do not add or remove parameter rows; do not infer or generate parameter rows; only copy from the input. The only addition is the number column.
+- **First column (#):** For single-parameter rows use a single number (1, 2, 13, 14, …). For grouped serial-number rows use the **range** of parameter numbers (e.g. 3-12 for KEY1 through KEY10); the next row after a group continues from the end of that range (e.g. 13). Build the table from the input: same columns (Parameter, Description, Type, Length, Decimal, Data Element, Domain), same order. **Serial-number series:** Group only when (a) parameters differ only by serial number (e.g. KEY1, KEY2, … KEY10) **and** (b) **Type, Length, Decimal, Data Element, and Domain are identical** for every row in the series. If any of these properties differs across the series, **do not group** — keep separate rows with single numbers. When grouping: one row with # = "first–last", Parameter = "PARAM_FIRST - PARAM_LAST", Description = "Description first - Description last"; use the common Type/Length/Decimal/Data Element/Domain. Do not omit any parameters; each appears either as its own row or inside a grouped row.
+- Do not add or infer parameter rows not in the input; only group or copy from the input. The only structural changes are grouping serial-number series (when properties match) and adding the number column (single number or range).
 - Output ONLY the subsection: heading "### Parameters Reference Table", the fixed intro paragraph, and the markdown table. No document title, no other sections (e.g. no Parameter Configuration Guidelines, no preamble).
-- Tone: professional. The intro is fixed; the table is verbatim from input.
+- Tone: professional. The intro is fixed; the table is built from input with serial-number series grouped.
 
 Benchmark format reference (intro + table structure). Source: reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.docx
 
@@ -36,7 +36,8 @@ This table lists all configurable input parameters. Users set values for these p
 |---|-----------|-------------|------|--------|---------|--------------|--------|
 | 1 | AEDAT | Changed On | DATS | 8 | 0 | AEDAT | DATUM |
 | 2 | AGGR_FIELDS | Aggregation Fields |  | 0 | 0 |  |  |
-| … | … | (include every row from your input file, numbered 3 to n) |  |  |  |  |  |
+| 3-12 | KEY1 - KEY10 | Field Name 1 - Field Name 10 |  |  |  |  |  |
+| 13 | … | (next parameter; include every parameter: single # or range # for groups) |  |  |  |  |  |
 
 Parameters (Name (Description)) file location or paste:
 [Provide the file path or paste the parameters table content here]
