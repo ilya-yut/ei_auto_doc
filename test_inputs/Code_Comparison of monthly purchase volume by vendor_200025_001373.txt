@@ -1,0 +1,399 @@
+FUNCTION ZABC4C_F_SW_10_07_CM_MN_VL_CV.
+*"--------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /ABC4C/S_SW_10_07_CM_MN_VL_CV OPTIONAL
+*"--------------------------------------------------------------------
+*-----------------------------------------------------------------------
+*  Date(dd-mmm-yyyy): 29-Jul-2019
+*  Author           : Taotsu Nakamura - 50023710
+*-----------------------------------------------------------------------
+*  Alert Definition : This alert detects exceptional sales(purchase) volume increase (decrease)
+*                     by comparing fiscal periods between current and last year.
+*                     It could be checked on customer(vendor) level.
+*-----------------------------------------------------------------------
+*  CHANGE HISTORY
+* ----------------------------------------------------------------------
+*  DATE(DMY)     TP Request#   Programmer   Description
+*  29-Jul-2019   SD3K900118    50023710     Create initial version
+*  04-Aug-2019   SD3K900124    50023710     Correction by QA process
+* ----------------------------------------------------------------------
+* ----------------------------------------------------------------------
+* Local Type definition
+* ----------------------------------------------------------------------
+  TYPES:
+    BEGIN OF typ_fig,
+      acct_num   TYPE /abc4c/e_sw_acct_num,         " Account Number
+      bukrs      TYPE bukrs,                        " Company Code
+      gjahr      TYPE gjahr,                        " Fiscal Year
+      um01u      TYPE umxxu,                        " Sales in the Posting Period
+      um02u      TYPE umxxu,                        " Sales in the Posting Period
+      um03u      TYPE umxxu,                        " Sales in the Posting Period
+      um04u      TYPE umxxu,                        " Sales in the Posting Period
+      um05u      TYPE umxxu,                        " Sales in the Posting Period
+      um06u      TYPE umxxu,                        " Sales in the Posting Period
+      um07u      TYPE umxxu,                        " Sales in the Posting Period
+      um08u      TYPE umxxu,                        " Sales in the Posting Period
+      um09u      TYPE umxxu,                        " Sales in the Posting Period
+      um10u      TYPE umxxu,                        " Sales in the Posting Period
+      um11u      TYPE umxxu,                        " Sales in the Posting Period
+      um12u      TYPE umxxu,                        " Sales in the Posting Period
+    END   OF typ_fig.
+* ----------------------------------------------------------------------
+* Local Data definition
+* ----------------------------------------------------------------------
+* - single DATA
+  data_single:
+    langu                langu,                    " Language (not in use)
+    datum                sy-datum,                 " System Date
+    target               sy-datum,                 " Target Date
+    compare              sy-datum,                 " Date to Compare
+    fname                fname,                    " Field name
+    tabix                sy-tabix                  " table index
+    .
+* - range DATA
+*  data_multy:
+*    datum                datum,                    " Date
+*    budat                budat,                    " Posting Date
+*    aedat                aedat,                    " Date on Which Record Was Created
+*    cpudt                cpudt,                    " Day On Which Accounting Document Was Entered
+*    upddt                upddt,                    " Date of the Last Document Update
+*    bldat                bldat                     " Document Date
+*    .
+  DATA:
+    ls_data              TYPE /abc4c/s_sw_10_07_cm_mn_vl_cv,
+    ls_fig               TYPE typ_fig,
+    lt_fig               TYPE TABLE OF typ_fig
+    .
+  FIELD-SYMBOLS:
+    <fs_data>            TYPE /abc4c/s_sw_10_07_cm_mn_vl_cv,
+    <fs_umxxu>           TYPE umxxu
+    .
+* ----------------------------------------------------------------------
+* Parameters Definition
+* ----------------------------------------------------------------------
+* Define Special Parameters
+* - single DATA
+  data_single:
+    sw_dest              rfcdest,                  " RFC destination
+    backdays             int4,                     " BACKDAYS
+    date_ref_fld         name_feld,                " DATE_REF_FLD
+    duration_unit        /skn/e_sw_duration_unit   " Duration unit
+    .
+* - range DATA
+  data_multy:
+    duration             /skn/e_sw_duration        " Duration
+    .
+* Define EI specific Parameters
+* - single DATA
+  data_single:
+    backmonths           /abc4c/e_sw_backmonths,   " Months Backwards
+    compmonths           /abc4c/e_sw_compmonths,   " Months to Compare
+    dc_ind               /abc4c/e_sw_dc_ind,       " Debtor/Creditor Indicator
+    perc_vari            /abc4c/e_sw_perc_vari     " Percent Variance of fiscal period transaction volumes
+    .
+* - range DATA
+  data_multy:
+    acct_grp             /abc4c/e_sw_acct_grp,     " Account Group
+    acct_num             /abc4c/e_sw_acct_num,     " Account Number
+    bukrs                bukrs,                    " Company Code
+    kna1_loevm           loevm_x,                  " Central deletion flag
+    kna1_cassd           cassd_x,                  " Central sales block
+    kna1_sperr           sperb_x,                  " Central posting block
+    knb1_loevm           loevm_b,                  " Delete flag for company code
+    knb1_sperr           sperb_b,                  " Posting block for company code
+    lfa1_loevm           loevm_x,                  " Central deletion flag
+    lfa1_sperm           cassd_x,                  " Central purchasing block
+    lfa1_sperr           sperb_x,                  " Central posting block
+    lfb1_loevm           loevm_b,                  " Delete flag for company code
+    lfb1_sperr           sperb_b                   " Posting block for company code
+    .
+* ----------------------------------------------------------------------
+* Extracting parameters’ value and populating variables
+* ----------------------------------------------------------------------
+* Set initial value
+  lv_datum               = sy-datum." System date
+  lv_langu               = 'E'.     " English
+  lv_date_ref_fld        = 'BUDAT'. " Document date
+  lv_backmonths          = 1.       " Months Backwards
+  lv_compmonths          = 12.      " Months to Compare
+  lv_dc_ind              = 'D'.     " Debtor/Creditor Indicator
+* Extract Special Parameters
+* - single value
+  select_single:
+    sw_dest,                        " RFC destination
+    backdays,                       " BACKDAYS
+    date_ref_fld,                   " DATE_REF_FLD
+    duration_unit                   " Duration unit
+    .
+* - range value
+  select_multy:
+    duration                        " Duration
+    .
+* Extract EI specific Parameters
+* - single value
+  select_single:
+    backmonths,                     " Months Backwards
+    compmonths,                     " Months to Compare
+    dc_ind,                         " Debtor/Creditor Indicator
+    perc_vari                       " Percent Variance of fiscal period transaction volumes
+    .
+* - range value
+  select_multy:
+    acct_grp,                       " Account Group
+    acct_num,                       " Account Number
+    bukrs,                          " Company Code
+    kna1_loevm,                     " Central deletion flag
+    kna1_cassd,                     " Central sales block
+    kna1_sperr,                     " Central posting block
+    knb1_loevm,                     " Delete flag for company code
+    knb1_sperr,                     " Posting block for company code
+    lfa1_loevm,                     " Central deletion flag
+    lfa1_sperm,                     " Central purchasing block
+    lfa1_sperr,                     " Central posting block
+    lfb1_loevm,                     " Delete flag for company code
+    lfb1_sperr                      " Posting block for company code
+    .
+* ----------------------------------------------------------------------
+* Initiating
+* ----------------------------------------------------------------------
+  CLEAR:
+    is_alert
+    .
+  REFRESH:
+    t_data,
+    lt_fig
+    .
+* ----------------------------------------------------------------------
+* Retrieving alert data
+* ----------------------------------------------------------------------
+  "--- Run Cloud Mode -----
+  IF lv_sw_dest IS NOT INITIAL.
+    CALL FUNCTION 'ZABC4C_FC_SW_10_07_CM_MN_VL_CV'
+      IMPORTING
+        is_alert = is_alert
+      TABLES
+        t_select = t_select
+        t_data   = t_data.
+  ENDIF.
+  CHECK lv_sw_dest IS INITIAL.
+  "--- Run Cloud Mode -----
+* Calculate the Target Date from BACKMONTHS parameter.
+  lv_target = lv_datum.
+  lv_target+6(2) = '01'. " Get the first day of this month
+  DO lv_backmonths TIMES.
+    lv_target = lv_target - 1.
+    lv_target+6(2) = '01'.
+  ENDDO.
+* Calculate the Date to Cpmpare from COMPMONTHS parameter.
+  lv_compare = lv_target.
+  DO lv_compmonths TIMES.
+    lv_compare = lv_compare - 1.
+    lv_compare+6(2) = '01'.
+  ENDDO.
+  IF lv_dc_ind = 'C'.
+*   Extract vendor master records from Vendor Master (LFA1/LFB1).
+    SELECT
+            a~lifnr as acct_num
+            a~ktokk as acct_grp
+            a~loevm as lfa1_loevm
+            a~sperm as lfa1_sperm
+            a~sperr as lfa1_sperr
+            b~bukrs
+            b~loevm as lfb1_loevm
+            b~sperr as lfb1_sperr
+            c~waers
+      INTO CORRESPONDING FIELDS OF TABLE t_data
+      FROM lfa1 as a
+      INNER JOIN lfb1 AS b ON a~lifnr EQ b~lifnr
+      INNER JOIN t001 as c ON b~bukrs EQ c~bukrs
+      WHERE a~lifnr  IN r_acct_num
+      AND   a~ktokk  IN r_acct_grp
+      AND   b~bukrs  IN r_bukrs
+      AND   a~sperr  IN r_lfa1_sperr
+      AND   a~sperm  IN r_lfa1_sperm
+      AND   a~loevm  IN r_lfa1_loevm
+      AND   b~sperr  IN r_lfb1_sperr
+      AND   b~loevm  IN r_lfb1_loevm
+      .
+  ELSE.
+*   Extract customer master records from Customer Master (KNA1/KNB1).
+    SELECT
+            a~kunnr as acct_num
+            a~ktokd as acct_grp
+            a~loevm as kna1_loevm
+            a~cassd as kna1_cassd
+            a~sperr as kna1_sperr
+            b~bukrs
+            b~loevm as knb1_loevm
+            b~sperr as knb1_sperr
+            c~waers
+      INTO CORRESPONDING FIELDS OF TABLE t_data
+      FROM kna1 as a
+      INNER JOIN knb1 AS b ON a~kunnr EQ b~kunnr
+      INNER JOIN t001 as c ON b~bukrs EQ c~bukrs
+      WHERE a~kunnr  IN r_acct_num
+      AND   a~ktokd  IN r_acct_grp
+      AND   b~bukrs  IN r_bukrs
+      AND   a~sperr  IN r_kna1_sperr
+      AND   a~cassd  IN r_kna1_cassd
+      AND   a~loevm  IN r_kna1_loevm
+      AND   b~sperr  IN r_knb1_sperr
+      AND   b~loevm  IN r_knb1_loevm
+      .
+  ENDIF.
+*<<< If there is no Account Maste Data, the processing is terminated
+  CHECK t_data[] is NOT INITIAL.
+* Calculate the fiscal year and fiscal period of Target Date
+  LOOP AT t_data ASSIGNING <fs_data>.
+*   Get fiscal year: Target Date
+    CALL FUNCTION '/ABC4C/F_SW_10_GET_CUR_YEAR'
+      EXPORTING
+        BUKRS             = <fs_data>-bukrs
+        DATUM             = lv_target
+      IMPORTING
+        MONAT             = <fs_data>-monat_tgt
+        GJAHR             = <fs_data>-gjahr_tgt
+      EXCEPTIONS
+        WRONG_CODE        = 1
+        WRONG_VALUE       = 2
+        OTHERS            = 3.
+    IF SY-SUBRC <> 0 OR <fs_data>-gjahr_tgt IS INITIAL.
+      DELETE t_data INDEX sy-tabix.
+      CONTINUE.
+    ENDIF.
+*   Get fiscal year: Date to Compare
+    CALL FUNCTION '/ABC4C/F_SW_10_GET_CUR_YEAR'
+      EXPORTING
+        BUKRS             = <fs_data>-bukrs
+        DATUM             = lv_compare
+      IMPORTING
+        MONAT             = <fs_data>-monat_cmp
+        GJAHR             = <fs_data>-gjahr_cmp
+      EXCEPTIONS
+        WRONG_CODE        = 1
+        WRONG_VALUE       = 2
+        OTHERS            = 3.
+    IF SY-SUBRC <> 0 OR <fs_data>-gjahr_cmp IS INITIAL.
+      DELETE t_data INDEX sy-tabix.
+      CONTINUE.
+    ENDIF.
+    <fs_data>-backmonths = lv_backmonths.
+    <fs_data>-compmonths = lv_compmonths.
+    <fs_data>-dc_ind     = lv_dc_ind.
+  ENDLOOP.
+  IF lv_dc_ind = 'C'.
+*   Extract vendor transaction figures from Vendor Master (Transaction Figures) (LFC1)
+    SELECT lifnr AS acct_num bukrs gjahr um01u um02u um03u um04u um05u um06u um07u um08u um09u um10u um11u um12u
+      INTO CORRESPONDING FIELDS OF TABLE lt_fig
+      FROM lfc1
+      FOR ALL ENTRIES IN t_data
+      WHERE lifnr = t_data-acct_num
+      AND   bukrs = t_data-bukrs
+      AND ( gjahr = t_data-gjahr_tgt OR gjahr = t_data-gjahr_cmp ).
+    SORT lt_fig BY acct_num bukrs gjahr.
+  ELSE.
+*   Extract customer transaction figures from Customer Master (Transaction Figures) (KNC1)
+    SELECT kunnr AS acct_num bukrs gjahr um01u um02u um03u um04u um05u um06u um07u um08u um09u um10u um11u um12u
+      INTO CORRESPONDING FIELDS OF TABLE lt_fig
+      FROM knc1
+      FOR ALL ENTRIES IN t_data
+      WHERE kunnr = t_data-acct_num
+      AND   bukrs = t_data-bukrs
+      AND ( gjahr = t_data-gjahr_tgt OR gjahr = t_data-gjahr_cmp ).
+  ENDIF.
+*<<< If there is no Figure Data, the processing is terminated
+  CHECK lt_fig[] is NOT INITIAL.
+  SORT lt_fig BY acct_num bukrs gjahr.
+* ----------------------------------------------------------------------
+* Post retrieving manipulations
+* ----------------------------------------------------------------------
+*	Detect the customers(vendors) whose variances exceed the threshold(percentage) from the comparison of fiscal period transaction volumes.
+  LOOP AT t_data ASSIGNING <fs_data>.
+    lv_tabix = sy-tabix.
+    CLEAR ls_fig.
+*   Get target amount
+    READ TABLE lt_fig INTO ls_fig WITH KEY acct_num = <fs_data>-acct_num
+                                           bukrs    = <fs_data>-bukrs
+                                           gjahr    = <fs_data>-gjahr_tgt
+                                           BINARY SEARCH.
+    IF sy-subrc = 0.
+      CONCATENATE 'UM' <fs_data>-monat_tgt 'U' INTO lv_fname.
+      ASSIGN COMPONENT lv_fname OF STRUCTURE ls_fig TO <fs_umxxu>.
+      <fs_data>-umxxu_tgt = <fs_umxxu>.
+    ELSE.
+      DELETE t_data INDEX lv_tabix.
+      CONTINUE.
+    ENDIF.
+    CLEAR ls_fig.
+*   Get compare amount
+    READ TABLE lt_fig INTO ls_fig WITH KEY acct_num = <fs_data>-acct_num
+                                           bukrs    = <fs_data>-bukrs
+                                           gjahr    = <fs_data>-gjahr_cmp
+                                           BINARY SEARCH.
+    IF sy-subrc = 0.
+      CONCATENATE 'UM' <fs_data>-monat_cmp 'U' INTO lv_fname.
+      ASSIGN COMPONENT lv_fname OF STRUCTURE ls_fig TO <fs_umxxu>.
+      <fs_data>-umxxu_cmp = <fs_umxxu>.
+    ELSE.
+      DELETE t_data INDEX lv_tabix.
+      CONTINUE.
+    ENDIF.
+*   Caliculate percent variance
+    IF <fs_data>-umxxu_tgt <> 0 AND <fs_data>-umxxu_cmp <> 0.
+      <fs_data>-perc_vari = <fs_data>-umxxu_tgt / <fs_data>-umxxu_cmp * 100 - 100.
+    ENDIF.
+*   Get descriptions
+    IF lv_dc_ind = 'C'.
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR              = <fs_data>-acct_num
+        IMPORTING
+          VENDOR_DESC        = <fs_data>-acct_desc
+        EXCEPTIONS
+          WRONG_VENDOR       = 1
+          OTHERS             = 2.
+      IF SY-SUBRC <> 0.
+*       Implement suitable error handling here
+      ENDIF.
+    ELSE.
+      CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR              = <fs_data>-acct_num
+        IMPORTING
+          CUST_DESC          = <fs_data>-acct_desc
+        EXCEPTIONS
+          WRONG_CUSTOMER     = 1
+          OTHERS             = 2.
+      IF SY-SUBRC <> 0.
+*       Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+*   Get descriptions
+    CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+      EXPORTING
+        BUKRS                = <fs_data>-bukrs
+      IMPORTING
+        COMP_CODE_DESC       = <fs_data>-comp_code_desc
+      EXCEPTIONS
+        WRONG_CODE           = 1
+        OTHERS               = 2.
+    IF SY-SUBRC <> 0.
+*     Implement suitable error handling here
+    ENDIF.
+  ENDLOOP.
+* ----------------------------------------------------------------------
+* Post retrieving filtering
+* ----------------------------------------------------------------------
+* no action
+* ----------------------------------------------------------------------
+* Finishing
+* ----------------------------------------------------------------------
+*--- Check Alert Information
+  READ TABLE t_data INDEX 1.
+  CHECK NOT sy-tfill  IS INITIAL .
+  is_alert = 'X' .
+ENDFUNCTION.

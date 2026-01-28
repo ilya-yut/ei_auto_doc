@@ -12,6 +12,9 @@ venv/
 *.swp
 *~
 
+# Office lock files
+~$*
+
 # Logs
 *.log
 

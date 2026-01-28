@@ -1,0 +1,91 @@
+---
+description: When output contains Explanation_*_narrative_context.md, fill the three [TODO:] sections in the matching Explanation_*.md using that context, reference/sample_format.md, benchmark, and all .cursor rules. Verify each section against rules + sample format + benchmark before replacing; read file after each edit.
+globs: output/**/*_narrative_context.md
+---
+
+# EI Doc: Cursor Workflow — Fill Narrative TODOs
+
+This rule applies **when** `python scripts/generate_ei_doc.py --cursor-workflow` has been run and `output/` contains a file matching `Explanation_*_narrative_context.md`.
+
+---
+
+## When This Rule Applies
+
+- **Trigger:** The user asks to fill the `[TODO:]` placeholders, or you are working in a session where `output/Explanation_*_narrative_context.md` exists alongside `output/Explanation_*.md` (same base name).
+- **Scope:** Only the three narrative placeholders in the main doc. All other sections (Parameters table, Parameter Configuration Guidelines, Defaults, Structure, ABAP) are already produced by the script.
+
+---
+
+## Inputs You Must Use
+
+1. **Narrative context file** — `output/Explanation_<base>_narrative_context.md`  
+   Contains: `full_name`, `technical_code`, structure summary, parameters summary, code path/excerpt, **benchmark path**, and Instructions for Cursor.
+
+2. **Format authority** — `reference/sample_format.md`  
+   Defines section titles, heading levels, and the intended structure/depth for General Overview, Problem Description, Suggested Resolution.
+
+3. **Parameter reference** — `reference/_Parameters.docx`  
+   Use for any parameter-related wording in narrative where relevant.
+
+4. **Benchmark** — Path is in the narrative context file under **Benchmark path (for verification)**.  
+   Usually `reference files/Explanation_*.md`. Use it to match style, depth, paragraph/bullet counts, and tone.
+
+5. **All applicable .cursor rules** — You must read and apply:
+   - `.cursor/rules/abap-function-doc-format-authority.md` — format authority, section order, table shapes, no implementation details in narrative
+   - `.cursor/rules/document-authority.md` — "For ABAP Function / EI Documentation" hierarchy (sample → param reference → code/structure/params)
+   - `.cursor/rules/anti-hallucination-rules.md` — verify-before-claim, read-after-write, no assumptions as facts
+   - Any behavior/verification rules that apply to doc edits (e.g. mandatory read-after-write)
+
+---
+
+## Process: One Placeholder at a Time
+
+For **each** of the three placeholders in this order:
+
+1. `[TODO: General Overview]`
+2. `[TODO: Problem Description]`
+3. `[TODO: Suggested Resolution]`
+
+do the following. **Do not** replace a placeholder until its content has passed all three verification checks below.
+
+### Step 1 — Draft
+
+- Use the narrative context file (full_name, technical_code, structure summary, parameters, code excerpt).
+- Use `reference/sample_format.md` for section shape and depth.
+- Use `reference/_Parameters.docx` where parameter descriptions matter for narrative.
+- Comply with the rules listed above (no implementation details in narrative, correct hierarchy, verify-before-claim).
+
+### Step 2 — Verify (all three must pass)
+
+Before replacing the placeholder, check the draft against:
+
+- **(a) .cursor rules** — Format authority, document authority, anti-hallucination, read-after-write. Correct structure, no forbidden implementation details, no unverified claims.
+- **(b) reference/sample_format.md** — Section matches required structure, heading levels, and the intent of that section (e.g. Overview: intro + "This EI serves as..." + bullets + closing + data sources; Problem: three bold subsections with bullets; Resolution: Immediate Response / System Assessment / Corrective Actions).
+- **(c) Benchmark** — File path from the narrative context’s **Benchmark path (for verification)**. Style, depth, paragraph/bullet counts, and tone must align with that doc.
+
+If **any** check fails, revise the draft and re-run all three checks. Do **not** write to the file until all three pass.
+
+### Step 3 — Accept and Edit
+
+- Replace **only** the current placeholder (e.g. `[TODO: General Overview]`) with the verified content.
+- **Immediately** read the file after the edit to confirm the change.
+- Then proceed to the next placeholder and repeat Steps 1–3.
+
+---
+
+## Output
+
+- **Result:** Each of the three placeholders in `output/Explanation_<base>.md` is replaced by verified narrative.
+- **Constraint:** No placeholder is replaced by content that has not passed (a) .cursor rules, (b) reference/sample_format.md, (c) benchmark.
+- **No new files:** All edits are in the existing `output/Explanation_<base>.md`.
+
+---
+
+## Summary
+
+| Placeholder                 | Draft from context + sample_format + _Parameters.docx + .cursor rules |
+|----------------------------|-----------------------------------------------------------------------|
+| Verify before replacing    | (a) .cursor rules  (b) reference/sample_format.md  (c) benchmark       |
+| After replacing            | Read the file to confirm the edit                                    |
+
+Do all three TODOs in sequence; for each, verify against all three authorities, then replace, then read the file.
