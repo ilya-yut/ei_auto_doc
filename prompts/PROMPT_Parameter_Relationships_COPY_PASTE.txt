@@ -1,0 +1,43 @@
+You are documenting the Parameter Relationships subsection for an SAP Exception Indicator (EI) / function module. You will receive FOUR inputs: (1) Output structure / fields file, (2) Parameters (Name (Description)) file — the Parameters sheet from the Available fields Excel for this EI, (3) ABAP code file, (4) Selected parameters file — reusable explanation text for parameters (path: C:\vibe code dev\ei_auto_doc\reference\_Parameters.docx).
+
+Your task: Identify which parameters actually work together (relationships visible in code, in _Parameters.docx, or clear business logic). Output ONLY the "Parameter Relationships" subsection — or omit this subsection entirely if there are no such relationships.
+
+Relationship discovery:
+1. Search the Selected parameters file (_Parameters.docx): For every parameter in the Parameters (Name (Description)) file, look up that parameter in _Parameters.docx. Where the file describes how parameters work together, connections between parameters, or "Work together / Connection" (or similar), use that to identify relationship groups and to align wording. Adjust table/field/domain terms to match this EI; do not copy verbatim if the function differs.
+2. Always check all time-related parameters from the Parameters (Name (Description)) file against the ABAP code. In most cases some time parameters will have visible relations (e.g. BACKDAYS + date reference, DURATION + DURATION_UNIT, date field parameters).
+3. Always check aggregation-related parameters against the code. Aggregation may connect to other fields or parameters (e.g. AGGR_PERIOD, AGGR_FIELDS, grouping keys).
+4. If the code shows relationships beyond time and aggregation (e.g. partner pairs, threshold filters, key/structure parameters), add those groups to this subsection.
+5. Reference ONLY parameters that appear in the Parameters (Name (Description)) file for this EI. Do not mention parameters not in that file.
+6. This subsection must NOT list all parameters from the Parameters file. Only parameters with a verified relationship (from code or clear business logic) belong here. In typical EIs, only a minority of parameters have relationships (~20–30% of the full list max). If your analysis yields 0 relationships, double-check the code (time/aggregation usage). If it yields relationships for most parameters, double-check and keep only those with clear, code-visible relationships.
+
+Structure:
+- Use bold sub-section titles for each relationship group (e.g. **Time-Based Parameters:**, **Aggregation Parameters:**, **Business Partner Parameters:**). Groupings are free-form and depend on the actual relationships you find.
+- Under each group: bullet lists describing how those parameters work together. Optionally add **Example Configuration:** and **Result:** where it helps.
+- Serial-number series (e.g. KEY1–KEY10, KEY1_DS–KEY10_DS): if relevant for a group, describe them as a group (e.g. "KEY1–KEY10 work with TABNAME to define key structure"). Describe individually only if business meaning differs strongly despite similar naming.
+
+OUTPUT FORMAT:
+- If there are one or more relationship groups: output the heading "### Parameter Relationships", then your groupings (bold sub-headings + bullets, optional example/result). No fixed intro sentence; content is free-form.
+- If there are no relationships: do not output the "Parameter Relationships" subsection at all (omit it entirely).
+
+Rules:
+- Search _Parameters.docx: For every parameter in the Parameters (Name (Description)) file, search _Parameters.docx for that parameter. Where it describes how parameters work together or connections, use that to identify and describe relationship groups. Adjust wording to match this EI.
+- Only include parameters that have a verified relationship in code, in _Parameters.docx, or clear business logic. Do not list every parameter.
+- Parameter scope: mention ONLY parameters from the Parameters (Name (Description)) file for this EI.
+- Verification: If you end up with 0 relationship groups, re-check the code for time and aggregation usage before omitting. If you end up with relationship groups covering most of the parameter list, re-check and reduce to only parameters with clear, code-visible relationships (~20–30% max typical).
+- Serial-number series: describe as a group when relevant unless business meaning differs strongly by index.
+- Tone: professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
+- Non-standard entities: avoid Z*, Y*, /SKN/*, etc., unless necessary.
+- Output: ONLY "### Parameter Relationships" (and its content) when relationships exist; output nothing for this subsection when none exist. No other sections, no document title, no preamble.
+
+Benchmark (structure and level of detail). Source: reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.md — subsection "### Parameter Relationships".
+
+Output structure / fields file location or paste:
+
+Parameters (Name (Description)) file location or paste:
+
+ABAP code file location or paste:
+
+Selected parameters file: C:\vibe code dev\ei_auto_doc\reference\_Parameters.docx (if LLM cannot read .docx, paste relevant parameter explanations or provide text export)
+---
+
+Respond with ONLY the "### Parameter Relationships" subsection (heading + content) when relationships exist, or with nothing for this subsection when none exist. No other text.
