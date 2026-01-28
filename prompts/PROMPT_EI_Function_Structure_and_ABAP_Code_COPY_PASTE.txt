@@ -1,0 +1,47 @@
+You are documenting the EI Function Structure (output fields table) and the ABAP Code (function module source) for an SAP Exception Indicator (EI) / function module. You will receive TWO inputs: (1) Output structure / fields file (e.g. Structure_*.xlsx or its table content), (2) ABAP code file (e.g. Code_*.txt).
+
+Your task: Produce ONLY two sections in this order:
+
+1. EI Function Structure — A table with ALL rows from the structure file. Use this intro sentence verbatim: "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations." Table columns: Structure Name, Field Name, Description, Data Type, Component Type. Copy every row from the structure input; do not add, remove, or merge rows. If the structure file has Data Type and length in separate columns, combine in the output as e.g. DATS(8), CHAR(4), CURR(15,2) to match the benchmark; otherwise use values as provided.
+
+2. ABAP Code — One code block with the ENTIRE ABAP source from the code file. Copy verbatim; do not summarize or omit. Use heading "## ABAP Code" and a fenced code block with language "abap".
+
+EI Function Structure:
+- Heading: ## EI Function Structure
+- Intro (constant): "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+- Table header: | Structure Name | Field Name | Description | Data Type | Component Type |
+- Body: copy every data row from the structure input. Data Type as TYPE(LENGTH) when source has type+length (e.g. DATS(8), CHAR(4)); otherwise as in source. No row omissions.
+
+ABAP Code:
+- Heading: ## ABAP Code
+- Fenced code block: ```abap ... ``` with full source from the code file, verbatim, all lines.
+
+OUTPUT FORMAT (follow exactly):
+
+## EI Function Structure
+
+This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations.
+
+| Structure Name | Field Name | Description | Data Type | Component Type |
+|----------------|------------|-------------|-----------|----------------|
+[copy all rows from structure input]
+
+## ABAP Code
+
+```abap
+[full ABAP source from code file – every line, verbatim]
+```
+
+Rules:
+- EI Function Structure: all rows from structure file; exact benchmark intro sentence; columns Structure Name, Field Name, Description, Data Type, Component Type; Data Type in benchmark style (e.g. DATS(8)) when source has type+length. No added/removed/merged rows.
+- ABAP Code: entire source in one ```abap block, verbatim.
+- Output: ONLY these two sections. No other sections, no document title, no preamble.
+
+Benchmark (structure and constant text). Source: reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.md — sections EI Function Structure and ABAP Code. Use same headings, intro sentence, table format, and code block format; content from your two inputs.
+
+Output structure / fields file location or paste:
+
+ABAP code file location or paste:
+---
+
+Respond with ONLY the two sections in order: (1) "## EI Function Structure" (intro + full table from structure input), (2) "## ABAP Code" (full code block from code input). No other text.
