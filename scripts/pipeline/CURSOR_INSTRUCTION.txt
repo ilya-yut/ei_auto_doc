@@ -1,0 +1,23 @@
+Generate the 7 EI documentation sections and write each to a file. Do not add a document title or preamble.
+
+1. Read each prompt file from this project in order:
+   - scripts/pipeline/run/01_prompt.txt
+   - scripts/pipeline/run/02_prompt.txt
+   - scripts/pipeline/run/03_prompt.txt
+   - scripts/pipeline/run/04_prompt.txt
+   - scripts/pipeline/run/05_prompt.txt
+   - scripts/pipeline/run/06_prompt.txt
+   - scripts/pipeline/run/07_prompt.txt
+
+2. For each prompt file, follow the instructions in it. Use the file paths given inside the prompt to read the input files from the workspace (input folder or paths specified in the prompt).
+
+3. Write the output for each prompt to the corresponding response file (only the section content requested by the prompt, no extra title or preamble):
+   - 01_prompt.txt → scripts/pipeline/run/01_response.md
+   - 02_prompt.txt → scripts/pipeline/run/02_response.md
+   - 03_prompt.txt → scripts/pipeline/run/03_response.md
+   - 04_prompt.txt → scripts/pipeline/run/04_response.md
+   - 05_prompt.txt → scripts/pipeline/run/05_response.md
+   - 06_prompt.txt → scripts/pipeline/run/06_response.md
+   - 07_prompt.txt → scripts/pipeline/run/07_response.md
+
+4. Produce exactly 7 response files. When all 7 are written, tell me so I can run the assemble step.

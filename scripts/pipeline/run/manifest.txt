@@ -1,0 +1,2 @@
+output_basename=Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT
+title=Exception Indicator: SD Delivery Status (General) - SW_10_01_DLV_STAT

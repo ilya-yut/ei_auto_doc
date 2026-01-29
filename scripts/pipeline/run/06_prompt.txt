@@ -1,0 +1,137 @@
+# Default Values and Practical Configuration Examples – prompt for any EI / function module
+
+Use this prompt to generate **only** two subsections of the Parameters section for an SAP Exception Indicator (EI) document: (1) **Default Values**, and (2) **Practical Configuration Examples**. Provide the three input files (or their contents) under the headings at the end, then send the whole thing to the LLM.
+
+---
+
+## Role and task
+
+You are documenting **Default Values** and **Practical Configuration Examples** for an SAP Exception Indicator (EI) / function module. You will receive **three** inputs:
+
+1. **Output structure / fields file** – structure (e.g. Excel or table) listing all output fields of the EI.
+2. **Parameters (Name (Description)) file** – the **Parameters** sheet from the Available fields Excel for this EI (same as used for the Parameters Reference Table). Contains the full list of parameters for this function.
+3. **ABAP code file** – the function module source code.
+
+**Your task:** Produce **two** subsections in order:
+
+1. **Default Values** – List parameters that have a default that can be overridden by the caller. **Include both:** (a) parameters with an **explicit default value** in the code (e.g. assignment when empty, assignment before read), and (b) parameters that **effectively default to initial** (empty for CHAR1/flag, 0 for numeric) when not supplied — document these as "Default: initial (empty)" or "Default: initial (0)" with brief meaning. Only parameters that appear in the Parameters (Name (Description)) file belong here. If none are found after double-checking the code, **omit this subsection entirely**. There is typically at least one such parameter per EI.
+
+2. **Practical Configuration Examples** – **Mandatory.** Produce 1–5 use cases (see rules below) as code blocks with a business-meaning title and a **Purpose:** paragraph per use case. Each use case must reflect real business scenarios. When the Parameters file contains date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), use **a subset** per use case so that business logic stays clear and easily understandable for SAP business/technical professionals; do not use all date-related parameters in a single use case.
+
+---
+
+## How to produce the Default Values subsection
+
+1. **Systematic check:** For every parameter in the Parameters (Name (Description)) file that is read as a **single value** (e.g. via SELECT_SINGLE, DATA_SINGLE, or equivalent), determine:
+   - **(a)** Is it **assigned a value before** being read from the caller? (e.g. LV_LANGU = SY-LANGU before SELECT_SINGLE → default system language.)
+   - **(b)** Is it **assigned a value when initial**? (e.g. IF LV_BACKDAYS IS INITIAL. LV_BACKDAYS = 1.)
+   - **(c)** If not supplied, does it **remain initial** and is that value used in the logic? (e.g. IF LV_REPETITIVE EQ 'X' → initial = off/standard mode; DATE_FROM = SY_DATLO - LV_REPET_BACKDAYS → initial = 0.)
+   If (a), (b), or (c), include it in Default Values.
+
+2. **Include initial-as-default:** Parameters that have **no assignment** but are **used when initial** (empty or 0) must be included. Document as: **PARAM** — Default: initial (empty); [brief meaning when not supplied]. Or **PARAM** — Default: initial (0); [brief meaning when not supplied].
+
+3. **Format:** Bullet list: **PARAM_NAME** — Default: `value` or Default: initial (empty) or Default: initial (0) (brief meaning in parentheses if helpful). Do **not** include line numbers or other implementation details. Examples: **BACKDAYS** — Default: `1` (when REPETITIVE = 'X' and not supplied). **REPETITIVE** — Default: initial (empty); standard mode when not supplied. **REPET_BACKDAYS** — Default: initial (0); repetitive window starts today when not supplied.
+
+4. **Optional Note:** Add a short **Note:** after the list only when useful (e.g. behavior when a parameter is not specified, or period alignment).
+
+5. **If no defaults found:** Re-scan the code using the (a)(b)(c) check above. If still none, **omit the "Default Values" subsection** (output nothing for that subsection).
+
+---
+
+## How to produce the Practical Configuration Examples subsection
+
+1. **Mandatory.** This subsection must always be present with at least one use case.
+
+2. **Number of use cases:**
+   - **Very few parameters** (e.g. only a counter or 1–2 parameters): **1–2** use cases.
+   - **Multiple parameters** (typical EI): **3–4** use cases.
+   - **Many very specific parameters** (aggregation, pseudo-SQL fields, fancy date relationships): **4–5** use cases.
+
+3. **Date-related parameters:** When the Parameters file contains multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS, BACKMONTHS, COMPMONTHS), **do not use them all in one use case**. Use **a subset** per use case so that business logic stays clear and easily understandable for professionals in the respective SAP business/technical domain. Spread date-related parameters across use cases; in each use case include only those that fit the scenario. Do not invent parameters that are not in the Parameters file.
+
+4. **Business meaning:** For each use case, choose a **clear business scenario** (e.g. "Monthly High-Value Sales Monitoring", "Weekly Customer Sales Pattern Analysis"). The **Purpose:** paragraph must explain what the configuration achieves in business terms and when it is useful.
+
+5. **Parameter scope:** Use **only** parameters that appear in the Parameters (Name (Description)) file for this EI. Do not reference parameters not in that file.
+
+6. **Format per use case:**
+   - **Use Case N: [Business-meaning title]**
+   - Code block with one parameter per line: `PARAM = value` or `PARAM = value range`. Optionally a short inline comment.
+   - **Purpose:** One or two sentences describing the business scenario and what the configuration achieves.
+
+---
+
+## Output format (follow exactly)
+
+Output **strictly** the following, in this order. Nothing else.
+
+### Default Values
+
+- **PARAM1** — Default: `value` (brief meaning if helpful).
+- **PARAM2** — Default: initial (empty); [brief meaning when not supplied].
+- **PARAM3** — Default: initial (0); [brief meaning when not supplied].
+
+**Note:** (Optional; only if useful.)
+
+*(If no parameters with defaults (explicit or initial-as-default) are found in the code after double-checking, omit this entire subsection — do not output the heading or any placeholder.)*
+
+### Practical Configuration Examples
+
+**Use Case 1: [Business-meaning title]**
+```
+PARAM1 = value
+PARAM2 = value
+...
+```
+**Purpose:** [One or two sentences: business scenario and what the configuration achieves.]
+
+**Use Case 2: [Business-meaning title]**
+```
+...
+```
+**Purpose:** ...
+
+*(Continue for 1–5 use cases depending on parameter complexity. This subsection is mandatory; output at least one use case.)*
+
+---
+
+## Rules
+
+- **Default Values:** Include parameters that have a default that can be overridden: **(1)** explicit default in code (assignment when empty, assignment before read), **(2)** effective default to initial (empty for CHAR1/flag, 0 for numeric) when not supplied — document as "Default: initial (empty)" or "Default: initial (0)" with brief meaning. For every single-value parameter in the Parameters file, check (a) assigned before read, (b) assigned when initial, (c) used when initial; if any, include it. If none found after double-checking, omit the Default Values subsection entirely. Do not include line numbers or implementation details.
+- **Practical Examples:** This subsection is **mandatory.** Output at least one use case; 1–5 use cases depending on parameter count and complexity (see above). Every use case must have a business-meaning title and a **Purpose:** paragraph.
+- **Date parameters:** When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case. Use a subset per use case so business logic stays clear and easily understandable for SAP business/technical professionals.
+- **Parameter scope:** Mention **only** parameters that appear in the Parameters (Name (Description)) file for this EI.
+- **Tone:** Professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
+- **Non-standard entities:** Avoid mentioning non-standard entities (e.g. Z*, Y*, /SKN/*) unless necessary.
+- **Output scope:** Only the two subsections (Default Values when present, Practical Configuration Examples always). No other sections, no document title, no preamble.
+
+---
+
+## Benchmark reference (structure and level of detail – do not copy content)
+
+Use the **Default Values** and **Practical Configuration Examples** subsections in the benchmark for structure and level of detail only. Infer content for the function you are given from the three inputs. (In the benchmark file the first subsection is titled "Default Values and Parameter Options Explicitly Stated in EI Code"; in your output use the heading **### Default Values**.)
+
+**Source:** `reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.md` (subsections for default values and practical examples).
+
+**Structure in benchmark:**
+- **Default Values:** Bullet list — **PARAM** — Default: `value` or Default: initial (empty) or Default: initial (0) (brief meaning). Include both explicit defaults and parameters that default to initial when not supplied. Optional **Note:**. No line numbers. If the code uses parameters when initial (e.g. IF LV_FLAG EQ 'X', or DATE_FROM = ... - LV_NUM), document their default as initial (empty) or initial (0) with brief meaning.
+- **Practical Examples:** **Use Case N: [Title]**, code block (PARAM = value per line), **Purpose:** paragraph. Use cases with a subset of date/aggregation/threshold parameters per use case for clarity; each has clear business meaning.
+
+---
+
+## Inputs (provide below)
+
+**1. Output structure / fields file** (path or paste):
+
+C:\vibe code dev\ei_auto_doc\input\Structure_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.xlsx
+
+**2. Parameters (Name (Description)) file** (path or paste – Parameters sheet from Available fields Excel):
+
+C:\vibe code dev\ei_auto_doc\input\Available fields_SD Delivery Status (General)_SW_10_01_DLV_STAT.xlsx
+
+**3. ABAP code file** (path or paste):
+
+C:\vibe code dev\ei_auto_doc\input\Code_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.txt
+
+---
+
+Respond with **only** the two subsections in order: (1) "### Default Values" (omit entirely if no defaults found in code), (2) "### Practical Configuration Examples" (mandatory, 1–5 use cases). No other sections or text.
