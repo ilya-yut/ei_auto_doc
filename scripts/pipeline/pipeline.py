@@ -515,9 +515,9 @@ def assemble() -> None:
         md2docx.convert_md_to_docx(out_md, out_docx)
         print("Wrote", out_docx)
     except ImportError as e:
-        print("MD→DOCX converter unavailable (install markdown, beautifulsoup4). Skipping .docx.", e)
+        print("MD->DOCX converter unavailable (install markdown, beautifulsoup4). Skipping .docx.", e)
     except Exception as e:
-        print("MD→DOCX conversion failed. Markdown is ready.", e)
+        print("MD->DOCX conversion failed. Markdown is ready.", e)
 
 
 def main() -> None:

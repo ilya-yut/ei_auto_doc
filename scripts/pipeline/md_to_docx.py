@@ -31,7 +31,7 @@ def _add_code_block(doc, code_text: str) -> None:
 def _add_table_from_html(doc, table_element) -> None:
     from docx.oxml import OxmlElement
     from docx.oxml.ns import qn
-    from docx.shared import RGBColor
+    from docx.shared import Inches, RGBColor
 
     BLACK = RGBColor(0, 0, 0)
     rows_el = table_element.find_all("tr")
@@ -74,6 +74,21 @@ def _add_table_from_html(doc, table_element) -> None:
     for row in table.rows:
         for cell in row.cells:
             set_cell_border(cell)
+
+    # Explicit column widths so # and Type (and other narrow cols) fit content
+    if num_cols == 8:
+        # Parameters Reference Table: #, Parameter, Description, Type, Length, Decimal, Data Element, Domain
+        widths_8 = (0.45, 1.35, 2.2, 0.65, 0.5, 0.5, 1.05, 0.85)
+        for i, w in enumerate(widths_8):
+            if i < num_cols:
+                table.columns[i].width = Inches(w)
+    elif num_cols == 5:
+        # EI Function Structure: Structure Name, Field Name, Description, Data Type, Component Type
+        widths_5 = (1.5, 1.25, 2.5, 0.85, 1.1)
+        for i, w in enumerate(widths_5):
+            if i < num_cols:
+                table.columns[i].width = Inches(w)
+
     doc.add_paragraph()
 
 

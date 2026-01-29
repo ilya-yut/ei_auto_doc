@@ -2,18 +2,19 @@
 
 ## General Overview
 
-This Exception Indicator (EI) monitors SD delivery document status and related header/item statuses in Sales and Distribution to identify deliveries that meet configurable date, organizational, status, and partner criteria. It provides visibility into delivery status patterns, goods movement status, billing status, and credit-check status, enabling detection of blocked deliveries, delayed processing, and status anomalies that require management attention.
+This Exception Indicator (EI) monitors SD delivery document status and related header and item statuses in Sales and Distribution to identify deliveries that meet configurable date, organizational, status, and partner criteria. It provides visibility into delivery status patterns, goods movement status, billing status, and credit-check status, enabling detection of blocked deliveries, delayed processing, and status anomalies that require management attention.
 
 This EI serves as an essential control for delivery and order fulfillment oversight by:
-- Filtering delivery data by a configurable time window (BACKDAYS) and by a reference date field (e.g. planned goods movement date, delivery date, picking date)
-- Calculating status duration in selected time units (DURATION, DURATION_UNIT) relative to the reference date for age-in-status analysis
-- Supporting filtering by sales organization, distribution channel, division, shipping point, route, customer (ship-to, sold-to), and three configurable business partner roles
-- Enabling multi-dimensional filtering by delivery, billing, picking, packing, and goods movement statuses (WBSTK, FKSTK, LFSTA, KOSTK, etc.) and by document characteristics (type, category, material, sales office)
-- Providing partner enrichment (BP1/BP2/BP3 code, function, name) from VBPA for relationship and accountability visibility
+- Enabling detection of blocked or aged deliveries that require release or escalation
+- Supporting identification of billing blocks and credit blocks that delay revenue recognition and collection
+- Providing visibility into status duration for prioritization and root-cause analysis of delivery delays
+- Enabling delivery performance and concentration analysis by organization, channel, and customer for resource allocation
+- Supporting accountability and relationship visibility by sold-to, ship-to, and other partner roles for dispute and fulfillment oversight
 
 This monitoring supports identification of deliveries stuck in specific statuses, billing blocks, credit blocks, and delayed goods movements. The EI is valuable for order-to-cash reviews, delivery performance analysis, and exception management in SD.
 
-The EI retrieves delivery and status data from SAP SD tables (LIKP – Delivery Header, LIPS – Delivery Item, VBUK – SD Document Header Status, VBUP – SD Document Item Status, VBAK – Sales Document Header), joins to VBAP for order item data and to VBPA and KNA1 for partner and customer names, then filters by all configured parameters and computes duration per delivery line. Results are returned in the T_DATA structure for reporting and alerting.
+The EI uses delivery and status data from SAP SD (LIKP, LIPS, VBUK, VBUP, VBAK) and partner and customer data (VBPA, KNA1) and aggregates by time period and organizational dimensions.
+
 
 ## Problem Description
 
@@ -176,423 +177,456 @@ This table lists all configurable input parameters. Users set values for these p
 
 **AEDAT** (Changed On):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Filters delivery and delivery-item data by the "changed on" date (LIKP/LIPS header and line). The EI applies this to the date range derived from BACKDAYS and DATE_REF_FLD when DATE_REF_FLD is set to AEDAT. Use to focus on recently changed deliveries.
 
 **ARKTX** (Description):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Material description (LIPS-ARKTX). Use to filter deliveries by item description text. Populates the output when in the structure; supports range or single value.
 
 **AUART** (Sales Document Type):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales document type from the reference order (VBAK-AUART via LIPS-VGBEL/VGPOS). Filters deliveries by the type of the originating sales order. Use to restrict to specific order types (e.g. standard orders, returns).
 
 **BACKDAYS** (Backdays):
 
 Number of days to look back from today. When no date range is supplied, the EI builds the selection using SY-DATUM minus BACKDAYS. Used to limit the delivery date window.
 
+**BACKDAYS and DATE_REF_FLD Connection:**
+
+BACKDAYS defines how many days back from today the window starts. DATE_REF_FLD selects which date field (e.g. WADAT, LFDAT, ERDAT) is used for that window. Together they determine which deliveries fall into the selection. Set BACKDAYS first, then choose DATE_REF_FLD to match the business date you care about (e.g. planned goods movement vs delivery date).
+
 **BLOCK** (Indicator: Document preselected for archiving):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Indicator from VBUK-BLOCK. Filters deliveries by archiving preselection. Use to include or exclude documents marked for archiving.
 
 **BLOCK_DESC** (Billing block desc.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Text description for the billing block (FAKSK), resolved via function for display. Populated by the EI from FAKSK; use FAKSK to filter by billing block.
 
 **BP1_CODE** (Partner1 - Code):
 
-Partner code for first partner role. Filters deliveries by this partner and populates the output; BP1_NAME is enriched from customer master.
+Partner number for the first partner role. Filters deliveries by this partner (from VBPA). BP1_NAME is populated from customer master (KNA1). Use with BP1_FUNCT to define the role (e.g. sold-to, ship-to).
 
 **BP1_FUNCT** (Partner1 - Function):
 
-Partner function for first business partner (e.g. sold-to, ship-to). Used with BP1_CODE to filter and enrich partner data from VBPA.
+Partner function for the first business partner (PARVW). Used with BP1_CODE to filter and enrich partner data from VBPA.
+
+**BP1_FUNCT Options:**
+
+- **AG**: Sold-to party  
+- **WE**: Ship-to party  
+- **RE**: Bill-to party  
+- **SP**: Contact person  
+(Other PARVW values apply; use the value that matches the role you want to filter by.)
 
 **BP1_NAME** (Name):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Name of the first partner (from KNA1-NAME1). Populated by the EI from customer master based on BP1_CODE. Use for display; filter by BP1_CODE.
 
 **BP2_CODE** (Partner2 - Code):
 
-Partner code for second partner role. Filters and enriches output.
+Partner code for the second partner role. Filters and enriches output; works with BP2_FUNCT and BP2_NAME.
 
 **BP2_FUNCT** (Partner2 - Function):
 
-Partner function for second business partner. Works with BP2_CODE and BP2_NAME.
+Partner function for the second business partner. Works with BP2_CODE and BP2_NAME.
 
 **BP2_NAME** (Name):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Name of the second partner. Populated from customer master. Filter by BP2_CODE.
 
 **BP3_CODE** (Partner3 - Code):
 
-Partner code for third partner role. Filters and enriches output.
+Partner code for the third partner role. Filters and enriches output.
 
 **BP3_FUNCT** (Partner3 - Function):
 
-Partner function for third business partner. Works with BP3_CODE and BP3_NAME.
+Partner function for the third business partner. Works with BP3_CODE and BP3_NAME.
 
 **BP3_NAME** (Name):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Name of the third partner. Populated from customer master. Filter by BP3_CODE.
 
 **BZIRK** (Sales district):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales district (LIKP-BZIRK). Filters deliveries by sales district. Supports range selection.
 
 **CMGST** (Overall CreditStatus):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall credit status (VBUK-CMGST). Filters deliveries by credit check status. Use to focus on blocked or released deliveries.
 
 **COSTA** (Confirmation status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Confirmation status at item level. Filters by confirmation status. Supports range or single value.
 
 **DATE_REF_FLD** (Date Ref Field):
 
-Field used as the reference date for filtering and for duration calculation (e.g. WADAT, LFDAT, ERDAT, AEDAT, KODAT). The EI maps this to the corresponding delivery/header date range and uses it to compute status duration.
+Field name used as the reference date for the selection window and for duration calculation. The EI maps this to the corresponding delivery/header date and uses it with BACKDAYS to build the date range and with DURATION/DURATION_UNIT to compute how long the delivery has been in the current status.
+
+**DATE_REF_FLD Options:**
+
+- **ERDAT**: Created on  
+- **AEDAT**: Changed on  
+- **LDDAT**: Loading date  
+- **TDDAT**: Transportation planning date  
+- **KODAT**: Picking date  
+- **WADAT**: Planned goods movement date (default in code)  
+- **WADAT_IST**: Actual goods movement date  
+- **LFDAT**: Delivery date  
+- **FKDAT**: Billing date  
 
 **DUMMY** (Single-Character Flag):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Single-character flag; technical or placeholder. Use as required by the front end or selection interface.
 
 **DURATION** (Duration In Time Units):
 
-Duration in the selected time unit (see DURATION_UNIT) between the reference date (DATE_REF_FLD) and current date. The EI calculates this per delivery and filters by the supplied range to focus on aged-in-status deliveries.
+Duration in the selected time unit (see DURATION_UNIT) between the reference date (DATE_REF_FLD) and current date. The EI calculates this per delivery and filters by the supplied range to focus on deliveries that have been in the current status for a given length of time.
+
+**DURATION and DURATION_UNIT Connection:**
+
+DURATION gives the numeric value (e.g. 7); DURATION_UNIT gives the unit (e.g. D = days). Together they define the "age in status" filter. DATE_REF_FLD determines which date is used as the start for the calculation. Set all three when filtering by how long deliveries have been in status.
 
 **DURATION_D** (Duration In Days):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Duration in days (calculated/output). Use to filter or display age in days when the unit is days.
 
 **DURATION_UNIT** (Duration Unit):
 
-Unit for duration calculation (e.g. D = days). Used together with DATE_REF_FLD and DURATION to filter deliveries by how long they have been in the current status.
+Unit for duration calculation. Used with DATE_REF_FLD and DURATION to filter deliveries by how long they have been in the current status.
+
+**DURATION_UNIT Options:**
+
+- **D**: Days (default in code)
 
 **ERDAT** (Created On):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Creation date of the delivery (LIKP-ERDAT). Filters by creation date. Used in the date range when DATE_REF_FLD = ERDAT.
 
 **ERNAM** (Created By):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+User who created the delivery (LIKP-ERNAM). Filters by creator. Supports range or single value.
 
 **ERZET** (Time):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Creation time. Filters by time when time-based selection is used.
 
 **FAKSK** (Billing block):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Billing block (LIKP-FAKSK). Filters deliveries by billing block. BLOCK_DESC provides the text for the code.
 
 **FKDAT** (Billing Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Billing date (LIKP-FKDAT). Filters by billing date. Used in the date range when DATE_REF_FLD = FKDAT.
 
 **FKIVK** (Totals status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Totals status (VBUK-FKIVK). Filters by billing totals status.
 
 **FKIVP** (Interco. Bill.Status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Intercompany billing status (VBUK-FKIVP). Filters by intercompany billing status.
 
 **FKSTA** (Billing Status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Billing status at item level (VBUP-FKSTA). Filters by line-level billing status.
 
 **FKSTK** (Billing status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall billing status (VBUK-FKSTK). Filters by header billing status.
 
 **HDALL** (On Hold):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Header-level hold indicator. Filters deliveries that are on hold.
 
 **HDALS** (Pos. Hold):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Item-level hold indicator. Filters by position hold.
 
 **KDAUF** (Sales Order):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales order number (LIKP/LIPS reference). Filters deliveries by the originating sales order. Supports range selection.
 
 **KDGRP** (Customer group):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Customer group (LIKP-KDGRP). Filters by customer group. Supports range selection.
 
 **KDPOS** (Sales order item):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales order item number. Filters by order item when analyzing at item level.
 
 **KLMENG** (Cumul.confirmed qty):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Cumulative confirmed quantity from the sales order (VBAP-KLMENG). Output/display; use for value-based analysis.
 
 **KODAT** (Picking Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Picking date (LIKP-KODAT). Filters by picking date. Used in the date range when DATE_REF_FLD = KODAT.
 
 **KOQUA** (Pick confirmation):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Pick confirmation status at item level. Filters by pick confirmation.
 
 **KOQUK** (Pick confirmation):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Pick confirmation (alternate). Filters by pick confirmation status.
 
 **KOSTA** (Picking status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Picking status at item level (VBUP-KOSTA). Filters by picking status.
 
 **KOSTK** (Overall pick.status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall picking status (VBUK-KOSTK). Filters by header picking status.
 
 **KUNAG** (Sold-to party):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sold-to party (LIKP-KUNAG). Filters deliveries by sold-to customer. SOLDTO_DESC is populated from KNA1.
 
 **KUNNR** (Ship-to party):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Ship-to party (LIKP-KUNNR, from LIKP-KUNWE in code). Filters deliveries by ship-to customer. SHIPTO_DESC is populated from KNA1.
 
 **KWMENG** (Order Quantity):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Order quantity from the sales order. Output/display; use for quantity-based analysis.
 
 **LANG** (Language for texts):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Language for descriptions (e.g. BLOCK_DESC, MPROK_DESC). Drives text resolution.
 
 **LDDAT** (Loading Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Loading date (LIKP-LDDAT). Filters by loading date. Used when DATE_REF_FLD = LDDAT.
 
 **LFART** (Delivery Type):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery type (LIKP-LFART). Filters by delivery type. Supports range selection.
 
 **LFBNR** (Reference Document):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Reference document number. Filters by reference document.
 
 **LFDAT** (Delivery Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery date (LIKP-LFDAT). Filters by delivery date. Used when DATE_REF_FLD = LFDAT.
 
 **LFGSA** (Overall deliv.status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall delivery status (VBUK-VBUP). Filters by overall delivery status.
 
 **LFIMG** (Delivery quantity):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery quantity (LIPS-LFIMG). Filters or displays delivered quantity.
 
 **LFPOS** (Reference Doc. Item):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Reference document item. Filters by reference item.
 
 **LFSTA** (Delivery status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery status at item level (VBUP-LFSTA). Filters by line delivery status.
 
 **LGMNG** (Actual delivery qty):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Actual delivered quantity in stockkeeping units (LIPS-LGMNG). Output; used for quantity analysis.
 
 **LVSTA** (WM activity status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Warehouse management activity status. Filters by WM status.
 
 **LVSTK** (Overall WM status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall WM status. Filters by warehouse management status.
 
 **MANAGE_IN_UTC** ('X' - Manage in UTC):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+When set (e.g. 'X'), date/time handling uses UTC. Use when working across time zones.
 
 **MATKL** (Material Group):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Material group (LIPS-MATKL). Filters by material group. WGBEZ provides the group description.
 
 **MATNR** (Material):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Material number (LIPS-MATNR). Filters deliveries by material. Supports range selection.
 
 **MEINS** (Base Unit of Measure):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Base unit of measure (LIPS-MEINS). Filters or displays UoM.
 
 **MPROK** (Manual price):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Manual price indicator (VBAP-MPROK). Filters by manual pricing. MPROK_DESC provides the short text.
 
 **MPROK_DESC** (Short text):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Short text for manual price (MPROK). Populated by the EI from domain MPROK; use for display.
 
 **NETWR_LIPS** (Net Value):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Net value at delivery item level (derived from LIPS/VBAP). Output for value analysis.
 
 **NETWR_VBAP** (Net value):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Net value from the sales order (VBAP). Output for value analysis.
 
 **PDSTA** (Proof of delivery status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Proof of delivery status at item level. Filters by POD status.
 
 **PDSTK** (Proof of delivery status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall proof of delivery status. Filters by POD status.
 
 **PKSTA** (Packing status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Packing status at item level. Filters by packing status.
 
 **PKSTK** (Packing status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Overall packing status. Filters by packing status.
 
 **PODAT** (Proof of delivery date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Proof of delivery date. Filters by POD date.
 
 **POSNR** (Item):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery item number (LIPS-POSNR). Filters by item position.
 
 **PSTYV** (Item category):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Item category (LIPS-PSTYV). Filters by item category.
 
 **ROUTE** (Route):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Route (LIKP-ROUTE). Filters by route. Supports range selection.
 
 **SHIPTO_DESC** (Name):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Ship-to party name (KNA1-NAME1 for KUNNR). Populated by the EI from customer master. Use for display; filter by KUNNR.
 
 **SOLDTO_DESC** (Name):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sold-to party name (KNA1-NAME1 for KUNAG). Populated by the EI from customer master. Use for display; filter by KUNAG.
 
 **SPART** (Division):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Division (LIPS-SPART). Filters by division. Supports range selection.
 
 **SPE_TMPID** (Temp Inb.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Temporary inbound indicator. Filters by temporary inbound flag.
 
 **TDDAT** (Transptn Plang Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Transportation planning date (LIKP-TDDAT). Filters by transport planning date. Used when DATE_REF_FLD = TDDAT.
 
 **TRSTA** (Trns.plan.status):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Transportation planning status. Filters by transport planning status.
 
 **UVK01 - UVK05** (Header reserves 1 - Header reserves 5):
 
-Reserve/status indicators for header (UVK), item (UVP), or total (UVS). Used to filter deliveries by the corresponding status dimension. All five values share the same type and domain.
+Reserve/status indicators at header level (VBUK). Used to filter deliveries by the corresponding status dimension. All five share the same type and domain; use the index that matches the dimension you need.
 
 **UVP01 - UVP05** (Item reserves 1 - Item reserves 5):
 
-Reserve/status indicators for header (UVK), item (UVP), or total (UVS). Used to filter deliveries by the corresponding status dimension. All five values share the same type and domain.
+Reserve/status indicators at item level (VBUP). Used to filter deliveries by the corresponding status dimension. All five share the same type and domain.
 
 **UVPAS** (It.data packaging):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Item data packaging status. Filters by packaging data status.
 
 **UVPIS** (It.data picking/putaway):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Item data picking/putaway status. Filters by picking/putaway status.
 
 **UVS01 - UVS05** (Total reserves 1 - Total reserves 5):
 
-Reserve/status indicators for header (UVK), item (UVP), or total (UVS). Used to filter deliveries by the corresponding status dimension. All five values share the same type and domain.
+Reserve/status indicators for totals. Used to filter deliveries by the corresponding status dimension. All five share the same type and domain.
 
 **VBELN** (Delivery):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Delivery number (LIKP-VBELN). Filters by delivery document. Supports range selection.
 
 **VBTYP** (SD document categ.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+SD document category (LIKP-VBTYP). Filters by document category.
 
 **VESTK** (HU placed in stock):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Handling unit placed in stock indicator. Filters by HU placement status.
 
 **VGBEL** (Reference Document):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Reference document (e.g. sales order) from LIPS. Filters by reference document.
 
 **VGPOS** (Reference Item):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Reference item number. Filters by reference item.
 
 **VGTYP** (SD document categ. (prev)):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+SD document category of the reference document. Filters by reference document category.
 
 **VKBUR** (Sales Office):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales office (LIKP-VKBUR). Filters by sales office. Supports range selection.
 
 **VKORG** (Sales Organization):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales organization (LIKP-VKORG). Filters by sales organization. Supports range selection.
 
 **VLSTK** (Status Decent. Whse):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Status decentral warehouse. Filters by warehouse status.
 
 **VRKME** (Sales Unit):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Sales unit of measure (LIPS-VRKME). Filters or displays sales UoM.
 
 **VSTEL** (Shipping Point/Receiving Pt):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Shipping point (LIKP-VSTEL). Filters by shipping point. Supports range selection.
 
 **VTWEG** (Distribution Channel):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Distribution channel (LIPS-VTWEG). Filters by distribution channel. Supports range selection.
 
 **WADAT** (Pland Gds Mvmnt Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Planned goods movement date (LIKP-WADAT). Filters by planned goods movement date. Default reference date in code when DATE_REF_FLD = WADAT.
 
 **WADAT_IST** (Act. Gds Mvmnt Date):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Actual goods movement date (LIKP-WADAT_IST). Filters by actual goods movement date. Used when DATE_REF_FLD = WADAT_IST.
 
 **WAERK** (Document Currency):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Document currency of the sales order (VBAP-WAERK). Represents the document/transaction currency in which order and delivery values are held. Use for display or currency-based filtering; do not document technical source (e.g. table/join).
 
 **WAVWR** (Cost):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Cost (VBAP-WAVWR). Filters or displays cost. Use for value-based analysis.
 
 **WBSTA** (Goods movement stat.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Goods movement status at item level. Filters by goods movement status.
 
 **WBSTK** (Total gds mvt stat.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Total goods movement status. Filters by overall goods movement status.
 
 **WGBEZ** (Material Group Desc.):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Material group description (MATKL text). Populated by the EI for display. Filter by MATKL.
 
 **XBLNR** (Reference):
 
-Used to filter or control delivery/status data selection or output. See structure and code for field usage and mapping.
+Reference (LIKP-XBLNR). Filters or displays customer reference.
+
 
 ### Parameter Relationships
 
