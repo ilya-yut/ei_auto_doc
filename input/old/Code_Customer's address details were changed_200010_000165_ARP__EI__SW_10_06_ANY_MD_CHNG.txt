@@ -1,0 +1,637 @@
+FUNCTION /skn/f_sw_10_06_md_chng_log.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_MD_CHNG_LOG
+*"----------------------------------------------------------------------
+*** 15.03.21++
+  TYPES: BEGIN OF ty_key_field,
+           tabname   TYPE tabname,
+           fieldname TYPE fieldname,
+         END OF ty_key_field,
+         tt_key_field TYPE STANDARD TABLE OF ty_key_field.
+*** 15.03.21++
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  data_single: manage_in_utc       char1 ,
+               langu               langu,
+               backdays            int4,
+               repet_backdays      int4,        " 31.08.21++
+               convert_key         char1,
+               header_only         char1,
+               repetitive          char1.       " 15.03.21++
+  data_multy:   objectclas        cdobjectcl,
+                objectid          cdobjectv,
+                changenr          cdchangenr,                  " 15.03.21++
+                username          cdusername,
+                tcode             cdtcode,
+                change_ind        cdchngindh,
+                tabname           tabname,
+                fname             fieldname,
+                chngind           cdchngind,
+                udate             cddatum,
+                udate_repet       cddatum,                     " 31.08.21++
+                duration_d        /skn/e_sw_duration_d,
+                datum             sydatum,                    " Paased by SW Online Monitor
+                fname_rep         fieldname.                   " 15.03.21++
+*** 15.03.21++
+  TYPES: BEGIN OF ty_lfbk_key,
+           lifnr TYPE lifnr,
+           banks TYPE banks,
+           bankl TYPE bankl,
+           bankn TYPE bankn,
+         END OF ty_lfbk_key,
+         tt_lfbk_key TYPE STANDARD TABLE OF ty_lfbk_key.
+*** 15.03.21++
+  DATA: lv_fieldname TYPE fieldname,
+        lv_shift     TYPE ddleng,
+        lv_leng      TYPE ddleng.
+  DATA: lv_tabkey_len TYPE i VALUE '70',    "!!!
+        lv_ilen TYPE i.
+  FIELD-SYMBOLS: <fs_old> TYPE any,
+                 <fs_new> TYPE any.
+  DATA : fld TYPE fieldname,
+         ifld TYPE i,
+         ctmp(2) TYPE c.
+  DEFINE populate_key_field .
+    " &1 - Field Index
+    clear lv_FIELDNAME.
+    perform GET_KEY_FIELD  using    LS_DATA-TABNAME
+                                    &1
+                           changing lv_FIELDNAME
+                                    lv_SHIFT
+                                    lv_LENG.
+    if lv_FIELDNAME is not initial.
+      LS_DATA-KEY&1   =  lv_FIELDNAME.
+      lv_ilen = lv_SHIFT + lv_LENG.
+      if lv_ilen <= lv_TABKEY_len.
+        LS_DATA-KEY&1_V =  LS_DATA-TABKEY+lv_SHIFT(lv_LENG).
+      endif.
+      perform get_FIELD_DESC using   LS_DATA-TABNAME
+                                     lv_FIELDNAME
+                                     lv_LANGU
+                            changing LS_DATA-KEY&1_DS.
+    endif.
+  END-OF-DEFINITION .
+  DEFINE populate_key_fields .
+    populate_key_field 1.
+    populate_key_field 2.
+    populate_key_field 3.
+    populate_key_field 4.
+    populate_key_field 5.
+    populate_key_field 6.
+    populate_key_field 7.
+    populate_key_field 8.
+    populate_key_field 9.
+    populate_key_field 10.
+  END-OF-DEFINITION .
+  DEFINE convert_key_fields .
+    refresh lt_KEY_CONV..
+    clear: ls_KEY_CONV,
+           ls_KEY_old,
+           ls_KEY_new.
+    loop at lt_DATA_KEY into LS_DATA .
+      if LS_DATA-CHNGIND = 'E' .
+        ls_KEY_old = LS_DATA.
+      elseif LS_DATA-CHNGIND = 'I' .
+        ls_KEY_new = LS_DATA.
+      endif.
+    endloop.
+    clear ifld.
+    do 10 times.
+      clear ls_KEY_CONV.
+      add 1 to ifld.
+      ctmp = ifld.
+      concatenate 'KEY' ctmp '_V'  into fld.
+      ASSIGN COMPONENT fld of STRUCTURE ls_KEY_old to <fs_old>.
+      ASSIGN COMPONENT fld of STRUCTURE ls_KEY_new to <fs_new>.
+      if <fs_old> <> <fs_new>.
+        "--- Add Data
+        move-CORRESPONDING ls_KEY_new to ls_KEY_CONV.
+        ls_KEY_CONV-CHNGIND = 'U'.
+        ls_KEY_CONV-VALUE_NEW = <fs_new>.
+        ls_KEY_CONV-VALUE_OLD = <fs_old>.
+        concatenate 'KEY' ctmp  into fld.
+         ASSIGN COMPONENT fld of STRUCTURE ls_KEY_old to <fs_old>.
+          ls_KEY_CONV-FNAME = <fs_old>.
+        append ls_KEY_CONV to lt_KEY_CONV.
+      endif.
+    enddo.
+  END-OF-DEFINITION .
+  "--- Run Cloud Mode -----
+  data_single: sw_dest rfcdest.             .
+  select_single: sw_dest.
+  IF lv_sw_dest IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_06_MD_CHNG_LOG'
+      IMPORTING
+        is_alert = is_alert
+      TABLES
+        t_select = t_select
+        t_data   = t_data.
+  ENDIF.
+  CHECK lv_sw_dest IS INITIAL.
+  "--- Run Cloud Mode -----
+  select_multy:  objectclas,
+                 objectid,
+                 changenr,                  " 15.03.21++
+                 username,
+                 tcode,
+                 change_ind,
+                 tabname,
+                 fname,
+                 chngind,
+                 udate,
+                 udate_repet,                " 31.08.21++
+                 duration_d,
+                 datum.
+  lv_langu = sy-langu.
+  select_single: langu,
+                 manage_in_utc,
+                 backdays,
+                 repet_backdays,             " 31.08.21++
+                 convert_key,
+                 header_only,
+                 repetitive.                 " 15.03.21++
+  "-----------------------------------------------
+  " Additional Definition                        "
+  "-----------------------------------------------
+  DATA : date_from TYPE d,
+         backdays  TYPE i.
+  DATA : sy_tabix LIKE sy-tabix .
+  DATA : ls_data LIKE LINE OF t_data.
+  DATA : lt_data LIKE TABLE OF ls_data,
+         lt_data_tmp LIKE TABLE OF ls_data.
+  DATA : lt_data_key LIKE TABLE OF ls_data.
+  DATA : ls_key_conv LIKE LINE OF t_data,
+         ls_key_old LIKE LINE OF t_data,
+         ls_key_new LIKE LINE OF t_data,
+         lt_key_conv LIKE TABLE OF ls_key_conv.
+  DATA : time_diff TYPE i .
+  DATA : sy_datlo LIKE sy-datlo ,
+         sy_timlo LIKE sy-timlo .
+  DATA: lv_object TYPE cdobjectcl.
+  data_multy:   obj_clas cdobjectcl.  "For temporary use
+  DATA : domvalue LIKE  dd07v-domvalue_l,
+         ddtext LIKE  dd07v-ddtext.
+  DATA: ls_del TYPE cdpos,
+        lt_del LIKE TABLE OF ls_del,
+        is_del_added(1) TYPE c.
+*** Begin 15.03.21++
+  DATA: lv_tabix       TYPE i,
+        lv_num         TYPE char1,
+        lv_exist       TYPE boole_d,
+        lv_append      TYPE boole_d,
+        lv_field       TYPE fieldname,
+        lv_len         TYPE i,
+        lv_tabkey      TYPE cdtabkey,
+        lv_lifnr       TYPE lifnr,
+        lv_vendor_desc TYPE name1_gp.
+  DATA: ls_data_new   LIKE LINE OF t_data,
+        ls_data_old   LIKE LINE OF t_data,
+        ls_components TYPE abap_compdescr,
+        ls_data_tmp   LIKE LINE OF t_data,
+        ls_data_tmp2  LIKE LINE OF t_data,
+        ls_key_field  TYPE ty_key_field,
+        ls_dd03l      TYPE dd03l,
+        ls_inf        TYPE rpy_tabl,
+        ls_tab_field  TYPE rpy_main.
+  DATA: lt_data_tmp2      LIKE TABLE OF ls_data,
+        lt_key_field      TYPE tt_key_field,
+        lt_dd03l          TYPE STANDARD TABLE OF dd03l,
+        lt_dd03l_pos      TYPE STANDARD TABLE OF dd03l,
+        lt_tab_fields     TYPE STANDARD TABLE OF rpy_main,
+        lt_tab_fields_tmp TYPE STANDARD TABLE OF rpy_main.
+  DATA: lr_str_desc TYPE REF TO cl_abap_structdescr,
+        lr_data     TYPE REF TO data.
+  FIELD-SYMBOLS: <fs_field_key> TYPE any,
+                 <fs_val_key>   TYPE any,
+                 <fs_val_key1>  TYPE any,
+                 <fs_line>      TYPE any.
+*** End 15.03.21++
+  DATA: lv_changenr TYPE cdchangenr.
+  DATA: is_key_case(1) TYPE c.
+  "-----------------------------------------------
+  " 2. Extracting & Populating Parameters        "
+  "-----------------------------------------------
+*** Begin 03.09.21--
+*  IF r_datum[] IS INITIAL .  " Set default value
+*    rs_datum-sign   = 'I' .
+*    rs_datum-option = 'GE'.
+****    date_from = sy-datum - lv_backdays .
+*    date_from       = sy_datlo - lv_backdays.
+*    rs_datum-low    = date_from .
+*    APPEND rs_datum TO r_datum.
+*  ENDIF .
+*  r_udate[] = r_datum[].
+*** End 03.09.21--
+*** Begin 03.09.21++
+  IF lv_repetitive EQ 'X'.
+    IF r_datum[] IS INITIAL .  " Set default value
+      rs_datum-sign   = 'I' .
+      rs_datum-option = 'GE'.
+      date_from       = sy_datlo - lv_repet_backdays.
+      rs_datum-low    = date_from .
+      APPEND rs_datum TO r_datum.
+    ENDIF .
+    IF r_udate_repet[] IS INITIAL.
+      r_udate_repet[] = r_datum[].
+    ENDIF.
+    IF lv_backdays IS INITIAL.
+      lv_backdays = 1.
+    ENDIF.
+    IF r_udate[] IS INITIAL.  " Set default value
+      rs_udate-sign   = 'I' .
+      rs_udate-option = 'GE'.
+      date_from       = sy_datlo - lv_backdays.
+      rs_udate-low    = date_from.
+      APPEND rs_udate TO r_udate.
+    ENDIF.
+  ELSE.
+    IF r_datum[] IS INITIAL .  " Set default value
+      rs_datum-sign   = 'I' .
+      rs_datum-option = 'GE'.
+      date_from       = sy_datlo - lv_backdays.
+      rs_datum-low    = date_from.
+      APPEND rs_datum TO r_datum.
+    ENDIF.
+    r_udate[] = r_datum[].
+  ENDIF.
+*** End 03.09.21++
+  set_sy_time lv_manage_in_utc sy_datlo sy_timlo .
+  time_shift sy_datlo sy_timlo . " TIME_SHIFT parameter
+  "-----------------------------------------------
+  " 3. Initiating Output Table(Mandatory!!!)     "
+  "-----------------------------------------------
+  CLEAR is_alert .
+  REFRESH t_data .
+  REFRESH lt_data .
+  IF r_objectclas[] IS INITIAL.
+    IF r_tabname[] IS NOT INITIAL.
+      SELECT object
+         FROM tcdob
+         INTO lv_object
+         WHERE tabname IN r_tabname.
+        rs_obj_clas-low    = lv_object.
+        rs_obj_clas-option = 'EQ'.
+        rs_obj_clas-sign   = 'I'.
+        APPEND rs_obj_clas TO r_obj_clas.
+      ENDSELECT.
+    ENDIF.
+  ENDIF.
+  LOOP AT r_objectclas INTO rs_objectclas.
+    APPEND rs_objectclas TO r_obj_clas.
+  ENDLOOP.
+  "-----------------------------------------------
+  " 4. Retrieving/preparing Alert Data           "
+  "-----------------------------------------------
+  "--- Check that Object Class is not empty
+  IF r_obj_clas[] IS INITIAL.
+    EXIT.      "!!!!!!
+  ENDIF.
+  SELECT *
+    FROM cdhdr
+    INTO CORRESPONDING FIELDS OF TABLE lt_data
+    WHERE objectclas IN r_obj_clas
+    AND   objectid   IN r_objectid
+    AND   changenr   IN r_changenr           " 15.03.21++
+    AND   username   IN r_username
+    AND   tcode      IN r_tcode
+    AND   change_ind IN r_change_ind
+    AND   udate      IN r_udate. "
+  IF lv_header_only EQ 'X'.
+    t_data[] = lt_data[].
+    READ TABLE t_data INTO ls_data INDEX 1.
+    CHECK sy-tfill IS NOT INITIAL .
+    is_alert = 'X' .
+    EXIT.
+  ENDIF.
+  "-----------------------------------------------
+  " 5. Post retrieving manipulations             "
+  "-----------------------------------------------
+  LOOP AT lt_data INTO ls_data.
+    sy_tabix = sy-tabix.
+    REFRESH lt_del.
+    CLEAR is_del_added.
+    CLEAR is_key_case.
+    REFRESH lt_data_key.
+    lv_changenr = ls_data-changenr.
+    REFRESH lt_data_tmp.
+    SELECT *
+     FROM cdpos
+     INTO CORRESPONDING FIELDS OF ls_data "TABLE T_DATA
+     WHERE objectclas EQ ls_data-objectclas
+     AND   objectid   EQ ls_data-objectid
+     AND   changenr   EQ ls_data-changenr
+     AND   tabname    IN r_tabname
+"          AND FNAME IN R_FNAME
+"          AND CHNGIND IN R_CHNGIND
+          . "
+      APPEND ls_data TO lt_data_tmp.   "  T_DATA.
+      IF ls_data-chngind = 'I'.
+        IF ls_data-fname = 'KEY'.    " Insert Key
+          is_key_case = 'X'.
+          populate_key_fields .
+          APPEND ls_data TO lt_data_key.
+        ENDIF.
+      ENDIF.
+      IF ls_data-chngind = 'E'.
+        IF is_del_added IS INITIAL.
+          MOVE-CORRESPONDING ls_data TO ls_del.
+          APPEND ls_del  TO lt_del.
+          ls_data-fname = 'KEY'.
+          CLEAR ls_data-value_old.
+          APPEND ls_data TO lt_data_tmp.  " T_DATA.
+          populate_key_fields .
+          APPEND ls_data TO lt_data_key.
+          is_del_added = 'X'.
+        ENDIF.
+      ENDIF.
+    ENDSELECT.
+*** 15.03.21++
+    IF lv_repetitive EQ abap_true.
+      lv_convert_key = 'X'.
+    ENDIF.
+*** 15.03.21++
+    "--- Convert KEY Field (I/E)
+    IF lv_convert_key IS NOT INITIAL. " to convert KEY
+*        refresh lt_DATA_KEY.
+*        loop at T_DATA into LS_DATA where FNAME = 'KEY'.
+*          populate_key_fields .
+*          append LS_DATA to lt_DATA_KEY.
+*        endloop.
+      "--- Convert KEY Field (I/E)
+      convert_key_fields.
+      LOOP AT lt_key_conv INTO ls_key_conv.
+        MOVE-CORRESPONDING ls_key_conv TO ls_data.
+        APPEND ls_data TO lt_data_tmp.  "T_DATA.
+      ENDLOOP.
+      " Delete KEY records
+      IF is_key_case IS NOT INITIAL.
+        DELETE lt_data_tmp WHERE fname   = 'KEY' AND changenr = lv_changenr.
+        DELETE lt_data_tmp WHERE chngind = 'E'   AND changenr = lv_changenr.
+      ENDIF.
+    ENDIF.
+*** Begin 15.03.21++
+    IF lv_repetitive EQ abap_true.
+      IF ls_data-udate IN r_udate.                   " 31.08.21++
+        SELECT *
+          FROM dd03l
+          INTO TABLE lt_dd03l
+          WHERE tabname   IN r_tabname
+          AND   as4local  EQ 'A'.
+        SORT lt_dd03l BY tabname fieldname.
+        CALL FUNCTION 'RPY_TABLE_READ_SHORT'
+          EXPORTING
+            activation_type  = 'A'
+            language         = lv_langu
+            table_name       = ls_data-tabname
+          IMPORTING
+            tabl_inf         = ls_inf
+          TABLES
+            tabl_fields      = lt_tab_fields_tmp
+          EXCEPTIONS
+            cancelled        = 1
+            not_found        = 2
+            permission_error = 3
+            illegal_type     = 4
+            OTHERS           = 5.
+        IF sy-subrc IS INITIAL AND lt_tab_fields_tmp IS NOT INITIAL.
+          DELETE lt_tab_fields_tmp WHERE keyflag NE 'X'.
+          LOOP AT lt_tab_fields_tmp INTO ls_tab_field.
+            READ TABLE lt_tab_fields WITH KEY tablname  = ls_tab_field-tablname
+                                              fieldname = ls_tab_field-fieldname
+                                              TRANSPORTING NO FIELDS.
+            IF sy-subrc IS NOT INITIAL.
+              APPEND ls_tab_field TO lt_tab_fields.
+            ENDIF.
+          ENDLOOP.
+        ELSE.
+          lt_dd03l_pos = lt_dd03l.
+          SORT lt_dd03l_pos BY position.
+          LOOP AT lt_dd03l_pos INTO ls_dd03l WHERE keyflag EQ abap_true.
+            CLEAR: ls_tab_field.
+            ls_tab_field-tablname   = ls_dd03l-tabname.
+            ls_tab_field-fieldname  = ls_dd03l-fieldname.
+            ls_tab_field-dtelname   = ls_dd03l-rollname.
+            ls_tab_field-checktable = ls_dd03l-checktable.
+            ls_tab_field-keyflag    = ls_dd03l-keyflag.
+            APPEND ls_tab_field TO lt_tab_fields.
+          ENDLOOP.
+        ENDIF.
+        CLEAR: lt_tab_fields_tmp.
+      ENDIF.
+    ENDIF.
+*** End 15.03.21++
+    LOOP AT lt_data_tmp INTO ls_data.
+*      APPEND ls_data TO t_data.          " 15.03.21--
+*** Begin 15.03.21++
+      IF lv_repetitive EQ abap_true.
+        CHECK ls_data-udate IN r_udate.      " 31.08.21++
+        CLEAR: lv_tabkey, lv_len, lv_leng.
+        IF lt_data_tmp2 IS INITIAL.
+          APPEND ls_data TO lt_data_tmp2.
+        ELSE.
+          LOOP AT lt_tab_fields INTO ls_tab_field WHERE tablname EQ ls_data-tabname.
+            lv_tabix = sy-tabix.
+            lv_num   = lv_tabix.
+            CONDENSE lv_num.
+            CONCATENATE 'KEY' lv_num '_V' INTO lv_field.
+            CREATE DATA lr_data TYPE (ls_tab_field-dtelname).
+            IF lr_data IS BOUND.
+              ASSIGN lr_data->* TO <fs_val_key>.
+              READ TABLE lt_dd03l INTO ls_dd03l WITH KEY tabname   = ls_tab_field-tablname
+                                                         fieldname = ls_tab_field-fieldname
+                                                         BINARY SEARCH.
+            ENDIF.
+            ASSIGN COMPONENT lv_field OF STRUCTURE ls_data TO <fs_val_key>.
+            IF sy-subrc IS INITIAL AND <fs_val_key> IS ASSIGNED.
+              lv_tabkey+lv_len(ls_dd03l-leng) = <fs_val_key>+0(ls_dd03l-leng).
+              lv_len                          = lv_len + ls_dd03l-leng.
+            ENDIF.
+            IF NOT ls_tab_field-fieldname IN r_fname[].
+              READ TABLE lt_key_field WITH KEY fieldname = ls_tab_field-fieldname
+                                      TRANSPORTING NO FIELDS.
+              IF sy-subrc IS NOT INITIAL.
+                ls_key_field-tabname   = ls_tab_field-tablname.
+                ls_key_field-fieldname = ls_tab_field-fieldname.
+                APPEND ls_key_field TO lt_key_field.
+              ENDIF.
+            ENDIF.
+          ENDLOOP.
+          LOOP AT lt_data_tmp2 INTO ls_data_tmp.
+* If tabkeys are equal,
+            IF ls_data_tmp-value_old EQ ls_data-value_new.
+              "ls_data_tmp-tabkey EQ lv_tabkey AND lv_exist IS INITIAL.
+              APPEND ls_data TO lt_data_tmp2.
+              lv_exist = 'X'.
+            ELSE.
+* Check if object have the same key fields, except the field that being checked
+              lv_append = 'X'.
+              LOOP AT lt_key_field INTO ls_key_field.
+                lv_tabix = sy-tabix.
+                lv_num   = lv_tabix.
+                CONDENSE lv_num.
+                CONCATENATE 'KEY' lv_num '_V' INTO lv_field.
+                ASSIGN COMPONENT lv_field OF STRUCTURE ls_data     TO <fs_val_key>.
+                ASSIGN COMPONENT lv_field OF STRUCTURE ls_data_tmp TO <fs_val_key1>.
+                IF <fs_val_key> IS ASSIGNED AND <fs_val_key1> IS ASSIGNED.
+                  IF <fs_val_key> NE <fs_val_key1>.
+                    IF lv_exist EQ abap_true.
+                      APPEND LINES OF lt_data_tmp2 TO t_data.
+                    ENDIF.
+                    CLEAR: lt_key_field, lt_data_tmp2.
+                    CLEAR: lv_append, lv_exist.
+* Append line of a new object
+                    APPEND ls_data TO lt_data_tmp2.
+                    EXIT.
+                  ENDIF.
+                ENDIF.
+              ENDLOOP.
+* Append the line with the same key field to temporary table
+              IF lv_append EQ abap_true.
+                READ TABLE lt_data_tmp2 WITH KEY udate  = ls_data-udate
+                                                 utime  = ls_data-utime
+                                                 tabkey = lv_tabkey
+                  TRANSPORTING NO FIELDS.
+                IF sy-subrc IS NOT INITIAL.
+                  APPEND ls_data TO lt_data_tmp2.
+                ENDIF.
+                CLEAR: lv_append.
+              ENDIF.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+      ELSE.
+        APPEND ls_data TO t_data.
+      ENDIF.
+*** End 15.03.21++
+    ENDLOOP.
+  ENDLOOP.
+*** Begin 15.03.21++
+  IF lv_exist EQ 'X'.
+    APPEND LINES OF lt_data_tmp2 TO t_data.
+  ENDIF.
+*** End 15.03.21++
+  "-----------------------------------------------
+  " 6. Post retrieving filtering                 "
+  "-----------------------------------------------
+  DELETE t_data WHERE objectclas NOT IN r_objectclas.
+  DELETE t_data WHERE change_ind NOT IN r_change_ind.
+  DELETE t_data WHERE chngind NOT IN r_chngind.
+  DELETE t_data WHERE fname NOT IN r_fname.
+  LOOP AT t_data INTO ls_data.
+    sy_tabix = sy-tabix .
+    PERFORM get_field_desc USING    ls_data-tabname
+                                    ls_data-fname
+                                    lv_langu
+                           CHANGING ls_data-field_desc.
+    PERFORM get_tab_desc USING ls_data-tabname
+                               lv_langu
+                         CHANGING ls_data-tab_desc.
+**** 10/22++
+    IF ls_data-tabname EQ 'LFA1' AND
+       ls_data-objectid IS NOT INITIAL.
+      lv_lifnr = ls_data-objectid.
+**    "--- Get  Vendor Decriptions
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          lifnr        = lv_lifnr
+        IMPORTING
+          vendor_desc  = lv_vendor_desc
+        EXCEPTIONS
+          wrong_vendor = 1
+          OTHERS       = 2.
+      IF sy-subrc IS INITIAL.
+        ls_data-object_desc = lv_vendor_desc.
+        CLEAR: lv_vendor_desc.
+      ENDIF.
+    ENDIF.
+**** 10/22++
+    domvalue = ls_data-change_ind.
+    CLEAR ddtext.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        i_domname  = 'CDCHNGIND'
+        i_domvalue = domvalue
+        langu      = lv_langu
+      IMPORTING
+        e_ddtext   = ddtext
+      EXCEPTIONS
+        not_exist  = 1
+        OTHERS     = 2.
+    IF sy-subrc = 0.
+      ls_data-change_ind_desc = ddtext.
+    ENDIF.
+    domvalue = ls_data-chngind.
+    CLEAR ddtext.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        i_domname  = 'CDCHNGIND'
+        i_domvalue = domvalue
+        langu      = lv_langu
+      IMPORTING
+        e_ddtext   = ddtext
+      EXCEPTIONS
+        not_exist  = 1
+        OTHERS     = 2.
+    IF sy-subrc = 0.
+      ls_data-chngind_desc = ddtext.
+    ENDIF.
+    MODIFY t_data FROM ls_data INDEX sy_tabix.
+  ENDLOOP.
+  DESCRIBE FIELD ls_data-tabkey LENGTH lv_tabkey_len IN CHARACTER MODE.
+  "--- Poplate Key Components
+  LOOP AT t_data INTO ls_data.
+    sy_tabix = sy-tabix .
+    populate_key_fields .
+    CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+      EXPORTING
+        bname      = ls_data-username
+      IMPORTING
+        name_first = ls_data-name_first
+        name_last  = ls_data-name_last
+        name_text  = ls_data-name_text
+*       WA_ADRP    =
+      EXCEPTIONS
+        no_data    = 1
+        OTHERS     = 2.
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+    ENDIF.
+    MODIFY t_data FROM ls_data INDEX sy_tabix.
+  ENDLOOP.
+*  LOOP AT T_DATA INTO LS_DATA.
+*    SY_TABIX = SY-TABIX .
+*
+*         CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*            EXPORTING
+*              D_FROM          = LS_DATA-UDATE
+*              T_FROM          = LS_DATA-UTIME
+*              D_TO            = sy_datlo
+*              T_TO            = sy_timlo
+*              TIME_UNIT        = 'D'
+*            IMPORTING
+*              TIME_DIFF        = TIME_DIFF
+*            EXCEPTIONS
+*              WRONG_VALUE      = 1
+*              OTHERS           = 2 .
+*         IF SY-SUBRC = 0.
+*           LS_DATA-DURATION_D = TIME_DIFF .
+*         else.
+*           LS_DATA-DURATION_D = '999999' .
+*         ENDIF.
+*    MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+*  ENDLOOP.
+*
+*  DELETE T_DATA WHERE DURATION_D NOT IN R_DURATION_D.
+  "-----------------------------------------------
+  " 7. Finishing (Set IS_ALERT parameter)        "
+  "-----------------------------------------------
+  READ TABLE t_data INTO ls_data INDEX 1.
+  CHECK sy-tfill IS NOT INITIAL .
+  is_alert = 'X' .
+ENDFUNCTION.

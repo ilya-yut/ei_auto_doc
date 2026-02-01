@@ -1,47 +1,53 @@
 ### Default Values
 
-- **BACKDAYS** — Default: `1` (used when no date range is supplied to build the selection from SY-DATUM minus BACKDAYS).
-- **DATE_REF_FLD** — Default: `WADAT` (planned goods movement date used as reference for filtering and duration calculation when not supplied).
-- **DURATION_UNIT** — Default: `D` (days; used for duration calculation when not supplied).
-- **LANG** — Default: system language (SY-LANGU); used for description lookups (e.g. billing block, domain values).
-
-**Note:** Other parameters default to initial (empty or 0) when not supplied; the EI then selects all values for that dimension (e.g. no filter on that field).
+- **BACKDAYS** — Default: `1` (when no explicit date range is supplied; the default monitoring window starts one day back from today).
+- **DATE_REF_FLD** — Default: `CPUDT` (entry date of the accounting document is used as the reference for the default date range and duration calculation).
+- **DURATION_UNIT** — Default: `D` (duration is calculated in days).
+- **LANGU** — Default: `E` (English or system default for G/L account descriptions when not supplied).
+- **FULL** — Default: initial (empty); when not set, the EI returns one record per document header rather than full line-item detail.
+- **WORKING_DAYS** — Default: initial (empty); when not set, no filtering by working days or holidays is applied.
+- **WFCID** — Default: initial (empty); when not set, the factory calendar is not used and working-days logic is skipped.
 
 ### Practical Configuration Examples
 
-**Use Case 1: Deliveries in status longer than 7 days (by planned goods movement date)**
+**Use Case 1: Exceptional postings in the last 30 days by entry date**
 ```
 BACKDAYS = 30
-DATE_REF_FLD = WADAT
-DURATION = 7
+DATE_REF_FLD = CPUDT
+BUKRS = 1000
+```
+**Purpose:** Focus on accounting documents entered in the last 30 days in company code 1000, using entry date as the reference for the default window and for duration. Supports period-end review and aging of recent postings.
+
+**Use Case 2: High-value local-currency line items, header view**
+```
+DMBTR = 100000 (e.g. lower bound via range)
+FULL = (initial)
+BLART = SA
+```
+**Purpose:** Identify documents with local-currency line items above a threshold, document type SA (G/L document), without expanding to line-level detail. Useful for high-value exception review.
+
+**Use Case 3: Postings by posting date and duration in days**
+```
+DATE_REF_FLD = BUDAT
 DURATION_UNIT = D
+DURATION = 1 to 90 (e.g. range: documents posted 1–90 days ago)
 ```
-**Purpose:** Focus on deliveries whose planned goods movement date is at least 7 days ago, within a 30-day lookback, to identify aged deliveries for follow-up.
+**Purpose:** Monitor documents by posting date with duration in days, e.g. to find postings that have been in the system between 1 and 90 days. Supports aging and follow-up prioritization.
 
-**Use Case 2: Billing-blocked deliveries in a sales organization**
+**Use Case 4: Full line-item detail with user and G/L account description**
 ```
-VKORG = 1010
-FAKSK = (relevant billing block codes)
-BACKDAYS = 14
-DATE_REF_FLD = AEDAT
+FULL = X
+BUKRS = 1000
+GJAHR = 2024
 ```
-**Purpose:** Monitor deliveries with billing block in sales organization 1010 over the last 14 days by change date, for release or exception handling.
+**Purpose:** Retrieve all line items for documents in company code 1000 and fiscal year 2024, with user name and G/L account long text. Supports detailed audit and root-cause analysis.
 
-**Use Case 3: Partner-based view (ship-to and sold-to)**
+**Use Case 5: Working days only in a company code**
 ```
-BP1_FUNCT = WE
-BP2_FUNCT = AG
-BP1_CODE = (range of ship-to parties)
-BP2_CODE = (range of sold-to parties)
-WBSTK = (e.g. C for complete)
+WFCID = 01 (or appropriate factory calendar ID)
+WORKING_DAYS = X
+BUKRS = 2000
+BACKDAYS = 7
+DATE_REF_FLD = BUDAT
 ```
-**Purpose:** Analyze delivery status by ship-to (WE) and sold-to (AG) partner and filter by total goods movement status.
-
-**Use Case 4: Credit status and sales office**
-```
-CMGST = (e.g. credit block status)
-VKBUR = 1000
-DURATION = 1
-DURATION_UNIT = D
-```
-**Purpose:** Identify deliveries with specific credit-check status in sales office 1000 and duration of at least 1 day for escalation.
+**Purpose:** Restrict results to postings that fall on working days (excluding holidays) in the last seven days by posting date, for company code 2000. Supports calendar-aware exception reporting.

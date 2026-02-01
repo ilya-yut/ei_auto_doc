@@ -1,6 +1,6 @@
 You are documenting the Parameters Reference Table section for an SAP Exception Indicator (EI) / function module. You will receive ONE input: the Parameters (Name (Description)) file — typically the "Parameters" sheet from the Available fields Excel or an equivalent file containing the parameters table.
 
-Your task: Output ONLY the "Parameters Reference Table" subsection for the EI document. Use the fixed intro wording from the benchmark and build the parameters table from the input file. Group serial-number series (e.g. KEY1, KEY2, … KEY10) into one row only when Type, Length, Decimal, Data Element, and Domain are identical across the series; otherwise keep separate rows. For grouped rows: first column (#) = range (e.g. 3-12); Parameter = "PARAM_FIRST - PARAM_LAST", Description = "Description first - Description last". Next row after a group continues from the end of the range (e.g. 13). Do not output a document title, other sections, or preamble.
+Your task: Output ONLY the "Parameters Reference Table" subsection for the EI document. Use the fixed intro wording from the benchmark and build the parameters table from the input file. Do not group serial-number series in the table; list every parameter from the input as its own row with a single number in the first column (1, 2, 3, …). Do not output a document title, other sections, or preamble.
 
 OUTPUT FORMAT (follow exactly):
 
@@ -10,14 +10,14 @@ OUTPUT FORMAT (follow exactly):
 This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic.
 
 [Table:]
-Add a first column with parameter number or range (1, 2, 3-12, 13, …). Build the table from the input: same column headers and order. For single-parameter rows use a single # (1, 2, 13, …). For grouped serial-number rows use the range (e.g. 3-12); next row = 13. Group only when parameters differ only by serial number and Type, Length, Decimal, Data Element, Domain are identical for every row in the series; if any property differs, do not group — keep separate rows. Grouped row: # = "first–last", Parameter = "PARAM_FIRST - PARAM_LAST", Description = "Description first - Description last". Include every parameter; do not omit any.
+Add a first column with the parameter number (1, 2, 3, …). Build the table from the input: same column headers and order. List every parameter from the input as its own row; first column = single number (1, 2, 3, …). Do not group serial-number series (e.g. KEY1, KEY2, … KEY10) into one row; each parameter has its own row. Include every parameter; do not omit any.
 
 Rules:
 - Use the fixed intro sentence exactly as stated above. Do not reword or extend it.
-- First column (#): single number for single rows; range (e.g. 3-12) for grouped serial-number rows; next row after a group continues from end of range (e.g. 13). Serial-number series: group only when Type, Length, Decimal, Data Element, Domain are identical across the series; if any differs, do not group. Grouped row: Parameter "PARAM_FIRST - PARAM_LAST", Description "Description first - Description last". Do not omit any parameters.
-- Do not add or infer parameter rows not in the input; only group or copy from the input. The only structural changes are grouping serial-number series (when properties match) and adding the number column (single or range).
+- First column (#): Use a single number (1, 2, 3, …) for every row. List every parameter from the input as its own row; do not group serial-number series. Do not omit any parameters.
+- Do not add or infer parameter rows not in the input; only copy from the input. The only structural change is adding the number column (1, 2, 3, …).
 - Output ONLY the subsection: heading "### Parameters Reference Table", the fixed intro paragraph, and the markdown table. No document title, no other sections (e.g. no Parameter Configuration Guidelines, no preamble).
-- Tone: professional. The intro is fixed; the table is built from input with serial-number series grouped when properties match.
+- Tone: professional. The intro is fixed; the table is built from input with one row per parameter (no grouping).
 
 Benchmark format reference (intro + table structure). Source: reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.docx
 
@@ -29,8 +29,9 @@ This table lists all configurable input parameters. Users set values for these p
 |---|-----------|-------------|------|--------|---------|--------------|--------|
 | 1 | AEDAT | Changed On | DATS | 8 | 0 | AEDAT | DATUM |
 | 2 | AGGR_FIELDS | Aggregation Fields |  | 0 | 0 |  |  |
-| 3-12 | KEY1 - KEY10 | Field Name 1 - Field Name 10 |  |  |  |  |  |
-| 13 | … | (next parameter; single # or range # for groups) |  |  |  |  |  |
+| 3 | KEY1 | Field Name |  |  |  |  |  |
+| 4 | KEY2 | Field Name |  |  |  |  |  |
+| … | … | (include every parameter; one row per parameter, # = 1, 2, 3, …) |  |  |  |  |  |
 
 Parameters (Name (Description)) file location or paste:
 [Provide the file path or paste the parameters table content here]

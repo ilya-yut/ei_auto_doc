@@ -97,11 +97,11 @@ Use the **EI Function Structure** and **ABAP Code** sections in the benchmark fo
 
 **1. Output structure / fields file** (path or paste – e.g. Structure_*.xlsx or table content):
 
-C:\vibe code dev\ei_auto_doc\input\Structure_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.xlsx
+C:\vibe code dev\ei_auto_doc\input\Structure_Exceptional posting by GL account_200025_001359.xlsx
 
 **2. ABAP code file** (path or paste – e.g. Code_*.txt):
 
-C:\vibe code dev\ei_auto_doc\input\Code_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.txt
+C:\vibe code dev\ei_auto_doc\input\Code_Exceptional posting by GL account_200025_001359.txt
 
 ---
 

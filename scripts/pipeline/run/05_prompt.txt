@@ -76,15 +76,15 @@ Use the **Parameter Relationships** subsection in the benchmark for structure an
 
 **1. Output structure / fields file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Structure_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.xlsx
+C:\vibe code dev\ei_auto_doc\input\Structure_Exceptional posting by GL account_200025_001359.xlsx
 
 **2. Parameters (Name (Description)) file** (path or paste – Parameters sheet from Available fields Excel):
 
-C:\vibe code dev\ei_auto_doc\input\Available fields_SD Delivery Status (General)_SW_10_01_DLV_STAT.xlsx
+C:\vibe code dev\ei_auto_doc\input\Available fields_Exceptional posting by GL account_200025_001359.xlsx
 
 **3. ABAP code file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Code_Deliveries are blocked due to credit problems_TD_DLV_BLOCK_OBLIGO_SLS_ORG_1200__EI__SW_10_01_DLV_STAT.txt
+C:\vibe code dev\ei_auto_doc\input\Code_Exceptional posting by GL account_200025_001359.txt
 
 **4. Selected parameters file** (reusable explanations):
 

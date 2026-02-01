@@ -1,0 +1,628 @@
+FUNCTION /SKN/F_SW_10_01_DLV_STAT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_DLV_STAT OPTIONAL
+*"----------------------------------------------------------------------
+******* Begin change 29.11.17++
+  TYPES: BEGIN OF TY_LIPS,
+    VBELN      TYPE LIPS-VBELN,
+    POSNR      TYPE LIPS-POSNR,
+    LFIMG      TYPE LIPS-LFIMG,
+    VRKME      TYPE LIPS-VRKME,
+    LGMNG      TYPE LIPS-LGMNG,     "Actual quantity delivered IN stockkeeping units
+    MEINS      TYPE LIPS-MEINS,     "Base UNIT OF Measure
+    VGTYP      TYPE LIPS-VGTYP,     "SD document category (REFERENCE document)
+    VGBEL      TYPE LIPS-VGBEL,     "Document NUMBER OF the REFERENCE document
+    VGPOS      TYPE LIPS-VGPOS,     "Item NUMBER OF the REFERENCE item
+    NETWR_LIPS TYPE LIPS-NETWR,     "Net VALUE (will be calculated)
+    KLMENG     TYPE VBAP-KLMENG,    "Cumulative confirmed quantity IN base UNIT
+    WAERK      TYPE VBAP-WAERK,     "SD Document CURRENCY
+    NETWR_VBAP TYPE VBAP-NETWR,     "Net VALUE
+    MPROK      TYPE VBAP-MPROK, """11-6-19
+    WAVWR      TYPE VBAP-WAVWR,
+  END OF TY_LIPS,
+  TT_LIPS TYPE STANDARD TABLE OF TY_LIPS.
+  TYPES: BEGIN OF TY_KNA1,
+    KUNNR TYPE KNA1-KUNNR,
+    NAME1 TYPE KNA1-NAME1,
+  END OF TY_KNA1,
+  TT_KNA1 TYPE TABLE OF TY_KNA1.
+******* End change 29.11.17++
+  DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+               LANGU          LANGU,
+               BACKDAYS       INT4,
+               BP1_FUNCT      PARVW,
+               BP2_FUNCT      PARVW,
+               BP3_FUNCT      PARVW,
+               DATE_REF_FLD   NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+  LV_BACKDAYS = 1.
+  LV_DATE_REF_FLD  = 'WADAT'. "Planned goods movement date 'LFDAT'. "Delivery date
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU. """11-6-19
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 BACKDAYS,
+                 BP1_FUNCT,
+                 BP2_FUNCT,
+                 BP3_FUNCT,
+                 DATE_REF_FLD,
+                 DURATION_UNIT.
+  DATA_MULTY: VBELN        VBELN_VL,
+              PSTYV        PSTYV_VL,
+              LFART        LFART,
+              VBTYP        VBTYP,
+              VKORG        VKORG,
+              VTWEG        VTWEG,
+              SPART        SPART,
+              BZIRK        BZIRK,
+              KDGRP        KDGRP,
+              VSTEL        VSTEL,
+              ROUTE        ROUTE,
+              ERDAT        ERDAT,
+              ERNAM        ERNAM,
+              AEDAT        AEDAT,
+              LDDAT        LDDAT,
+              TDDAT        TDDAT_D,
+              LFDAT        LFDAT_V,
+              KODAT        KODAT,
+              WADAT        WADAK,
+              WADAT_IST    WADAT_IST,
+              PODAT        PODAT,
+              ERDAT_LN     ERDAT,
+              AEDAT_LN      AEDAT,
+              FAKSK        FAKSK,
+              DATUM        SY-DATUM,
+              "            DURATION_M   /SKN/E_SW_DURATION_M,
+              "            DURATION_H   /SKN/E_SW_DURATION_H,
+              "            DURATION_D   /SKN/E_SW_DURATION_D,
+              DURATION    /SKN/E_SW_DURATION,
+              KUNNR       KUNWE, "Ship-to party
+              KUNAG       KUNAG, "Sold-to party
+              WBSTK       WBSTK,
+              FKSTK       FKSTK,
+              KOSTK       KOSTK,
+              LVSTK       LVSTK,
+              FKIVK       FKIVK,
+              PKSTK       PKSTK,
+              TRSTA       TRSTA,
+              UVPAS       UVPAK_SU,
+              UVPIS       UVPIK_SU,
+              VESTK       VESTK,
+              BLOCK       BLOCK_VB,
+              PDSTK       PDSTK,
+              LFSTA       LFSTA,
+              LFGSA       LFGSA,
+              WBSTA       WBSTA,
+              FKSTA       FKSTA,
+              KOSTA       KOSTA,
+              LVSTA       LVSTA,
+              FKIVP       FKIVP,
+              PKSTA       PKSTA,
+              KOQUA       KOQUA,
+              PDSTA       PDSTA,
+              CMGST       CMGST, ""19-7-16
+              POSNR       POSNR_VL, """24-7-16
+              MATNR       MATNR,
+              BP1_CODE    KUNNR,
+              BP2_CODE    KUNNR,
+              BP3_CODE    KUNNR,
+              BP_FUNCT    PARVW,
+              VGTYP       VGTYP,   " 30.11.17++
+              FKDAT       FKDAT,   " 30.01.18++
+              MATKL       MATKL,   " 04.02.18++
+              AUART       AUART,   """ 6/5/19
+              MPROK       MPROK,  """"11-6-19
+              WAVWR       WAVWR,
+              VKBUR       VKBUR.
+  SELECT_MULTY: VBELN,
+                PSTYV,
+                LFART,
+                VBTYP,
+                VKORG,
+                VTWEG,
+                SPART,
+                BZIRK,
+                KDGRP,
+                VSTEL,
+                ROUTE,
+                ERDAT,
+                ERNAM,
+                AEDAT,
+                LDDAT,
+                TDDAT,
+                LFDAT,
+                KODAT,
+                WADAT,
+                WADAT_IST,
+                PODAT,
+                ERDAT_LN,
+                AEDAT_LN,
+                FAKSK,
+                DATUM,
+                "            DURATION_M,
+                "            DURATION_H ,
+                "            DURATION_D,
+                DURATION,
+                KUNNR , "Ship-to party
+                KUNAG,  "Sold-to party
+                WBSTK,
+                FKSTK,
+                KOSTK,
+                LVSTK,
+                FKIVK,
+                PKSTK,
+                TRSTA,
+                UVPAS,
+                UVPIS,
+                VESTK,
+                BLOCK,
+                PDSTK,
+                LFSTA,
+                LFGSA,
+                WBSTA,
+                FKSTA,
+                KOSTA,
+                LVSTA,
+                FKIVP,
+                PKSTA,
+                KOQUA,
+                PDSTA,
+                CMGST,  """19-7-16
+                POSNR,  """24-7-16
+                MATNR,
+                BP1_CODE,
+                BP2_CODE,
+                BP3_CODE,
+                VGTYP,       " 30.11.17
+                FKDAT,       " 30.01.18
+                MATKL,       " 04.02.18
+                AUART,
+                MPROK,  """ 11-6-19
+                WAVWR,
+                VKBUR        " 10.03.22++
+                .
+  CONVERT_MULTY: KUNNR ALPHA,
+                 KUNAG ALPHA,
+                 VBELN ALPHA,
+                 BP1_CODE ALPHA,
+                 BP2_CODE ALPHA,
+                 BP3_CODE ALPHA,
+                 MATNR MATN1,
+                 AUART AUART. """6/5/19
+  ""Tanya 14/11/18 :
+  CONVERT_SINGLE:  BP1_FUNCT PARVW ,
+                   BP2_FUNCT PARVW ,
+                   BP3_FUNCT PARVW .
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+  R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA :   FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+        CI(1) TYPE C,
+        NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+        DATE_FROM LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA : W_DATA LIKE LINE OF T_DATA .
+  DATA : WA_VBPA TYPE VBPA.
+  DATA : LV_VBELN TYPE VBELN,
+        LV_POSNR TYPE POSNR,
+        LV_PARVW TYPE PARVW,
+        LV_KUNNR TYPE  KUNNR,
+        LV_KUNNR_NAME TYPE  NAME1_GP,
+        LV_LIFNR TYPE  LIFNR,
+        LV_LIFNR_NAME TYPE  NAME1_GP,
+        LV_PERNR TYPE  PERNR_D,
+        LV_PERNR_NAME TYPE  NAME1_GP,
+        LV_NRART TYPE NRART.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+*** Begin change 29.11.17++
+  DATA: LS_LIPS TYPE TY_LIPS,
+        LS_KNA1 TYPE TY_KNA1.
+  DATA: LT_LIPS TYPE TT_LIPS,
+        LT_KNA1 TYPE TT_KNA1,
+        LT_DATA TYPE TABLE OF /SKN/S_SW_10_01_DLV_STAT.
+  FIELD-SYMBOLS: <FS_DATA> TYPE /SKN/S_SW_10_01_DLV_STAT.
+*** End change 29.11.17++
+  FIELD-SYMBOLS:  TYPE ANY ,
+  <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+        LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA: BEGIN OF LS_VBELN,
+    VBELN TYPE VBELN_VL,
+  END OF  LS_VBELN.
+  DATA : LT_VBELN LIKE TABLE OF LS_VBELN.
+  """ 11-6-19
+  DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+        LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+        LV_DDTEXT LIKE  DD07V-DDTEXT.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    DATA: LV_IS_HANA(1) TYPE C.
+    CALL FUNCTION '/SKN/F_SW_IS_RFCDEST_HANA'
+      EXPORTING
+        DEST    = LV_SW_DEST
+      IMPORTING
+        IS_HANA = LV_IS_HANA.
+    IF LV_IS_HANA IS NOT INITIAL.
+      CALL FUNCTION '/SKN/FH_SW_10_01_DLV_STAT'
+        IMPORTING
+          IS_ALERT = IS_ALERT
+        TABLES
+          T_SELECT = T_SELECT
+          T_DATA   = T_DATA.
+    ELSE.
+      CALL FUNCTION '/SKN/FC_SW_10_01_DLV_STAT'
+        IMPORTING
+          IS_ALERT = IS_ALERT
+        TABLES
+          T_SELECT = T_SELECT
+          T_DATA   = T_DATA.
+    ENDIF.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+*   "----
+*   if R_ERDAT[] is initial  and
+*      R_AUDAT[] is initial .
+*     R_ERDAT[] = R_DATUM[].
+*   endif.
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Document created
+    WHEN 'AEDAT'.
+      R_AEDAT[] = R_DATUM[]. "changed on
+    WHEN 'LDDAT'.
+      R_LDDAT[] = R_DATUM[]. "Loading Date
+    WHEN 'TDDAT'.
+      R_TDDAT[] = R_DATUM[]. "Transportation Planning Date
+    WHEN 'KODAT'.
+      R_KODAT[] = R_DATUM[]. "Picking Date
+    WHEN 'WADAT'.
+      R_WADAT[] = R_DATUM[]. "Planned goods movement date
+    WHEN 'WADAT_IST'.
+      R_WADAT_IST[] = R_DATUM[].  "Actual Goods Movement Date
+    WHEN 'LFDAT'.
+      R_LFDAT[] = R_DATUM[]. "Delivery date
+*** 30.01.18++
+    WHEN 'FKDAT'.
+      R_FKDAT[] = R_DATUM[].
+*** 30.01.18++
+    WHEN OTHERS.
+      R_WADAT[] = R_DATUM[]. "Planned goods movement date
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT *
+*    from LIKP as a
+*    inner join VBUK as k
+  FROM VBUK AS K
+  INNER JOIN LIKP AS A
+  ON A~VBELN = K~VBELN
+  INNER JOIN LIPS AS B
+  ON A~VBELN = B~VBELN
+  "INNER JOIN  VBAK AS v  """06/05/19
+  LEFT JOIN  VBAK AS V  """06/05/19
+  ON B~VGBEL = V~VBELN   """06/05/19
+  INNER JOIN VBUP AS L
+  ON B~VBELN = L~VBELN AND
+     B~POSNR = L~POSNR
+*** Begin change 05.11.17--
+*    INNER JOIN kna1 as k1
+*    on a~kunnr = k1~kunnr
+*    INNER JOIN kna1 as k2
+*    ON a~kunag = k2~kunnr
+*** End change 05.11.17--
+  INTO CORRESPONDING FIELDS OF TABLE T_DATA
+  WHERE A~VBELN IN R_VBELN
+  AND   B~PSTYV IN R_PSTYV
+  AND   A~LFART IN R_LFART
+  AND   A~VBTYP IN R_VBTYP
+  AND   A~VKORG IN R_VKORG
+  AND   B~VTWEG IN R_VTWEG
+  AND   B~SPART IN R_SPART
+  AND   A~BZIRK IN R_BZIRK
+  AND   A~KDGRP IN R_KDGRP
+  AND   A~VSTEL IN R_VSTEL
+  AND   A~ROUTE IN R_ROUTE
+  AND A~ERDAT IN R_ERDAT
+  AND A~ERNAM IN R_ERNAM
+  AND A~AEDAT IN R_AEDAT
+  AND A~LDDAT IN R_LDDAT
+  AND A~TDDAT IN R_TDDAT
+  AND A~LFDAT IN R_LFDAT
+  AND A~KODAT IN R_KODAT
+  AND A~WADAT IN R_WADAT
+  AND A~WADAT_IST IN R_WADAT_IST
+  AND A~PODAT IN R_PODAT
+  AND A~FKDAT IN R_FKDAT   " 30.01.18++
+  AND A~KUNNR IN R_KUNNR  "Ship-to party
+  AND A~KUNAG IN R_KUNAG  "Sold-to party
+  AND A~FAKSK IN R_FAKSK
+  AND K~WBSTK IN R_WBSTK
+  AND K~FKSTK IN R_FKSTK
+  AND K~KOSTK IN R_KOSTK
+  AND K~LVSTK IN R_LVSTK
+  AND K~FKIVK IN R_FKIVK
+  AND K~PKSTK IN R_PKSTK
+  AND K~TRSTA IN R_TRSTA
+  AND K~UVPAS IN R_UVPAS
+  AND K~UVPIS IN R_UVPIS
+  AND K~VESTK IN R_VESTK
+  AND K~BLOCK IN R_BLOCK
+  AND K~PDSTK IN R_PDSTK
+  AND K~CMGST IN R_CMGST  ""19-7-16
+  AND B~ERDAT IN R_ERDAT_LN " ERDAT from line -LIPS
+  AND B~AEDAT IN R_AEDAT_LN
+  AND B~POSNR IN R_POSNR  """24-7-16
+  AND B~MATNR IN R_MATNR  """24-7-16
+  AND B~VGTYP IN R_VGTYP  " 04.02.18++
+  AND B~MATKL IN R_MATKL  " 04.02.18++
+  AND L~LFSTA IN R_LFSTA
+  AND L~LFGSA IN R_LFGSA
+  AND L~WBSTA IN R_WBSTA
+  AND L~FKSTA IN R_FKSTA
+  AND L~KOSTA IN R_KOSTA
+  AND L~LVSTA IN R_LVSTA
+  AND L~FKIVP IN R_FKIVP
+  AND L~PKSTA IN R_PKSTA
+  AND L~KOQUA IN R_KOQUA
+  AND L~PDSTA IN R_PDSTA
+  . " AND v~AUART IN r_AUART .  """6/5/19
+  .
+  DELETE T_DATA WHERE AUART NOT IN R_AUART.  """6/5/19
+  DELETE T_DATA WHERE VKBUR NOT IN R_VKBUR.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT  "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+  "--- Get BPs
+  REFRESH LT_VBELN.
+  LOOP AT T_DATA.
+**** 03/22++
+    SY_TABIX = SY-TABIX.
+    IF T_DATA-VKBUR NOT IN R_VKBUR[].
+      DELETE T_DATA[] INDEX SY_TABIX.
+      CONTINUE.
+    ENDIF.
+**** 03/22++
+    MOVE-CORRESPONDING T_DATA TO LS_VBELN.
+    APPEND LS_VBELN TO LT_VBELN.
+  ENDLOOP.
+  SORT LT_VBELN BY VBELN.
+  DELETE ADJACENT DUPLICATES FROM LT_VBELN.
+  IF LT_VBELN[] IS NOT INITIAL.
+    "--- Fill R_BP_FUNCT ----
+    REFRESH R_BP_FUNCT.
+    SET_BP_RANGE 1.
+    SET_BP_RANGE 2.
+    SET_BP_RANGE 3.
+    IF R_BP_FUNCT[] IS NOT INITIAL.
+      SELECT *
+        FROM VBPA
+        INTO CORRESPONDING FIELDS OF TABLE LT_VBPA
+        FOR ALL ENTRIES IN LT_VBELN
+        WHERE VBELN EQ LT_VBELN-VBELN
+        AND   PARVW IN R_BP_FUNCT.
+      SORT LT_VBPA BY VBELN POSNR PARVW.
+      LOOP AT T_DATA.
+        SY_TABIX = SY-TABIX .
+        LV_DATA_POSNR = T_DATA-POSNR.
+        GET_BP_ATTR 1.
+        GET_BP_ATTR 2.
+        GET_BP_ATTR 3.
+        MODIFY T_DATA INDEX SY_TABIX.
+      ENDLOOP.
+      DELETE T_DATA WHERE BP1_CODE NOT IN R_BP1_CODE.
+      DELETE T_DATA WHERE BP2_CODE NOT IN R_BP2_CODE.
+      DELETE T_DATA WHERE BP3_CODE NOT IN R_BP3_CODE.
+    ENDIF.
+  ENDIF.
+  "--- Get BPs
+**** Add additional values to Deliveries 29.11.17++ ****************
+  CHECK T_DATA IS NOT INITIAL.
+  LT_DATA = T_DATA[].
+  SORT LT_DATA BY VBELN POSNR.
+  SELECT LIPS~VBELN LIPS~POSNR LIPS~LGMNG LIPS~MEINS
+         LIPS~VGTYP LIPS~VGBEL LIPS~VGPOS LIPS~NETWR AS LIPS_NETWR
+         VBAP~NETWR AS VBAP_NETWR VBAP~KLMENG VBAP~WAERK
+         VBAP~WAVWR VBAP~MPROK """ 11-6-19
+    FROM LIPS LEFT OUTER JOIN VBAP ON  LIPS~VGBEL EQ VBAP~VBELN
+                                   AND LIPS~VGPOS EQ VBAP~POSNR
+    INTO CORRESPONDING FIELDS OF TABLE LT_LIPS
+    FOR ALL ENTRIES IN LT_DATA
+    WHERE LIPS~VBELN EQ LT_DATA-VBELN
+    AND   LIPS~POSNR EQ LT_DATA-POSNR
+    AND   LIPS~VGTYP IN R_VGTYP.
+**    DELETE lt_data WHERE WAVWR NOT IN  r_WAVWR .  """11/6/19
+**    DELETE lt_data WHERE MPROK NOT IN  r_MPROK .  """11/6/19
+  IF SY-SUBRC = 0.
+    SORT LT_LIPS BY VBELN POSNR.
+  ENDIF.
+  SORT LT_DATA BY KUNNR KUNAG.
+  SELECT KNA1~KUNNR KNA1~NAME1
+    FROM KNA1
+    INTO TABLE LT_KNA1
+    FOR ALL ENTRIES IN T_DATA
+    WHERE ( KUNNR EQ T_DATA-KUNNR
+    OR      KUNNR EQ T_DATA-KUNAG ).
+  IF LT_KNA1 IS NOT INITIAL.
+    SORT LT_KNA1 BY KUNNR.
+  ENDIF.
+**** Add additional values to Deliveries 29.11.17++ ****************
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+    SY_TABIX = SY-TABIX .
+*Ship-to party
+**** Begin change 05.11.17--
+*    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+*      EXPORTING
+*        kunnr                = t_data-kunnr
+*      IMPORTING
+*        cust_desc            = t_data-shipto_desc
+*      EXCEPTIONS
+*        wrong_customer       = 1
+*        OTHERS               = 2              .
+*    IF sy-subrc <> 0.
+*    ENDIF.
+*Sold-to party desc
+*    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+*      EXPORTING
+*        kunnr                = t_data-kunag
+*      IMPORTING
+*        cust_desc            = t_data-soldto_desc
+*      EXCEPTIONS
+*        wrong_customer       = 1
+*        OTHERS               = 2              .
+*    IF sy-subrc <> 0.
+*    ENDIF.
+**** End change 05.11.17--
+*Billing Block desc
+    CALL FUNCTION '/SKN/F_SW_10_BIL_BLOCK_DESC'
+      EXPORTING
+        FAKSK      = <FS_DATA>-FAKSK         "t_data-faksk
+        LANGU      = LV_LANGU
+      IMPORTING
+        BLOCK_DESC = <FS_DATA>-BLOCK_DESC    "t_data-block_desc
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+**** Begin change 29.11.17++
+*Ship-to party
+    READ TABLE LT_LIPS INTO LS_LIPS WITH KEY VBELN = <FS_DATA>-VBELN
+                                             POSNR = <FS_DATA>-POSNR
+    BINARY SEARCH.
+    IF SY-SUBRC = 0.
+      <FS_DATA>-LGMNG = LS_LIPS-LGMNG.
+      <FS_DATA>-MEINS = LS_LIPS-MEINS.
+      <FS_DATA>-WAERK = LS_LIPS-WAERK.
+      IF LS_LIPS-KLMENG <> 0.
+        <FS_DATA>-NETWR_LIPS = LS_LIPS-LGMNG *
+        ( LS_LIPS-NETWR_VBAP / LS_LIPS-KLMENG ).
+      ELSE.
+        <FS_DATA>-NETWR_LIPS = 0.
+      ENDIF.
+      <FS_DATA>-MPROK = LS_LIPS-MPROK. """11/6/19
+      <FS_DATA>-WAVWR = LS_LIPS-WAVWR. """11/6/19
+      IF <FS_DATA>-MPROK NOT IN R_MPROK.
+        DELETE T_DATA.
+        CONTINUE.
+      ENDIF.
+      IF <FS_DATA>-WAVWR NOT IN R_WAVWR.
+        DELETE T_DATA.
+        CONTINUE.
+      ENDIF.
+    ENDIF.
+    CLEAR LS_KNA1.
+    READ TABLE LT_KNA1 INTO LS_KNA1 WITH KEY KUNNR = <FS_DATA>-KUNNR
+                                             BINARY SEARCH.
+    IF SY-SUBRC = 0.
+      <FS_DATA>-SHIPTO_DESC = LS_KNA1-NAME1.
+    ENDIF.
+    CLEAR LS_KNA1.
+    READ TABLE LT_KNA1 INTO LS_KNA1 WITH KEY KUNNR = <FS_DATA>-KUNAG
+                                             BINARY SEARCH.
+    IF SY-SUBRC = 0.
+      <FS_DATA>-SOLDTO_DESC = LS_KNA1-NAME1.
+    ENDIF.
+**** End change 29.11.17++
+**** Begin change 04.02.18++
+    IF <FS_DATA>-MATKL IS NOT INITIAL.
+* Material group desc.
+      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+        EXPORTING
+          MATKL      = <FS_DATA>-MATKL
+*         LANGU      = SY-LANGU
+        IMPORTING
+          MATKL_DESC = <FS_DATA>-WGBEZ
+*         MATKL_DESC_L       =
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+*     Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+**** End change 04.02.18++
+    "******* 11-6-19
+***  IF  <fs_data>-MPROK is  not INITIAL .
+    LV_DOMNAME = 'MPROK'.
+    LV_DOMVALUE = <FS_DATA>-MPROK. """"t_data-MPROK.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      <FS_DATA>-MPROK_DESC = LV_DDTEXT.
+    ENDIF.
+***   ENDIF.
+*    MODIFY t_data INDEX sy_tabix.  " 05.12.17--
+  ENDLOOP.
+  DELETE T_DATA WHERE WAVWR NOT IN  R_WAVWR .  """11/6/19
+  DELETE T_DATA WHERE MPROK NOT IN  R_MPROK .  """11/6/19
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

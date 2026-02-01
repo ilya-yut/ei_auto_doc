@@ -1,0 +1,1139 @@
+FUNCTION /skn/f_sw_10_02_invent_cnt .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_02_INVENT_CNT OPTIONAL
+*"----------------------------------------------------------------------
+*** Begin Yuri C.++ 04.12.19
+  INCLUDE /skn/pc_sw_ai_top.
+  TYPES: BEGIN OF ty_waers,
+           waers  TYPE t001-waers,
+         END OF ty_waers,
+         tt_waers TYPE STANDARD TABLE OF ty_waers.
+*** End Yuri C.++ 04.12.19
+  data_single: manage_in_utc  char1 ,
+               langu          langu,
+               backdays       int4,
+               date_ref_fld   name_feld,
+               duration_unit  /skn/e_sw_duration_unit,
+               agg_lvl        char10,
+               diff_amount    int4,
+               present_zero   char1,
+*** Begin Yuri C.++ 04.02.19
+               ref_tabname1   tabname,
+               ref_tabname2   tabname,
+               ref_field1     name_feld,
+               ref_field2     name_feld,
+               comp_operator  bucc_operator,
+               waers_fr       waers.
+*** End Yuri C.++ 04.12.19
+  lv_backdays      = 1.
+  lv_date_ref_fld  = 'BUDAT'. "Posting Date in the Document
+  lv_duration_unit = 'D'.
+  lv_agg_lvl       = ''.
+  lv_diff_amount   = 0.
+  lv_present_zero  = ''.
+  lv_langu         = 'E'.
+*** Begin Yuri C.++ 04.12.19
+*  lv_waers_fr     = 'USD'.
+*  lv_ref_tabname1 = 'ISEG'.
+*  lv_ref_field1   = 'DMBTR'.
+*** End Yuri C.++ 04.12.19
+  select_single: manage_in_utc,
+                 langu,
+                 backdays,
+                 date_ref_fld,
+                 duration_unit,
+                 agg_lvl,
+                 diff_amount,
+                 present_zero,
+*** Begin Yuri C.++ 04.12.19
+                 ref_tabname1,
+                 ref_tabname2,
+                 ref_field1,
+                 ref_field2,
+                 comp_operator,
+                 waers_fr.
+*** end Yuri C.++ 04.12.19
+  DATA: lv_diff_amount_ TYPE int4.
+  lv_diff_amount_ = lv_diff_amount * ( -1 ).
+  data_multy: vgart        vgart,
+              werks        werks_d,
+              lgort        lgort_d,
+              sobkz        sobkz,
+              usnam_hd     usnam,  "User name header
+              usnam        usnaa,  "Us name Item
+              sperr        isper,
+              zstat        dzstat,
+              dstat        dstat,
+              lstat        lstat,
+              xbufi        xbufi,
+              waers        waers,  "10/02/18
+              bldat        bldat,
+              gidat        gidat,
+              zldat        dzldat,
+              budat        budat,
+              datum        sy-datum,
+*** Begin Yuri C.++ 04.12.19
+*** T001W/T001K/T001
+              bwkey        bwkey,
+              bukrs        bukrs,
+              ktopl        ktopl,
+              result_comp  netwr_ap,
+*** End Yuri C.++ 04.12.19
+              duration    /skn/e_sw_duration
+                  .
+  select_multy:
+              vgart,
+              werks,
+              lgort,
+              sobkz,
+              usnam_hd,  "User name header
+              usnam,
+              sperr,
+              zstat,
+              dstat,
+              lstat,
+              xbufi,
+              waers,  "10/02/18
+              bldat,
+              gidat,
+              zldat,
+              budat,
+              datum,
+*** Begin Yuri C.++ 04.12.19
+*** T001W/T001K/T001
+              bwkey,
+              bukrs,
+              ktopl,
+              result_comp,
+*** End Yuri C.++ 04.12.19
+              duration
+                 .
+  RANGES : r_fld_name FOR dd03p-fieldname,
+           r_fld_val FOR dd03p-fieldname .
+  DATA: fld_name TYPE fieldname.
+  DATA: i TYPE i,
+        ci(1) TYPE c,
+        nfields TYPE i VALUE 3.   "
+  DATA : backdays  TYPE i ,
+         date_from LIKE sy-datum .
+  DATA : langu LIKE sy-langu .
+  DATA : is_out(1) TYPE c.
+  DATA : time_diff TYPE  int4 .
+*** Begin Yuri C.++ 04.12.19
+  DATA: lv_amount_from  TYPE dmbtr,
+        lv_amount_to    TYPE dmbtr,
+        lv_amount_fr    TYPE dmbtr,
+        lv_query        TYPE string,
+        lv_query1       TYPE string,
+        lv_query2       TYPE string,
+        lv_query_curr   TYPE string,
+        lv_text1        TYPE string,
+        lv_text2        TYPE string,
+        lv_type1        TYPE datatype_d,
+        lv_type2        TYPE datatype_d,
+        lv_open         TYPE boole_d VALUE 'X',
+        lv_open_waers   TYPE boole_d VALUE 'X',
+        lv_open_having  TYPE boole_d VALUE 'X',
+        lv_having       TYPE boole_d,
+        lv_val          TYPE char21,
+        lv_field1_exist TYPE boole_d,
+        lv_field2_exist TYPE boole_d,
+        lv_waers_exist  TYPE boole_d,
+        lv_alias1       TYPE /skn/e_sw_alias,
+        lv_alias2       TYPE /skn/e_sw_alias,
+        lv_alias_curr   TYPE /skn/e_sw_alias,
+        lv_return       TYPE sysubrc,
+        lv_tabix        TYPE i,
+        lv_waers        TYPE waers.
+  DATA: ls_waers TYPE ty_waers.
+  DATA: lt_waers TYPE tt_waers.
+  DATA: lt_option         TYPE TABLE OF rfc_db_opt,
+        lt_iblnr_option   TYPE TABLE OF rfc_db_opt,
+        lt_werks_option   TYPE TABLE OF rfc_db_opt,
+        lt_out_where_cond TYPE TABLE OF /skn/s_sw_where_tab,
+        lt_having_options TYPE TABLE OF rfc_db_opt,
+        lt_in_range	      TYPE TABLE OF /skn/s_sw_range_tab,
+        lt_sel_fields     TYPE /skn/tt_sel_fields,
+        lt_dd03l          TYPE TABLE OF dd03l,
+        lt_data           TYPE TABLE OF /skn/s_sw_10_02_invent_cnt.
+  DATA: lwa_out_where_cond LIKE LINE OF lt_out_where_cond,
+        lwa_in_range       LIKE LINE OF lt_in_range,
+        ls_option          LIKE LINE OF lt_option,
+        ls_having_options  TYPE rfc_db_opt,
+        ls_sel_fields      LIKE LINE OF lt_sel_fields,
+        ls_dd03l           TYPE dd03l.
+*** End Yuri C.++ 04.12.19
+  DATA : w_data LIKE LINE OF t_data .
+  DATA: BEGIN OF ls_werks,
+         werks    TYPE werks_d,
+         budat    TYPE budat,
+         sum_diff TYPE f,
+         waers    TYPE waers,
+        END OF ls_werks.
+  DATA: lt_werks LIKE TABLE OF ls_werks.
+  DATA: BEGIN OF ls_iblnr,
+         iblnr TYPE iblnr,
+         gjahr TYPE gjahr,
+        END OF ls_iblnr.
+  DATA: lt_iblnr LIKE TABLE OF ls_iblnr.
+  DATA: BEGIN OF ls_iblnr_sum,
+         iblnr TYPE iblnr,
+         gjahr TYPE gjahr,
+         sum_diff TYPE f,
+        END OF ls_iblnr_sum.
+  DATA: lt_iblnr_sum LIKE TABLE OF ls_iblnr_sum.
+  data_multy: iblnr_tot   iblnr,
+              gjahr_tot   gjahr,
+              dmbtr       dmbtr.
+  DATA : sy_tabix LIKE sy-tabix .
+  DATA : fld(60) TYPE c .
+  DATA : ref_date TYPE d.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS: <fs> TYPE any ,
+                 <fs_v> TYPE any .
+  DATA: lv_sel_ikpf   TYPE string,
+        lv_sel_iseg1  TYPE string,
+        lv_sel_iseg2  TYPE string,
+        lv_sel_iseg3  TYPE string,
+        lv_sel_clause TYPE string.
+  "--- Run Cloud Mode -----
+  data_single: sw_dest rfcdest.             .
+  select_single: sw_dest.
+  IF lv_sw_dest IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_02_INVENT_CNT'
+      IMPORTING
+        is_alert = is_alert
+      TABLES
+        t_select = t_select
+        t_data   = t_data.
+  ENDIF.
+  CHECK lv_sw_dest IS INITIAL.
+  "--- Run Cloud Mode -----
+  IF r_datum[] IS INITIAL .
+    rs_datum-sign   = 'I' .
+    rs_datum-option = 'GE' .
+    date_from       = sy-datum - lv_backdays .
+    rs_datum-low    = date_from .
+    APPEND rs_datum TO r_datum.
+  ENDIF.
+  "--- Set Reference Date Field
+  CASE lv_date_ref_fld.
+    WHEN 'BLDAT'.
+      r_bldat[] = r_datum[]. "Document Date in Document
+    WHEN 'GIDAT'.
+      r_gidat[] = r_datum[]. "Planned date of inventory count
+    WHEN 'ZLDAT'.
+      r_zldat[] = r_datum[].  "Date of last count
+    WHEN 'BUDAT'.
+      r_budat[] = r_datum[].  "Posting Date in the Document
+    WHEN OTHERS.
+      r_budat[] = r_datum[].  "Posting Date in the Document
+  ENDCASE.
+  REFRESH r_dmbtr.
+  IF lv_present_zero IS INITIAL.
+    "--- <> 0.
+    rs_dmbtr-sign   = 'I'.
+    rs_dmbtr-option = 'NE'.
+    rs_dmbtr-low    = 0.
+    APPEND rs_dmbtr TO r_dmbtr.
+  ENDIF.
+*--- Retrieve data
+  CLEAR is_alert .
+  REFRESH t_data.
+*** Begin Yuri C.++ 04.12.19
+  rs_result_comp-sign   = 'I'.
+  rs_result_comp-option = 'GE'.
+  rs_result_comp-low    = lv_diff_amount.
+  APPEND rs_result_comp TO r_result_comp[].
+  CLEAR: rs_result_comp.
+  rs_result_comp-sign   = 'I'.
+  rs_result_comp-option = 'LE'.
+  rs_result_comp-low    = lv_diff_amount_.
+  APPEND rs_result_comp TO r_result_comp[].
+**************** Get Table field details ******************
+  CLEAR: lt_option[], lt_out_where_cond[].
+  CLEAR: ls_option.
+  IF lv_ref_tabname1 IS NOT INITIAL.
+    IF lt_option IS NOT INITIAL.
+      CONCATENATE 'AND' 'TABNAME' 'EQ' INTO lv_query SEPARATED BY space.
+    ELSE.
+      CONCATENATE 'TABNAME' 'EQ' INTO lv_query SEPARATED BY space.
+    ENDIF.
+    CONCATENATE ''''lv_ref_tabname1''''  INTO lv_ref_tabname1.
+    CONCATENATE lv_query lv_ref_tabname1 INTO ls_option-text SEPARATED BY space.
+    APPEND ls_option TO lt_option.
+  ENDIF.
+  CLEAR: ls_option.
+  IF lv_ref_tabname2 IS NOT INITIAL.
+    IF lt_option IS NOT INITIAL.
+      CONCATENATE 'AND' 'TABNAME' 'EQ' INTO lv_query SEPARATED BY space.
+    ELSE.
+      CONCATENATE 'TABNAME' 'EQ' INTO lv_query SEPARATED BY space.
+    ENDIF.
+    CONCATENATE ''''lv_ref_tabname2''''  INTO lv_ref_tabname2.
+    CONCATENATE lv_query lv_ref_tabname2 INTO ls_option-text SEPARATED BY space.
+    APPEND ls_option TO lt_option.
+  ENDIF.
+  IF lt_option IS NOT INITIAL.
+* Select table fields
+    SELECT *
+      FROM dd03l
+      INTO TABLE lt_dd03l
+      WHERE (lt_option).
+  ENDIF.
+  CLEAR: ls_option,
+         lt_option.
+* Check REF field 1 in table fields
+  READ TABLE lt_dd03l INTO ls_dd03l WITH KEY fieldname = lv_ref_field1.
+  IF sy-subrc = 0.
+    lv_field1_exist = 'X'.
+    lv_type1        = ls_dd03l-datatype.
+  ENDIF.
+  CLEAR: ls_dd03l.
+* Check REF field 2 in table fields
+  READ TABLE lt_dd03l INTO ls_dd03l WITH KEY fieldname = lv_ref_field2.
+  IF sy-subrc = 0.
+    lv_field2_exist = 'X'.
+    lv_type2        = ls_dd03l-datatype.
+  ENDIF.
+  REPLACE ALL OCCURRENCES OF '''' IN lv_ref_tabname1 WITH ''.
+  REPLACE ALL OCCURRENCES OF '''' IN lv_ref_tabname2 WITH ''.
+* Set Alias
+  IF lv_field1_exist EQ 'X'.
+    CASE lv_ref_tabname1.
+      WHEN 'ISEG'.
+        lv_alias1 = 'b'.
+*      WHEN ''.
+*        lv_alias1 = ''.
+      WHEN OTHERS.
+    ENDCASE.
+    CONCATENATE lv_alias1 lv_ref_field1 INTO lv_query1
+      SEPARATED BY '~'.
+  ENDIF.
+  IF lv_field2_exist EQ 'X'.
+    IF lv_ref_tabname1 <> lv_ref_tabname2 AND lv_ref_tabname2 IS NOT INITIAL.
+      CASE lv_ref_tabname2.
+        WHEN 'ISEG'.
+          lv_alias2 = 'b'.
+*        WHEN ''.
+*          lv_alias2 = ''.
+        WHEN OTHERS.
+      ENDCASE.
+    ELSE.
+      lv_alias2 = lv_alias1.
+    ENDIF.
+    CONCATENATE lv_alias2 lv_ref_field2 INTO lv_query2
+      SEPARATED BY '~'.
+  ENDIF.
+**************** Get Table field details ******************
+**** Get all Currencies type of documents from T001 Table
+  IF lv_waers_fr IS NOT INITIAL AND r_result_comp[] IS NOT INITIAL.
+    REFRESH: lt_out_where_cond.
+    CLEAR: lt_option.
+*** T001W *****
+    _range_to_sel_table 'w~WERKS' werks.
+    _range_to_sel_table 'w~BWKEY' bwkey.
+**** T001W ****
+**** T001K ****
+    _range_to_sel_table 'k~BUKRS' bukrs.
+**** T001K ****
+**** T001 ****
+    _range_to_sel_table 't~WAERS' waers.
+    _range_to_sel_table 't~KTOPL' ktopl.
+**** T001 ****
+    lt_option[] = lt_out_where_cond[].
+    SELECT t~waers
+      FROM t001w AS w INNER JOIN t001k AS k ON w~bwkey EQ k~bwkey
+                      INNER JOIN t001  AS t ON k~bukrs EQ t~bukrs
+      INTO TABLE lt_waers
+      WHERE (lt_option)
+      GROUP BY t~waers.
+    IF sy-subrc = 0.
+      lv_waers_exist = 'X'.
+    ENDIF.
+  ENDIF.
+**** Get all Currencies type of documents from T001 Table
+*** End Yuri C.++ 04.12.19
+*** Begin Yuri C.-- 04.12.19
+*  IF lv_agg_lvl = ''. "Single
+*
+*    _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+*    " i_tabname = &1 , i_structure = &2 , TABLE_ALIAS = &3,  TAB_DEST  = &4 , S  EL_CLAUSE   = &5.
+*    _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg.
+*    CONCATENATE lv_sel_ikpf lv_sel_iseg INTO lv_sel_clause SEPARATED BY ' '.
+*    CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+*    SELECT (lv_sel_clause)  "   *
+*       FROM ikpf AS a
+*       INNER JOIN iseg AS b ON  a~iblnr = b~iblnr
+*                            AND a~gjahr = b~gjahr
+*       INTO CORRESPONDING FIELDS OF TABLE t_data
+*       WHERE  a~vgart IN r_vgart
+*         AND  b~werks IN r_werks
+*         AND  b~lgort IN r_lgort
+*         AND  b~sobkz IN r_sobkz
+*         AND  b~usnam IN r_usnam
+*         AND  a~usnam IN r_usnam_hd
+*         AND  a~sperr IN r_sperr
+*         AND  a~zstat IN r_zstat
+*         AND  a~dstat IN r_dstat
+*         AND  a~lstat IN r_lstat
+*         AND  a~xbufi IN r_xbufi
+*         AND  b~waers IN r_waers   "10/02/18
+*
+*         AND a~bldat IN r_bldat
+*         AND a~gidat IN r_gidat
+*         AND b~zldat IN r_zldat  "?????
+*         AND b~budat IN r_budat  "?????
+*         AND b~dmbtr IN r_dmbtr  "     <> 0
+*         AND ( b~dmbtr >= lv_diff_amount OR b~dmbtr =< lv_diff_amount_ )
+*             .
+*  ELSEIF lv_agg_lvl = 'WERKS'. "Plant(WERKS)
+*
+*    REFRESH lt_werks.
+*
+*    SELECT b~werks b~budat SUM( b~dmbtr )
+*      FROM ikpf AS a
+*      INNER JOIN iseg AS b
+*      ON a~iblnr = b~iblnr
+*      AND a~gjahr = b~gjahr
+*      INTO (ls_werks-werks, ls_werks-budat, ls_werks-sum_diff)
+*      WHERE  a~vgart IN r_vgart
+*        AND  b~werks IN r_werks
+*        AND  b~lgort IN r_lgort
+*        AND  b~sobkz IN r_sobkz
+*        AND  b~usnam IN r_usnam
+*        AND  a~usnam IN r_usnam_hd
+*        AND  a~sperr IN r_sperr
+*        AND  a~zstat IN r_zstat
+*        AND  a~dstat IN r_dstat
+*        AND  a~lstat IN r_lstat
+*        AND  a~xbufi IN r_xbufi
+*        AND  b~waers IN r_waers   "10/02/18
+*
+*        AND a~bldat IN r_bldat
+*        AND a~gidat IN r_gidat
+*        AND b~zldat IN r_zldat  "?????
+*        AND b~budat IN r_budat  "?????
+*        AND b~dmbtr <> 0
+*      GROUP BY b~werks b~budat
+*      HAVING SUM( b~dmbtr )  > lv_diff_amount OR
+*             SUM( b~dmbtr )  < lv_diff_amount_.
+*      "and ( b~DMBTR > lv_DIFF_AMOUNT OR b~DMBTR < lv_DIFF_AMOUNT_ ).
+*      APPEND ls_werks TO lt_werks.
+*    ENDSELECT.
+*
+*    IF lt_werks[] IS NOT INITIAL.
+*
+*      _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+*      _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg.
+*
+*      CONCATENATE lv_sel_ikpf lv_sel_iseg INTO lv_sel_clause SEPARATED BY ' '.
+*      CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+*
+*      SELECT (lv_sel_clause)  "   *
+*       FROM ikpf AS a
+*       INNER JOIN iseg AS b
+*       ON a~iblnr = b~iblnr
+*       AND a~gjahr = b~gjahr
+*       INTO CORRESPONDING FIELDS OF TABLE t_data
+*       FOR ALL ENTRIES IN lt_werks
+*       WHERE  a~vgart IN r_vgart
+*         AND  b~werks = lt_werks-werks
+*         AND  b~budat = lt_werks-budat
+*         AND  b~lgort IN r_lgort
+*         AND  b~sobkz IN r_sobkz
+*         AND  b~usnam IN r_usnam
+*         AND  a~usnam IN r_usnam_hd
+*         AND  a~sperr IN r_sperr
+*         AND  a~zstat IN r_zstat
+*         AND  a~dstat IN r_dstat
+*         AND  a~lstat IN r_lstat
+*         AND  a~xbufi IN r_xbufi
+*         AND  b~waers IN r_waers   "10/02/18
+*
+*   "      and a~BLDAT in R_BLDAT
+*         AND a~gidat IN r_gidat
+*         AND b~zldat IN r_zldat  "?????
+*         AND b~dmbtr IN r_dmbtr.  "     <> 0
+*    ENDIF.
+*    "****************************************************
+*  ELSEIF lv_agg_lvl = 'IBLNR'. "Document (IBLNR)
+*    "--- Get IBLNR
+*    REFRESH lt_iblnr.
+*    SELECT DISTINCT b~iblnr b~gjahr
+*      FROM ikpf AS a
+*      INNER JOIN iseg AS b
+*      ON a~iblnr = b~iblnr
+*      AND a~gjahr = b~gjahr
+*      INTO CORRESPONDING FIELDS OF TABLE lt_iblnr
+*      WHERE  a~vgart IN r_vgart
+*        AND  b~werks IN r_werks
+*        AND  b~lgort IN r_lgort
+*        AND  b~sobkz IN r_sobkz
+*        AND  b~usnam IN r_usnam
+*        AND  a~usnam IN r_usnam_hd
+*        AND  a~sperr IN r_sperr
+*        AND  a~zstat IN r_zstat
+*        AND  a~dstat IN r_dstat
+*        AND  a~lstat IN r_lstat
+*        AND  a~xbufi IN r_xbufi
+*        AND  b~waers IN r_waers   "10/02/18
+*
+*        AND a~bldat IN r_bldat
+*        AND a~gidat IN r_gidat
+*        AND b~zldat IN r_zldat  "?????
+*        AND b~budat IN r_budat  "?????
+*        AND b~dmbtr <> 0.
+**
+*    IF lt_iblnr[] IS NOT INITIAL.
+*      REFRESH: r_iblnr_tot,
+*               r_gjahr_tot.
+*      LOOP AT lt_iblnr INTO ls_iblnr.
+*        rs_iblnr_tot-sign = 'I'.
+*        rs_iblnr_tot-option = 'EQ'.
+*        rs_iblnr_tot-low = ls_iblnr-iblnr.
+*        APPEND rs_iblnr_tot TO r_iblnr_tot.
+*        rs_gjahr_tot-sign = 'I'.
+*        rs_gjahr_tot-option = 'EQ'.
+*        rs_gjahr_tot-low = ls_iblnr-gjahr.
+*        APPEND rs_gjahr_tot TO r_gjahr_tot.
+*      ENDLOOP.
+*      SORT: r_iblnr_tot,
+*            r_gjahr_tot.
+*      DELETE ADJACENT DUPLICATES FROM: r_iblnr_tot,
+*                                       r_gjahr_tot.
+*      REFRESH lt_iblnr_sum.
+*      SELECT b~iblnr b~gjahr SUM( b~dmbtr )
+*        FROM iseg AS b
+*         INTO (ls_iblnr_sum-iblnr, ls_iblnr_sum-gjahr, ls_iblnr_sum-sum_diff)
+**        FOR ALL ENTRIES IN lt_IBLNR
+*         WHERE b~iblnr IN r_iblnr_tot
+*           AND b~gjahr IN r_gjahr_tot
+*           AND b~dmbtr <> 0
+*         GROUP BY b~iblnr b~gjahr
+*         HAVING SUM( b~dmbtr )  > lv_diff_amount OR
+*               SUM( b~dmbtr )  < lv_diff_amount_.
+*        APPEND ls_iblnr_sum TO lt_iblnr_sum.
+*      ENDSELECT.
+*    ENDIF.
+*
+*    IF lt_iblnr_sum[] IS NOT INITIAL.
+*
+*      _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+*      _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg.
+*      CONCATENATE lv_sel_ikpf lv_sel_iseg INTO lv_sel_clause SEPARATED BY ' '.
+*      CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+*
+*      SELECT (lv_sel_clause)  "   *
+*         FROM ikpf AS a
+*         INNER JOIN iseg AS b
+*           ON a~iblnr = b~iblnr
+*          AND a~gjahr = b~gjahr
+*         INTO CORRESPONDING FIELDS OF TABLE t_data
+*         FOR ALL ENTRIES IN lt_iblnr_sum
+*         WHERE a~iblnr = lt_iblnr_sum-iblnr
+*           AND a~gjahr = lt_iblnr_sum-gjahr
+*           AND b~dmbtr IN r_dmbtr.  "     <> 0
+*    ENDIF.
+*
+*  ELSE.
+*  ENDIF.
+*** End Yuri C.-- 04.12.19
+*** Begin Yuri C.++ 04.12.19
+  IF lt_waers IS NOT INITIAL AND ( lv_field1_exist EQ 'X' OR
+       lv_field2_exist EQ 'X' ) AND lv_waers_exist EQ 'X'.
+    lv_alias_curr = 'b'.
+    REFRESH: lt_out_where_cond[].
+* IKPF
+    _range_to_sel_table 'a~vgart'  vgart.
+    _range_to_sel_table 'a~usnam'  usnam_hd.
+    _range_to_sel_table 'a~sperr'  sperr.
+    _range_to_sel_table 'a~zstat'  zstat.
+    _range_to_sel_table 'a~dstat'  dstat.
+    _range_to_sel_table 'a~lstat'  lstat.
+    _range_to_sel_table 'a~xbufi'  xbufi.
+    _range_to_sel_table 'a~bldat'  bldat.
+    _range_to_sel_table 'a~gidat'  gidat.
+* ISEG
+    _range_to_sel_table 'b~werks'  werks.
+    _range_to_sel_table 'b~lgort'  lgort.
+    _range_to_sel_table 'b~sobkz'  sobkz.
+    _range_to_sel_table 'b~usnam'  usnam.
+*    _range_to_sel_table 'b~waers'  waers.
+    _range_to_sel_table 'b~zldat'  zldat.
+    _range_to_sel_table 'b~budat'  budat.
+    _range_to_sel_table 'b~dmbtr'  dmbtr.
+    IF lv_agg_lvl EQ ''.
+      _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+      _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg1.
+      CONCATENATE lv_sel_ikpf lv_sel_iseg1
+        INTO lv_sel_clause SEPARATED BY ' '.
+      CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD'
+        INTO lv_sel_clause SEPARATED BY ' '.
+    ELSEIF lv_agg_lvl EQ 'WERKS'.
+      REFRESH lt_werks.
+      lv_having = 'X'.
+    ELSEIF lv_agg_lvl EQ 'IBLNR'.
+      REFRESH lt_iblnr.
+      lv_having = 'X'.
+    ENDIF.
+    LOOP AT lt_waers INTO ls_waers.
+      CLEAR: lv_waers, lv_return, lv_tabix, ls_option, lt_option,
+             lt_having_options, lt_werks_option, lt_iblnr_option.
+      lv_open_having = 'X'.
+      APPEND LINES OF lt_out_where_cond TO lt_option.
+      APPEND LINES OF lt_out_where_cond TO lt_iblnr_option.
+      APPEND LINES OF lt_out_where_cond TO lt_werks_option.
+      IF lv_open_waers EQ 'X'.
+        CLEAR: lv_open_waers.
+        ls_option-text = '('.
+        IF lt_option IS NOT INITIAL.
+          CONCATENATE 'AND' ls_option-text INTO ls_option-text SEPARATED BY space.
+        ENDIF.
+        APPEND ls_option TO lt_option.
+      ENDIF.
+      lv_waers = ls_waers-waers.
+      LOOP AT r_result_comp INTO rs_result_comp.
+        lv_tabix = sy-tabix.
+        CLEAR: lv_amount_from, lv_amount_to, lv_amount_fr,
+               ls_option, lv_text1, lv_text2, lv_query_curr,
+               lv_val, lv_return.
+        lv_amount_from = rs_result_comp-low.
+        lv_amount_to   = rs_result_comp-high.
+        IF lv_amount_from IS NOT INITIAL.
+* Set select condition of RS_RESULT_COMP-LOW value
+          IF lv_waers_fr <> lv_waers AND lv_waers IS NOT INITIAL AND
+             lv_waers_fr IS NOT INITIAL.
+            CLEAR: lv_return.
+* Unit conversion for LOW amount
+            CALL FUNCTION 'CONVERT_TO_FOREIGN_CURRENCY'
+              EXPORTING
+                date             = sy-datum
+                foreign_currency = lv_waers        " Document Curr
+                local_amount     = lv_amount_from
+                local_currency   = lv_waers_fr     " Foreign Curr
+              IMPORTING
+                foreign_amount   = lv_amount_fr
+              EXCEPTIONS
+                no_rate_found    = 1
+                overflow         = 2
+                no_factors_found = 3
+                no_spread_found  = 4
+                derived_2_times  = 5
+                OTHERS           = 6.
+            lv_return = sy-subrc.
+          ELSE.
+            lv_amount_fr = lv_amount_from.
+          ENDIF.
+          IF lv_return <> 0.
+            lv_open_waers = 'X'.
+            EXIT.
+          ENDIF.
+          IF lv_amount_fr IS NOT INITIAL.
+            IF lv_tabix > 1.
+              ls_option-text = 'OR'.
+              APPEND ls_option TO lt_option.
+            ENDIF.
+            CLEAR: ls_option.
+            IF lv_open EQ 'X'.
+              CLEAR lv_open.
+              ls_option-text = '('.
+            ENDIF.
+            lv_val = lv_amount_fr.
+            SHIFT lv_val RIGHT DELETING TRAILING space.
+            SHIFT lv_val LEFT DELETING LEADING space.
+            CONCATENATE ''''lv_waers'''' INTO lv_query_curr.
+            CONCATENATE lv_alias_curr '~' 'WAERS' INTO lv_text1.
+            CONCATENATE lv_text1 'EQ' lv_query_curr INTO lv_text2
+              SEPARATED BY space.
+            CONCATENATE ''''lv_val'''' INTO lv_val IN CHARACTER MODE.
+            CONCATENATE ls_option-text lv_text2 'AND'
+                        lv_query1 rs_result_comp-option lv_val
+              INTO ls_option-text SEPARATED BY space.
+          ENDIF.
+* Set select condition of RS_RESULT_COMP-HIGH value
+          IF lv_amount_to IS NOT INITIAL.
+            CLEAR: lv_amount_fr, lv_val.
+* Unit conversion for HIGH amount
+            CALL FUNCTION 'CONVERT_TO_FOREIGN_CURRENCY'
+              EXPORTING
+                date             = sy-datum
+                foreign_currency = ls_waers-waers  " Document Curr
+                local_amount     = lv_amount_to
+                local_currency   = lv_waers_fr     " Foreign Curr
+              IMPORTING
+                foreign_amount   = lv_amount_fr
+              EXCEPTIONS
+                no_rate_found    = 1
+                overflow         = 2
+                no_factors_found = 3
+                no_spread_found  = 4
+                derived_2_times  = 5
+                OTHERS           = 6.
+            IF sy-subrc = 0 AND lv_amount_fr IS NOT INITIAL.
+              IF ls_option IS NOT INITIAL.
+                lv_val = lv_amount_fr.
+                SHIFT lv_val RIGHT DELETING TRAILING space.
+                SHIFT lv_val LEFT DELETING LEADING space.
+                CONCATENATE ''''lv_val'''' INTO lv_val IN CHARACTER MODE.
+                CONCATENATE ls_option-text 'AND' lv_val
+                  INTO ls_option-text SEPARATED BY space.
+              ELSE.
+                lv_val = lv_amount_fr.
+                SHIFT lv_val RIGHT DELETING TRAILING space.
+                SHIFT lv_val LEFT DELETING LEADING space.
+                CONCATENATE ''''lv_val'''' INTO lv_val IN CHARACTER MODE.
+                CONCATENATE ls_option-text 'AND' lv_val
+                  INTO ls_option-text SEPARATED BY space.
+              ENDIF.
+              CLEAR: ls_option.
+              APPEND ls_option TO lt_option.
+            ENDIF.
+          ENDIF.
+          IF lv_open IS INITIAL.
+            CONCATENATE ls_option-text ')' INTO ls_option-text
+              SEPARATED BY space.
+            lv_open = 'X'.
+          ENDIF.
+          IF ls_option IS NOT INITIAL.
+            APPEND ls_option TO lt_option.
+          ENDIF.
+          IF lv_having EQ 'X'.
+            IF lv_open_having EQ 'X'.
+              CONCATENATE '( SUM(' lv_query1 ')' '>' lv_val
+                INTO ls_having_options-text SEPARATED BY space.
+              CLEAR lv_open_having.
+            ELSE.
+              CONCATENATE ls_having_options-text 'OR SUM(' lv_query1 ')'
+                '<' lv_val ')' INTO ls_having_options-text SEPARATED BY space.
+              lv_open_having = 'X'.
+            ENDIF.
+            IF lt_having_options IS NOT INITIAL AND lv_open_having IS INITIAL.
+              CONCATENATE 'AND' ls_having_options-text
+                INTO ls_having_options-text SEPARATED BY space.
+            ENDIF.
+            APPEND ls_having_options TO lt_having_options.
+            CLEAR: ls_having_options.
+            IF lv_field2_exist EQ 'X'.
+* Here we can add another having option query condition
+            ENDIF.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+      IF lv_return = 0.
+        CLEAR: ls_option.
+        IF lv_open_waers IS INITIAL.
+          ls_option-text = ')'.
+          APPEND ls_option TO lt_option.
+          lv_open_waers = 'X'.
+        ENDIF.
+        IF lv_agg_lvl = ''. "Single.
+          SELECT (lv_sel_clause)
+             FROM ikpf AS a
+             INNER JOIN iseg AS b ON  a~iblnr = b~iblnr
+                                  AND a~gjahr = b~gjahr
+             INTO CORRESPONDING FIELDS OF TABLE lt_data
+             WHERE (lt_option)
+                   .
+        ELSEIF lv_agg_lvl = 'WERKS'. "Plant(WERKS)
+          REFRESH lt_werks.
+          CLEAR: lv_sel_clause.
+          lv_sel_iseg1 = 'b~werks'.
+          lv_sel_iseg2 = 'b~budat'.
+          lv_sel_iseg3 = lv_query1.
+          CONCATENATE lv_sel_iseg1 lv_sel_iseg2
+            INTO lv_sel_clause SEPARATED BY space.
+          CONCATENATE lv_sel_clause 'SUM(' lv_sel_iseg3 ')' 'AS SUM_DIFF'
+             INTO lv_sel_clause SEPARATED BY space.
+          CLEAR ls_option.
+* lv_text2 = B~WAERS EQ current currency(to conversion on)
+          ls_option-text = lv_text2.
+          IF lt_werks_option IS NOT INITIAL.
+            CONCATENATE 'AND' ls_option-text INTO ls_option-text
+              SEPARATED BY space.
+          ENDIF.
+          APPEND ls_option TO lt_werks_option.
+          SELECT (lv_sel_clause)  "b~werks b~budat SUM( b~dmbtr )
+            FROM ikpf AS a
+            INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                                 AND a~gjahr EQ b~gjahr
+            INTO CORRESPONDING FIELDS OF ls_werks "(ls_werks-werks, ls_werks-budat, ls_werks-sum_diff)
+            WHERE (lt_werks_option)
+*                   a~vgart IN r_vgart
+*              AND  b~werks IN r_werks
+*              AND  b~lgort IN r_lgort
+*              AND  b~sobkz IN r_sobkz
+*              AND  b~usnam IN r_usnam
+*              AND  a~usnam IN r_usnam_hd
+*              AND  a~sperr IN r_sperr
+*              AND  a~zstat IN r_zstat
+*              AND  a~dstat IN r_dstat
+*              AND  a~lstat IN r_lstat
+*              AND  a~xbufi IN r_xbufi
+*              AND  b~waers IN r_waers   "10/02/18
+*
+*              AND a~bldat IN r_bldat
+*              AND a~gidat IN r_gidat
+*              AND b~zldat IN r_zldat
+*              AND b~budat IN r_budat
+*              AND b~dmbtr <> 0
+              GROUP BY b~werks b~budat
+              HAVING (lt_having_options). "( SUM( b~dmbtr ) > lv_diff_amount OR
+            "  SUM( b~dmbtr ) < lv_diff_amount_ ).
+            APPEND ls_werks TO lt_werks.
+          ENDSELECT.
+          IF lt_werks[] IS NOT INITIAL.
+            CLEAR: lv_sel_clause, lv_sel_ikpf, lv_sel_iseg1.
+            _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+            _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg1.
+            CONCATENATE lv_sel_ikpf lv_sel_iseg1 INTO lv_sel_clause SEPARATED BY ' '.
+            CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+            SELECT (lv_sel_clause)
+             FROM ikpf AS a
+             INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                                  AND a~gjahr EQ b~gjahr
+             INTO CORRESPONDING FIELDS OF TABLE lt_data
+             FOR ALL ENTRIES IN lt_werks
+             WHERE a~vgart IN r_vgart
+             AND   b~werks EQ lt_werks-werks
+             AND   b~budat EQ lt_werks-budat
+             AND   b~lgort IN r_lgort
+             AND   b~sobkz IN r_sobkz
+             AND   b~usnam IN r_usnam
+             AND   a~usnam IN r_usnam_hd
+             AND   a~sperr IN r_sperr
+             AND   a~zstat IN r_zstat
+             AND   a~dstat IN r_dstat
+             AND   a~lstat IN r_lstat
+             AND   a~xbufi IN r_xbufi
+             AND   b~waers IN r_waers
+             AND   a~gidat IN r_gidat
+             AND   b~zldat IN r_zldat
+             AND   b~dmbtr IN r_dmbtr.
+          ENDIF.
+*    "****************************************************
+        ELSEIF lv_agg_lvl = 'IBLNR'. "Document (IBLNR)
+          "--- Get IBLNR
+          REFRESH lt_iblnr.
+          SELECT DISTINCT b~iblnr b~gjahr
+            FROM ikpf AS a INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                                                AND a~gjahr EQ b~gjahr
+            INTO CORRESPONDING FIELDS OF TABLE lt_iblnr
+            WHERE a~vgart IN r_vgart
+            AND   b~werks IN r_werks
+            AND   b~lgort IN r_lgort
+            AND   b~sobkz IN r_sobkz
+            AND   b~usnam IN r_usnam
+            AND   a~usnam IN r_usnam_hd
+            AND   a~sperr IN r_sperr
+            AND   a~zstat IN r_zstat
+            AND   a~dstat IN r_dstat
+            AND   a~lstat IN r_lstat
+            AND   a~xbufi IN r_xbufi
+            AND   b~waers IN r_waers
+            AND   a~bldat IN r_bldat
+            AND   a~gidat IN r_gidat
+            AND   b~zldat IN r_zldat
+            AND   b~budat IN r_budat
+            AND   b~dmbtr NE 0.
+          IF lt_iblnr[] IS NOT INITIAL.
+            REFRESH: r_iblnr_tot,
+                     r_gjahr_tot.
+            LOOP AT lt_iblnr INTO ls_iblnr.
+              rs_iblnr_tot-sign   = 'I'.
+              rs_iblnr_tot-option = 'EQ'.
+              rs_iblnr_tot-low    = ls_iblnr-iblnr.
+              APPEND rs_iblnr_tot TO r_iblnr_tot.
+              rs_gjahr_tot-sign   = 'I'.
+              rs_gjahr_tot-option = 'EQ'.
+              rs_gjahr_tot-low    = ls_iblnr-gjahr.
+              APPEND rs_gjahr_tot TO r_gjahr_tot.
+            ENDLOOP.
+            SORT: r_iblnr_tot,
+                  r_gjahr_tot.
+            DELETE ADJACENT DUPLICATES FROM: r_iblnr_tot,
+                                             r_gjahr_tot.
+            REFRESH lt_iblnr_sum.
+*** Set Selection fields
+            CLEAR: lv_sel_clause.
+            lv_sel_iseg1 = 'b~iblnr'.
+            lv_sel_iseg2 = 'b~gjahr'.
+            lv_sel_iseg3 = lv_query1.
+            CONCATENATE lv_sel_iseg1 lv_sel_iseg2
+              INTO lv_sel_clause SEPARATED BY space.
+            CONCATENATE lv_sel_clause 'SUM(' lv_sel_iseg3 ')' 'AS SUM_DIFF'
+               INTO lv_sel_clause SEPARATED BY space.
+            SELECT (lv_sel_clause) "b~iblnr b~gjahr SUM( b~dmbtr )
+              FROM iseg AS b
+              INTO CORRESPONDING FIELDS OF ls_iblnr_sum "(ls_iblnr_sum-iblnr, ls_iblnr_sum-gjahr, ls_iblnr_sum-sum_diff)
+              WHERE (lt_iblnr_option)
+              AND   b~iblnr IN r_iblnr_tot
+              AND   b~gjahr IN r_gjahr_tot
+              AND   b~dmbtr NE 0
+              GROUP BY b~iblnr b~gjahr
+              HAVING (lt_having_options).   "SUM( b~dmbtr ) > lv_diff_amount
+              "OR     SUM( b~dmbtr ) < lv_diff_amount_.
+              APPEND ls_iblnr_sum TO lt_iblnr_sum.
+            ENDSELECT.
+          ENDIF.
+          IF lt_iblnr_sum[] IS NOT INITIAL.
+            CLEAR: lv_sel_iseg1, lv_sel_ikpf, lv_sel_clause.
+            _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+            _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg1.
+            CONCATENATE lv_sel_ikpf lv_sel_iseg1 INTO lv_sel_clause SEPARATED BY ' '.
+            CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+            SELECT (lv_sel_clause)  "   *
+               FROM ikpf AS a INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                                                   AND a~gjahr EQ b~gjahr
+               INTO CORRESPONDING FIELDS OF TABLE lt_data
+               FOR ALL ENTRIES IN lt_iblnr_sum
+               WHERE a~iblnr EQ lt_iblnr_sum-iblnr
+               AND   a~gjahr EQ lt_iblnr_sum-gjahr
+               AND   b~dmbtr IN r_dmbtr.
+          ENDIF.
+        ENDIF.
+        IF sy-subrc = 0 AND lt_data IS NOT INITIAL.
+          APPEND LINES OF lt_data TO t_data[].
+          CLEAR: lt_data.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ELSE.
+    IF lv_agg_lvl = ''. "Single
+      SELECT (lv_sel_clause)
+         FROM ikpf AS a
+         INNER JOIN iseg AS b ON  a~iblnr = b~iblnr
+                              AND a~gjahr = b~gjahr
+         INTO CORRESPONDING FIELDS OF TABLE t_data
+         WHERE  a~vgart IN r_vgart
+           AND  b~werks IN r_werks
+           AND  b~lgort IN r_lgort
+           AND  b~sobkz IN r_sobkz
+           AND  b~usnam IN r_usnam
+           AND  a~usnam IN r_usnam_hd
+           AND  a~sperr IN r_sperr
+           AND  a~zstat IN r_zstat
+           AND  a~dstat IN r_dstat
+           AND  a~lstat IN r_lstat
+           AND  a~xbufi IN r_xbufi
+           AND  b~waers IN r_waers   "10/02/18
+           AND a~bldat IN r_bldat
+           AND a~gidat IN r_gidat
+           AND b~zldat IN r_zldat
+           AND b~budat IN r_budat
+           AND b~dmbtr IN r_dmbtr
+           AND ( b~dmbtr >= lv_diff_amount OR b~dmbtr =< lv_diff_amount_ )
+               .
+    ELSEIF lv_agg_lvl = 'WERKS'. "Plant(WERKS)
+      REFRESH lt_werks.
+      SELECT b~werks b~budat SUM( b~dmbtr )
+        FROM ikpf AS a
+        INNER JOIN iseg AS b
+        ON a~iblnr = b~iblnr
+        AND a~gjahr = b~gjahr
+        INTO (ls_werks-werks, ls_werks-budat, ls_werks-sum_diff)
+        WHERE  a~vgart IN r_vgart
+          AND  b~werks IN r_werks
+          AND  b~lgort IN r_lgort
+          AND  b~sobkz IN r_sobkz
+          AND  b~usnam IN r_usnam
+          AND  a~usnam IN r_usnam_hd
+          AND  a~sperr IN r_sperr
+          AND  a~zstat IN r_zstat
+          AND  a~dstat IN r_dstat
+          AND  a~lstat IN r_lstat
+          AND  a~xbufi IN r_xbufi
+          AND  b~waers IN r_waers   "10/02/18
+          AND a~bldat IN r_bldat
+          AND a~gidat IN r_gidat
+          AND b~zldat IN r_zldat
+          AND b~budat IN r_budat
+          AND b~dmbtr <> 0
+          GROUP BY b~werks b~budat
+          HAVING SUM( b~dmbtr ) > lv_diff_amount OR
+                 SUM( b~dmbtr ) < lv_diff_amount_.
+        APPEND ls_werks TO lt_werks.
+      ENDSELECT.
+      IF lt_werks[] IS NOT INITIAL.
+        CLEAR: lv_sel_ikpf, lv_sel_iseg1, lv_sel_clause.
+        _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+        _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg1.
+        CONCATENATE lv_sel_ikpf lv_sel_iseg1 INTO lv_sel_clause SEPARATED BY ' '.
+        CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+        SELECT (lv_sel_clause)  "   *
+         FROM ikpf AS a
+         INNER JOIN iseg AS b
+         ON a~iblnr = b~iblnr
+         AND a~gjahr = b~gjahr
+         INTO CORRESPONDING FIELDS OF TABLE t_data
+         FOR ALL ENTRIES IN lt_werks
+         WHERE  a~vgart IN r_vgart
+           AND  b~werks = lt_werks-werks
+           AND  b~budat = lt_werks-budat
+           AND  b~lgort IN r_lgort
+           AND  b~sobkz IN r_sobkz
+           AND  b~usnam IN r_usnam
+           AND  a~usnam IN r_usnam_hd
+           AND  a~sperr IN r_sperr
+           AND  a~zstat IN r_zstat
+           AND  a~dstat IN r_dstat
+           AND  a~lstat IN r_lstat
+           AND  a~xbufi IN r_xbufi
+           AND  b~waers IN r_waers   "10/02/18
+     "      and a~BLDAT in R_BLDAT
+           AND a~gidat IN r_gidat
+           AND b~zldat IN r_zldat  "?????
+           AND b~dmbtr IN r_dmbtr.  "     <> 0
+      ENDIF.
+*    "****************************************************
+    ELSEIF lv_agg_lvl = 'IBLNR'. "Document (IBLNR)
+      "--- Get IBLNR
+      REFRESH lt_iblnr.
+      SELECT DISTINCT b~iblnr b~gjahr
+        FROM ikpf AS a
+        INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                             AND a~gjahr EQ b~gjahr
+        INTO CORRESPONDING FIELDS OF TABLE lt_iblnr
+        WHERE  a~vgart IN r_vgart
+        AND    b~werks IN r_werks
+        AND    b~lgort IN r_lgort
+        AND    b~sobkz IN r_sobkz
+        AND    b~usnam IN r_usnam
+        AND    a~usnam IN r_usnam_hd
+        AND    a~sperr IN r_sperr
+        AND    a~zstat IN r_zstat
+        AND    a~dstat IN r_dstat
+        AND    a~lstat IN r_lstat
+        AND    a~xbufi IN r_xbufi
+        AND    b~waers IN r_waers
+        AND    a~bldat IN r_bldat
+        AND    a~gidat IN r_gidat
+        AND    b~zldat IN r_zldat
+        AND    b~budat IN r_budat
+        AND    b~dmbtr NE 0.
+*
+      IF lt_iblnr[] IS NOT INITIAL.
+        REFRESH: r_iblnr_tot,
+                 r_gjahr_tot.
+        LOOP AT lt_iblnr INTO ls_iblnr.
+          rs_iblnr_tot-sign   = 'I'.
+          rs_iblnr_tot-option = 'EQ'.
+          rs_iblnr_tot-low    = ls_iblnr-iblnr.
+          APPEND rs_iblnr_tot TO r_iblnr_tot.
+          rs_gjahr_tot-sign   = 'I'.
+          rs_gjahr_tot-option = 'EQ'.
+          rs_gjahr_tot-low    = ls_iblnr-gjahr.
+          APPEND rs_gjahr_tot TO r_gjahr_tot.
+        ENDLOOP.
+        SORT: r_iblnr_tot,
+              r_gjahr_tot.
+        DELETE ADJACENT DUPLICATES FROM: r_iblnr_tot,
+                                         r_gjahr_tot.
+        REFRESH lt_iblnr_sum.
+        SELECT b~iblnr b~gjahr SUM( b~dmbtr )
+          FROM iseg AS b
+           INTO (ls_iblnr_sum-iblnr, ls_iblnr_sum-gjahr, ls_iblnr_sum-sum_diff)
+           WHERE b~iblnr IN r_iblnr_tot
+           AND   b~gjahr IN r_gjahr_tot
+           AND   b~dmbtr NE 0
+           GROUP BY b~iblnr b~gjahr
+           HAVING SUM( b~dmbtr ) > lv_diff_amount OR
+                  SUM( b~dmbtr ) < lv_diff_amount_.
+          APPEND ls_iblnr_sum TO lt_iblnr_sum.
+        ENDSELECT.
+      ENDIF.
+      IF lt_iblnr_sum[] IS NOT INITIAL.
+        CLEAR: lv_sel_ikpf, lv_sel_iseg1, lv_sel_clause.
+        _build_sql_sel_clause 'IKPF' '/SKN/S_SW_10_02_INVENT_CNT' 'a' ' ' lv_sel_ikpf.
+        _build_sql_sel_clause 'ISEG' '/SKN/S_SW_10_02_INVENT_CNT' 'b' ' ' lv_sel_iseg1.
+        CONCATENATE lv_sel_ikpf lv_sel_iseg1 INTO lv_sel_clause SEPARATED BY ' '.
+        CONCATENATE lv_sel_clause 'a~USNAM as USNAM_HD' INTO lv_sel_clause SEPARATED BY ' '.
+        SELECT (lv_sel_clause)  "   *
+           FROM ikpf AS a INNER JOIN iseg AS b ON  a~iblnr EQ b~iblnr
+                                               AND a~gjahr EQ b~gjahr
+           INTO CORRESPONDING FIELDS OF TABLE t_data
+           FOR ALL ENTRIES IN lt_iblnr_sum
+           WHERE a~iblnr EQ lt_iblnr_sum-iblnr
+           AND   a~gjahr EQ lt_iblnr_sum-gjahr
+           AND   b~dmbtr IN r_dmbtr.  "     <> 0
+      ENDIF.
+    ENDIF.
+  ENDIF.
+*** End Yuri C.++ 04.02.19
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT t_data .
+    sy_tabix = sy-tabix .
+    CONCATENATE 'T_DATA-' lv_date_ref_fld INTO fld .
+    ASSIGN (fld) TO <fs>.
+    ref_date = <fs> .
+    IF NOT ref_date IS INITIAL.
+      t_data-duration_unit = lv_duration_unit.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          d_from      = ref_date
+          t_from      = sy-uzeit
+          d_to        = sy-datum
+          t_to        = sy-uzeit
+          time_unit   = lv_duration_unit   "'D'
+        IMPORTING
+          time_diff   = time_diff
+        EXCEPTIONS
+          wrong_value = 1
+          OTHERS      = 2.
+      IF sy-subrc = 0.
+        IF time_diff < '999999'.
+          t_data-duration  = time_diff .
+        ELSE.
+          t_data-duration  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY t_data INDEX sy_tabix.
+    ENDIF.
+  ENDLOOP.
+  DELETE t_data WHERE duration  NOT IN r_duration .
+******************************************************************************
+  LOOP AT t_data .
+    sy_tabix = sy-tabix .
+    ""    t_data-ABS_DMBTR = abs( t_data-DMBTR ).
+    IF t_data-menge < t_data-buchm.
+      t_data-abs_dmbtr = t_data-dmbtr * ( -1 ).
+    ELSE.
+      t_data-abs_dmbtr = t_data-dmbtr.
+    ENDIF.
+    MODIFY t_data INDEX sy_tabix.
+  ENDLOOP.
+********************************************************************************
+  LOOP AT t_data.
+**Material desc
+    sy_tabix = sy-tabix .
+    CALL FUNCTION '/SKN/F_SW_10_MATERIAL_DESC'
+      EXPORTING
+        matnr         = t_data-matnr
+        langu         = lv_langu
+      IMPORTING
+        material_desc = t_data-mat_desc
+      EXCEPTIONS
+        wrong_code    = 1
+        OTHERS        = 2.
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+    ENDIF.
+*** Begin Yuri C.++ 11.12.19
+    t_data-ref_field_name1 = lv_ref_field1.
+    t_data-ref_field_name2 = lv_ref_field2.
+    t_data-waers_fr        = lv_waers_fr.
+*** End Yuri C.++ 11.12.19
+    MODIFY t_data INDEX sy_tabix.
+  ENDLOOP.
+*****************************************************************
+*--- Check Alert Information
+  READ TABLE t_data INDEX 1.
+  CHECK NOT sy-tfill  IS INITIAL .
+  is_alert = 'X' .
+ENDFUNCTION.

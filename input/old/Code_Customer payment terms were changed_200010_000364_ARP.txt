@@ -1,0 +1,253 @@
+  FUNCTION /SKN/F_SW_10_06_PT_CHNG_LOG .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_PT_CHNG_LOG
+*"----------------------------------------------------------------------
+    "-----------------------------------------------
+    " 1. Parameters Definition                     "
+    "-----------------------------------------------
+    DATA_SINGLE: BACKDAYS  INT4,
+                 SW_DEST   RFCDEST,
+                 SPRAS     LANGU.
+    DATA_MULTY: OBJECTID    KUNNR,
+                ZTERM       DZTERM,
+                KUNNR       KUNNR,
+                BUKRS       BUKRS,
+                VKORG       VKORG,
+                VTWEG       VTWEG,
+                MATNR       MATNR,
+                USERNAME    CDUSERNAME.
+    TYPES: BEGIN OF TY_KNA1,
+             KUNNR TYPE KNA1-KUNNR,
+             NAME1 TYPE KNA1-NAME1,
+           END OF TY_KNA1,
+           TT_KNA1 TYPE STANDARD TABLE OF TY_KNA1.
+    TYPES: BEGIN OF TY_T001,
+             BUKRS TYPE T001-BUKRS,
+             BUTXT TYPE T001-BUTXT,
+           END OF TY_T001,
+           TT_T001 TYPE STANDARD TABLE OF TY_T001.
+    TYPES: BEGIN OF TY_TVKOT,
+             SPRAS TYPE TVKOT-SPRAS,
+             VKORG TYPE TVKOT-VKORG,
+             VTEXT TYPE TVKOT-VTEXT,
+           END OF TY_TVKOT,
+           TT_TVKOT TYPE STANDARD TABLE OF TY_TVKOT.
+    CONSTANTS: C_KEY TYPE STRING VALUE 'KEY',
+               C_V   TYPE STRING VALUE '_V',
+               C_BUKRS TYPE FIELDNAME VALUE 'BUKRS',
+               C_VKORG TYPE FIELDNAME VALUE 'VKORG',
+               C_VTWEG TYPE FIELDNAME VALUE 'VTWEG',
+               C_SPART TYPE FIELDNAME VALUE 'SPART',
+               C_KNB1  TYPE TABNAME   VALUE 'KNB1',
+               C_KNVV  TYPE TABNAME   VALUE 'KNVV'.
+    DATA: LV_COMP       TYPE CHAR10,
+          LV_IND        TYPE CHAR2,
+          LV_BREAK      TYPE FLAG,
+          LV_EXIT       TYPE BOOLE_D.
+    DATA: LS_DATA LIKE LINE OF T_DATA[].
+    DATA: LT_DATA TYPE TABLE OF /SKN/S_SW_10_06_MD_CHNG_LOG,
+          LT_KNA1  TYPE TT_KNA1,
+          LT_T001  TYPE TT_T001,
+          LT_TVKOT TYPE TT_TVKOT.
+    DATA: LS_DATA_MD LIKE LINE OF LT_DATA,
+          LS_KNA1    TYPE TY_KNA1,
+          LS_T001    TYPE TY_T001,
+          LS_TVKOT   TYPE TY_TVKOT.
+    FIELD-SYMBOLS: <FS_DATA> LIKE LINE OF T_DATA[],
+                   <FS_VAL>  TYPE ANY.
+    SELECT_SINGLE: BACKDAYS,
+                   SW_DEST,
+                   SPRAS.
+    SELECT_MULTY: OBJECTID,
+                  ZTERM,
+                  KUNNR,
+                  BUKRS,
+                  VKORG,
+                  VTWEG,
+                  MATNR,
+                  USERNAME.
+    IF LV_SPRAS IS INITIAL.
+      LV_SPRAS = 'E'.
+    ENDIF.
+* Configuration Alert
+    CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = LT_DATA.
+* Check if found some change in configuration log
+    CHECK IS_ALERT EQ 'X'.
+    SELECT_MULTY: ZTERM,
+                  KUNNR,
+                  BUKRS,
+                  VKORG,
+                  VTWEG,
+                  MATNR.
+* Move data change's log to main tab.
+    LOOP AT LT_DATA INTO LS_DATA_MD WHERE OBJECTID IS NOT INITIAL.
+      CLEAR: LV_BREAK, LV_IND, LS_DATA, LV_EXIT.
+      MOVE-CORRESPONDING LS_DATA_MD TO LS_DATA.
+      LS_DATA-KUNNR = LS_DATA_MD-OBJECTID.
+      ASSIGN LS_DATA TO <FS_DATA>.
+      CASE LS_DATA-TABNAME.
+        WHEN C_KNB1. "'KNB1'.
+          WHILE LV_BREAK IS INITIAL.
+            LV_IND = LV_IND + 1.
+            CLEAR: LV_COMP.
+            CONCATENATE C_KEY LV_IND INTO LV_COMP.
+            ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+              TO <FS_VAL>.
+            IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+              CASE <FS_VAL>.
+                WHEN C_BUKRS. "'BUKRS'.
+                  CONCATENATE C_KEY LV_IND C_V INTO LV_COMP.
+                  UNASSIGN <FS_VAL>.
+                  ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+                    TO <FS_VAL>.
+                  IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+                    IF R_BUKRS IS NOT INITIAL.
+                      IF <FS_VAL> IN R_BUKRS.
+                        <FS_DATA>-BUKRS = <FS_VAL>.
+                      ELSE.
+                        LV_EXIT = 'X'.
+                        EXIT.
+                      ENDIF.
+                    ELSE.
+                      <FS_DATA>-BUKRS = <FS_VAL>.
+                    ENDIF.
+                  ENDIF.
+              ENDCASE.
+            ELSE.
+              LV_BREAK = 'X'.
+            ENDIF.
+            UNASSIGN <FS_VAL>.
+          ENDWHILE.
+        WHEN C_KNVV. "'KNVV'.
+          WHILE LV_BREAK IS INITIAL.
+            LV_IND = LV_IND + 1.
+            CLEAR: LV_COMP.
+            CONCATENATE C_KEY LV_IND INTO LV_COMP.
+            ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+              TO <FS_VAL>.
+            IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+              CLEAR: LV_COMP.
+              CASE <FS_VAL>.
+                WHEN C_VKORG. "'VKORG'.
+                  CONCATENATE C_KEY LV_IND C_V INTO LV_COMP.
+                  UNASSIGN <FS_VAL>.
+                  ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+                    TO <FS_VAL>.
+                  IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+                    IF R_VKORG IS NOT INITIAL.
+                      IF <FS_VAL> IN R_VKORG.
+                        <FS_DATA>-VKORG = <FS_VAL>.
+                      ELSE.
+                        LV_EXIT = 'X'.
+                        EXIT.
+                      ENDIF.
+                    ELSE.
+                      <FS_DATA>-VKORG = <FS_VAL>.
+                    ENDIF.
+                  ENDIF.
+                WHEN C_VTWEG. "'VTWEG'.
+                  CONCATENATE C_KEY LV_IND C_V INTO LV_COMP.
+                  UNASSIGN <FS_VAL>.
+                  ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+                  TO <FS_VAL>.
+                  IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+                    IF R_VTWEG IS NOT INITIAL.
+                      IF <FS_VAL> IN R_VTWEG.
+                        <FS_DATA>-VTWEG = <FS_VAL>.
+                      ELSE.
+                        LV_EXIT = 'X'.
+                        EXIT.
+                      ENDIF.
+                    ELSE.
+                      <FS_DATA>-VTWEG = <FS_VAL>.
+                    ENDIF.
+                  ENDIF.
+                WHEN C_SPART. "'SPART'.
+                  CONCATENATE C_KEY LV_IND C_V INTO LV_COMP.
+                  UNASSIGN <FS_VAL>.
+                  ASSIGN COMPONENT LV_COMP OF STRUCTURE LS_DATA_MD
+                  TO <FS_VAL>.
+                  IF SY-SUBRC = 0 AND <FS_VAL> IS NOT INITIAL.
+                    <FS_DATA>-SPART = <FS_VAL>.
+                  ENDIF.
+              ENDCASE.
+              UNASSIGN <FS_VAL>.
+            ELSE.
+              LV_BREAK = 'X'.
+            ENDIF.
+          ENDWHILE.
+      ENDCASE.
+      IF LV_EXIT EQ 'X'.
+        CONTINUE.
+      ENDIF.
+      LS_DATA-ZTERM_OLD = LS_DATA_MD-VALUE_OLD.
+      LS_DATA-ZTERM_NEW = LS_DATA_MD-VALUE_NEW.
+      APPEND LS_DATA TO T_DATA[].
+    ENDLOOP.
+* if sw_dest is empty then on premise, else on cloud
+    IF LV_SW_DEST IS NOT INITIAL.
+      CALL FUNCTION '/SKN/FC_SW_10_06_PT_CHNG_LOG'
+        IMPORTING
+          IS_ALERT = IS_ALERT
+        TABLES
+          T_SELECT = T_SELECT
+          T_DATA   = T_DATA.
+    ENDIF.
+    CHECK LV_SW_DEST IS INITIAL.
+    IF T_DATA[] IS NOT INITIAL.
+      SELECT KUNNR NAME1
+        INTO TABLE LT_KNA1
+        FROM KNA1
+        FOR ALL ENTRIES IN T_DATA
+        WHERE KUNNR EQ T_DATA-KUNNR.
+      SELECT BUKRS BUTXT
+        FROM T001
+        INTO TABLE LT_T001
+        FOR ALL ENTRIES IN T_DATA[]
+        WHERE BUKRS EQ T_DATA-BUKRS.
+      SELECT SPRAS VKORG VTEXT
+        FROM TVKOT
+        INTO TABLE LT_TVKOT
+        FOR ALL ENTRIES IN T_DATA[]
+        WHERE SPRAS EQ LV_SPRAS
+        AND   VKORG EQ T_DATA-VKORG.
+    ENDIF.
+* Customer Description Name
+    LOOP AT T_DATA ASSIGNING <FS_DATA>.
+      IF <FS_DATA>-KUNNR IS NOT INITIAL.
+        READ TABLE LT_KNA1 INTO LS_KNA1 WITH KEY KUNNR = <FS_DATA>-KUNNR
+                                                 BINARY SEARCH.
+        IF SY-SUBRC = 0.
+          <FS_DATA>-NAME1 = LS_DATA-NAME1.
+        ENDIF.
+        IF <FS_DATA>-BUKRS IS NOT INITIAL.
+          READ TABLE LT_T001 INTO LS_T001 WITH KEY BUKRS = <FS_DATA>-BUKRS.
+          IF SY-SUBRC = 0.
+            <FS_DATA>-BUTXT = LS_T001-BUTXT.
+          ENDIF.
+        ENDIF.
+        IF <FS_DATA>-VKORG IS NOT INITIAL.
+          READ TABLE LT_TVKOT INTO LS_TVKOT WITH KEY VKORG = <FS_DATA>-VKORG.
+          IF SY-SUBRC = 0.
+            <FS_DATA>-BUTXT = LS_T001-BUTXT.
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+    IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+    ENDIF.
+    READ TABLE T_DATA INTO LS_DATA INDEX 1.
+    CHECK SY-TFILL IS NOT INITIAL .
+    IS_ALERT = 'X' .
+  ENDFUNCTION.

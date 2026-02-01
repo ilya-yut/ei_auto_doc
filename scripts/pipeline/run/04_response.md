@@ -1,456 +1,244 @@
 ### Parameter Configuration Guidelines
 
-**IMPORTANT:** This section provides configuration guidance for ALL 117 parameters listed in the Parameters Reference Table above.
+**IMPORTANT:** This section provides configuration guidance for ALL 57 parameters listed in the Parameters Reference Table above.
 
+**AD_NAMEFIR** (First Name):
+
+First name of the user who posted the document. Populated from user master when full line detail is requested; used for display.
+
+**AD_NAMELAS** (Last Name):
+
+Last name of the user who posted the document. Populated from user master when full line detail is requested; used for display.
 
 **AEDAT** (Changed On):
 
-Filters delivery and delivery-item data by the "changed on" date (LIKP/LIPS header and line). The EI applies this to the date range derived from BACKDAYS and DATE_REF_FLD when DATE_REF_FLD is set to AEDAT. Use to focus on recently changed deliveries.
+Date the record was last changed. Restricts which documents are included by change date; when DATE_REF_FLD = AEDAT, the default date range is applied to this field. Also appears in the result.
 
-**ARKTX** (Description):
+**BACKDAYS** (Back days):
 
-Material description (LIPS-ARKTX). Use to filter deliveries by item description text. Populates the output when in the structure; supports range or single value.
+Number of days to look back from the current date when building the default monitoring window. When no explicit date range is supplied, the EI uses today minus this value as the start of the window and applies it to the date field selected by DATE_REF_FLD.
 
-**AUART** (Sales Document Type):
+**BELNR** (Document Number):
 
-Sales document type from the reference order (VBAK-AUART via LIPS-VGBEL/VGPOS). Filters deliveries by the type of the originating sales order. Use to restrict to specific order types (e.g. standard orders, returns).
+Accounting document number. Restricts which documents are included; also appears in the result.
 
-**BACKDAYS** (Backdays):
+**BKTXT** (Document Header Text):
 
-Number of days to look back from today. When no date range is supplied, the EI builds the selection using SY-DATUM minus BACKDAYS. Used to limit the delivery date window.
+Document header text. Restricts which documents are included; also appears in the result.
 
-**BACKDAYS and DATE_REF_FLD Connection:**
+**BLART** (Document Type):
 
-BACKDAYS defines how many days back from today the window starts. DATE_REF_FLD selects which date field (e.g. WADAT, LFDAT, ERDAT) is used for that window. Together they determine which deliveries fall into the selection. Set BACKDAYS first, then choose DATE_REF_FLD to match the business date you care about (e.g. planned goods movement vs delivery date).
+Document type (e.g. SA, KA). Restricts which documents are included; also appears in the result.
 
-**BLOCK** (Indicator: Document preselected for archiving):
+**BLDAT** (Document Date):
 
-Indicator from VBUK-BLOCK. Filters deliveries by archiving preselection. Use to include or exclude documents marked for archiving.
+Document date in the document. Restricts which documents are included; also appears in the result. When DATE_REF_FLD = BLDAT, the default range is applied to this field.
 
-**BLOCK_DESC** (Billing block desc.):
+**BSCHL** (Posting Key):
 
-Text description for the billing block (FAKSK), resolved via function for display. Populated by the EI from FAKSK; use FAKSK to filter by billing block.
+Posting key. Restricts which line items are included; also appears in the result.
 
-**BP1_CODE** (Partner1 - Code):
+**BSTAT** (Doc.status):
 
-Partner number for the first partner role. Filters deliveries by this partner (from VBPA). BP1_NAME is populated from customer master (KNA1). Use with BP1_FUNCT to define the role (e.g. sold-to, ship-to).
+Document status. Restricts which documents are included; also appears in the result.
 
-**BP1_FUNCT** (Partner1 - Function):
+**BSTAT Options:**
+- **X** or other domain values: Set (e.g. posted, parked).
+- ** ** (space or initial): Not set / initial.
 
-Partner function for the first business partner (PARVW). Used with BP1_CODE to filter and enrich partner data from VBPA.
+**BUDAT** (Posting Date):
 
-**BP1_FUNCT Options:**
+Posting date in the document. Restricts which documents are included; also appears in the result. When DATE_REF_FLD = BUDAT, the default range is applied to this field.
 
-- **AG**: Sold-to party  
-- **WE**: Ship-to party  
-- **RE**: Bill-to party  
-- **SP**: Contact person  
-(Other PARVW values apply; use the value that matches the role you want to filter by.)
+**BUKRS** (Company Code):
 
-**BP1_NAME** (Name):
+Company code. Restricts which documents are included; also appears in the result.
 
-Name of the first partner (from KNA1-NAME1). Populated by the EI from customer master based on BP1_CODE. Use for display; filter by BP1_CODE.
+**BUZEI** (Item):
 
-**BP2_CODE** (Partner2 - Code):
+Line item number within the accounting document. Restricts which line items are included when filtering by item; also appears in the result.
 
-Partner code for the second partner role. Filters and enriches output; works with BP2_FUNCT and BP2_NAME.
+**COMP_OPERATOR** (Operator):
 
-**BP2_FUNCT** (Partner2 - Function):
+Comparison operator for consistency checks. Used with comparison logic when applicable; values are domain-specific (e.g. EQ, NE, GT, LT).
 
-Partner function for the second business partner. Works with BP2_CODE and BP2_NAME.
+**CPUDT** (Entry Date):
 
-**BP2_NAME** (Name):
+Day on which the accounting document was entered. Restricts which documents are included; when DATE_REF_FLD = CPUDT (default in code), the default range is applied to this field. Also appears in the result.
 
-Name of the second partner. Populated from customer master. Filter by BP2_CODE.
+**DATE_REF_FLD** (Date reference field):
 
-**BP3_CODE** (Partner3 - Code):
-
-Partner code for the third partner role. Filters and enriches output.
-
-**BP3_FUNCT** (Partner3 - Function):
-
-Partner function for the third business partner. Works with BP3_CODE and BP3_NAME.
-
-**BP3_NAME** (Name):
-
-Name of the third partner. Populated from customer master. Filter by BP3_CODE.
-
-**BZIRK** (Sales district):
-
-Sales district (LIKP-BZIRK). Filters deliveries by sales district. Supports range selection.
-
-**CMGST** (Overall CreditStatus):
-
-Overall credit status (VBUK-CMGST). Filters deliveries by credit check status. Use to focus on blocked or released deliveries.
-
-**COSTA** (Confirmation status):
-
-Confirmation status at item level. Filters by confirmation status. Supports range or single value.
-
-**DATE_REF_FLD** (Date Ref Field):
-
-Field name used as the reference date for the selection window and for duration calculation. The EI maps this to the corresponding delivery/header date and uses it with BACKDAYS to build the date range and with DURATION/DURATION_UNIT to compute how long the delivery has been in the current status.
+Name of the date field used as the reference for the default date range and for duration calculation. Determines which date (posting date, entry date, change date, document date, last update) is used when no explicit range is supplied and for computing how long the document has been in the system.
 
 **DATE_REF_FLD Options:**
+- **BUDAT**: Posting date in the document.
+- **AEDAT**: Changed on.
+- **CPUDT**: Entry date (default in code).
+- **UPDDT**: Last update.
+- **BLDAT**: Document date in the document.
 
-- **ERDAT**: Created on  
-- **AEDAT**: Changed on  
-- **LDDAT**: Loading date  
-- **TDDAT**: Transportation planning date  
-- **KODAT**: Picking date  
-- **WADAT**: Planned goods movement date (default in code)  
-- **WADAT_IST**: Actual goods movement date  
-- **LFDAT**: Delivery date  
-- **FKDAT**: Billing date  
+**DMBE2 - DMBE3** (Amount in LC2 – Amount in LC3):
 
-**DUMMY** (Single-Character Flag):
+Amount in second and third local currency. Restrict which line items are included by amount; also appear in the result. Business meaning: second and third local currency amounts for reporting.
 
-Single-character flag; technical or placeholder. Use as required by the front end or selection interface.
+**DMBTR** (Amount in LC):
+
+Amount in local currency. Restricts which line items are included by amount; also appears in the result. Business meaning: local currency amount of the line item.
 
 **DURATION** (Duration In Time Units):
 
-Duration in the selected time unit (see DURATION_UNIT) between the reference date (DATE_REF_FLD) and current date. The EI calculates this per delivery and filters by the supplied range to focus on deliveries that have been in the current status for a given length of time.
-
-**DURATION and DURATION_UNIT Connection:**
-
-DURATION gives the numeric value (e.g. 7); DURATION_UNIT gives the unit (e.g. D = days). Together they define the "age in status" filter. DATE_REF_FLD determines which date is used as the start for the calculation. Set all three when filtering by how long deliveries have been in status.
-
-**DURATION_D** (Duration In Days):
-
-Duration in days (calculated/output). Use to filter or display age in days when the unit is days.
+Duration in the unit given by DURATION_UNIT (e.g. days) between the reference date (from DATE_REF_FLD) and the run date. Restricts which documents are included when a duration filter is applied; also appears in the result.
 
 **DURATION_UNIT** (Duration Unit):
 
-Unit for duration calculation. Used with DATE_REF_FLD and DURATION to filter deliveries by how long they have been in the current status.
+Unit for DURATION (e.g. days, hours). Used with DURATION and DATE_REF_FLD when computing and filtering by how long the document has been in the system.
 
 **DURATION_UNIT Options:**
+- **D**: Days.
+- **H**: Hours (if supported by the duration calculation function).
+- **M**: Minutes (if supported).
 
-- **D**: Days (default in code)
+**FABKL** (Factory calendar):
 
-**ERDAT** (Created On):
+Factory calendar key. Used with WFCID and working-days logic to determine factory date and working-day indicator; used for filtering by working days or holidays when configured.
 
-Creation date of the delivery (LIKP-ERDAT). Filters by creation date. Used in the date range when DATE_REF_FLD = ERDAT.
+**FACDATE** (Factory date):
 
-**ERNAM** (Created By):
+Factory calendar date. Populated when a factory calendar is used; used for display and for working-days filtering.
 
-User who created the delivery (LIKP-ERNAM). Filters by creator. Supports range or single value.
+**FULL** ('X' - ALL items of FI document):
 
-**ERZET** (Time):
+When set, the EI returns all line items of each FI document with user name and G/L account description; when not set, returns one record per document header.
 
-Creation time. Filters by time when time-based selection is used.
+**FULL Options:**
+- **X**: Return full line-item detail (all items per document).
+- ** ** (space or initial): Return header-level records only.
 
-**FAKSK** (Billing block):
+**GJAHR** (Fiscal Year):
 
-Billing block (LIKP-FAKSK). Filters deliveries by billing block. BLOCK_DESC provides the text for the code.
+Fiscal year. Restricts which documents are included; also appears in the result.
 
-**FKDAT** (Billing Date):
+**GRPID** (Session name):
 
-Billing date (LIKP-FKDAT). Filters by billing date. Used in the date range when DATE_REF_FLD = FKDAT.
+Batch input session name. Restricts which documents are included; also appears in the result.
 
-**FKIVK** (Totals status):
+**GVTYP** (P&L statmt acct type):
 
-Totals status (VBUK-FKIVK). Filters by billing totals status.
+P&L statement account type (G/L account type). Restricts which line items are included via G/L account master; also appears in the result.
 
-**FKIVP** (Interco. Bill.Status):
+**HKONT** (G/L Account):
 
-Intercompany billing status (VBUK-FKIVP). Filters by intercompany billing status.
+G/L account number. Restricts which line items are included; also appears in the result.
 
-**FKSTA** (Billing Status):
+**HKONT_DESC** (G/L Acct Long Text):
 
-Billing status at item level (VBUP-FKSTA). Filters by line-level billing status.
+G/L account long text. Populated from G/L account master (SKA1/SKAT); used for display.
 
-**FKSTK** (Billing status):
+**HWAE2 - HWAE3** (Local currency 2 – Local currency 3):
 
-Overall billing status (VBUK-FKSTK). Filters by header billing status.
+Second and third local currency. Business meaning: company code second and third local currency for reporting.
 
-**HDALL** (On Hold):
+**HWAER** (Local Currency):
 
-Header-level hold indicator. Filters deliveries that are on hold.
+Document/local currency. Business meaning: company code local currency in which amounts are stored.
 
-**HDALS** (Pos. Hold):
+**KTOKS** (Account Group):
 
-Item-level hold indicator. Filters by position hold.
+G/L account group. Restricts which line items are included via G/L account master; also appears in the result.
 
-**KDAUF** (Sales Order):
+**KTOPL** (Chart of Accounts):
 
-Sales order number (LIKP/LIPS reference). Filters deliveries by the originating sales order. Supports range selection.
+Chart of accounts. Restricts which line items are included via G/L account master; also appears in the result.
 
-**KDGRP** (Customer group):
+**KTOPL_T001** (Chart of Accounts):
 
-Customer group (LIKP-KDGRP). Filters by customer group. Supports range selection.
+Chart of accounts (from company code). Used for consistency with company code; also appears in the result.
 
-**KDPOS** (Sales order item):
+**KURS2 - KURS3** (Exchange rate 2 – Exchange rate 3):
 
-Sales order item number. Filters by order item when analyzing at item level.
+Exchange rates for second and third local currency. Restrict or display; used for multi-currency reporting.
 
-**KLMENG** (Cumul.confirmed qty):
+**KURSF** (Exchange rate):
 
-Cumulative confirmed quantity from the sales order (VBAP-KLMENG). Output/display; use for value-based analysis.
+Exchange rate. Restricts or displays; used for document currency conversion.
 
-**KODAT** (Picking Date):
+**KZKRS** (Group Currency Exchange Rate):
 
-Picking date (LIKP-KODAT). Filters by picking date. Used in the date range when DATE_REF_FLD = KODAT.
+Group currency exchange rate. Used for group currency reporting.
 
-**KOQUA** (Pick confirmation):
+**KZWRS** (Group currency):
 
-Pick confirmation status at item level. Filters by pick confirmation.
+Group currency. Business meaning: currency used for group-level reporting.
 
-**KOQUK** (Pick confirmation):
+**LANGU** (Language Key (G/L account)):
 
-Pick confirmation (alternate). Filters by pick confirmation status.
+Language key used when retrieving G/L account descriptions. When not supplied, a default (e.g. system language) may be used.
 
-**KOSTA** (Picking status):
+**MONAT** (Posting period):
 
-Picking status at item level (VBUP-KOSTA). Filters by picking status.
+Fiscal period (posting period). Restricts which documents are included; also appears in the result.
 
-**KOSTK** (Overall pick.status):
+**REF_FIELD_NAME1 - REF_FIELD_NAME2** (Field name – Field name):
 
-Overall picking status (VBUK-KOSTK). Filters by header picking status.
+First and second reference field names for comparison or display. Used when consistency or comparison checks reference specific fields.
 
-**KUNAG** (Sold-to party):
+**RESULT_COMP** (Value 1 to Compare):
 
-Sold-to party (LIKP-KUNAG). Filters deliveries by sold-to customer. SOLDTO_DESC is populated from KNA1.
+Comparison value for consistency checks. Used with operator and reference fields when filtering or validating.
 
-**KUNNR** (Ship-to party):
+**SGTXT** (Text):
 
-Ship-to party (LIKP-KUNNR, from LIKP-KUNWE in code). Filters deliveries by ship-to customer. SHIPTO_DESC is populated from KNA1.
+Line item text. Restricts which line items are included; also appears in the result.
 
-**KWMENG** (Order Quantity):
+**SHKZG** (Debit/Credit Ind.):
 
-Order quantity from the sales order. Output/display; use for quantity-based analysis.
+Debit/credit indicator. Restricts which line items are included (e.g. debit or credit only); also appears in the result.
 
-**LANG** (Language for texts):
+**SHKZG Options:**
+- **S**: Debit (Soll).
+- **H**: Credit (Haben).
 
-Language for descriptions (e.g. BLOCK_DESC, MPROK_DESC). Drives text resolution.
+**TCODE** (Transaction Code):
 
-**LDDAT** (Loading Date):
+Transaction code used to create the document. Restricts which documents are included; also appears in the result.
 
-Loading date (LIKP-LDDAT). Filters by loading date. Used when DATE_REF_FLD = LDDAT.
+**UPDDT** (Last update):
 
-**LFART** (Delivery Type):
+Date of the last document update. Restricts which documents are included; when DATE_REF_FLD = UPDDT, the default range is applied. Also appears in the result.
 
-Delivery type (LIKP-LFART). Filters by delivery type. Supports range selection.
+**USNAM** (User name):
 
-**LFBNR** (Reference Document):
+User name who posted the document. Restricts which documents are included; also appears in the result.
 
-Reference document number. Filters by reference document.
+**WAERS** (Currency):
 
-**LFDAT** (Delivery Date):
+Document currency key. Business meaning: transaction/document currency in which the document was entered.
 
-Delivery date (LIKP-LFDAT). Filters by delivery date. Used when DATE_REF_FLD = LFDAT.
+**WAERS_FR** (Foreign Currency):
 
-**LFGSA** (Overall deliv.status):
+Foreign currency. Business meaning: foreign currency when the document involves a different currency than local currency.
 
-Overall delivery status (VBUK-VBUP). Filters by overall delivery status.
+**WERKS** (Plant):
 
-**LFIMG** (Delivery quantity):
+Plant. Restricts or displays when relevant to the document; also appears in the result.
 
-Delivery quantity (LIPS-LFIMG). Filters or displays delivered quantity.
+**WFCID** (Factory calendar ID):
 
-**LFPOS** (Reference Doc. Item):
+Factory calendar ID. When set, the EI uses the factory calendar to determine working days and holidays; used together with WORKING_DAYS to filter by working days only or holidays only.
 
-Reference document item. Filters by reference item.
+**WORKING_DAYS** (Working Day - Y/N):
 
-**LFSTA** (Delivery status):
+When WFCID is set, filters results to working days only or to holidays only.
 
-Delivery status at item level (VBUP-LFSTA). Filters by line delivery status.
+**WORKING_DAYS Options:**
+- **X** (or C_YES): Include only working days (exclude holidays).
+- ** ** (or C_NO): Include only holidays (exclude working days).
+- ** ** (initial): No filtering by working day; all dates included.
 
-**LGMNG** (Actual delivery qty):
+**WRBTR** (Amount):
 
-Actual delivered quantity in stockkeeping units (LIPS-LGMNG). Output; used for quantity analysis.
-
-**LVSTA** (WM activity status):
-
-Warehouse management activity status. Filters by WM status.
-
-**LVSTK** (Overall WM status):
-
-Overall WM status. Filters by warehouse management status.
-
-**MANAGE_IN_UTC** ('X' - Manage in UTC):
-
-When set (e.g. 'X'), date/time handling uses UTC. Use when working across time zones.
-
-**MATKL** (Material Group):
-
-Material group (LIPS-MATKL). Filters by material group. WGBEZ provides the group description.
-
-**MATNR** (Material):
-
-Material number (LIPS-MATNR). Filters deliveries by material. Supports range selection.
-
-**MEINS** (Base Unit of Measure):
-
-Base unit of measure (LIPS-MEINS). Filters or displays UoM.
-
-**MPROK** (Manual price):
-
-Manual price indicator (VBAP-MPROK). Filters by manual pricing. MPROK_DESC provides the short text.
-
-**MPROK_DESC** (Short text):
-
-Short text for manual price (MPROK). Populated by the EI from domain MPROK; use for display.
-
-**NETWR_LIPS** (Net Value):
-
-Net value at delivery item level (derived from LIPS/VBAP). Output for value analysis.
-
-**NETWR_VBAP** (Net value):
-
-Net value from the sales order (VBAP). Output for value analysis.
-
-**PDSTA** (Proof of delivery status):
-
-Proof of delivery status at item level. Filters by POD status.
-
-**PDSTK** (Proof of delivery status):
-
-Overall proof of delivery status. Filters by POD status.
-
-**PKSTA** (Packing status):
-
-Packing status at item level. Filters by packing status.
-
-**PKSTK** (Packing status):
-
-Overall packing status. Filters by packing status.
-
-**PODAT** (Proof of delivery date):
-
-Proof of delivery date. Filters by POD date.
-
-**POSNR** (Item):
-
-Delivery item number (LIPS-POSNR). Filters by item position.
-
-**PSTYV** (Item category):
-
-Item category (LIPS-PSTYV). Filters by item category.
-
-**ROUTE** (Route):
-
-Route (LIKP-ROUTE). Filters by route. Supports range selection.
-
-**SHIPTO_DESC** (Name):
-
-Ship-to party name (KNA1-NAME1 for KUNNR). Populated by the EI from customer master. Use for display; filter by KUNNR.
-
-**SOLDTO_DESC** (Name):
-
-Sold-to party name (KNA1-NAME1 for KUNAG). Populated by the EI from customer master. Use for display; filter by KUNAG.
-
-**SPART** (Division):
-
-Division (LIPS-SPART). Filters by division. Supports range selection.
-
-**SPE_TMPID** (Temp Inb.):
-
-Temporary inbound indicator. Filters by temporary inbound flag.
-
-**TDDAT** (Transptn Plang Date):
-
-Transportation planning date (LIKP-TDDAT). Filters by transport planning date. Used when DATE_REF_FLD = TDDAT.
-
-**TRSTA** (Trns.plan.status):
-
-Transportation planning status. Filters by transport planning status.
-
-**UVK01 - UVK05** (Header reserves 1 - Header reserves 5):
-
-Reserve/status indicators at header level (VBUK). Used to filter deliveries by the corresponding status dimension. All five share the same type and domain; use the index that matches the dimension you need.
-
-**UVP01 - UVP05** (Item reserves 1 - Item reserves 5):
-
-Reserve/status indicators at item level (VBUP). Used to filter deliveries by the corresponding status dimension. All five share the same type and domain.
-
-**UVPAS** (It.data packaging):
-
-Item data packaging status. Filters by packaging data status.
-
-**UVPIS** (It.data picking/putaway):
-
-Item data picking/putaway status. Filters by picking/putaway status.
-
-**UVS01 - UVS05** (Total reserves 1 - Total reserves 5):
-
-Reserve/status indicators for totals. Used to filter deliveries by the corresponding status dimension. All five share the same type and domain.
-
-**VBELN** (Delivery):
-
-Delivery number (LIKP-VBELN). Filters by delivery document. Supports range selection.
-
-**VBTYP** (SD document categ.):
-
-SD document category (LIKP-VBTYP). Filters by document category.
-
-**VESTK** (HU placed in stock):
-
-Handling unit placed in stock indicator. Filters by HU placement status.
-
-**VGBEL** (Reference Document):
-
-Reference document (e.g. sales order) from LIPS. Filters by reference document.
-
-**VGPOS** (Reference Item):
-
-Reference item number. Filters by reference item.
-
-**VGTYP** (SD document categ. (prev)):
-
-SD document category of the reference document. Filters by reference document category.
-
-**VKBUR** (Sales Office):
-
-Sales office (LIKP-VKBUR). Filters by sales office. Supports range selection.
-
-**VKORG** (Sales Organization):
-
-Sales organization (LIKP-VKORG). Filters by sales organization. Supports range selection.
-
-**VLSTK** (Status Decent. Whse):
-
-Status decentral warehouse. Filters by warehouse status.
-
-**VRKME** (Sales Unit):
-
-Sales unit of measure (LIPS-VRKME). Filters or displays sales UoM.
-
-**VSTEL** (Shipping Point/Receiving Pt):
-
-Shipping point (LIKP-VSTEL). Filters by shipping point. Supports range selection.
-
-**VTWEG** (Distribution Channel):
-
-Distribution channel (LIPS-VTWEG). Filters by distribution channel. Supports range selection.
-
-**WADAT** (Pland Gds Mvmnt Date):
-
-Planned goods movement date (LIKP-WADAT). Filters by planned goods movement date. Default reference date in code when DATE_REF_FLD = WADAT.
-
-**WADAT_IST** (Act. Gds Mvmnt Date):
-
-Actual goods movement date (LIKP-WADAT_IST). Filters by actual goods movement date. Used when DATE_REF_FLD = WADAT_IST.
-
-**WAERK** (Document Currency):
-
-Document currency of the sales order (VBAP-WAERK). Represents the document/transaction currency in which order and delivery values are held. Use for display or currency-based filtering; do not document technical source (e.g. table/join).
-
-**WAVWR** (Cost):
-
-Cost (VBAP-WAVWR). Filters or displays cost. Use for value-based analysis.
-
-**WBSTA** (Goods movement stat.):
-
-Goods movement status at item level. Filters by goods movement status.
-
-**WBSTK** (Total gds mvt stat.):
-
-Total goods movement status. Filters by overall goods movement status.
-
-**WGBEZ** (Material Group Desc.):
-
-Material group description (MATKL text). Populated by the EI for display. Filter by MATKL.
+Amount in document currency. Restricts which line items are included by amount; also appears in the result. Business meaning: amount in document currency.
 
 **XBLNR** (Reference):
 
-Reference (LIKP-XBLNR). Filters or displays customer reference.
+Reference document number. Restricts which documents are included; also appears in the result.

@@ -5,7 +5,18 @@ No Pandoc or reference document; formatting is applied in code.
 Adapted from ei docs / doc generator scripts 5 / scripts / md_to_docx_converter.py.
 """
 
+import re
 from pathlib import Path
+
+# XML 1.0 allows only #x9, #xA, #xD as control chars; python-docx fails on NULL and other control chars
+_CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+
+
+def _sanitize_xml_text(s: str) -> str:
+    """Remove/replace control characters so strings are XML-compatible for python-docx."""
+    if not s:
+        return s
+    return _CONTROL_CHARS.sub("", s)
 
 
 def _parse_markdown_to_elements(md_content: str):
@@ -21,6 +32,7 @@ def _parse_markdown_to_elements(md_content: str):
 def _add_code_block(doc, code_text: str) -> None:
     from docx.shared import Pt, RGBColor
 
+    code_text = _sanitize_xml_text(code_text)
     p = doc.add_paragraph()
     run = p.add_run(code_text)
     run.font.name = "Consolas"
@@ -51,7 +63,7 @@ def _add_table_from_html(doc, table_element) -> None:
         for col_idx, cell in enumerate(cells):
             if col_idx < num_cols:
                 table_cell = table.rows[row_idx].cells[col_idx]
-                table_cell.text = cell.get_text(strip=True)
+                table_cell.text = _sanitize_xml_text(cell.get_text(strip=True))
                 for paragraph in table_cell.paragraphs:
                     for run in paragraph.runs:
                         run.font.color.rgb = BLACK
@@ -150,6 +162,7 @@ def convert_md_to_docx(md_path: Path | str, output_path: Path | str | None = Non
 
     with open(md_path, "r", encoding="utf-8") as f:
         md_content = f.read()
+    md_content = _sanitize_xml_text(md_content)
 
     doc = Document()
     BLACK = RGBColor(0, 0, 0)
@@ -175,7 +188,7 @@ def convert_md_to_docx(md_path: Path | str, output_path: Path | str | None = Non
 
         if element.name in ("h1", "h2", "h3", "h4", "h5", "h6"):
             level = int(element.name[1])
-            heading_text = element.get_text(strip=True)
+            heading_text = _sanitize_xml_text(element.get_text(strip=True))
             doc.add_heading(heading_text, level=min(level, 4))
             if level == 2:
                 current_section = heading_text.lower()

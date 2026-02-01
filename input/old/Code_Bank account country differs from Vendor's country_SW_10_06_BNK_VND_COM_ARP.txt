@@ -1,0 +1,119 @@
+FUNCTION /SKN/F_SW_10_06_THIRD_BANK_ACC.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_BANK_CODE_COMP OPTIONAL
+*"----------------------------------------------------------------------
+  TYPES: BEGIN OF TY_DATA,
+             LIFNR TYPE LFBK-LIFNR,
+             BANKS TYPE LFBK-BANKS,
+             BANKL TYPE LFBK-BANKL,
+             BANKN TYPE LFBK-BANKN,
+             KOVON TYPE LFBK-KOVON,
+             KOBIS TYPE LFBK-KOBIS,
+             LAND1 TYPE LFA1-LAND1,
+             NAME1 TYPE LFA1-NAME1,
+           END OF TY_DATA,
+           TT_DATA TYPE STANDARD TABLE OF TY_DATA.
+  DATA_SINGLE: SW_DEST       RFCDEST,
+               BACKDAYS      INT4,
+               FORWDAYS      INT4,
+               KOVON         KOVON,
+               KOBIS         KOBIS.
+  DATA_MULTY: LIFNR    LIFNR,
+              LAND1    LAND1,
+              ERDAT    ERDAT_RF,
+              BANKS    BANKS,
+              DATUM    SY-DATUM.
+  SELECT_MULTY: LIFNR,
+                LAND1,
+                ERDAT,
+                BANKS,
+                DATUM.
+  SELECT_SINGLE: SW_DEST,
+                 BACKDAYS.
+  CONVERT_MULTY: LIFNR ALPHA.
+  DATA: SY_TABIX LIKE SY-TABIX,
+        SY_DATLO LIKE SY-DATLO,
+        SY_TIMLO LIKE SY-TIMLO.
+*  DATA: lt_data  TYPE tt_data,
+*        ls_data  TYPE ty_data,
+*        ls_data2 LIKE LINE OF t_data[].
+  DATA: BACKDAYS  TYPE I,
+        FORWDAYS  TYPE I,
+        DATE_FROM LIKE SY-DATUM,
+        DATE_TO   LIKE SY-DATUM,
+        REF_DATE  TYPE D.
+  DATA: TIME_DIFF TYPE  INT4 .
+  DATA: FLD(60) TYPE C.
+  FIELD-SYMBOLS:  TYPE ANY.
+  IF NOT LV_FORWDAYS  IS INITIAL.
+    LV_BACKDAYS = LV_FORWDAYS * ( -1 ).
+  ENDIF.
+  IF R_ERDAT[] IS INITIAL AND LV_BACKDAYS <> 0.
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS.
+    RS_DATUM-LOW    = DATE_FROM .
+    RS_DATUM-HIGH   = SY-DATUM.
+    APPEND RS_DATUM TO R_DATUM.
+    R_ERDAT = R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  DATE_FROM = SY-DATUM.
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    DATE_FROM = RS_DATUM-LOW.
+    DATE_TO   = RS_DATUM-HIGH.
+    IF DATE_TO < DATE_FROM.
+      DATE_TO = DATE_FROM.
+    ENDIF.
+  ENDIF.
+  IF LV_KOVON IS INITIAL.
+    LV_KOVON = DATE_FROM.
+  ENDIF.
+  IF LV_KOBIS IS INITIAL.
+    LV_KOBIS = DATE_TO.
+  ENDIF.
+* if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_06_THIRD_BANK_AC'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*"--- Run Cloud Mode -----
+*--- Retrieve data
+  CLEAR: IS_ALERT. "lt_data.
+  REFRESH T_DATA.
+  SELECT LFBK~LIFNR LFBK~BANKS LFBK~BANKL LFBK~BANKN
+         LFBK~KOVON LFBK~KOBIS
+         LFA1~LAND1 LFA1~NAME1
+    FROM LFBK INNER JOIN LFA1 ON  LFBK~LIFNR EQ LFA1~LIFNR
+                              AND LFBK~BANKS <> LFA1~LAND1
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE LFBK~LIFNR IN R_LIFNR
+    AND   LFBK~BANKS IN R_BANKS
+    AND   LFA1~ERDAT IN R_ERDAT
+    AND   LFA1~LAND1 IN R_LAND1
+    AND   LFBK~KOVON >= SY-DATUM
+    AND   LFBK~KOBIS <= SY-DATUM.
+.
+*  LOOP AT lt_data INTO ls_data.
+*
+*    CLEAR: ls_data2.
+*    IF ls_data-banks <> ls_data-land1.
+*      MOVE-CORRESPONDING ls_data TO ls_data2.
+*      APPEND ls_data2 TO t_data.
+*    ENDIF.
+*  ENDLOOP.
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.
