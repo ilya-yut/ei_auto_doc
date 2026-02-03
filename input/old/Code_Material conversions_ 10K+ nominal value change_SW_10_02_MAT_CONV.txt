@@ -1,0 +1,923 @@
+FUNCTION /SKN/F_SW_10_02_MAT_MOVMNT3 .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_02_MAT_MOVMNT OPTIONAL
+*"----------------------------------------------------------------------
+  TYPES: BEGIN OF TY_RATE,
+           WAERS TYPE MSEG-WAERS,
+           RATE  TYPE UKURS_CURR,
+         END OF TY_RATE,
+         TT_RATE TYPE STANDARD TABLE OF TY_RATE.
+  CONSTANTS: C_MSEG TYPE TABNAME VALUE 'MSEG'.
+  DATA_SINGLE: BACKDAYS       INT4,
+               DATE_REF_FLD   NAME_FELD,
+               LANGU          SPRAS,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               WAERS_FR       WAERS                    " Foreign Currency
+               .
+* Set default parameters
+  LV_BACKDAYS      = 1.
+  LV_DATE_REF_FLD  = 'CPUDT_MKPF'.
+  LV_LANGU         = 'E'.
+  LV_DURATION_UNIT = 'D'.
+*  lv_waers_fr      = 'USD'.             " --17.09.20 Leon's request
+  SELECT_SINGLE: BACKDAYS,
+                 DATE_REF_FLD,
+                 LANGU,
+                 DURATION_UNIT,
+                 WAERS_FR.
+  DATA_MULTY: BWART       CHAR3,
+              XAUTO       CHAR1,
+              MJAHR       MJAHR,
+              MATNR       CHAR18,
+              MBLNR       MBLNR,
+              WERKS       CHAR4,
+              LGORT       CHAR4,
+              INSMK       CHAR1,
+              ZUSCH       CHAR1,
+              ZUSTD       CHAR1,
+              SOBKZ       CHAR1,
+              USNAM_MKPF  MSEG-USNAM_MKPF,
+              TCODE2_MKPF MSEG-TCODE2_MKPF,
+              VBELN_IM    VBELN_VL,
+              LIFNR       LIFNR,
+              KUNNR       CHAR10,
+              KDAUF       KDAUF,
+              SHKZG       SHKZG,
+              WAERS       WAERS,
+              DMBTR       DMBTR,
+              DMBTR_FR    DMBTR,
+              BALANCE     DMBTR,
+              BALANCE_FR  DMBTR,
+              BNBTR       BNBTR,
+              BUALT       BUALT,
+              BWTAR       CHAR10,
+              EBELN       BSTNR,
+              ELIKZ       ELIKZ,
+              EQUNR       EQUNR,
+              WEMPF       WEMPF,
+              ABLAD       ABLAD,
+              GSBER       GSBER,
+              KOKRS       KOKRS,
+              PARGB       PARGB,
+              PARBU       PARBU,
+              KOSTL       KOSTL,
+              AUFNR       AUFNR,
+              ANLN1       ANLN1,
+              ANLN2       ANLN2,
+              BUKRS       BUKRS,
+              BELNR       CHAR10,
+              BUZEI       BUZEI,
+              BELUM       BELNR_D,
+              BUZUM       BUZEI,
+              RSNUM       RSNUM,
+              RSPOS       RSPOS,
+              KZEAR       KZEAR,
+              GRUND       GRUND,
+              PRCTR       PRCTR,
+              PS_PSP_PNR  PS_PSP_PNR,
+              NPLNR       NPLNR,
+              SAKTO       SAKTO,
+              VFDAT       VFDAT,
+              GEBER       BP_GEBER,
+              FISTL       FISTL,
+              LBKUM       LBKUM,
+              SALK3       SALK3,
+              VPRSV       VPRSV,
+              FKBER       FKBER,
+              MTART       MTART,
+*** 30.01.19++
+              UMMAT       UMMAT,
+              UMWRK       UMWRK,
+              UMLGO       UMLGO,
+              UMCHA       UMCHA,
+              UMZST       UMZST,
+              UMZUS       UMZUS,
+              UMBAR       UMBAR,
+              UMSOK       UMSOK,
+              USNAM       USNAM,
+              TCODE2      TCODE,
+*** 30.01.19++
+              DURATION    /SKN/E_SW_DURATION,
+              DATUM       SY-DATUM,
+              BUDAT_MKPF  BUDAT,
+              CPUDT_MKPF  CPUDT
+              .
+  SELECT_MULTY: BWART,
+                XAUTO,
+                MJAHR,
+                MATNR,
+                MBLNR,
+                WERKS,
+                LGORT,
+                INSMK,
+                ZUSCH,
+                ZUSTD,
+                SOBKZ,
+                USNAM_MKPF,
+                TCODE2_MKPF,
+                VBELN_IM,
+                LIFNR,
+                KUNNR,
+                KDAUF,
+                SHKZG,
+                WAERS,
+                DMBTR,
+                DMBTR_FR,
+                BALANCE,
+                BALANCE_FR,
+                BNBTR,
+                BUALT,
+                BWTAR,
+                EBELN,
+                ELIKZ,
+                EQUNR,
+                WEMPF,
+                ABLAD,
+                GSBER,
+                KOKRS,
+                PARGB,
+                PARBU,
+                KOSTL,
+                AUFNR,
+                ANLN1,
+                ANLN2,
+                BUKRS,
+                BELNR,
+                BUZEI,
+                BELUM,
+                BUZUM,
+                RSNUM,
+                RSPOS,
+                KZEAR,
+                GRUND,
+                PRCTR,
+                PS_PSP_PNR,
+                NPLNR,
+                SAKTO,
+                VFDAT,
+                GEBER,
+                FISTL,
+                LBKUM,
+                SALK3,
+                VPRSV,
+                FKBER,
+                MTART,
+*** 30.01.19++
+                UMMAT,
+                UMWRK,
+                UMLGO,
+                UMCHA,
+                UMZST,
+                UMZUS,
+                UMBAR,
+                UMSOK,
+*** 30.01.19++
+                DURATION,
+                DATUM,
+                BUDAT_MKPF,
+                CPUDT_MKPF
+              .
+  FIELD-SYMBOLS:    TYPE ANY.
+  DATA : SY_TABIX    LIKE SY-TABIX ,
+         FLD(60)     TYPE C ,
+         REF_DATE    TYPE D
+         .
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM,
+         TIME_DIFF TYPE  INT4.
+  DATA: LT_MSEG      TYPE TABLE OF /SKN/S_SW_10_02_MAT_MOVMNT,
+        LT_MSEG_SON  TYPE STANDARD TABLE OF /SKN/S_SW_10_02_MAT_MOVMNT,
+        LS_MSEG      TYPE  /SKN/S_SW_10_02_MAT_MOVMNT,
+        LS_DATA      TYPE  /SKN/S_SW_10_02_MAT_MOVMNT.
+*** Begin 15.01.19++
+  DATA: LV_TABIX      TYPE SYTABIX,
+        LV_LOC_FACTOR TYPE FFACT_CURR,
+        LV_COUNT      TYPE I.
+  DATA: LS_RATE  TYPE TY_RATE,
+        LS_T001L TYPE T001L.
+  DATA: LT_DATA       TYPE TABLE OF /SKN/S_SW_10_02_MAT_MOVMNT,
+        LT_MSEG_WAERS TYPE TABLE OF /SKN/S_SW_10_02_MAT_MOVMNT,
+        LT_RATE       TYPE TT_RATE,
+        LT_T001L      TYPE TABLE OF T001L.
+  FIELD-SYMBOLS: <FS_DATA> LIKE LINE OF LT_MSEG .
+*** End 15.01.19++
+  ""Currency conversion & foreign amount condition
+  DATA: BEGIN OF LS_CURR_RATE,
+          FCURR TYPE FCURR_CURR, "local currency
+          UKURS TYPE UKURS_CURR, "exchange rate
+        END OF LS_CURR_RATE.
+  DATA: LV_BALANCE    TYPE DMBTR,
+        LV_BALANCE_FR TYPE DMBTR.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_02_MAT_MOVMNT3'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'BUDAT_MKPF'.
+      R_BUDAT_MKPF[] = R_DATUM[]. "Expected debit date
+    WHEN 'CPUDT_MKPF'.
+      R_CPUDT_MKPF[] = R_DATUM[]. "Day On Which Accounting Document Was Entered
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT.
+  REFRESH T_DATA.
+  " ---- Not Aggregated amount select
+*** 31.01.19++
+  IF LV_DATE_REF_FLD IS NOT INITIAL.
+    SELECT COUNT( * )
+      FROM DD03L
+      INTO LV_COUNT
+      WHERE TABNAME   EQ C_MSEG
+      AND   FIELDNAME EQ LV_DATE_REF_FLD.
+  ENDIF.
+*** 31.01.19++
+  IF LV_COUNT IS NOT INITIAL.
+    SELECT *
+      INTO CORRESPONDING FIELDS OF TABLE LT_MSEG
+      FROM MSEG AS A
+      INNER JOIN MARA AS B ON  A~MATNR EQ B~MATNR
+      WHERE A~BWART       IN R_BWART
+      AND   A~XAUTO       IN R_XAUTO
+      AND   A~MJAHR       IN R_MJAHR
+      AND   A~MATNR       IN R_MATNR
+      AND   A~MBLNR       IN R_MBLNR
+      AND   A~WERKS       IN R_WERKS
+      AND   A~LGORT       IN R_LGORT
+      AND   A~INSMK       IN R_INSMK
+      AND   A~ZUSCH       IN R_ZUSCH
+      AND   A~ZUSTD       IN R_ZUSTD
+      AND   A~SOBKZ       IN R_SOBKZ
+      AND   A~USNAM_MKPF  IN R_USNAM_MKPF
+      AND   A~TCODE2_MKPF IN R_TCODE2_MKPF
+      AND   A~VBELN_IM    IN R_VBELN_IM
+      AND   A~LIFNR       IN R_LIFNR
+      AND   A~KUNNR       IN R_KUNNR
+      AND   A~KDAUF       IN R_KDAUF
+      AND   A~SHKZG       IN R_SHKZG
+*** Begin ++ 26.09.20
+      AND   A~WAERS       IN R_WAERS
+      AND   A~DMBTR       IN R_DMBTR
+*** End   ++ 26.09.20
+      AND   A~BNBTR       IN R_BNBTR
+      AND   A~BWTAR       IN R_BWTAR
+      AND   A~EBELN       IN R_EBELN
+      AND   A~ELIKZ       IN R_ELIKZ
+      AND   A~EQUNR       IN R_EQUNR
+      AND   A~WEMPF       IN R_WEMPF
+      AND   A~ABLAD       IN R_ABLAD
+      AND   A~GSBER       IN R_GSBER
+      AND   A~KOKRS       IN R_KOKRS
+      AND   A~PARGB       IN R_PARGB
+      AND   A~PARBU       IN R_PARBU
+      AND   A~KOSTL       IN R_KOSTL
+      AND   A~AUFNR       IN R_AUFNR
+      AND   A~ANLN1       IN R_ANLN1
+      AND   A~ANLN2       IN R_ANLN2
+      AND   A~BUKRS       IN R_BUKRS
+      AND   A~BELNR       IN R_BELNR
+      AND   A~BUZEI       IN R_BUZEI
+      AND   A~BELUM       IN R_BELUM
+      AND   A~BUZUM       IN R_BUZUM
+      AND   A~RSNUM       IN R_RSNUM
+      AND   A~RSPOS       IN R_RSPOS
+      AND   A~KZEAR       IN R_KZEAR
+      AND   A~GRUND       IN R_GRUND
+      AND   A~PRCTR       IN R_PRCTR
+      AND   A~PS_PSP_PNR  IN R_PS_PSP_PNR
+      AND   A~NPLNR       IN R_NPLNR
+      AND   A~SAKTO       IN R_SAKTO
+      AND   A~VFDAT       IN R_VFDAT
+      AND   A~GEBER       IN R_GEBER
+      AND   A~FISTL       IN R_FISTL
+      AND   A~LBKUM       IN R_LBKUM
+      AND   A~SALK3       IN R_SALK3
+      AND   A~VPRSV       IN R_VPRSV
+      AND   A~FKBER       IN R_FKBER
+*** Begin ++ 29.01.19
+      AND   A~UMMAT       IN R_UMMAT
+      AND   A~UMWRK       IN R_UMWRK
+      AND   A~UMLGO       IN R_UMLGO
+      AND   A~UMCHA       IN R_UMCHA
+      AND   A~UMZST       IN R_UMZST
+      AND   A~UMZUS       IN R_UMZUS
+      AND   A~UMBAR       IN R_UMBAR
+      AND   A~UMSOK       IN R_UMSOK
+*** End   ++ 29.01.19
+      AND   A~BUDAT_MKPF IN R_BUDAT_MKPF
+      AND   A~CPUDT_MKPF IN R_CPUDT_MKPF
+      AND   B~MTART      IN R_MTART.
+* Filter by budat/cpudt in MKPF
+  ELSE.
+    SELECT *
+      INTO CORRESPONDING FIELDS OF TABLE LT_MSEG
+      FROM MSEG AS A INNER JOIN MKPF AS B ON  A~MBLNR EQ B~MBLNR
+                                          AND A~MJAHR EQ B~MJAHR
+                     INNER JOIN MARA AS C ON  A~MATNR EQ C~MATNR
+      WHERE A~BWART       IN R_BWART
+      AND   A~XAUTO       IN R_XAUTO
+      AND   A~MJAHR       IN R_MJAHR
+      AND   A~MATNR       IN R_MATNR
+      AND   A~MBLNR       IN R_MBLNR
+      AND   A~WERKS       IN R_WERKS
+      AND   A~LGORT       IN R_LGORT
+      AND   A~INSMK       IN R_INSMK
+      AND   A~ZUSCH       IN R_ZUSCH
+      AND   A~ZUSTD       IN R_ZUSTD
+      AND   A~SOBKZ       IN R_SOBKZ
+      AND   A~USNAM_MKPF  IN R_USNAM_MKPF
+      AND   A~TCODE2_MKPF IN R_TCODE2_MKPF
+      AND   A~VBELN_IM    IN R_VBELN_IM
+      AND   A~LIFNR       IN R_LIFNR
+      AND   A~KUNNR       IN R_KUNNR
+      AND   A~KDAUF       IN R_KDAUF
+      AND   A~SHKZG       IN R_SHKZG
+*** Begin ++ 26.09.20
+      AND   A~WAERS       IN R_WAERS
+      AND   A~DMBTR       IN R_DMBTR
+*** End   ++ 26.09.20
+      AND   A~BNBTR       IN R_BNBTR
+      AND   A~BWTAR       IN R_BWTAR
+      AND   A~EBELN       IN R_EBELN
+      AND   A~ELIKZ       IN R_ELIKZ
+      AND   A~EQUNR       IN R_EQUNR
+      AND   A~WEMPF       IN R_WEMPF
+      AND   A~ABLAD       IN R_ABLAD
+      AND   A~GSBER       IN R_GSBER
+      AND   A~KOKRS       IN R_KOKRS
+      AND   A~PARGB       IN R_PARGB
+      AND   A~PARBU       IN R_PARBU
+      AND   A~KOSTL       IN R_KOSTL
+      AND   A~AUFNR       IN R_AUFNR
+      AND   A~ANLN1       IN R_ANLN1
+      AND   A~ANLN2       IN R_ANLN2
+      AND   A~BUKRS       IN R_BUKRS
+      AND   A~BELNR       IN R_BELNR
+      AND   A~BUZEI       IN R_BUZEI
+      AND   A~BELUM       IN R_BELUM
+      AND   A~BUZUM       IN R_BUZUM
+      AND   A~RSNUM       IN R_RSNUM
+      AND   A~RSPOS       IN R_RSPOS
+      AND   A~KZEAR       IN R_KZEAR
+      AND   A~GRUND       IN R_GRUND
+      AND   A~PRCTR       IN R_PRCTR
+      AND   A~PS_PSP_PNR  IN R_PS_PSP_PNR
+      AND   A~NPLNR       IN R_NPLNR
+      AND   A~SAKTO       IN R_SAKTO
+      AND   A~VFDAT       IN R_VFDAT
+      AND   A~GEBER       IN R_GEBER
+      AND   A~FISTL       IN R_FISTL
+      AND   A~LBKUM       IN R_LBKUM
+      AND   A~SALK3       IN R_SALK3
+      AND   A~VPRSV       IN R_VPRSV
+      AND   A~FKBER       IN R_FKBER
+      AND   A~UMMAT       IN R_UMMAT
+      AND   A~UMWRK       IN R_UMWRK
+      AND   A~UMLGO       IN R_UMLGO
+      AND   A~UMCHA       IN R_UMCHA
+      AND   A~UMZST       IN R_UMZST
+      AND   A~UMZUS       IN R_UMZUS
+      AND   A~UMBAR       IN R_UMBAR
+      AND   A~UMSOK       IN R_UMSOK
+      AND   B~BUDAT       IN R_BUDAT_MKPF
+      AND   B~CPUDT       IN R_CPUDT_MKPF
+      AND   C~MTART       IN R_MTART.
+  ENDIF.
+**** End 30.01.19++
+** Begin 13.01.19++
+  IF LT_MSEG IS NOT INITIAL.
+    SELECT *
+      FROM T001L
+      INTO TABLE LT_T001L
+      FOR ALL ENTRIES IN LT_MSEG
+      WHERE ( WERKS EQ LT_MSEG-WERKS OR WERKS EQ LS_MSEG-UMWRK )
+      AND   ( LGORT EQ LT_MSEG-LGORT OR LGORT EQ LS_MSEG-UMLGO ).
+  ENDIF.
+  LT_MSEG_WAERS = LT_MSEG.
+  SORT LT_MSEG_WAERS BY WAERS (LV_DATE_REF_FLD).
+  DELETE ADJACENT DUPLICATES FROM LT_MSEG_WAERS COMPARING WAERS.
+  LOOP AT LT_MSEG_WAERS INTO LS_MSEG.
+    CLEAR: LS_RATE.
+    LS_RATE-WAERS = LS_MSEG-WAERS.
+    IF LS_MSEG-WAERS NE LV_WAERS_FR AND
+         LS_MSEG-WAERS IS NOT INITIAL AND LV_WAERS_FR IS NOT INITIAL.          " 17.09.20++
+      CALL FUNCTION 'CONVERT_TO_FOREIGN_CURRENCY'
+        EXPORTING
+          DATE             = SY-DATUM
+          FOREIGN_CURRENCY = LV_WAERS_FR      " Target(Foreign) Currency
+          LOCAL_AMOUNT     = LS_MSEG-DMBTR
+*         local_amount     = 1
+          LOCAL_CURRENCY   = LS_MSEG-WAERS    " Source Currency
+        IMPORTING
+          EXCHANGE_RATE    = LS_RATE-RATE
+          FOREIGN_AMOUNT   = LS_MSEG-DMBTR_FR
+          LOCAL_FACTOR     = LV_LOC_FACTOR
+        EXCEPTIONS
+          NO_RATE_FOUND    = 1
+          OVERFLOW         = 2
+          NO_FACTORS_FOUND = 3
+          NO_SPREAD_FOUND  = 4
+          DERIVED_2_TIMES  = 5
+          OTHERS           = 6.
+      IF SY-SUBRC IS INITIAL.
+*        ls_rate-rate = abs( ls_rate-rate / 1000 ).         " 17.09.20--
+*** 28.10.20++
+        IF LV_LOC_FACTOR NE 0.
+          LS_RATE-RATE = LS_RATE-RATE * LV_LOC_FACTOR.
+        ELSE.
+          LS_RATE-RATE = LS_RATE-RATE.
+        ENDIF.
+*** 28.10.20++
+      ENDIF.
+    ELSE.
+      LS_RATE-RATE = 1.
+    ENDIF.
+    APPEND LS_RATE TO LT_RATE.
+  ENDLOOP.
+  SORT LT_MSEG BY PARENT_ID.
+  LT_MSEG_SON = LT_MSEG.
+  DELETE LT_MSEG WHERE PARENT_ID IS NOT INITIAL.
+  DELETE LT_MSEG_SON WHERE PARENT_ID IS INITIAL.
+  SORT LT_MSEG BY MBLNR MJAHR LINE_ID.
+  SORT LT_MSEG_SON BY MBLNR MJAHR PARENT_ID.
+  LOOP AT LT_MSEG_SON INTO LS_DATA.
+    CLEAR: LS_MSEG, LV_BALANCE, LV_BALANCE_FR, LS_RATE, LS_T001L.
+    LS_DATA-WAERS_FR = LV_WAERS_FR.
+    IF LS_DATA-WAERS <> LV_WAERS_FR AND LS_DATA-DMBTR IS NOT INITIAL AND
+         LV_WAERS_FR IS NOT INITIAL.
+      READ TABLE LT_RATE INTO LS_RATE WITH KEY WAERS = LS_DATA-WAERS.
+      IF SY-SUBRC IS INITIAL AND LS_RATE-RATE NE 0.
+*        ls_data-dmbtr_fr = ls_data-dmbtr / ls_rate-rate.
+        IF LS_RATE-RATE GT 0.
+          LS_DATA-DMBTR_FR = LS_DATA-DMBTR / ABS( LS_RATE-RATE ).
+        ELSE.
+          LS_DATA-DMBTR_FR = LS_DATA-DMBTR * ABS( LS_RATE-RATE ).
+        ENDIF.
+      ELSE.
+        LS_DATA-DMBTR_FR = 0.
+      ENDIF.
+    ELSE.
+      LS_DATA-DMBTR_FR = LS_DATA-DMBTR.
+    ENDIF.
+    CHECK LS_DATA-DMBTR_FR IN R_DMBTR_FR.    " ++ 26.09.20
+* Check the line id relative to document
+    READ TABLE LT_MSEG INTO LS_MSEG WITH KEY MBLNR   = LS_DATA-MBLNR
+                                             MJAHR   = LS_DATA-MJAHR
+                                             LINE_ID = LS_DATA-PARENT_ID
+                                             BINARY SEARCH.
+    IF SY-SUBRC = 0.
+      LV_TABIX = SY-TABIX.
+      DELETE LT_MSEG INDEX LV_TABIX.        " Delete activated row in order to leave with the single rows
+      " what mean the existing single rows not have the son row
+      LS_MSEG-WAERS_FR = LV_WAERS_FR.
+      IF LS_MSEG-WAERS NE LV_WAERS_FR AND LS_MSEG-DMBTR IS NOT INITIAL AND
+           LV_WAERS_FR IS NOT INITIAL.                                             " 17.09.20++
+        READ TABLE LT_RATE INTO LS_RATE WITH KEY WAERS = LS_MSEG-WAERS.
+        IF SY-SUBRC = 0 AND LS_RATE-RATE <> 0.
+*          ls_mseg-dmbtr_fr = ls_mseg-dmbtr / ls_rate-rate.
+          IF LS_RATE-RATE GT 0.
+            LS_MSEG-DMBTR_FR = LS_MSEG-DMBTR / ABS( LS_RATE-RATE ).
+          ELSE.
+            LS_MSEG-DMBTR_FR = LS_MSEG-DMBTR * ABS( LS_RATE-RATE ).
+          ENDIF.
+        ELSE.
+          LS_MSEG-DMBTR_FR = 0.
+        ENDIF.
+      ELSE.
+        LS_MSEG-DMBTR_FR = LS_MSEG-DMBTR.
+      ENDIF.
+      CHECK LS_MSEG-DMBTR_FR IN R_DMBTR_FR.               " ++ 26.09.20
+    ELSE.
+      CONTINUE.
+    ENDIF.
+* Calculate abs. balance between debit and credit amount of document
+    LV_BALANCE    = ABS( ABS( LS_MSEG-DMBTR )    - ABS( LS_DATA-DMBTR ) ).
+    LV_BALANCE_FR = ABS( ABS( LS_MSEG-DMBTR_FR ) - ABS( LS_DATA-DMBTR_FR ) ).
+* Check if amount it's within the range of filter parameter
+*    CHECK lv_balance_fr IN r_dmbtr.         " -- 26.09.20
+    CHECK LV_BALANCE    IN R_BALANCE.      " ++ 26.09.20
+    CHECK LV_BALANCE_FR IN R_BALANCE_FR.   " ++ 26.09.20
+*** Add Entry and Posting Date to Items Yuri C.++ 15.05.19
+    LS_DATA-CPUDT_MKPF = LS_MSEG-CPUDT_MKPF.
+    LS_DATA-BUDAT      = LS_MSEG-BUDAT.
+*** Add Entry and Posting Date to Items Yuri C.++ 15.05.19
+    "--- Get  Vendor Decriptions type LIFNR
+    IF LS_DATA-LIFNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        = LS_DATA-LIFNR
+        IMPORTING
+          VENDOR_DESC  = LS_DATA-LIFNR_DESC
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+    ENDIF.
+    "--- Get  Customer Decriptions type KUNNR
+    IF LS_DATA-KUNNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR          = LS_DATA-KUNNR
+        IMPORTING
+          CUST_DESC      = LS_DATA-KUNNR_DESC
+        EXCEPTIONS
+          WRONG_CUSTOMER = 1
+          OTHERS         = 2.
+    ENDIF.
+    "--- Get Company Code Decriptions
+    IF LS_DATA-BUKRS IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+        EXPORTING
+          BUKRS          = LS_DATA-BUKRS  " Company Code
+        IMPORTING
+          COMP_CODE_DESC = LS_DATA-BUTXT  " Name of Company Code or Company
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+    ENDIF.
+    "--- Get Plant Decriptions
+    IF LS_DATA-WERKS IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+        EXPORTING
+          WERKS      = LS_DATA-WERKS         "   Plant
+          LANGU      = LV_LANGU              " Language Key
+        IMPORTING
+          PLANT_DESC = LS_DATA-WERKS_DESC   " Description of Plant
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    "--- Get  Material Movement Type Decriptions
+    IF LS_DATA-BWART IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MAT_MOV_DESC'
+        EXPORTING
+          BWART         = LS_DATA-BWART       " Mat. Movement Type (Inventory Management)
+          LANGU         = LV_LANGU            " Language Key
+          SOBKZ         = LS_DATA-SOBKZ       " Special Stock Indicator
+          KZBEW         = LS_DATA-KZBEW       " Movement Indicator
+          KZZUG         = LS_DATA-KZZUG       " Receipt Indicator
+          KZVBR         = LS_DATA-KZVBR       " Consumption Posting
+        IMPORTING
+          BWART_DESC    = LS_DATA-BTEXT  " Movement Type Text (Inventory Management)
+        EXCEPTIONS
+          WRONG_MAT_MOV = 1
+          OTHERS        = 2.
+    ENDIF.
+*    "--- Get  Material Decriptions Matnr
+    IF LS_DATA-MATNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MATERIAL_DESC'
+        EXPORTING
+          MATNR         = LS_DATA-MATNR
+          LANGU         = LV_LANGU
+        IMPORTING
+          MATERIAL_DESC = LS_DATA-MAKTX
+        EXCEPTIONS
+          WRONG_CODE    = 1
+          OTHERS        = 2.
+    ENDIF.
+****
+* KOSTL Description
+    IF LS_DATA-KOSTL IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_KOSTL_DESC'
+        EXPORTING
+          SPRAS      = LV_LANGU
+          KOKRS      = LS_DATA-KOKRS
+          KOSTL      = LS_DATA-KOSTL
+        IMPORTING
+          KOSTL_DESC = LS_DATA-KTEXT
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    IF LS_DATA-UMWRK IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+        EXPORTING
+          WERKS      = LS_DATA-UMWRK
+          LANGU      = LV_LANGU
+        IMPORTING
+          PLANT_DESC = LS_DATA-UMWRK_DESC
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    CLEAR: LS_T001L.
+    IF LS_DATA-WERKS IS NOT INITIAL AND LS_DATA-LGORT IS NOT INITIAL.
+      READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_DATA-WERKS
+                                                 LGORT = LS_DATA-LGORT
+                                                 BINARY SEARCH.
+      IF SY-SUBRC = 0.
+        LS_DATA-LGORT_DESC = LS_T001L-LGOBE.
+      ENDIF.
+    ENDIF.
+    CLEAR: LS_T001L.
+    IF LS_DATA-UMLGO IS NOT INITIAL AND LS_DATA-UMWRK IS NOT INITIAL.
+      READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_DATA-UMWRK
+                                                 LGORT = LS_DATA-UMLGO
+                                                 BINARY SEARCH.
+      IF SY-SUBRC = 0.
+        LS_DATA-UMLGO_DESC = LS_T001L-LGOBE.
+      ENDIF.
+    ENDIF.
+****
+    APPEND LS_DATA TO T_DATA.
+    IF LS_MSEG IS NOT INITIAL.
+      "--- Get  Vendor Decriptions type LIFNR
+      IF LS_MSEG-LIFNR IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+          EXPORTING
+            LIFNR        = LS_MSEG-LIFNR
+          IMPORTING
+            VENDOR_DESC  = LS_MSEG-LIFNR_DESC
+          EXCEPTIONS
+            WRONG_VENDOR = 1
+            OTHERS       = 2.
+      ENDIF.
+      "--- Get  Customer Decriptions type KUNNR
+      IF LS_MSEG-KUNNR IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+          EXPORTING
+            KUNNR          = LS_MSEG-KUNNR
+          IMPORTING
+            CUST_DESC      = LS_MSEG-KUNNR_DESC
+          EXCEPTIONS
+            WRONG_CUSTOMER = 1
+            OTHERS         = 2.
+      ENDIF.
+      "--- Get Company Code Decriptions
+      IF LS_MSEG-BUKRS IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+          EXPORTING
+            BUKRS          = LS_MSEG-BUKRS  " Company Code
+          IMPORTING
+            COMP_CODE_DESC = LS_MSEG-BUTXT  " Name of Company Code or Company
+          EXCEPTIONS
+            WRONG_CODE     = 1
+            OTHERS         = 2.
+      ENDIF.
+      "--- Get Plant Decriptions
+      IF LS_MSEG-WERKS IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+          EXPORTING
+            WERKS      = LS_MSEG-WERKS         "   Plant
+            LANGU      = LV_LANGU              " Language Key
+          IMPORTING
+            PLANT_DESC = LS_MSEG-WERKS_DESC   " Description of Plant
+          EXCEPTIONS
+            WRONG_CODE = 1
+            OTHERS     = 2.
+      ENDIF.
+      "--- Get  Material Movement Type Decriptions
+      IF LS_MSEG-BWART IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_MAT_MOV_DESC'
+          EXPORTING
+            BWART         = LS_MSEG-BWART       " Mat. Movement Type (Inventory Management)
+            LANGU         = LV_LANGU            " Language Key
+            SOBKZ         = LS_MSEG-SOBKZ       " Special Stock Indicator
+            KZBEW         = LS_MSEG-KZBEW       " Movement Indicator
+            KZZUG         = LS_MSEG-KZZUG       " Receipt Indicator
+            KZVBR         = LS_MSEG-KZVBR       " Consumption Posting
+          IMPORTING
+            BWART_DESC    = LS_MSEG-BTEXT       " Movement Type Text (Inventory Management)
+          EXCEPTIONS
+            WRONG_MAT_MOV = 1
+            OTHERS        = 2.
+      ENDIF.
+*    "--- Get  Material Decriptions Matnr
+      IF LS_MSEG-MATNR IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_MATERIAL_DESC'
+          EXPORTING
+            MATNR         = LS_MSEG-MATNR
+            LANGU         = LV_LANGU
+          IMPORTING
+            MATERIAL_DESC = LS_MSEG-MAKTX
+          EXCEPTIONS
+            WRONG_CODE    = 1
+            OTHERS        = 2.
+      ENDIF.
+****
+* KOSTL Description
+      IF LS_MSEG-KOSTL IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_KOSTL_DESC'
+          EXPORTING
+            SPRAS      = LV_LANGU
+            KOKRS      = LS_MSEG-KOKRS
+            KOSTL      = LS_MSEG-KOSTL
+          IMPORTING
+            KOSTL_DESC = LS_MSEG-KTEXT
+          EXCEPTIONS
+            WRONG_CODE = 1
+            OTHERS     = 2.
+      ENDIF.
+      IF LS_MSEG-UMWRK IS NOT INITIAL.
+        CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+          EXPORTING
+            WERKS      = LS_MSEG-UMWRK
+            LANGU      = LV_LANGU
+          IMPORTING
+            PLANT_DESC = LS_MSEG-UMWRK_DESC
+          EXCEPTIONS
+            WRONG_CODE = 1
+            OTHERS     = 2.
+      ENDIF.
+      CLEAR: LS_T001L.
+      IF LS_MSEG-WERKS IS NOT INITIAL AND LS_MSEG-LGORT IS NOT INITIAL.
+        READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_MSEG-WERKS
+                                                   LGORT = LS_MSEG-LGORT
+                                                   BINARY SEARCH.
+        IF SY-SUBRC = 0.
+          LS_MSEG-LGORT_DESC = LS_T001L-LGOBE.
+        ENDIF.
+      ENDIF.
+      CLEAR: LS_T001L.
+      IF LS_MSEG-UMLGO IS NOT INITIAL AND LS_MSEG-UMWRK IS NOT INITIAL.
+        READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_MSEG-UMWRK
+                                                   LGORT = LS_MSEG-UMLGO
+                                                   BINARY SEARCH.
+        IF SY-SUBRC = 0.
+          LS_MSEG-UMLGO_DESC = LS_T001L-LGOBE.
+        ENDIF.
+      ENDIF.
+****
+      APPEND LS_MSEG TO T_DATA.
+    ENDIF.
+  ENDLOOP.
+* Check single rows of the document
+  LOOP AT LT_MSEG INTO LS_DATA.
+    CLEAR: LV_BALANCE, LV_BALANCE_FR, LS_RATE.
+    LS_DATA-WAERS_FR = LV_WAERS_FR.
+    IF LS_DATA-WAERS <> LV_WAERS_FR AND LS_DATA-DMBTR IS NOT INITIAL AND
+         LV_WAERS_FR IS NOT INITIAL.                                           " 17.09.20++
+      READ TABLE LT_RATE INTO LS_RATE WITH KEY WAERS = LS_DATA-WAERS.
+      IF SY-SUBRC  = 0 AND LS_RATE-RATE <> 0.
+*        ls_data-dmbtr_fr = ls_data-dmbtr / ls_rate-rate.
+        IF LS_RATE-RATE GT 0.
+          LS_DATA-DMBTR_FR = LS_DATA-DMBTR / ABS( LS_RATE-RATE ).
+        ELSE.
+          LS_DATA-DMBTR_FR = LS_DATA-DMBTR * ABS( LS_RATE-RATE ).
+        ENDIF.
+      ELSE.
+        LS_DATA-DMBTR_FR = 0.
+      ENDIF.
+    ELSE.
+      LS_DATA-DMBTR_FR = LS_DATA-DMBTR.
+    ENDIF.
+*** 20.06.21++
+    CHECK LS_DATA-DMBTR    IN R_DMBTR[].
+    CHECK LS_DATA-DMBTR_FR IN R_DMBTR_FR[].
+*** 20.06.21++
+* Calculate abs. doc. amount
+    LV_BALANCE    = ABS( LS_DATA-DMBTR ).
+    LV_BALANCE_FR = ABS( LS_DATA-DMBTR_FR ).
+* Check if amount it's within the range of filter parameter
+*    CHECK lv_balance_fr IN r_dmbtr.        " 20.06.21--
+*** 20.06.21++
+    CHECK LV_BALANCE IN R_BALANCE[].
+    CHECK LV_BALANCE IN R_BALANCE_FR[].
+*** 20.06.21++
+    LS_DATA-BALANCE    = LV_BALANCE.
+    LS_DATA-BALANCE_FR = LV_BALANCE_FR.
+    "--- Get  Vendor Decriptions type LIFNR
+    IF LS_DATA-LIFNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        = LS_DATA-LIFNR
+        IMPORTING
+          VENDOR_DESC  = LS_DATA-LIFNR_DESC
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+    ENDIF.
+    "--- Get  Customer Decriptions type KUNNR
+    IF LS_DATA-KUNNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR          = LS_DATA-KUNNR
+        IMPORTING
+          CUST_DESC      = LS_DATA-KUNNR_DESC
+        EXCEPTIONS
+          WRONG_CUSTOMER = 1
+          OTHERS         = 2.
+    ENDIF.
+    "--- Get Company Code Decriptions
+    IF LS_DATA-BUKRS IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+        EXPORTING
+          BUKRS          = LS_DATA-BUKRS  " Company Code
+        IMPORTING
+          COMP_CODE_DESC = LS_DATA-BUTXT  " Name of Company Code or Company
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+    ENDIF.
+    "--- Get Plant Decriptions
+    IF LS_DATA-WERKS IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+        EXPORTING
+          WERKS      = LS_DATA-WERKS         "   Plant
+          LANGU      = LV_LANGU              " Language Key
+        IMPORTING
+          PLANT_DESC = LS_DATA-WERKS_DESC   " Description of Plant
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    "--- Get  Material Movement Type Decriptions
+    IF LS_DATA-BWART IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MAT_MOV_DESC'
+        EXPORTING
+          BWART         = LS_DATA-BWART       " Mat. Movement Type (Inventory Management)
+          LANGU         = LV_LANGU            " Language Key
+          SOBKZ         = LS_DATA-SOBKZ       " Special Stock Indicator
+          KZBEW         = LS_DATA-KZBEW       " Movement Indicator
+          KZZUG         = LS_DATA-KZZUG       " Receipt Indicator
+          KZVBR         = LS_DATA-KZVBR       " Consumption Posting
+        IMPORTING
+          BWART_DESC    = LS_DATA-BTEXT       " Movement Type Text (Inventory Management)
+        EXCEPTIONS
+          WRONG_MAT_MOV = 1
+          OTHERS        = 2.
+    ENDIF.
+*    "--- Get  Material Decriptions Matnr
+    IF LS_DATA-MATNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MATERIAL_DESC'
+        EXPORTING
+          MATNR         = LS_DATA-MATNR
+          LANGU         = LV_LANGU
+        IMPORTING
+          MATERIAL_DESC = LS_DATA-MAKTX
+        EXCEPTIONS
+          WRONG_CODE    = 1
+          OTHERS        = 2.
+    ENDIF.
+****
+* KOSTL Description
+    IF LS_DATA-KOSTL IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_KOSTL_DESC'
+        EXPORTING
+          SPRAS      = LV_LANGU
+          KOKRS      = LS_DATA-KOKRS
+          KOSTL      = LS_DATA-KOSTL
+        IMPORTING
+          KOSTL_DESC = LS_DATA-KTEXT
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    IF LS_DATA-UMWRK IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+        EXPORTING
+          WERKS      = LS_DATA-UMWRK
+          LANGU      = LV_LANGU
+        IMPORTING
+          PLANT_DESC = LS_DATA-UMWRK_DESC
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+    CLEAR: LS_T001L.
+    IF LS_DATA-WERKS IS NOT INITIAL AND LS_DATA-LGORT IS NOT INITIAL.
+      READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_DATA-WERKS
+                                                 LGORT = LS_DATA-LGORT
+                                                 BINARY SEARCH.
+      IF SY-SUBRC = 0.
+        LS_DATA-LGORT_DESC = LS_T001L-LGOBE.
+      ENDIF.
+    ENDIF.
+    CLEAR: LS_T001L.
+    IF LS_DATA-UMLGO IS NOT INITIAL AND LS_DATA-UMWRK IS NOT INITIAL.
+      READ TABLE LT_T001L INTO LS_T001L WITH KEY WERKS = LS_DATA-UMWRK
+                                                 LGORT = LS_DATA-UMLGO
+                                                 BINARY SEARCH.
+      IF SY-SUBRC = 0.
+        LS_DATA-UMLGO_DESC = LS_T001L-LGOBE.
+      ENDIF.
+    ENDIF.
+****
+    APPEND LS_DATA TO T_DATA.
+  ENDLOOP.
+*** End Yuri C.++ 13.01.19
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

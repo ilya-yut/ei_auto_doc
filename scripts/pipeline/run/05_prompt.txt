@@ -76,15 +76,15 @@ Use the **Parameter Relationships** subsection in the benchmark for structure an
 
 **1. Output structure / fields file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Structure_Exceptional posting by GL account_200025_001359.xlsx
+C:\vibe code dev\ei_auto_doc\input\Structure_Purch. Orders Approved by Creator_TAD_10_03_PO_APPR_BY_2.xlsx
 
 **2. Parameters (Name (Description)) file** (path or paste – Parameters sheet from Available fields Excel):
 
-C:\vibe code dev\ei_auto_doc\input\Available fields_Exceptional posting by GL account_200025_001359.xlsx
+C:\vibe code dev\ei_auto_doc\input\Available fields_Purch. Orders Approved by Creator_TAD_10_03_PO_APPR_BY_2.xlsx
 
 **3. ABAP code file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Code_Exceptional posting by GL account_200025_001359.txt
+C:\vibe code dev\ei_auto_doc\input\Code_Purch. Orders Approved by Creator_TAD_10_03_PO_APPR_BY_2.txt
 
 **4. Selected parameters file** (reusable explanations):
 

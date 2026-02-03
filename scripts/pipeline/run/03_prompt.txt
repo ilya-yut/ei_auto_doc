@@ -41,7 +41,7 @@ This table lists all configurable input parameters. Users set values for these p
 | … | … | (include every parameter; one row per parameter, # = 1, 2, 3, …) |  |  |  |  |  |
 
 Parameters (Name (Description)) file location or paste:
-C:\vibe code dev\ei_auto_doc\input\Available fields_Exceptional posting by GL account_200025_001359.xlsx
+C:\vibe code dev\ei_auto_doc\input\Available fields_Purch. Orders Approved by Creator_TAD_10_03_PO_APPR_BY_2.xlsx
 
 ---
 

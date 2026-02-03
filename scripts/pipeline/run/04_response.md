@@ -1,244 +1,217 @@
 ### Parameter Configuration Guidelines
 
-**IMPORTANT:** This section provides configuration guidance for ALL 57 parameters listed in the Parameters Reference Table above.
+**IMPORTANT:** This section provides configuration guidance for ALL 42 parameters listed in the Parameters Reference Table above.
 
-**AD_NAMEFIR** (First Name):
+**AEDAT** (Created on):
 
-First name of the user who posted the document. Populated from user master when full line detail is requested; used for display.
+Date on which the purchase order was created. The EI uses this date (or the document date, depending on configuration) when building the monitoring window for order selection.
 
-**AD_NAMELAS** (Last Name):
+**BACKDAYS** (Backdays):
 
-Last name of the user who posted the document. Populated from user master when full line detail is requested; used for display.
+Number of days to look back from today. When no date range is supplied, the EI builds the monitoring window from today minus this value and applies it to the configured date field (e.g. creation date or PO date).
 
-**AEDAT** (Changed On):
+**BEDAT** (Document Date):
 
-Date the record was last changed. Restricts which documents are included by change date; when DATE_REF_FLD = AEDAT, the default date range is applied to this field. Also appears in the result.
+Purchase order document date (schedule line order date). The EI can use this date as the basis for the monitoring window and for duration calculation when so configured.
 
-**BACKDAYS** (Back days):
+**BSAKZ** (Control indicator):
 
-Number of days to look back from the current date when building the default monitoring window. When no explicit date range is supplied, the EI uses today minus this value as the start of the window and applies it to the date field selected by DATE_REF_FLD.
+Control indicator for the purchasing document type. Values are function-specific.
 
-**BELNR** (Document Number):
+**BSAKZ Options:**
 
-Accounting document number. Restricts which documents are included; also appears in the result.
+Values are function-specific; see output structure or document type configuration.
 
-**BKTXT** (Document Header Text):
+**BSART** (Purchasing Doc. Type):
 
-Document header text. Restricts which documents are included; also appears in the result.
+Purchasing document type (e.g. standard order, framework order). Used when the EI reads order header data to scope which document types are considered for the creator-approver check.
 
-**BLART** (Document Type):
+**BSART_DESC** (Doc. Type Descript.):
 
-Document type (e.g. SA, KA). Restricts which documents are included; also appears in the result.
+Short description of the purchasing document type; derived from document type and category via description lookup in the EI.
 
-**BLDAT** (Document Date):
+**BSTYP** (Purch. Doc. Category):
 
-Document date in the document. Restricts which documents are included; also appears in the result. When DATE_REF_FLD = BLDAT, the default range is applied to this field.
+Purchasing document category (e.g. standard order, framework order). Used when the EI reads order header data to scope which document categories are considered.
 
-**BSCHL** (Posting Key):
+**BSTYP Options:**
 
-Posting key. Restricts which line items are included; also appears in the result.
+Values are function-specific (e.g. standard order, framework order).
 
-**BSTAT** (Doc.status):
+**BSTYP_DESC** (Short Descript.):
 
-Document status. Restricts which documents are included; also appears in the result.
-
-**BSTAT Options:**
-- **X** or other domain values: Set (e.g. posted, parked).
-- ** ** (space or initial): Not set / initial.
-
-**BUDAT** (Posting Date):
-
-Posting date in the document. Restricts which documents are included; also appears in the result. When DATE_REF_FLD = BUDAT, the default range is applied to this field.
+Short text for the purchasing document category; derived from master data in the EI.
 
 **BUKRS** (Company Code):
 
-Company code. Restricts which documents are included; also appears in the result.
+Company code of the purchase order. Used when the EI reads order header data to scope which company codes are considered for the creator-approver check.
 
-**BUZEI** (Item):
+**CHANGENR** (Document Number):
 
-Line item number within the accounting document. Restricts which line items are included when filtering by item; also appears in the result.
-
-**COMP_OPERATOR** (Operator):
-
-Comparison operator for consistency checks. Used with comparison logic when applicable; values are domain-specific (e.g. EQ, NE, GT, LT).
-
-**CPUDT** (Entry Date):
-
-Day on which the accounting document was entered. Restricts which documents are included; when DATE_REF_FLD = CPUDT (default in code), the default range is applied to this field. Also appears in the result.
-
-**DATE_REF_FLD** (Date reference field):
-
-Name of the date field used as the reference for the default date range and for duration calculation. Determines which date (posting date, entry date, change date, document date, last update) is used when no explicit range is supplied and for computing how long the document has been in the system.
-
-**DATE_REF_FLD Options:**
-- **BUDAT**: Posting date in the document.
-- **AEDAT**: Changed on.
-- **CPUDT**: Entry date (default in code).
-- **UPDDT**: Last update.
-- **BLDAT**: Document date in the document.
-
-**DMBE2 - DMBE3** (Amount in LC2 – Amount in LC3):
-
-Amount in second and third local currency. Restrict which line items are included by amount; also appear in the result. Business meaning: second and third local currency amounts for reporting.
-
-**DMBTR** (Amount in LC):
-
-Amount in local currency. Restricts which line items are included by amount; also appears in the result. Business meaning: local currency amount of the line item.
+Change document number identifying the change log record for the release step; used to correlate the approver (USERNAME) with the release status (FRGZU) and to join order data with change document data.
 
 **DURATION** (Duration In Time Units):
 
-Duration in the unit given by DURATION_UNIT (e.g. days) between the reference date (from DATE_REF_FLD) and the run date. Restricts which documents are included when a duration filter is applied; also appears in the result.
+Duration in time units between the reference date (e.g. creation or PO date) and current date. The EI calculates this per record; the unit is configured via DURATION_UNIT. Used for age-based prioritization or filtering.
 
 **DURATION_UNIT** (Duration Unit):
 
-Unit for DURATION (e.g. days, hours). Used with DURATION and DATE_REF_FLD when computing and filtering by how long the document has been in the system.
+Unit in which duration is expressed (e.g. days). Used with DURATION for the duration calculation in the EI and for time-based filtering.
 
 **DURATION_UNIT Options:**
-- **D**: Days.
-- **H**: Hours (if supported by the duration calculation function).
-- **M**: Minutes (if supported).
 
-**FABKL** (Factory calendar):
+- **H**: Hours
+- **M**: Minutes
+- **D**: Days
+- **F**: Full days for specific day filtering
 
-Factory calendar key. Used with WFCID and working-days logic to determine factory date and working-day indicator; used for filtering by working days or holidays when configured.
+**EBELN** (Purchasing Document):
 
-**FACDATE** (Factory date):
+Purchasing document number. Used when the EI reads order header data and change documents to scope which orders are considered (by document number).
 
-Factory calendar date. Populated when a factory calendar is used; used for display and for working-days filtering.
+**EKGRP** (Purchasing Group):
 
-**FULL** ('X' - ALL items of FI document):
+Purchasing group of the order. Description is derived from master data in the EI. Used when the EI reads order header data to scope by purchasing group.
 
-When set, the EI returns all line items of each FI document with user name and G/L account description; when not set, returns one record per document header.
+**EKGRP_DESC** (Description p. group):
 
-**FULL Options:**
-- **X**: Return full line-item detail (all items per document).
-- ** ** (space or initial): Return header-level records only.
+Description of the purchasing group; from master data.
 
-**GJAHR** (Fiscal Year):
+**EKORG** (Purch. Organization):
 
-Fiscal year. Restricts which documents are included; also appears in the result.
+Purchasing organization of the order. Used when the EI reads order header data to scope which purchasing organizations are considered. Description is derived from master data in the EI.
 
-**GRPID** (Session name):
+**EKORG_DESC** (Description):
 
-Batch input session name. Restricts which documents are included; also appears in the result.
+Description of the purchasing organization; from master data.
 
-**GVTYP** (P&L statmt acct type):
+**ERNAM** (Created by):
 
-P&L statement account type (G/L account type). Restricts which line items are included via G/L account master; also appears in the result.
+User who created the purchase order. The EI compares this with the user who performed the release (USERNAME) to flag creator-approver same-user cases.
 
-**HKONT** (G/L Account):
+**FRGC** (Release code):
 
-G/L account number. Restricts which line items are included; also appears in the result.
+Release code resolved from release group, release strategy, and release status in the EI. Used after the EI reads release status from the change document to scope which release codes are included in the result.
 
-**HKONT_DESC** (G/L Acct Long Text):
+**FRGC Options:**
 
-G/L account long text. Populated from G/L account master (SKA1/SKAT); used for display.
+Values are function-specific (release code configuration).
 
-**HWAE2 - HWAE3** (Local currency 2 – Local currency 3):
+**FRGGR** (Release group):
 
-Second and third local currency. Business meaning: company code second and third local currency for reporting.
+Release group of the order. Used when the EI reads order header data to scope which orders are subject to release and have the specified release group(s).
 
-**HWAER** (Local Currency):
+**FRGKE** (Release indicator):
 
-Document/local currency. Business meaning: company code local currency in which amounts are stored.
+Release indicator that determines which release configuration applies to the order. Used when the EI reads order header data together with release configuration to scope which orders are subject to release.
 
-**KTOKS** (Account Group):
+**FRGKE Options:**
 
-G/L account group. Restricts which line items are included via G/L account master; also appears in the result.
+Values are function-specific (release configuration).
 
-**KTOPL** (Chart of Accounts):
+**FRGRL** (Subject to release):
 
-Chart of accounts. Restricts which line items are included via G/L account master; also appears in the result.
+Indicates whether the order is subject to release. Used when the EI reads order header data to scope which orders are subject to release and have a release strategy (creator-approver check applies only to such orders).
 
-**KTOPL_T001** (Chart of Accounts):
+**FRGRL Options:**
 
-Chart of accounts (from company code). Used for consistency with company code; also appears in the result.
+- **X**: Set/active (subject to release).
+- ** ** (space) or blank: Not set.
 
-**KURS2 - KURS3** (Exchange rate 2 – Exchange rate 3):
+**FRGSX** (Release Strategy):
 
-Exchange rates for second and third local currency. Restrict or display; used for multi-currency reporting.
+Release strategy code of the order. Used when the EI reads order header data to scope which orders have the specified release strategy and are subject to release.
 
-**KURSF** (Exchange rate):
+**FRGZU** (Release State):
 
-Exchange rate. Restricts or displays; used for document currency conversion.
+Release status (e.g. released, partially released). The EI reads this from the change document for the release field and resolves it to a release code (FRGC); the release code is then used to scope which orders are included in the result.
 
-**KZKRS** (Group Currency Exchange Rate):
+**KDATB** (Validity Per. Start):
 
-Group currency exchange rate. Used for group currency reporting.
+Start of validity period for the release strategy or related configuration.
 
-**KZWRS** (Group currency):
+**KDATE** (Validity Period End):
 
-Group currency. Business meaning: currency used for group-level reporting.
+End of validity period for the release strategy or related configuration.
 
-**LANGU** (Language Key (G/L account)):
+**LAST_ONLY** (Only last approver is checked):
 
-Language key used when retrieving G/L account descriptions. When not supplied, a default (e.g. system language) may be used.
+When set, the EI keeps only the most recent release per order and flags it only if that last approver is the order creator. When not set, every release step where the approver equals the creator is included.
 
-**MONAT** (Posting period):
+**LAST_ONLY Options:**
 
-Fiscal period (posting period). Restricts which documents are included; also appears in the result.
+- **X**: Set/active (only last release per order).
+- ** ** (space) or blank: Not set (all creator-approver same-user steps).
 
-**REF_FIELD_NAME1 - REF_FIELD_NAME2** (Field name – Field name):
+**LIFNR** (Vendor):
 
-First and second reference field names for comparison or display. Used when consistency or comparison checks reference specific fields.
+Vendor (supplier) number of the order. Used when the EI reads order header data to scope which vendors are considered for the creator-approver check.
 
-**RESULT_COMP** (Value 1 to Compare):
+**LOEKZ** (Deletion Indicator):
 
-Comparison value for consistency checks. Used with operator and reference fields when filtering or validating.
+Deletion indicator on the order. Used when the EI reads order header data; orders marked for deletion are excluded when this is not set, or scoped by the supplied value(s).
 
-**SGTXT** (Text):
+**LOEKZ Options:**
 
-Line item text. Restricts which line items are included; also appears in the result.
+- **X**: Set/active (deletion indicator set).
+- ** ** (space) or blank: Not set.
 
-**SHKZG** (Debit/Credit Ind.):
+**PROCSTAT** (Purch. doc. proc. state):
 
-Debit/credit indicator. Restricts which line items are included (e.g. debit or credit only); also appears in the result.
+Purchasing document processing state. Used when the EI reads order header data to scope which processing states are considered.
 
-**SHKZG Options:**
-- **S**: Debit (Soll).
-- **H**: Credit (Haben).
+**PROCSTAT Options:**
 
-**TCODE** (Transaction Code):
+Values are function-specific (e.g. draft, released, partially processed).
 
-Transaction code used to create the document. Restricts which documents are included; also appears in the result.
+**PROCSTAT_DESC** (Short Descript.):
 
-**UPDDT** (Last update):
+Short text for the processing state; derived from master data in the EI.
 
-Date of the last document update. Restricts which documents are included; when DATE_REF_FLD = UPDDT, the default range is applied. Also appears in the result.
+**RESWK** (Supplying Plant):
 
-**USNAM** (User name):
+Supplying (issuing) plant of the order. Used when the EI reads order header data to scope which plants are considered.
 
-User name who posted the document. Restricts which documents are included; also appears in the result.
+**RESWK_DESC** (Name 1):
+
+Name or description of the supplying plant; from master data.
+
+**RLWRT** (Total val. upon release):
+
+Total value at time of release. From the order; used for value-based analysis when exposed in the result.
+
+**STATU** (Status):
+
+Status of the purchasing document. Used when the EI reads order header data to scope which statuses are considered.
+
+**STATU Options:**
+
+Values are function-specific (e.g. released, blocked).
+
+**STATU_DESC** (Short Descript.):
+
+Short text for the document status; derived from master data in the EI.
+
+**UDATE** (Date):
+
+Creation date of the change document (release step). Identifies when the release was performed; used together with UTIME to order release steps (e.g. last release per order when LAST_ONLY is set).
+
+**USERNAME** (User):
+
+User who performed the release (approver). The EI compares this with the order creator (ERNAM) to flag creator-approver same-user cases.
+
+**UTIME** (Time):
+
+Time of the change document (release step). Used together with UDATE to order release steps (e.g. last release per order when LAST_ONLY is set).
+
+**VENDOR_DESC** (Name):
+
+Vendor name; derived from vendor master in the EI.
 
 **WAERS** (Currency):
 
-Document currency key. Business meaning: transaction/document currency in which the document was entered.
+Document currency of the purchase order. Business meaning: currency in which the order is valued.
 
-**WAERS_FR** (Foreign Currency):
+**ZTERM** (Terms of Payment):
 
-Foreign currency. Business meaning: foreign currency when the document involves a different currency than local currency.
-
-**WERKS** (Plant):
-
-Plant. Restricts or displays when relevant to the document; also appears in the result.
-
-**WFCID** (Factory calendar ID):
-
-Factory calendar ID. When set, the EI uses the factory calendar to determine working days and holidays; used together with WORKING_DAYS to filter by working days only or holidays only.
-
-**WORKING_DAYS** (Working Day - Y/N):
-
-When WFCID is set, filters results to working days only or to holidays only.
-
-**WORKING_DAYS Options:**
-- **X** (or C_YES): Include only working days (exclude holidays).
-- ** ** (or C_NO): Include only holidays (exclude working days).
-- ** ** (initial): No filtering by working day; all dates included.
-
-**WRBTR** (Amount):
-
-Amount in document currency. Restricts which line items are included by amount; also appears in the result. Business meaning: amount in document currency.
-
-**XBLNR** (Reference):
-
-Reference document number. Restricts which documents are included; also appears in the result.
+Terms of payment key of the order. Used when the EI reads order header data to scope which terms of payment are considered.

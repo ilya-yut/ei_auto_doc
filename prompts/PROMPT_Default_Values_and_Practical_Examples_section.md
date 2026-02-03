@@ -42,18 +42,22 @@ You are documenting **Default Values** and **Practical Configuration Examples** 
 
 1. **Mandatory.** This subsection must always be present with at least one use case.
 
-2. **Number of use cases:**
+2. **Minimum parameters per example:** Each practical configuration example must include **at least 2–3 parameters** in its code block. Do not produce an example that shows only one parameter.
+
+3. **Number of use cases:**
    - **Very few parameters** (e.g. only a counter or 1–2 parameters): **1–2** use cases.
    - **Multiple parameters** (typical EI): **3–4** use cases.
    - **Many very specific parameters** (aggregation, pseudo-SQL fields, fancy date relationships): **4–5** use cases.
 
-3. **Date-related parameters:** When the Parameters file contains multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS, BACKMONTHS, COMPMONTHS), **do not use them all in one use case**. Use **a subset** per use case so that business logic stays clear and easily understandable for professionals in the respective SAP business/technical domain. Spread date-related parameters across use cases; in each use case include only those that fit the scenario. Do not invent parameters that are not in the Parameters file.
+4. **Date-related parameters:** When the Parameters file contains multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS, BACKMONTHS, COMPMONTHS), **do not use them all in one use case**. Use **a subset** per use case so that business logic stays clear and easily understandable for professionals in the respective SAP business/technical domain. Spread date-related parameters across use cases; in each use case include only those that fit the scenario. Do not invent parameters that are not in the Parameters file.
 
-4. **Business meaning:** For each use case, choose a **clear business scenario** (e.g. "Monthly High-Value Sales Monitoring", "Weekly Customer Sales Pattern Analysis"). The **Purpose:** paragraph must explain what the configuration achieves in business terms and when it is useful.
+5. **DURATION_UNIT = F:** If **DURATION_UNIT** exists among the function’s parameters (Parameters file), **at least one** practical configuration example must include **DURATION_UNIT = F** (full days for specific day filtering) among its parameters. In that example, **DURATION** must be a **single value** (e.g. `DURATION = 30`), not a range (e.g. not `DURATION = 0–30` or `DURATION = 30–999999`).
 
-5. **Parameter scope:** Use **only** parameters that appear in the Parameters (Name (Description)) file for this EI. Do not reference parameters not in that file.
+6. **Business meaning:** For each use case, choose a **clear business scenario** (e.g. "Monthly High-Value Sales Monitoring", "Weekly Customer Sales Pattern Analysis"). The **Purpose:** paragraph must explain what the configuration achieves in business terms and when it is useful.
 
-6. **Format per use case:**
+7. **Parameter scope:** Use **only** parameters that appear in the Parameters (Name (Description)) file for this EI. Do not reference parameters not in that file.
+
+8. **Format per use case:**
    - **Use Case N: [Business-meaning title]**
    - Code block with one parameter per line: `PARAM = value` or `PARAM = value range`. Optionally a short inline comment.
    - **Purpose:** One or two sentences describing the business scenario and what the configuration achieves.
@@ -97,8 +101,9 @@ PARAM2 = value
 ## Rules
 
 - **Default Values:** Include parameters that have a default that can be overridden: **(1)** explicit default in code (assignment when empty, assignment before read), **(2)** effective default to initial (empty for CHAR1/flag, 0 for numeric) when not supplied — document as "Default: initial (empty)" or "Default: initial (0)" with brief meaning. For every single-value parameter in the Parameters file, check (a) assigned before read, (b) assigned when initial, (c) used when initial; if any, include it. If none found after double-checking, omit the Default Values subsection entirely. Do not include line numbers or implementation details.
-- **Practical Examples:** This subsection is **mandatory.** Output at least one use case; 1–5 use cases depending on parameter count and complexity (see above). Every use case must have a business-meaning title and a **Purpose:** paragraph.
+- **Practical Examples:** This subsection is **mandatory.** Output at least one use case; 1–5 use cases depending on parameter count and complexity (see above). **Each example must include at least 2–3 parameters** in its code block; do not produce an example with only one parameter. Every use case must have a business-meaning title and a **Purpose:** paragraph.
 - **Date parameters:** When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case. Use a subset per use case so business logic stays clear and easily understandable for SAP business/technical professionals.
+- **DURATION_UNIT = F:** If **DURATION_UNIT** exists in the Parameters file, **at least one** practical configuration example must have **DURATION_UNIT = F** among its parameters (full days for specific day filtering). In that example, **DURATION** must be a single value (e.g. `DURATION = 30`), not a range.
 - **Parameter scope:** Mention **only** parameters that appear in the Parameters (Name (Description)) file for this EI.
 - **Tone:** Professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
 - **Non-standard entities:** Avoid mentioning non-standard entities (e.g. Z*, Y*, /SKN/*) unless necessary.

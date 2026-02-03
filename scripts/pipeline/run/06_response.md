@@ -1,53 +1,43 @@
 ### Default Values
 
-- **BACKDAYS** — Default: `1` (when no explicit date range is supplied; the default monitoring window starts one day back from today).
-- **DATE_REF_FLD** — Default: `CPUDT` (entry date of the accounting document is used as the reference for the default date range and duration calculation).
-- **DURATION_UNIT** — Default: `D` (duration is calculated in days).
-- **LANGU** — Default: `E` (English or system default for G/L account descriptions when not supplied).
-- **FULL** — Default: initial (empty); when not set, the EI returns one record per document header rather than full line-item detail.
-- **WORKING_DAYS** — Default: initial (empty); when not set, no filtering by working days or holidays is applied.
-- **WFCID** — Default: initial (empty); when not set, the factory calendar is not used and working-days logic is skipped.
+- **BACKDAYS** — Default: `10` (when no date range is supplied, the EI uses a 10-day lookback from today for the monitoring window).
+- **DURATION_UNIT** — Default: `D` (duration is expressed in days when not supplied).
+- **LAST_ONLY** — Default: initial (empty); when not supplied, the EI includes all release steps where the approver equals the creator (not only the last release per order).
+
+**Note:** The reference date field used for the monitoring window and for duration calculation is set in the code to a default (e.g. PO date) when not supplied by the caller; other single-value parameters that are used when initial effectively default to "no restriction" where the code allows.
 
 ### Practical Configuration Examples
 
-**Use Case 1: Exceptional postings in the last 30 days by entry date**
-```
-BACKDAYS = 30
-DATE_REF_FLD = CPUDT
-BUKRS = 1000
-```
-**Purpose:** Focus on accounting documents entered in the last 30 days in company code 1000, using entry date as the reference for the default window and for duration. Supports period-end review and aging of recent postings.
+**Use Case 1: Last 10 days, creator = approver (default lookback)**
 
-**Use Case 2: High-value local-currency line items, header view**
 ```
-DMBTR = 100000 (e.g. lower bound via range)
-FULL = (initial)
-BLART = SA
+BACKDAYS = 10
 ```
-**Purpose:** Identify documents with local-currency line items above a threshold, document type SA (G/L document), without expanding to line-level detail. Useful for high-value exception review.
 
-**Use Case 3: Postings by posting date and duration in days**
-```
-DATE_REF_FLD = BUDAT
-DURATION_UNIT = D
-DURATION = 1 to 90 (e.g. range: documents posted 1–90 days ago)
-```
-**Purpose:** Monitor documents by posting date with duration in days, e.g. to find postings that have been in the system between 1 and 90 days. Supports aging and follow-up prioritization.
+**Purpose:** Monitor purchase orders where the creator is also the approver, for the last 10 days. Suitable for routine weekly or biweekly segregation-of-duties review.
 
-**Use Case 4: Full line-item detail with user and G/L account description**
-```
-FULL = X
-BUKRS = 1000
-GJAHR = 2024
-```
-**Purpose:** Retrieve all line items for documents in company code 1000 and fiscal year 2024, with user name and G/L account long text. Supports detailed audit and root-cause analysis.
+**Use Case 2: By company code and purchasing organization**
 
-**Use Case 5: Working days only in a company code**
 ```
-WFCID = 01 (or appropriate factory calendar ID)
-WORKING_DAYS = X
-BUKRS = 2000
-BACKDAYS = 7
-DATE_REF_FLD = BUDAT
+BUKRS = 1000, 2000
+EKORG = 1000, 2000
 ```
-**Purpose:** Restrict results to postings that fall on working days (excluding holidays) in the last seven days by posting date, for company code 2000. Supports calendar-aware exception reporting.
+
+**Purpose:** Limit results to specific company codes and purchasing organizations. Supports regional or organizational control and delegation review.
+
+**Use Case 3: Only last release per order**
+
+```
+LAST_ONLY = X
+```
+
+**Purpose:** Keep only the most recent release per order and flag it only if that last approver is the order creator. Reduces duplicate rows and focuses on the current release state.
+
+**Use Case 4: Duration in full days (specific day filtering)**
+
+```
+DURATION_UNIT = F
+DURATION = 0–30
+```
+
+**Purpose:** Express duration in full days and restrict to orders with duration between 0 and 30 full days since the reference date. Useful for age-based prioritization (e.g. recent approvals only).

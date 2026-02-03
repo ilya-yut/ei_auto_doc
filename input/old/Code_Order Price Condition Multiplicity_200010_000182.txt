@@ -1,0 +1,27 @@
+FUNCTION /SKN/F_SW_10_01_ORD_PRICE_MLT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_PRICE_MLT OPTIONAL
+*"----------------------------------------------------------------------
+  DATA: LT_DATA TYPE TABLE OF /SKN/S_SW_10_01_ORD_DISC_CHK,
+        LWA_DATA LIKE LINE OF LT_DATA,
+        LS_DATA LIKE T_DATA.
+  CALL FUNCTION '/SKN/F_SW_10_01_ORD_DISC_CHK'
+*   IMPORTING
+*     IS_ALERT       =
+   TABLES
+     T_SELECT       = T_SELECT
+     T_DATA         = LT_DATA.
+  LOOP AT LT_DATA INTO LWA_DATA.
+      MOVE-CORRESPONDING LWA_DATA TO LS_DATA.
+      APPEND LS_DATA TO T_DATA.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

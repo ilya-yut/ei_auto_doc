@@ -384,6 +384,14 @@ _04_PARAMS_REQUIRING_OPTIONS = [
     "TIME_REF_FLD",
     "DURATION_UNIT",
 ]
+# Generic/filler phrases: if a phrase appears more than max_occurrences times in 04, verification fails (principle: no useless repetition)
+_04_GENERIC_PHRASE_MAX_OCCURRENCES = [
+    ("set to focus on", 5),
+    ("set to narrow by", 5),
+    ("when relevant to the data flow", 3),
+    ("when needed", 5),
+    ("when applicable", 3),
+]
 
 
 def _serial_series_from_03_param_names(param_names_ordered: list[str]) -> list[tuple[str, str]]:
@@ -447,6 +455,16 @@ def verify_responses() -> list[str]:
                         "(date/time params: business meaning only; no R_DATUM, SY_DATLO, DATE_FROM, etc.)"
                     )
                     break
+
+        # Generic/filler phrases: fail if same phrase appears too often (no useless repetition)
+        text04_lower = text04.lower()
+        for phrase, max_occ in _04_GENERIC_PHRASE_MAX_OCCURRENCES:
+            count = text04_lower.count(phrase.lower())
+            if count > max_occ:
+                errors.append(
+                    f"04_response.md: generic phrase '{phrase}' appears {count} times (max {max_occ}). "
+                    "Use function- or parameter-specific content; see prompt rule 'No generic or useless sentences'."
+                )
 
         if r03.exists():
             text03 = r03.read_text(encoding="utf-8")

@@ -1,14 +1,17 @@
 ### Parameter Relationships
 
-**Time and duration parameters**
+**Time-Based Selection Parameters:**
 
-- **BACKDAYS** and **DATE_REF_FLD** work together: BACKDAYS defines how many days to look back from today when no explicit date range is supplied; DATE_REF_FLD selects which date field (BUDAT, AEDAT, CPUDT, UPDDT, BLDAT) is used for that range and for duration calculation. Set BACKDAYS to define the default window length and DATE_REF_FLD to align the window with posting date, entry date, change date, or document date as needed.
-- **DURATION** and **DURATION_UNIT** work with **DATE_REF_FLD**: duration is computed between the reference date (from the field named by DATE_REF_FLD) and the run date, in the unit given by DURATION_UNIT (e.g. days). Use DURATION to filter by how long the document has been in the system; DURATION_UNIT defines the unit of measure.
+- When no date range is supplied, the EI builds the monitoring window from today minus the lookback length. The number of days to look back is configured via a single numeric parameter; that value defines the start of the window. The EI then maps this window to a configurable date field (e.g. document created date or PO date) so that purchase orders are selected by the chosen date basis.
 
-**Factory calendar and working-days filtering**
+**Duration Calculation Parameters:**
 
-- **WFCID** and **WORKING_DAYS** work together: when WFCID (factory calendar ID) is set, the EI uses the calendar to determine working days and holidays. WORKING_DAYS then filters results to working days only or to holidays only. Leave WFCID initial to skip working-days filtering.
+- The EI computes a duration (in time units) between a reference date taken from each record and the current date. The reference date is taken from the output record using a configurable date field name. The unit in which duration is expressed (e.g. days) is configured separately. Together, the reference date field and the duration unit determine how duration is calculated; a numeric duration filter can then be used to restrict results (e.g. orders with duration within a range).
 
-**Full-detail mode**
+**Release Strategy and Release Code Parameters:**
 
-- **FULL**: when set to 'X', the EI returns all line items per document with user name and G/L account description; when not set, one record per document header is returned. FULL does not combine with other parameters in a relationship group but controls the level of detail in the result.
+- Release group, release strategy, release indicator, and release code work together to scope which purchase orders are subject to release and which release states are included. The EI reads release status from the change document (field FRGZU) and resolves it to a release code; the release code filter then determines which orders appear in the result. Setting release group, release strategy, and release code in combination focuses the result set on the relevant release configuration and status.
+
+**Creator vs. Approver (LAST_ONLY):**
+
+- When "only last approver" is set, the EI keeps at most one record per order (the most recent change by release date/time) and then checks whether the user who performed that release is the same as the order creator. When not set, the EI includes every release step where the approver equals the creator. This parameter therefore controls whether the result set is limited to the latest release per order or includes all creator-approver same-user release steps.

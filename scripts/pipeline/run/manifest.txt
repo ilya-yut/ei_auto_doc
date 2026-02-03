@@ -1,2 +1,2 @@
-output_basename=Exceptional posting by GL account_200025_001359
-title=Exception Indicator: FI: Exceptional Postings by GL account - SW_10_07_FI_EXC_POST
+output_basename=Purch. Orders Approved by Creator_TAD_10_03_PO_APPR_BY_2
+title=Exception Indicator: PUR: PUR PO Approved by Creator - SW_10_03_PO_APPR_BY
