@@ -50,9 +50,7 @@ You are documenting the **EI Function Structure** (output fields table) and the 
 
 ## Output format (follow exactly)
 
-Output **strictly** the following, in this order. Nothing else.
-
-### EI Function Structure
+Output **strictly** the following, in this order. Nothing else. Use **only** the `##` headings below—do **not** add a `###` line with the same section title (that duplicates the heading in Word).
 
 ## EI Function Structure
 
@@ -61,8 +59,6 @@ This table lists all output fields returned by the EI. These fields contain the 
 | Structure Name | Field Name | Description | Data Type | Component Type |
 |----------------|------------|-------------|-----------|----------------|
 | [copy all rows from structure input]
-
-### ABAP Code
 
 ## ABAP Code
 

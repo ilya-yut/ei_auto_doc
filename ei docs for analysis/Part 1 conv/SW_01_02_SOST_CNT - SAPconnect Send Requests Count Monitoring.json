@@ -1,0 +1,744 @@
+{
+  "source_file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: SAPconnect Send Requests Count Monitoring (SW_01_02_SOST_CNT)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive count-based monitoring and analysis of SAP SAPconnect send requests to ensure communication volume thresholds are maintained and identify potential processing bottlenecks or abnormal communication patterns. This count monitoring focuses on volume analysis rather than detailed request inspection, making it essential for capacity management and early detection of communication system overload scenarios."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SAPconnect Count Monitoring extends the standard SAPconnect monitoring framework by providing volume-based alerting capabilities with count threshold management. The technology enables proactive monitoring of communication processing volumes and provides early warning when send request counts exceed defined operational thresholds, crucial for maintaining system performance and preventing communication backlogs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed SAPconnect count monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Volume threshold monitoring to track send request counts against predefined operational limits"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication load analysis for understanding processing volume patterns and identifying peak usage periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity management to monitor system communication processing capacity and utilization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Trend analysis for identifying gradual increases in communication volume that may impact performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Threshold-based alerting for proactive notification when communication volumes exceed acceptable limits"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes SAPconnect volume statistics by leveraging the main SOST monitoring function and applying count-based filtering to focus on volume thresholds rather than individual request details. This enables targeted analysis of communication volume characteristics and identification of capacity-related issues before they impact business operations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP SAPconnect processing volumes are within acceptable operational thresholds and identifies potential capacity issues that may impact automated communication delivery performance and system stability."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Excessive SAPconnect processing volumes and abnormal count patterns indicate communication system capacity issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Volume and Capacity Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High communication volumes exceeding system processing capacity leading to backlogs and delivery delays"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Abnormal send request accumulation indicating processing bottlenecks or system performance degradation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication queue growth beyond operational thresholds affecting system resource utilization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Volume spikes disrupting normal communication processing workflows and system stability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource exhaustion from excessive communication processing workload affecting overall system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory consumption issues from accumulated send requests impacting available system resources"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing capacity limitations causing communication delivery delays and system responsiveness issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database performance impact from high-volume communication transaction processing affecting system operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication delivery delays due to volume-related processing bottlenecks affecting business operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from capacity-related performance degradation impacting service level commitments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from communication system overload affecting operational continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Potential communication failures from resource exhaustion compromising business communication reliability"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate high communication volumes using SOST transaction for detailed volume analysis and trend identification"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system resource utilization and processing capacity during high-volume periods for capacity assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review communication processing queues and system performance metrics for bottleneck identification"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze volume patterns and identify communication sources contributing to high processing loads"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor communication volume trends and processing capacity utilization for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate system sizing and resource allocation for communication processing workload management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check communication channel configuration and processing parameters for performance optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze volume patterns by communication type, time period, and system for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize communication processing parameters and system configurations for improved volume handling capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement volume management and throttling mechanisms for enhanced capacity control and performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive volume monitoring and capacity planning procedures for early issue detection and prevention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on communication volume analysis and growth projections"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "BACKDAYS",
+          "Backdays",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "2",
+          "DURATION",
+          "Duration In Time Units",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "3",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "4",
+          "LANGU",
+          "Language for texts",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "5",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "6",
+          "SNDART",
+          "AddrType",
+          "CHAR",
+          "3",
+          "0",
+          "SX_ADDRTYP",
+          "SX_ADDRTYP"
+        ],
+        [
+          "7",
+          "SNDNO",
+          "Sender no.",
+          "CHAR",
+          "12",
+          "0",
+          "SO_SND_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "8",
+          "SNDTP",
+          "Sender type",
+          "CHAR",
+          "3",
+          "0",
+          "SO_SND_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "9",
+          "SOST_CNT",
+          "Count",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_CNT",
+          ""
+        ],
+        [
+          "10",
+          "STAT_ERROR",
+          "'X' - Errors",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "11",
+          "STAT_OK",
+          "'X' - Sent",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "12",
+          "STAT_TRANSIT",
+          "'X' - Transmitted",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "13",
+          "STAT_WAIT",
+          "'X' - Waiting",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "14",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "15",
+          "STATUS",
+          "status of the sent object",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "16",
+          "USERNAM",
+          "Sender",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 16 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Backdays)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses duration in time units from the source context so only records with DURATION inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unit for elapsed time between each session's creation date and time and the evaluation clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes (preset in code before the selection read when not overridden)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day style counting where applicable to the duration helper."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Language for texts)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because language for texts (LANGU) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — UTC mode for the relevant timestamp comparisons."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — local time / framework default for the application server clock context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART (AddrType)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when addrtype on SNDART correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDNO (Sender no.)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when sender no. (SNDNO) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDTP (Sender type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because sender type (SNDTP) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOST_CNT (Count)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen SOST_CNT for count, then tighten thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR ('X' - Errors)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Restrict the extract to rows where this send or processing state is active for the object."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or initial — Do not use this flag as a filter dimension."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_OK ('X' - Sent)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_OK Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Restrict the extract to rows where this send or processing state is active for the object."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or initial — Do not use this flag as a filter dimension."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TRANSIT ('X' - Transmitted)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TRANSIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Restrict the extract to rows where this send or processing state is active for the object."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or initial — Do not use this flag as a filter dimension."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT ('X' - Waiting)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Restrict the extract to rows where this send or processing state is active for the object."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or initial — Do not use this flag as a filter dimension."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R — Red (error or failed-style outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G — Green (successful outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y — Yellow (warning or in-process outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Additional literals may exist where the framework extends the palette for neutral states."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS (status of the sent object)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Restricts the extract to the operational status values you configure for this EI's object type."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Use status domain values defined for the underlying SAP object (see data element or domain in the system)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Code applies STATUS as a filter; literals are environment-specific."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USERNAM (Sender)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After data is read, lines are removed unless sender on USERNAM still satisfies the active multivalued selection."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Sender identity, address type, and language selections narrow which send objects enter the working set before state, color, and status filters are applied. Duration-related inputs shape how long objects have remained in their current state relative to the evaluation moment, while lookback shapes how far back the initial read reaches when no explicit monitoring dates are supplied. The count threshold then decides whether the summarized volume is high enough to surface an alert after the detail function has produced its candidate list."
+    },
+    {
+      "kind": "paragraph",
+      "text": "State flags are evaluated together with the generic status and color selectors so that operations can target, for example, waiting or error bands without contradicting the broader status list. Time-zone handling applies consistently to timestamp comparisons used with duration logic. When all dimensions are left wide, the monitor still applies framework defaults for lookback and unit so that the run remains bounded and comparable from one execution to the next."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - initial - treated as 1 by code (one day of lookback when building the default monitoring date window from the evaluation clock)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - initial - treated as M by code (minutes as the unit for elapsed-time calculation when the parameter remains blank at read time)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note: Default handling for lookback and duration is implemented in the called detail routine; this count wrapper forwards selection tables and reads the alert flag from that routine before comparing the resulting table size to the configured count limit."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Tight operational slice for a busy hour"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus on one sender during a short window while still requiring a meaningful volume before alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 1\n DURATION = 120\n DURATION_UNIT = M\n USERNAM = BATCH_USER\n SOST_CNT = 500\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Error-heavy corridor with color emphasis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight when many red-state communications accumulate for monitored address types."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 3\n STATE_COLOR = R\n STAT_ERROR = X\n SNDART = INT\n STATUS = ERR\n SOST_CNT = 50\n MANAGE_IN_UTC = X\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Broad discovery with higher threshold"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Catch only very large backlogs during month-end when traffic is expected to rise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 7\n DURATION = 2880\n DURATION_UNIT = M\n STAT_WAIT = X\n STAT_TRANSIT = X\n SNDTP = BUP\n SNDNO = 10000001\n LANGU = E\n SOST_CNT = 2000\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST_CNT",
+          "SOST_CNT",
+          "SW: Count",
+          "INT4(10)",
+          "/SKN/E_SW_CNT"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_SOST_CNT.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_SOST_CNT OPTIONAL\n*\"----------------------------------------------------------------------\nDATA : LV_ALERT TYPE  CHAR1.\nDATA : LS_DATA TYPE /SKN/S_SW_01_02_SOST,\n       LT_DATA LIKE TABLE OF LS_DATA.\nDATA : LV_CNT TYPE I.\nDATA_MULTY: SOST_CNT /SKN/E_SW_CNT.\nSELECT_MULTY: SOST_CNT.\n   REFRESH T_DATA.\n   CALL FUNCTION '/SKN/F_SW_01_02_SOST'\n    IMPORTING\n       IS_ALERT       = LV_ALERT\n     TABLES\n       T_SELECT       = T_SELECT\n       T_DATA         = LT_DATA.\n    IS_ALERT = LV_ALERT.\n    DESCRIBE TABLE LT_DATA LINES LV_CNT.\n    IF LV_CNT IN R_SOST_CNT.\n      T_DATA-SOST_CNT = LV_CNT.\n      APPEND T_DATA.\n      IS_ALERT = LV_ALERT.\n    ELSE.\n      CLEAR IS_ALERT.\n    ENDIF.\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -1,0 +1,663 @@
+{
+  "source_file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: RFC Destination Connectivity Monitoring (SW_01_02_RFC_PING)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP RFC (Remote Function Call) destination connectivity to ensure reliable system integration and communication between distributed SAP systems and external applications. RFC connectivity is essential for system-to-system communication, where reliable network connections and proper RFC destination configurations must be maintained for business-critical integration scenarios."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC destinations enable SAP systems to communicate with other SAP systems, external applications, and third-party systems through standardized interfaces. This monitoring solution ensures that these communication channels remain available and responsive, preventing integration failures that could disrupt business processes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed RFC destination monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC destination connectivity testing to verify active communication channels and network availability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "HTTP and standard RFC protocol support for comprehensive monitoring of different RFC types (HTTP-based G/H types and traditional RFC protocols)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-time status assessment with color-coded indicators for immediate visual status identification"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System time synchronization verification to ensure proper timestamp coordination across distributed systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cloud and on-premise support with automatic detection and routing for different deployment scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution tests RFC destinations using either RFC_PING or RFCPING functions (depending on logon requirements), analyzes both standard RFC connections and HTTP-based connections, and provides enhanced filtering capabilities to focus on specific destinations, states, and user contexts. This enables targeted analysis of RFC connectivity performance and identification of communication-related issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP RFC destinations are accessible and functioning properly, identifying potential connectivity issues that may impact distributed system communication, data transfer, and business process execution."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor RFC destination connectivity and communication failures indicate system integration and network issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration and Communication Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Failed RFC connections preventing critical data transfer and business process execution between systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Network connectivity issues causing intermittent communication failures and system integration disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC destination configuration errors leading to connection timeouts and authentication failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Protocol-specific failures (HTTP vs. standard RFC) disrupting different types of system integration scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connection timeout accumulation affecting overall system performance and user experience"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource contention from repeated connection attempts impacting available system resources"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Network latency issues causing delays in real-time data synchronization and process execution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Load balancing failures in distributed RFC environments affecting system availability and responsiveness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from unreliable system-to-system communication affecting operational continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data synchronization failures due to RFC connectivity issues compromising data consistency across systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from communication delays impacting service level commitments and customer satisfaction"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration workflow failures causing manual intervention requirements and increased operational overhead"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Test RFC destinations manually using SM59 transaction to verify connectivity and identify specific failure points"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check network connectivity and firewall configurations between source and target systems for proper access rules"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review RFC destination configuration and authentication credentials for accuracy and validity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze system logs and RFC error messages for root cause identification and pattern analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor RFC connection performance trends and response times for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate network infrastructure and bandwidth utilization during peak RFC processing periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check RFC load balancing configuration and server group settings for optimal distribution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze RFC destination usage patterns by function module, user, and system for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize RFC destination parameters and connection pooling settings for improved performance and reliability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement RFC connection monitoring and alerting procedures for proactive issue detection and prevention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish RFC destination redundancy and failover mechanisms for enhanced fault tolerance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan network infrastructure upgrades based on RFC connectivity analysis and performance requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "ERR_MSG",
+          "Run Error",
+          "CHAR",
+          "255",
+          "0",
+          "/SKN/E_SW_ERROR",
+          "/SKN/D_SW_LTEXT"
+        ],
+        [
+          "2",
+          "LIST_FROM_TABLE",
+          "'X' - based on /SKN/T_SW_RFC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "3",
+          "LOCAL_DATE",
+          "Local Date",
+          "DATS",
+          "8",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "4",
+          "LOCAL_TIME",
+          "Local Time",
+          "TIMS",
+          "6",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "5",
+          "LOGON_CHECK",
+          "'X' - performs Logon",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "6",
+          "RFCDEST",
+          "RFC Destination",
+          "CHAR",
+          "32",
+          "0",
+          "RFCDEST",
+          "RFCDEST"
+        ],
+        [
+          "7",
+          "RFCDEST_DESC",
+          "",
+          "CHAR",
+          "100",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "8",
+          "RFCTYPE",
+          "Connection Type",
+          "CHAR",
+          "1",
+          "0",
+          "RFCTYPE_D",
+          "RFCTYPE"
+        ],
+        [
+          "9",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "10",
+          "STATE_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "11",
+          "UDATE",
+          "Date",
+          "DATS",
+          "8",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "12",
+          "UTIME",
+          "Time",
+          "TIMS",
+          "6",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 12 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ERR_MSG (Run Error)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets run error as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on ERR_MSG."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LIST_FROM_TABLE ('X' - based on /SKN/T_SW_RFC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "'X' - based on /SKN/T_SW_RFC” means: with X, the run is driven by that custom table; without X, it follows the other (general / RFCDES) path."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Set LIST_FROM_TABLE = X when you want the EI to only consider destinations that exist (and are active) in /SKN/T_SW_RFC that can be set by your Basis team or Skywind."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Leave it blank when you want the EI to work from RFCDES for the RFCDEST values you pass in — the usual “standard table of RFC destinations” behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOCAL_DATE (Local Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening local date through LOCAL_DATE alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOCAL_TIME (Local Time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—local time on LOCAL_TIME should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGON_CHECK ('X' - performs Logon)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treats 'x' - performs logon as a discriminator between similar rows that would otherwise look identical in a raw extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST (RFC Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where rfc destination on RFCDEST signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST_DESC (RFCDEST_DESC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—rfcdest_desc on RFCDEST_DESC should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCTYPE (Connection Type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring connection type (RFCTYPE) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R — Red (error or failed-style outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G — Green (successful outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y — Yellow (warning or in-process outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Additional literals may exist where the framework extends the palette for neutral states."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON (State Icon)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing state icon (STATE_ICON) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UDATE (Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen UDATE for date, then tighten thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UTIME (Time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when time on UTIME is narrowed together with client, user, or session filters."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST and RFCDEST_DESC work as the primary destination identity and descriptive context pair: narrowing the logical destination set is the first scope control before type, time, and presentation filters refine the extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCTYPE and LOGON_CHECK shape how the monitor interprets destination categories and whether logon-style validation participates in the evaluation path you expect for this run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOCAL_DATE, LOCAL_TIME, UDATE, and UTIME let you align the monitoring snapshot with calendar and clock context on the application server or with last-change timestamps when those dimensions matter for triage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LIST_FROM_TABLE and related mode-style inputs determine whether results are driven from table-oriented listing behavior versus the generalized evaluation path; treat them as switches that change how the same destination filters should be read."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR and STATE_ICON should be interpreted together as the presentation bundle returned for each row so operators do not read severity-style color in isolation from the icon semantics."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No default values are defined for this EI."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Destination slice with presentation filter"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Monitor a naming pattern for productive RFC targets while focusing on error-style presentation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST = PRD_*\n STATE_COLOR = R\n RFCTYPE = 3\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Table-driven listing with destination focus"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Use list-from-table mode for a bounded set of destinations you maintain in the selection interface."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LIST_FROM_TABLE = X\n RFCDEST = CENTRAL_HUB\n LOGON_CHECK = X\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Time-oriented snapshot for a destination family"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Correlate ping-style results with evaluation date and time windows on the application server clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST = EXT_*\n LOCAL_DATE = 20250401 - 20250430\n LOCAL_TIME = 080000 - 180000\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Rich bundle for integration war room"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Combine identity, type, presentation, and messaging context in one pass for a narrow integration review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST = PARTNER_A_DEST\n RFCDEST_DESC = *Partner A*\n RFCTYPE = 3\n STATE_COLOR = R\n STATE_ICON = 1\n ERR_MSG = *\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "ERR_MSG",
+          "SW: Run Error",
+          "CHAR(255)",
+          "/SKN/E_SW_ERROR"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "LOCAL_DATE",
+          "",
+          "DATS(8)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "LOCAL_TIME",
+          "",
+          "TIMS(6)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "RFCDEST",
+          "Logical Destination (Specified in Function Call)",
+          "CHAR(32)",
+          "RFCDEST"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "RFCDEST_DESC",
+          "",
+          "CHAR(100)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "RFCTYPE",
+          "Type of Entry in RFCDES",
+          "CHAR(1)",
+          "RFCTYPE_D"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "STATE_COLOR",
+          "SW: State Color",
+          "CHAR(1)",
+          "/SKN/E_SW_STATE_COLOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "STATE_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "UDATE",
+          "",
+          "DATS(8)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_PING",
+          "UTIME",
+          "",
+          "TIMS(6)",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_RFC_PING.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_RFC_PING OPTIONAL\n*\"----------------------------------------------------------------------\nRANGES : R_RFCDEST FOR /SKN/T_SW_RFC-RFCDEST ,\n         R_STATE_COLOR FOR /SKN/S_SW_SYS_RFC_PING-STATE_COLOR.\nDATA :   IS_GENERAL(1) TYPE C.\nDATA : WA TYPE /SKN/T_SW_RFC.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA : RFCDEST TYPE RFCDEST.\nDATA : RFC_MESS(255) TYPE C .\nDATA : IS_ERROR(1) TYPE C.\nDATA : RC TYPE  SYSUBRC,\n       ERR_MSG TYPE  /SKN/E_SW_ERROR.\nDATA: FM TYPE FUNCNAME.\n*-- Fill Selection Option Tables\n   LOOP AT T_SELECT WHERE FIELDNM = 'RFCDEST'.\n     MOVE-CORRESPONDING T_SELECT TO R_RFCDEST.\n     APPEND R_RFCDEST.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.\n     MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.\n     APPEND R_STATE_COLOR.\n   ENDLOOP.\n   IS_GENERAL = 'X'.\n   LOOP AT T_SELECT WHERE FIELDNM = 'IS_GENERAL'.\n     IF NOT T_SELECT-LOW IS INITIAL.\n       IS_GENERAL = 'X'.\n     ENDIF.\n     EXIT .\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'LIST_FROM_TABLE'.\n     IF NOT T_SELECT-LOW IS INITIAL.\n       CLEAR IS_GENERAL.\n     ENDIF.\n     EXIT .\n   ENDLOOP.\n\"--- Logon Chek\n  DATA_SINGLE: LOGON_CHECK CHAR1.             .\n  SELECT_SINGLE: LOGON_CHECK.\n   FM = 'RFC_PING'.\n   IF LV_LOGON_CHECK IS NOT INITIAL.\n     FM = 'RFCPING'.\n   ENDIF.\n  \"--- Run Cloud Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_02_RFC_PING'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Cloud Mode -----\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  IF IS_GENERAL IS INITIAL.\n    SELECT *\n      FROM /SKN/T_SW_RFC\n      INTO CORRESPONDING FIELDS OF TABLE T_DATA\n      WHERE  RFCDEST IN R_RFCDEST\n        AND  IS_ACTIVE > ' '.\n   ELSE.\n     IF NOT R_RFCDEST[] IS INITIAL.\n    SELECT *\n      FROM RFCDES\n      INTO CORRESPONDING FIELDS OF TABLE T_DATA\n      WHERE  RFCDEST IN R_RFCDEST .\n     ENDIF.\n   ENDIF.\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n    CLEAR IS_ERROR.\n    \" Test RFC Destinations\n    RFCDEST = T_DATA-RFCDEST.\n    IF NOT RFCDEST IS INITIAL .\n      IF ( T_DATA-RFCTYPE = 'G' OR T_DATA-RFCTYPE =  'H' ).\n        CALL FUNCTION '/SKN/F_SW_01_CHECK_RFC_HTTP'\n          EXPORTING\n            DEST          = RFCDEST\n          IMPORTING\n            RC            = RC\n            ERR_MSG       = ERR_MSG.\n        IF RC IS NOT INITIAL.\n          IS_ERROR = 'X'.\n        ENDIF.\n        RFC_MESS = ERR_MSG.\n      ELSE.\n        CALL FUNCTION  FM   \" 'RFC_PING'\n          DESTINATION  RFCDEST\n          EXCEPTIONS SYSTEM_FAILURE = 1\n                     MESSAGE RFC_MESS\n                     COMMUNICATION_FAILURE = 2\n                     MESSAGE RFC_MESS\n                     OTHERS            = 9 .\n        IF SY-SUBRC <> 0 AND SY-SUBRC < 9.\n          IS_ERROR = 'X'.\n        ENDIF.\n      ENDIF.\n      IF IS_ERROR IS NOT INITIAL.\n        T_DATA-ERR_MSG = RFC_MESS.\n        T_DATA-UDATE = SY-DATUM.\n        T_DATA-UTIME = SY-UZEIT.\n        T_DATA-STATE_COLOR = 'R'.\n        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n          EXPORTING\n            STATE_COLOR       = T_DATA-STATE_COLOR\n          IMPORTING\n            STATE_ICON        = T_DATA-STATE_ICON         .\n         MODIFY T_DATA INDEX SY_TABIX.\n      ELSE.\n        T_DATA-ERR_MSG = 'OK'.\n        T_DATA-UDATE = SY-DATUM.\n        T_DATA-UTIME = SY-UZEIT.\n        T_DATA-STATE_COLOR = 'G'.\n        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n          EXPORTING\n            STATE_COLOR       = T_DATA-STATE_COLOR\n          IMPORTING\n            STATE_ICON        = T_DATA-STATE_ICON         .\n        \"--- Set Local Date-Time\n        CALL FUNCTION '/SKN/F_SW_DT_GET_SYSTEM'\n          EXPORTING\n            DEST                        = T_DATA-RFCDEST\n          IMPORTING\n            SYS_DATE                    = T_DATA-LOCAL_DATE\n            SYS_TIME                    = T_DATA-LOCAL_TIME\n          EXCEPTIONS\n            COMMUNICATION_FAILURE       = 1\n            OTHERS                      = 2.\n        IF SY-SUBRC = 0.\n          MODIFY T_DATA INDEX SY_TABIX.\n        ENDIF.\n         MODIFY T_DATA INDEX SY_TABIX.\n      ENDIF .\n     ENDIF .\n  ENDLOOP.\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF T_DATA-RFCDEST_DESC IS INITIAL.\n      SELECT SINGLE RFCDOC1\n        INTO T_DATA-RFCDEST_DESC\n        FROM RFCDOC\n        WHERE RFCDEST = T_DATA-RFCDEST\n          AND RFCLANG = SY-LANGU .\n      IF SY-SUBRC IS INITIAL.\n        MODIFY T_DATA INDEX SY_TABIX.\n      ENDIF.\n    ENDIF.\n  ENDLOOP.\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.\n      DELETE T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -1,0 +1,923 @@
+{
+  "source_file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: System Client Status Monitoring (SW_01_01_SYS_IS_OPEN)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides comprehensive monitoring of SAP system client configurations to identify clients that allow changes to Repository objects and cross-client Customizing settings. The EI monitors the T000 table (client table) to track client security settings and alert on potentially risky configurations that could compromise system integrity."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring focuses on client change control settings which determine what types of changes are permitted in each client. This is critical for maintaining proper system landscape management and ensuring that development, testing, and production clients maintain appropriate change restrictions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP clients have appropriate change restrictions configured and identifies clients with overly permissive settings that may pose security or stability risks."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Clients with inappropriate change settings indicate system security and governance issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security and Compliance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Production clients allowing Repository changes creating system instability risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cross-client Customizing changes in wrong system landscape tiers affecting system integrity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unauthorized development activities in production environments compromising change management processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of proper change control leading to audit compliance violations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Stability Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Direct production changes bypassing proper testing and approval processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Repository modifications causing system-wide impacts without proper validation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configuration changes affecting multiple clients without controlled deployment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Potential system crashes or data corruption from untested changes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Change Management Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Breakdown of proper development-to-production promotion processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of traceability for system changes and modifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Difficulty in maintaining system consistency across landscape tiers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Challenges in system recovery and rollback scenarios"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review client configurations using SM30 (Table T000) to identify inappropriate settings"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check recent changes made to client configurations via audit logs and change tracking"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Verify change control processes and access authorizations for client management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Identify and document any unauthorized changes that may have occurred"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate client change settings across entire system landscape for consistency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review authorization concepts for client administration and change management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Assess change control procedures and approval workflows for system modifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor client configuration stability and change frequency patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement proper client configuration settings based on system landscape role (DEV/QAS/PRD)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular client configuration reviews and monitoring procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Apply principle of least privilege for client change authorizations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Document and enforce client configuration standards across system landscape"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "ADRNR",
+          "Character Field Length = 10",
+          "CHAR",
+          "10",
+          "0",
+          "CHAR10",
+          ""
+        ],
+        [
+          "2",
+          "CCCATEGORY",
+          "Client role",
+          "CHAR",
+          "1",
+          "0",
+          "CCCATEGORY",
+          ""
+        ],
+        [
+          "3",
+          "CCCOPYLOCK",
+          "Protection reg. client copy/comparison",
+          "CHAR",
+          "1",
+          "0",
+          "CCCOPYLOCK",
+          ""
+        ],
+        [
+          "4",
+          "CCCORACTIV",
+          "Changes and transports",
+          "CHAR",
+          "1",
+          "0",
+          "CCCORACTIV",
+          ""
+        ],
+        [
+          "5",
+          "CCIMAILDIS",
+          "CATT Authorization",
+          "CHAR",
+          "1",
+          "0",
+          "CCIMAILDIS",
+          ""
+        ],
+        [
+          "6",
+          "CCNOCASCAD",
+          "Protection against SAP upgrade",
+          "CHAR",
+          "1",
+          "0",
+          "CCNOCASCAD",
+          ""
+        ],
+        [
+          "7",
+          "CCNOCLIIND",
+          "No cross-client maintenance",
+          "CHAR",
+          "1",
+          "0",
+          "CCNOCLIIND",
+          ""
+        ],
+        [
+          "8",
+          "CCORIGCONT",
+          "Create Switch BC Sets",
+          "CHAR",
+          "1",
+          "0",
+          "CCORIGCONT",
+          ""
+        ],
+        [
+          "9",
+          "CCSOFTLOCK",
+          "Lock Method",
+          "CHAR",
+          "1",
+          "0",
+          "CCSOFTLOCK",
+          ""
+        ],
+        [
+          "10",
+          "CCTEMPLOCK",
+          "Locked due to client copy",
+          "CHAR",
+          "1",
+          "0",
+          "CCTEMPLOCK",
+          ""
+        ],
+        [
+          "11",
+          "CHANGEDATE",
+          "Date",
+          "DATS",
+          "8",
+          "0",
+          "AS4DATE",
+          ""
+        ],
+        [
+          "12",
+          "CHANGEUSER",
+          "Last Changed By",
+          "CHAR",
+          "12",
+          "0",
+          "AS4USER",
+          ""
+        ],
+        [
+          "13",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "14",
+          "DURATION_UNIT",
+          "Duration Unit",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          ""
+        ],
+        [
+          "15",
+          "LOGSYS",
+          "Logical System",
+          "CHAR",
+          "10",
+          "0",
+          "LOGSYS",
+          ""
+        ],
+        [
+          "16",
+          "MANDT",
+          "Client",
+          "CLNT",
+          "3",
+          "0",
+          "MANDT",
+          ""
+        ],
+        [
+          "17",
+          "MTEXT",
+          "Name",
+          "CHAR",
+          "25",
+          "0",
+          "MTEXT_D",
+          ""
+        ],
+        [
+          "18",
+          "MWAER",
+          "Standard currency",
+          "CUKY",
+          "5",
+          "0",
+          "MWAER",
+          ""
+        ],
+        [
+          "19",
+          "ORT01",
+          "City",
+          "CHAR",
+          "25",
+          "0",
+          "ORT01",
+          ""
+        ],
+        [
+          "20",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          ""
+        ],
+        [
+          "21",
+          "STATE_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          ""
+        ],
+        [
+          "22",
+          "STATUS_DESC",
+          "SW Message",
+          "CHAR",
+          "255",
+          "0",
+          "/SKN/E_SW_TEXT",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 22 parameters listed in the Parameters Reference Table when tuning this EI; each influences which client rows are retrieved, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADRNR (Character Field Length = 10)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADRNR carries the address number reference stored on the client row so distributed teams can tie an exception back to the same address record they maintain in standard business partner workflows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCATEGORY (Client role)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCATEGORY distinguishes production, test, demo, and training-style clients so monitoring can emphasize business-critical numbers while still listing exceptions elsewhere for completeness."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCOPYLOCK (Protection reg. client copy/comparison)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCOPYLOCK signals whether client copy utilities should treat the client as protected, helping change managers see when copy tooling could still run despite governance expectations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCORACTIV (Changes and transports)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCORACTIV captures whether client-specific transports and changes are allowed, which is a primary lever auditors review alongside repository openness."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCIMAILDIS (CATT Authorization)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCIMAILDIS records how computer-aided test tools may run in the client, which matters when automated scripts could still execute while customizing paths look hardened."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCNOCASCAD (Protection against SAP upgrade)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCNOCASCAD shows upgrade-related cascade protections so upgrade managers can confirm the client matches their freeze strategy before go-live."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCNOCLIIND (No cross-client maintenance)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCNOCLIIND is the strongest single indicator of how far cross-client repository work may proceed; the monitoring logic maps its values to the plain-language severity narrative and traffic-light styling that operators see first."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCNOCLIIND Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Space – repository and cross-client customizing remain fully changeable, which triggers the most severe narrative path"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        1 – cross-client customizing objects are blocked while repository work may continue"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        2 – repository objects are blocked while some customizing paths may still differ"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        3 – both repository and cross-client customizing objects are blocked, representing the hardened posture leadership usually expects in production"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCORIGCONT (Create Switch BC Sets)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCORIGCONT highlights which client records BC Set switches when solution documentation teams need to know where switch content is authored."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCSOFTLOCK (Lock Method)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCSOFTLOCK documents soft-lock expectations that Basis teams reconcile with enqueue behavior during maintenance windows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCTEMPLOCK (Locked due to client copy)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCTEMPLOCK tells operators when a client is temporarily locked because a copy is running, preventing false escalations during long-running infrastructure jobs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CHANGEDATE (Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CHANGEDATE stores the last time client control data changed, and the aging routine compares that calendar stamp to the evaluation moment so freshness rules can drop stale exceptions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CHANGEUSER (Last Changed By)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CHANGEUSER identifies the account that last touched the client row, giving security teams a direct pointer for follow-up interviews after an alert fires."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION receives the computed age returned by the shared time-difference helper after each client row is evaluated, and only rows whose age still fits the declared interval remain in the alert set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT tells the aging helper whether to measure elapsed time in minutes, hours, days, or full-day buckets before comparing the result with the configured interval."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D – day-based increments between the last change date and the evaluation timestamp"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H – hour-level granularity for short lookback windows"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M – minute-level granularity when near-real-time freshness is required"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F – full-day treatment when business rules expect calendar-day floors instead of fractional days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGSYS (Logical System)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGSYS ties each client to its logical-system name so central monitoring can align exceptions with the same identifier used in ALE distribution lists."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANDT (Client)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANDT is the primary key for selection; supply the productive or non-productive numbers the runbook names so the extract matches the landscape segment under review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MTEXT (Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MTEXT repeats the familiar client description text so dashboards remain human-readable without opening additional transactions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MWAER (Standard currency)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MWAER shows the client currency so finance-facing reviewers can interpret openness exceptions alongside monetary reporting expectations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ORT01 (City)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ORT01 provides a geographic hint for distributed governance teams that organize follow-up by region."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR is filled by the routine after interpreting cross-client maintenance indicators, giving alert consumers an at-a-glance severity token that downstream icon logic can reuse."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R – indicates the narrative path where repository and cross-client customizing remain fully open"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y – indicates partially restricted combinations where one class of change is blocked but others may remain"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G – indicates the hardened path where both repository and cross-client customizing objects are blocked"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Any other value leaves color styling untouched when the indicator does not map to a known posture"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON (State Icon)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON stores the icon token returned by the shared state-icon routine so alert layouts can show the same glyph users already recognize from other monitors."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC (SW Message)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC carries the full sentence that explains the openness posture in business language, which is what email or ticketing integrations should surface to non-Basis readers."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CHANGEDATE and CHANGEUSER describe when and who last edited that control record, while DURATION and DURATION_UNIT jointly express how long the row may remain in the alert set after its last change: the unit tells the aging helper how to measure elapsed time, and the numeric duration window decides whether the aged row survives the final retention test."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR, STATE_ICON, and STATUS_DESC form a single presentation bundle produced after the openness logic runs, so operators should interpret them together rather than treating the color token in isolation from the message text."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial - treated as unconstrained multi-value selection by code (empty interval table keeps every computed age value until explicit bounds are supplied)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - D set in code before the single-value read completes by code (day-based aging math runs unless the caller overrides the unit afterward)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Production landscape hardening sweep"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus on productive-role clients that still allow repository work, while requiring freshness within a single calendar-day window expressed in full-day units."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANDT = 100–399\n CCCATEGORY = P\n CCNOCLIIND = ' '\n DURATION_UNIT = F\n DURATION = 1\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Transport-free weekend watch"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight any client whose customizing path remains fully open immediately after a freeze announcement, using a short lookback without narrowing by duration window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCCORACTIV = '1'\n CCNOCLIIND = ' '\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Post-copy validation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Catch clients still flagged as temporarily locked or soft-locked after infrastructure work, while scoping to a named company cluster."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CCTEMPLOCK = X\n CCSOFTLOCK = X\n MTEXT = PRD*\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Currency-specific governance sample"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Give treasury-facing reviewers a slice of Euro-denominated productive clients whose cross-client indicator still shows partial restriction rather than full lock-down."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MWAER = EUR\n CCNOCLIIND = 1\n CCCATEGORY = P\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "ADRNR",
+          "Character Field Length = 10",
+          "CHAR(10)",
+          "CHAR10"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCCATEGORY",
+          "Client control: Role of client (production, test,...)",
+          "CHAR(1)",
+          "CCCATEGORY"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCCOPYLOCK",
+          "Protection reg. client copy program and comparison tools",
+          "CHAR(1)",
+          "CCCOPYLOCK"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCCORACTIV",
+          "Changes and transports for client-specific objects",
+          "CHAR(1)",
+          "CCCORACTIV"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCIMAILDIS",
+          "Client Control: CATT und eCATT Authorization",
+          "CHAR(1)",
+          "CCIMAILDIS"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCNOCASCAD",
+          "Client control: No client cascade for upgrade import",
+          "CHAR(1)",
+          "CCNOCASCAD"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCNOCLIIND",
+          "Maintenance authorization for objects in all clients",
+          "CHAR(1)",
+          "CCNOCLIIND"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCORIGCONT",
+          "Recording Client for Switch BC Sets",
+          "CHAR(1)",
+          "CCORIGCONT"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCSOFTLOCK",
+          "Client control: Soft Lock Required (Planned for 4.0)",
+          "CHAR(1)",
+          "CCSOFTLOCK"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CCTEMPLOCK",
+          "Client control: Indicator that client is temporarily locked",
+          "CHAR(1)",
+          "CCTEMPLOCK"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CHANGEDATE",
+          "Date of Last Change",
+          "DATS(8)",
+          "AS4DATE"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "CHANGEUSER",
+          "Last Changed by",
+          "CHAR(12)",
+          "AS4USER"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "LOGSYS",
+          "Logical system",
+          "CHAR(10)",
+          "LOGSYS"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "MANDT",
+          "Client",
+          "CLNT(3)",
+          "MANDT"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "MTEXT",
+          "Client name",
+          "CHAR(25)",
+          "MTEXT_D"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "MWAER",
+          "Standard currency throughout client",
+          "CUKY(5)",
+          "MWAER"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "ORT01",
+          "City",
+          "CHAR(25)",
+          "ORT01"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "STATE_COLOR",
+          "SW: State Color",
+          "CHAR(1)",
+          "/SKN/E_SW_STATE_COLOR"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "STATE_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/CLIENT_STATUS",
+          "STATUS_DESC",
+          "SW: Message",
+          "CHAR(255)",
+          "/SKN/E_SW_TEXT"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_SYS_IS_OPENED.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/CLIENT_STATUS OPTIONAL\n*\"----------------------------------------------------------------------\n  RANGES : R_MANDT    FOR /SKN/CLIENT_STATUS-MANDT,\n           R_CCCATEGORY FOR /SKN/CLIENT_STATUS-CCCATEGORY,\n           R_CCCORACTIV FOR /SKN/CLIENT_STATUS-CCCORACTIV,\n           R_CCORIGCONT FOR /SKN/CLIENT_STATUS-CCORIGCONT.\nDATA_MULTY: DURATION   /SKN/E_SW_DURATION.\nDATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\nDATA: SY_TABIX LIKE SY-TABIX.\n*-- Fill Selection Option Tables\n SELECT_MULTY: DURATION.\n LV_DURATION_UNIT = 'D'.\n SELECT_SINGLE: DURATION_UNIT.\n SY_DATLO = SY-DATUM .        \" Appl Server's Date\n SY_TIMLO = SY-UZEIT.\n\"--- Run Clood Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_01_SYS_IS_OPENED'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Clood Mode -----\n  LOOP AT T_SELECT WHERE FIELDNM = 'MANDT'.\n    MOVE-CORRESPONDING T_SELECT TO R_MANDT.\n    APPEND R_MANDT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'CCCATEGORY'.\n    MOVE-CORRESPONDING T_SELECT TO R_CCCATEGORY.\n    APPEND R_CCCATEGORY.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'CCCORACTIV'.\n    MOVE-CORRESPONDING T_SELECT TO R_CCCORACTIV.\n    APPEND R_CCCORACTIV.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'CCORIGCONT'.\n    MOVE-CORRESPONDING T_SELECT TO R_CCORIGCONT.\n    APPEND R_CCORIGCONT.\n  ENDLOOP.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  SELECT *\n     FROM T000\n     INTO CORRESPONDING FIELDS OF TABLE T_DATA\n     WHERE MANDT IN  R_MANDT\n       AND CCCATEGORY IN R_CCCATEGORY\n       AND CCCORACTIV IN R_CCCORACTIV\n       AND CCORIGCONT IN R_CCORIGCONT.\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n    CASE T_DATA-CCNOCLIIND.\n      WHEN ' '.\n        T_DATA-STATUS_DESC = 'Changes to Repository and cross-client Customizing allowed'.\n        T_DATA-STATE_COLOR = 'R'.\n      WHEN '1'.\n        T_DATA-STATUS_DESC = 'No changes to cross-client Customizing objects'.\n        T_DATA-STATE_COLOR = 'Y'.\n      WHEN '2'.\n        T_DATA-STATUS_DESC = 'No changes to Repository objects'.\n        T_DATA-STATE_COLOR = 'Y'.\n      WHEN '3'.\n        T_DATA-STATUS_DESC = 'No changes to Repository and cross-client Customizing objs'.\n        T_DATA-STATE_COLOR = 'G'.\n      WHEN OTHERS.\n    ENDCASE.\n    CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n      EXPORTING\n        STATE_COLOR = T_DATA-STATE_COLOR\n      IMPORTING\n        STATE_ICON  = T_DATA-STATE_ICON.\n    MODIFY T_DATA INDEX SY_TABIX.\n  ENDLOOP.\n*-- Fill Duration Value\n LOOP AT T_DATA .\n   SY_TABIX = SY-TABIX.\n   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-CHANGEDATE\n          T_FROM            = SY_TIMLO\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n   MODIFY T_DATA INDEX SY_TABIX .\n ENDLOOP .\n DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n*--- Check Alert Information\n  READ TABLE T_DATA INDEX 1.\n  CHECK NOT SY-TFILL  IS INITIAL .\n  IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -1,0 +1,319 @@
+FUNCTION /SKN/F_SW_01_20_USER_STATE.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_20_USER_STATE
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: MANAGE_IN_UTC       CHAR1 ,
+               LANGU               LANGU,
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT,
+               NO_DATE_RESTRICTION CHAR1,
+               VALID_USERS_ONLY    CHAR1, "Display only valid users
+               DATE_REF_FLD        NAME_FELD.
+  DATA_MULTY: BNAME            XUBNAME,
+                CLASS            XUCLASS,
+                USTYP            XUUSTYP,
+                UFLAG            XUUFLAG,  " Int 0/32/64/128
+                TRDAT            XULDATE,  " Last Logon
+                ERDAT            XUERDAT,   "Creation Date of the User Master Record
+                ANAME            XUANAME,   "Creator of the User Master Record
+                PWDLGNDATE       XUERDAT, "Date of Last Password Logon
+                PWDSETDATE       XUERDAT, "Date: Password Reset by Administrator
+                PWDLOCKDATE      XUERDAT, "Date: Setting of Password Lock
+                STATE_COLOR      /SKN/E_SW_STATE_COLOR,  " G/Y/R
+                DURATION         /SKN/E_SW_DURATION,
+                DATUM            SYDATUM , " Paased by SW Online Monitor
+                LOCNT             XULOCNT, ""9-8-16
+                MODBE	            XUMODIFIER, "Changed By 12-9-16
+                ACCNT	            XUACCNT. "Account ID
+  SELECT_MULTY:  BNAME,
+                 CLASS,
+                 USTYP,
+                 UFLAG ,
+                 TRDAT ,
+                 ERDAT ,   "Creation Date of the User Master Record
+                 PWDLGNDATE, "Date of Last Password Logon
+                 PWDSETDATE, "Date: Password Reset by Administrator
+                 PWDLOCKDATE, "Date: Setting of Password Lock
+                 ANAME,
+                 STATE_COLOR,
+                 DURATION,
+                 DATUM ,
+                 LOCNT, "9-8-16
+                 MODBE,
+                 ACCNT.
+  LV_LANGU = SY-LANGU.
+  LV_DURATION_UNIT = 'D'.
+  SELECT_SINGLE: LANGU,
+                 MANAGE_IN_UTC,
+                 DURATION_UNIT,
+                 NO_DATE_RESTRICTION,
+                 VALID_USERS_ONLY,
+                 DATE_REF_FLD.
+  "--- Run Clood Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_20_USER_STATE'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Clood Mode -----
+  "-----------------------------------------------
+  " Additional Definition                        "
+  "-----------------------------------------------
+  DATA : DATE_FROM TYPE D,
+         BACKDAYS  TYPE I.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : LS_DATA LIKE LINE OF T_DATA.
+  DATA : TIME_DIFF TYPE I .
+  DATA : SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+  DATA : REF_DATE LIKE SY-DATLO ,
+         REF_TIME LIKE SY-TIMLO .
+  DATA: C_FUNCTION    TYPE           RS38L_FNAM VALUE 'BAPI_USER_GET_DETAIL',
+        FUNC_EXISTS   TYPE           FLAG,
+        LV_GROUP      TYPE           RS38L_AREA,
+        LV_INCLUDE    TYPE           PROGNAME,
+        LV_NAMESPACE  TYPE           NAMESPACE,
+        LV_STR_AREA   TYPE           AREA,
+        LT_RETURN     TYPE TABLE OF  BAPIRET2,
+        LOGONDATA     LIKE           BAPILOGOND,
+        DEFAULTS      LIKE           BAPIDEFAUL,
+        ADDRESS       LIKE           BAPIADDR3,
+        COMPANY       LIKE           BAPIUSCOMP,
+        UCLASS        TYPE           BAPIUCLASS,
+        LASTMODIFIED  TYPE           BAPIMODDAT,
+        ISLOCKED      TYPE           BAPISLOCKD,
+        IDENTITY      TYPE           BAPIIDENTITY,
+        ADMINDATA     TYPE           BAPIUSERADMIN
+.
+  "-----------------------------------------------
+  " 2. Extracting & Populating Parameters        "
+  "-----------------------------------------------
+  LOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    BACKDAYS = T_SELECT-LOW .
+    DATE_FROM = SY-DATUM - BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+    EXIT.
+  ENDLOOP.
+  IF R_DATUM[] IS INITIAL .  " Set default value
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    BACKDAYS = '3000' .  "--- Default
+    DATE_FROM = SY-DATUM - BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF .
+*  ENDIF.
+  "-- 15/02/2015
+  IF LV_NO_DATE_RESTRICTION IS NOT INITIAL.
+    REFRESH R_DATUM.
+  ENDIF.
+**************** SET DATE REFERENCE FIELD ************************
+  "-- 15/02/2015
+  IF LV_DATE_REF_FLD IS NOT INITIAL.
+    CASE LV_DATE_REF_FLD.
+      WHEN 'ERDAT'.
+        R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+      WHEN 'TRDAT'.
+        R_TRDAT[] = R_DATUM[]. "" Last Logon
+      WHEN 'PWDLGNDATE'.
+        R_PWDLGNDATE[] = R_DATUM[]. "Date of Last Password Logon
+      WHEN 'PWDSETDATE'.
+        R_PWDSETDATE[] = R_DATUM[]. "Date: Password Reset by Administrator
+      WHEN 'PWDLOCKDATE'.
+        R_PWDLOCKDATE[] = R_DATUM[]. "Date: Setting of Password Lock
+      WHEN OTHERS.
+        R_TRDAT[] = R_DATUM[]. "Last Logon
+    ENDCASE.
+  ENDIF.
+  IF R_TRDAT[] IS INITIAL AND R_ERDAT[] IS INITIAL.
+    R_TRDAT[] = R_DATUM[] .
+  ENDIF.
+*************************************************************************
+  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+  TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+  "-----------------------------------------------
+  " 3. Initiating Output Table(Mandatory!!!)     "
+  "-----------------------------------------------
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  "-----------------------------------------------
+  " 4. Retrieving/preparing Alert Data           "
+  "-----------------------------------------------
+*  SELECT *
+*     FROM USR02
+*     INTO CORRESPONDING FIELDS OF TABLE T_DATA
+*     WHERE BNAME IN R_BNAME
+*       AND CLASS IN R_CLASS  " User Group
+*       AND USTYP IN R_USTYP  " User Type
+*       AND UFLAG IN R_UFLAG  " Int 0/32/64/128
+*       AND TRDAT IN R_TRDAT  " Last Logon
+*       AND ERDAT IN R_ERDAT  "Creation date
+*       AND ANAME IN R_ANAME  " Creator
+*       AND LOCNT IN R_LOCNT. "" Number of failed logon attempts "9-8-16
+  "****8-9-16************************
+  SELECT *
+   FROM USR02 AS A
+   LEFT  OUTER JOIN USR04 AS B
+    ON A~BNAME = B~BNAME
+   INTO CORRESPONDING FIELDS OF TABLE T_DATA
+   WHERE A~BNAME IN R_BNAME
+     AND A~CLASS IN R_CLASS  " User Group
+     AND A~USTYP IN R_USTYP  " User Type
+     AND A~UFLAG IN R_UFLAG  " Int 0/32/64/128
+     AND A~TRDAT IN R_TRDAT  " Last Logon
+     AND A~PWDLGNDATE IN R_PWDLGNDATE "Date of Last Password Logon
+     AND A~PWDSETDATE IN R_PWDSETDATE "Date: Password Reset by Administrator
+     AND A~PWDLOCKDATE IN R_PWDLOCKDATE "Date: Setting of Password Lock
+     AND A~ERDAT IN R_ERDAT  "Creation date
+     AND A~ANAME IN R_ANAME  " Creator
+     AND A~LOCNT IN R_LOCNT  "" Number of failed logon attempts "9-8-16
+     AND A~ACCNT IN R_ACCNT. """Account ID 05-06-17
+  DELETE T_DATA WHERE MODBE NOT IN R_MODBE. "  12-9-16
+  CALL FUNCTION 'FUNCTION_EXISTS'
+    EXPORTING
+      FUNCNAME           = C_FUNCTION     " Name of Function Module
+    IMPORTING
+      GROUP              = LV_GROUP        " Name of function group
+      INCLUDE            = LV_INCLUDE      " Name of include
+      NAMESPACE          = LV_NAMESPACE    " Namespace
+      STR_AREA           = LV_STR_AREA     " Name of function group without namespace
+    EXCEPTIONS
+      FUNCTION_NOT_EXIST = 1
+      OTHERS             = 2.
+  IF SY-SUBRC EQ 0.
+    FUNC_EXISTS = 'X'.
+  ENDIF.
+  "-----------------------------------------------
+  " 5. Post retrieving manipulations             "
+  "-----------------------------------------------
+  LOOP AT T_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    CLEAR: LS_DATA-STATE_COLOR,
+           LS_DATA-STATE_ICON,
+           LS_DATA-STATE_DESC,
+           LS_DATA-LOCK_ICON.
+    IF LS_DATA-UFLAG IS NOT INITIAL.
+      LS_DATA-STATE_COLOR = 'R'.
+      LS_DATA-STATE_ICON = STATE_ICON_RED.
+      CALL FUNCTION '/SKN/F_SW_01_GET_LOCK_DESC'
+        EXPORTING
+          UFLAG      = LS_DATA-UFLAG
+          LANGU      = LV_LANGU
+        IMPORTING
+          STATE_DESC = LS_DATA-STATE_DESC.
+      LS_DATA-LOCK_ICON = ICON_LOCKED.
+    ELSE.
+      LS_DATA-STATE_COLOR = 'G'.
+      LS_DATA-STATE_ICON = STATE_ICON_GREEN.
+    ENDIF.
+    LS_DATA-INIT_PWD_ICON = ICON_INIT_PWD.
+    CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+      EXPORTING
+        BNAME      = LS_DATA-BNAME
+      IMPORTING
+        NAME_FIRST = LS_DATA-NAME_FIRST
+        NAME_LAST  = LS_DATA-NAME_LAST
+        NAME_TEXT  = LS_DATA-NAME_TEXT
+      EXCEPTIONS
+        NO_DATA    = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+      CLEAR: LS_DATA-NAME_FIRST,
+             LS_DATA-NAME_LAST,
+             LS_DATA-NAME_TEXT.
+    ENDIF.
+    IF FUNC_EXISTS IS NOT INITIAL.
+      CLEAR: LOGONDATA, DEFAULTS, ADDRESS, COMPANY
+             , UCLASS, LASTMODIFIED, ISLOCKED
+             , IDENTITY, ADMINDATA, LT_RETURN.
+      CALL FUNCTION 'BAPI_USER_GET_DETAIL'
+        EXPORTING
+          USERNAME     = LS_DATA-BNAME    " User Name
+*         cache_results  = 'X'    " Temporarily buffer results in work process
+        IMPORTING
+          LOGONDATA    = LOGONDATA
+          DEFAULTS     = DEFAULTS
+          ADDRESS      = ADDRESS
+          COMPANY      = COMPANY
+          UCLASS       = UCLASS
+          LASTMODIFIED = LASTMODIFIED
+          ISLOCKED     = ISLOCKED
+          IDENTITY     = IDENTITY
+          ADMINDATA    = ADMINDATA
+        TABLES
+          RETURN       = LT_RETURN.
+      IF LT_RETURN IS INITIAL.
+        LS_DATA-MODDATE = LASTMODIFIED-MODDATE.
+        LS_DATA-MODTIME = LASTMODIFIED-MODTIME.
+        LS_DATA-MODIFIER = LASTMODIFIED-MODIFIER.
+      ENDIF.
+    ENDIF.
+    MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  "-----------------------------------------------
+  " 6. Post retrieving filtering                 "
+  "-----------------------------------------------
+  DELETE T_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+  LOOP AT T_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    REF_DATE = LS_DATA-TRDAT.
+    REF_TIME = LS_DATA-LTIME.
+    "-- 14/05/2015
+    IF LV_DATE_REF_FLD = 'ERDAT' OR LS_DATA-TRDAT IS INITIAL. " For New user with empty Log on date
+      REF_DATE = LS_DATA-ERDAT. "Date on Which Record Was Created
+      REF_TIME = SY_TIMLO.
+    ELSE.
+    ENDIF.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = REF_DATE
+        T_FROM      = REF_TIME
+        D_TO        = SY_DATLO
+        T_TO        = SY_TIMLO
+        TIME_UNIT   = LV_DURATION_UNIT
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      LS_DATA-DURATION = TIME_DIFF .
+    ELSE.
+      LS_DATA-DURATION = '999999' .
+    ENDIF.
+    MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  IF LV_VALID_USERS_ONLY IS NOT INITIAL.
+    LOOP AT T_DATA INTO LS_DATA.
+      SY_TABIX = SY-TABIX .
+      IF LS_DATA-GLTGV <= SY-DATUM AND LS_DATA-GLTGB >= SY-DATUM.
+      ELSE.
+        DELETE T_DATA INDEX SY_TABIX.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+  "-----------------------------------------------
+  " 7. Finishing (Set IS_ALERT parameter)        "
+  "-----------------------------------------------
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

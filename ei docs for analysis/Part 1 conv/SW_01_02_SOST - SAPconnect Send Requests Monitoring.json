@@ -1,0 +1,2195 @@
+{
+  "source_file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: SAPconnect Send Requests Monitoring (SW_01_02_SOST)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP SAPconnect send requests to ensure reliable email, fax, and other communication processing through the SAP system. SAPconnect technology enables automated communication delivery from SAP applications to external recipients via various communication channels, making it essential for business-critical notification scenarios where communication reliability and processing performance must be ensured."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SAPconnect (SOST) extends the standard SAP communication framework by providing transactional communication processing with status tracking and delivery confirmation. The technology ensures that outbound communications are processed reliably and provides detailed status information for troubleshooting and monitoring purposes, crucial for business processes that depend on automated notifications and communications."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed SAPconnect monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Send request tracking to monitor the status and performance of outbound communication processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication status analysis for understanding delivery patterns and identifying failed operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Address resolution monitoring to track recipient address processing and validation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing duration assessment for identifying communication delays and system bottlenecks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message type analysis for detailed tracking of different communication channels and formats"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes SAPconnect statistics from the SOST framework using the SX_SNDREC_SELECT function, similar to data available through the SOST transaction (SAPconnect Administration), and provides enhanced filtering capabilities to focus on specific communication types, statuses, recipients, and time periods. This enables targeted analysis of communication performance characteristics and identification of delivery-related issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP SAPconnect processing is functioning efficiently and identifies potential issues that may impact automated communication delivery, notification processing, and business communication workflows."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor SAPconnect performance and processing failures indicate communication system issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication and Delivery Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Failed outbound communications preventing critical business notifications and automated messaging"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stuck send requests causing communication delays and recipient notification failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Address resolution errors leading to delivery failures and communication processing issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication channel failures disrupting automated business workflows and notification processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource contention from excessive communication processing workload affecting overall system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory consumption issues from accumulated failed communications impacting available system resources"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing delays causing bottlenecks in time-critical business communications and automated notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database locking issues from long-running communication transactions affecting system responsiveness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication delivery failures due to incomplete or failed SAPconnect processing affecting business operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from communication delays impacting service level commitments and operational efficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from unreliable communication delivery affecting operational continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Potential message loss or delivery corruption from SAPconnect processing failures compromising business communication integrity"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate failed and stuck SAPconnect entries using SOST transaction for detailed error analysis and resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system resource utilization and memory consumption during communication processing periods for capacity assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review SAPconnect error logs and system messages for root cause identification and pattern analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze communication delivery patterns and identify frequently failing operations for targeted remediation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor SAPconnect processing performance trends and delivery completion patterns for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate system sizing and resource allocation for communication processing workload management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check network connectivity and communication channel configuration for reliability optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze communication processing patterns by message type, recipient, and system for performance tuning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize SAPconnect processing parameters and system configurations for improved reliability and performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement communication error handling and retry mechanisms for enhanced fault tolerance and recovery"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive SAPconnect monitoring and alerting procedures for early issue detection and prevention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on communication volume analysis and processing requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control data retrieval and processing."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "ADDRESS",
+          "Address name",
+          "CHAR",
+          "35",
+          "0",
+          "SO_ADRNAM",
+          "SO_STRI035"
+        ],
+        [
+          "2",
+          "ADRNR",
+          "Address number",
+          "CHAR",
+          "10",
+          "0",
+          "SO_ADR_NR",
+          "ADRNR"
+        ],
+        [
+          "3",
+          "ATTLEN",
+          "Size of all attachms",
+          "CHAR",
+          "12",
+          "0",
+          "SO_ATT_LEN",
+          "SO_OBJ_LEN"
+        ],
+        [
+          "4",
+          "BACKDAYS",
+          "Backdays",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "5",
+          "COLOR",
+          "Not More Closely Defined Area, Possibly Used for Patchlevels",
+          "CHAR",
+          "4",
+          "0",
+          "CHAR4",
+          "CHAR4"
+        ],
+        [
+          "6",
+          "COUNTER",
+          "Counter for status entries for this send process",
+          "CHAR",
+          "5",
+          "0",
+          "SO_STA_CNT",
+          "SO_NUMC005"
+        ],
+        [
+          "7",
+          "DEF_STAT",
+          "Boolean",
+          "CHAR",
+          "1",
+          "0",
+          "OS_BOOLEAN",
+          "OS_BOOLEAN"
+        ],
+        [
+          "8",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "9",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "10",
+          "FORNO",
+          "Number of forwarder",
+          "CHAR",
+          "12",
+          "0",
+          "SO_FOR_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "11",
+          "FORTP",
+          "Forwarder type",
+          "CHAR",
+          "3",
+          "0",
+          "SO_FOR_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "12",
+          "FORYR",
+          "Forwarder year",
+          "CHAR",
+          "2",
+          "0",
+          "SO_FOR_YR",
+          "SO_OBJ_YR"
+        ],
+        [
+          "13",
+          "ICON",
+          "Carrier field for icons",
+          "CHAR",
+          "132",
+          "0",
+          "ICON_TEXT",
+          "SYCHAR132"
+        ],
+        [
+          "14",
+          "LANGU",
+          "Language for texts",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "15",
+          "LENGTH",
+          "Document size",
+          "CHAR",
+          "12",
+          "0",
+          "SO_OBJ_LEN",
+          "SO_OBJ_LEN"
+        ],
+        [
+          "16",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "17",
+          "MARK",
+          "Boolean",
+          "CHAR",
+          "1",
+          "0",
+          "OS_BOOLEAN",
+          "OS_BOOLEAN"
+        ],
+        [
+          "18",
+          "MAX_RECORDS",
+          "Max. Output Records",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "19",
+          "MESSAGE",
+          "Message text",
+          "CHAR",
+          "220",
+          "0",
+          "BAPI_MSG",
+          "TEXT220"
+        ],
+        [
+          "20",
+          "MSGID",
+          "Message Class",
+          "CHAR",
+          "20",
+          "0",
+          "SYMSGID",
+          "ARBGB"
+        ],
+        [
+          "21",
+          "MSGNO",
+          "Message number",
+          "NUMC",
+          "3",
+          "0",
+          "SYMSGNO",
+          "SYMSGNO"
+        ],
+        [
+          "22",
+          "MSGTP",
+          "Type of send request (message or status)",
+          "CHAR",
+          "1",
+          "0",
+          "SO_MSGTP",
+          "SO_MSGTP"
+        ],
+        [
+          "23",
+          "MSGTXT",
+          "Text field lngth 255",
+          "CHAR",
+          "255",
+          "0",
+          "SO_TEXT255",
+          "SO_TEXT255"
+        ],
+        [
+          "24",
+          "MSGTY",
+          "Message Type",
+          "CHAR",
+          "1",
+          "0",
+          "SYMSGTY",
+          "SYCHAR01"
+        ],
+        [
+          "25",
+          "MSGV1",
+          "Message Variable",
+          "CHAR",
+          "50",
+          "0",
+          "SYMSGV",
+          "SYCHAR50"
+        ],
+        [
+          "26",
+          "MSGV2",
+          "Message Variable",
+          "CHAR",
+          "50",
+          "0",
+          "SYMSGV",
+          "SYCHAR50"
+        ],
+        [
+          "27",
+          "MSGV3",
+          "Message Variable",
+          "CHAR",
+          "50",
+          "0",
+          "SYMSGV",
+          "SYCHAR50"
+        ],
+        [
+          "28",
+          "MSGV4",
+          "Message Variable",
+          "CHAR",
+          "50",
+          "0",
+          "SYMSGV",
+          "SYCHAR50"
+        ],
+        [
+          "29",
+          "NODE",
+          "Node ID",
+          "CHAR",
+          "6",
+          "0",
+          "SX_NODE_ID",
+          "SX_NODE_ID"
+        ],
+        [
+          "30",
+          "OBJLEN",
+          "Document size",
+          "CHAR",
+          "12",
+          "0",
+          "SO_OBJ_LEN",
+          "SO_OBJ_LEN"
+        ],
+        [
+          "31",
+          "OBJNO",
+          "Object number",
+          "CHAR",
+          "12",
+          "0",
+          "SO_OBJ_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "32",
+          "OBJSNS",
+          "Sensitivity",
+          "CHAR",
+          "1",
+          "0",
+          "SO_OBJ_SNS",
+          "SO_OBJ_SNS"
+        ],
+        [
+          "33",
+          "OBJTP",
+          "Document class",
+          "CHAR",
+          "3",
+          "0",
+          "SO_OBJ_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "34",
+          "OBJYR",
+          "Object year",
+          "CHAR",
+          "2",
+          "0",
+          "SO_OBJ_YR",
+          "SO_OBJ_YR"
+        ],
+        [
+          "35",
+          "RC_NAME",
+          "Full Name",
+          "CHAR",
+          "80",
+          "0",
+          "AD_NAMTEXT",
+          "TEXT80"
+        ],
+        [
+          "36",
+          "RECNO",
+          "Recipient number",
+          "CHAR",
+          "12",
+          "0",
+          "SO_REC_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "37",
+          "RECTP",
+          "Recipient Type",
+          "CHAR",
+          "3",
+          "0",
+          "SO_REC_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "38",
+          "RECYR",
+          "Recipient year",
+          "CHAR",
+          "2",
+          "0",
+          "SO_REC_YR",
+          "SO_OBJ_YR"
+        ],
+        [
+          "39",
+          "SCOMNO",
+          "Number of the SAPcomm ID",
+          "CHAR",
+          "12",
+          "0",
+          "SO_SCOM_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "40",
+          "SCOMTP",
+          "Type of SAPcomm ID",
+          "CHAR",
+          "3",
+          "0",
+          "SO_SCOM_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "41",
+          "SCOMYR",
+          "Year of SAPcomm ID",
+          "CHAR",
+          "2",
+          "0",
+          "SO_SCOM_YR",
+          "SO_OBJ_YR"
+        ],
+        [
+          "42",
+          "SENDER",
+          "Address name",
+          "CHAR",
+          "35",
+          "0",
+          "SO_ADRNAM",
+          "SO_STRI035"
+        ],
+        [
+          "43",
+          "SNDART",
+          "AddrType",
+          "CHAR",
+          "3",
+          "0",
+          "SX_ADDRTYP",
+          "SX_ADDRTYP"
+        ],
+        [
+          "44",
+          "SNDART_DESC",
+          "Short text",
+          "CHAR",
+          "60",
+          "0",
+          "DDTEXT",
+          "DDTEXT"
+        ],
+        [
+          "45",
+          "SNDART_L",
+          "Text field length 50",
+          "CHAR",
+          "50",
+          "0",
+          "SO_TEXT050",
+          "SO_TEXT050"
+        ],
+        [
+          "46",
+          "SNDNO",
+          "Sender no.",
+          "CHAR",
+          "12",
+          "0",
+          "SO_SND_NO",
+          "SO_OBJ_NO"
+        ],
+        [
+          "47",
+          "SNDREQ",
+          "GUID",
+          "RAW",
+          "16",
+          "0",
+          "OS_GUID",
+          "SYSUUID"
+        ],
+        [
+          "48",
+          "SNDTP",
+          "Sender type",
+          "CHAR",
+          "3",
+          "0",
+          "SO_SND_TP",
+          "SO_OBJ_TP"
+        ],
+        [
+          "49",
+          "SNDYR",
+          "Sender year",
+          "CHAR",
+          "2",
+          "0",
+          "SO_SND_YR",
+          "SO_OBJ_YR"
+        ],
+        [
+          "50",
+          "SOST_MSGID",
+          "Message Class",
+          "CHAR",
+          "20",
+          "0",
+          "SYMSGID",
+          "ARBGB"
+        ],
+        [
+          "51",
+          "SOST_MSGV1",
+          "Message Variable",
+          "CHAR",
+          "50",
+          "0",
+          "SYMSGV",
+          "SYCHAR50"
+        ],
+        [
+          "52",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "53",
+          "STATE_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "54",
+          "STATUS",
+          "Status of the sent object",
+          "CHAR",
+          "12",
+          "0",
+          "SO_REC_STA",
+          "SO_TEXT012"
+        ],
+        [
+          "55",
+          "STATUS_DESC",
+          "SW Message",
+          "CHAR",
+          "255",
+          "0",
+          "/SKN/E_SW_TEXT",
+          "/SKN/D_SW_LTEXT"
+        ],
+        [
+          "56",
+          "STAT_DATE",
+          "Date of status",
+          "DATS",
+          "8",
+          "0",
+          "SO_STADATE",
+          "DATUM"
+        ],
+        [
+          "57",
+          "STAT_ERROR",
+          "'X' - Errors",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "58",
+          "STAT_OK",
+          "'X' - Sent",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "59",
+          "STAT_TIME",
+          "Time of status",
+          "TIMS",
+          "6",
+          "0",
+          "SO_STATIME",
+          "UZEIT"
+        ],
+        [
+          "60",
+          "STAT_TRANSIT",
+          "'X' - Transmitted",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "61",
+          "STAT_WAIT",
+          "'X' - Waiting",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "62",
+          "TITEL",
+          "Document title",
+          "CHAR",
+          "50",
+          "0",
+          "SO_OBJ_DES",
+          "SO_OBJ_DES"
+        ],
+        [
+          "63",
+          "USERNAM",
+          "Sender name",
+          "CHAR",
+          "12",
+          "0",
+          "SO_SND_NAM",
+          "USERNAME"
+        ],
+        [
+          "64",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "65",
+          "WAIT_DATE",
+          "No processing before this date",
+          "DATS",
+          "8",
+          "0",
+          "SO_WAITDAT",
+          "DATUM"
+        ],
+        [
+          "66",
+          "WAIT_TIME",
+          "No processing before this time",
+          "TIMS",
+          "6",
+          "0",
+          "SO_WAITTIM",
+          "UZEIT"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: This section provides configuration guidance for ALL 66 parameters listed in the Parameters Reference Table above."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADDRESS (Address name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADDRESS applies address name as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADRNR (Address number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADRNR carries address number for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ATTLEN (Size of all attachms):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ATTLEN applies size of all attachms as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Backdays):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "COLOR (Not More Closely Defined Area, Possibly Used for Patchlevels):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COLOR applies not more closely defined area, possibly used for patchlevels as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTER (Counter for status entries for this send process):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTER applies counter for status entries for this send process as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEF_STAT (Boolean):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEF_STAT applies boolean as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION is the numeric aging threshold used after status timestamp comparison; it controls when an item is treated as overdue for exception focus."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT defines the time unit for DURATION comparison, which directly changes whether thresholds are interpreted as minutes, hours, or days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H: Hours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M: Minutes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D: Days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F: Full days for specific day filtering"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORNO (Number of forwarder):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORNO contributes number of forwarder to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORTP (Forwarder type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORTP contributes forwarder type to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORYR (Forwarder year):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORYR contributes forwarder year to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ICON (Carrier field for icons):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ICON applies carrier field for icons as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Language for texts):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU applies language for texts as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LENGTH (Document size):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LENGTH applies document size as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC controls whether current-time comparison is normalized to UTC or evaluated in local system time, which affects cross-time-zone consistency."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: UTC mode for distributed/multi-time-zone landscapes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Local/system time mode for single-time-zone operation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MARK (Boolean):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MARK applies boolean as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MAX_RECORDS (Max. Output Records):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MAX_RECORDS caps extracted result volume to keep runtime predictable while still returning the highest-priority exception population."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESSAGE (Message text):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESSAGE applies message text as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGID (Message Class):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGID identifies the ABAP message class namespace used to resolve the semantic category of the communication status or error condition."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGNO (Message number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGNO is the numeric message key within MSGID and pinpoints the exact cataloged message variant for root-cause identification."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTP (Type of send request (message or status)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTP indicates whether the record context represents a send-request message versus status-oriented messaging semantics in SOST."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTXT (Text field lngth 255):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTXT contains the rendered long text payload (up to field length) that analysts read directly when diagnosing the communication event."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTY (Message Type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGTY is the one-character ABAP message severity type and helps classify the diagnostic intent (for example error versus warning/info)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGV1 - MSGV4 (Message Variables):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGV1 through MSGV4 form one ordered placeholder set used by message rendering calls; together they provide substitution values that complete final diagnostic text."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MSGV1 - MSGV4 Connection:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treat these four fields as one logical group because meaning emerges from the combined position-based substitution, not from isolated single-field review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NODE (Node ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "NODE contributes node id to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJLEN (Document size):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJLEN contributes document size to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJNO (Object number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJNO contributes object number to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJSNS (Sensitivity):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJSNS contributes sensitivity to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJTP (Document class):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJTP contributes document class to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJYR (Object year):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJYR contributes object year to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RC_NAME (Full Name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RC_NAME carries full name for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECNO (Recipient number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECNO contributes recipient number to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECTP (Recipient Type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECTP contributes recipient type to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECYR (Recipient year):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RECYR contributes recipient year to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMNO (Number of the SAPcomm ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMNO contributes number of the sapcomm id to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMTP (Type of SAPcomm ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMTP contributes type of sapcomm id to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMYR (Year of SAPcomm ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SCOMYR contributes year of sapcomm id to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SENDER (Address name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SENDER carries address name for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART (AddrType):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART contributes addrtype to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART_DESC (Short text):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART_DESC contributes short text to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART_L (Text field length 50):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART_L contributes text field length 50 to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDNO (Sender no.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDNO contributes sender no. to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDREQ (GUID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDREQ contributes guid to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDTP (Sender type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDTP contributes sender type to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDYR (Sender year):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDYR contributes sender year to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOST_MSGID (Message Class):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOST_MSGID provides message class used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOST_MSGV1 (Message Variable):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SOST_MSGV1 provides message variable used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR is the visual severity/state classifier used after status mapping so analysts can triage exception rows quickly by color-coded risk level."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R: Red (error/failed outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G: Green (successful outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y: Yellow (processing/warning outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        B: Blue (waiting/queued outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Gray: Gray (retry/future outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Code does not enumerate all color constants inline in this function body, so standard SAPconnect mapping is used as documented fallback."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON (State Icon):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON provides state icon used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS (Status of the sent object):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS is the lifecycle state filter for SOST requests and is used to separate waiting, in-process, successful, and failed communication outcomes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        WAIT: Waiting in queue."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        TRANSIT: Currently processed/transmitted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        OK: Successfully processed/delivered."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DIRECT: Processed directly."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        ERROR: Processing error occurred."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        INCONS: Inconsistent state/data condition."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        RETRY: Scheduled retry after failure."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        FUTURE: Scheduled for future processing."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        ACTIVE: Active in processing lifecycle."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC (SW Message):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC provides sw message used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_DATE (Date of status):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_DATE uses date of status to constrain monitoring interval boundaries and ensure temporal filtering matches the intended operational review window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR ('X' - Errors):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR is the explicit selector switch for ERROR state inclusion, typically used for remediation-oriented exception slices."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: Include this status selector in filtering logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Do not explicitly force this selector."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_OK ('X' - Sent):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_OK is the explicit selector switch for OK state inclusion when successful deliveries must remain visible in control evidence."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_OK Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: Include this status selector in filtering logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Do not explicitly force this selector."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TIME (Time of status):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TIME uses time of status to constrain monitoring interval boundaries and ensure temporal filtering matches the intended operational review window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TRANSIT ('X' - Transmitted):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TRANSIT is the explicit selector switch for TRANSIT state inclusion to monitor in-flight processing latency."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_TRANSIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: Include this status selector in filtering logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Do not explicitly force this selector."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT ('X' - Waiting):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT is the explicit selector switch for WAIT state inclusion, allowing queue-state-focused monitoring runs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: Include this status selector in filtering logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Do not explicitly force this selector."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TITEL (Document title):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TITEL applies document title as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USERNAM (Sender name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "USERNAM carries sender name for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "paragraph",
+      "text": "WAIT_DATE (No processing before this date):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "WAIT_DATE uses no processing before this date to constrain monitoring interval boundaries and ensure temporal filtering matches the intended operational review window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WAIT_TIME (No processing before this time):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "WAIT_TIME uses no processing before this time to constrain monitoring interval boundaries and ensure temporal filtering matches the intended operational review window."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationship"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Date and Time Controls:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS is the fallback date window. If explicit dates are not provided, the system uses BACKDAYS to build the initial lookback range."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DATUM / SND_DATE are explicit date filters. When these are provided, they define the date window directly and override fallback behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        SND_TIME, STAT_TIME, WAIT_TIME, and MANAGE_IN_UTC refine timestamp handling inside the selected date window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Status and Outcome Controls:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STAT_* selectors define which process states are emphasized."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STATUS, STATE_COLOR, and STATE_ICON represent interpretable processing outcomes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Duration Prioritization:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION + DURATION_UNIT are an additional age filter after date selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Simple flow: first filter by date window, then filter by record age (duration)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Final result keeps records that satisfy both date conditions and duration conditions."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Configuration Examples"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Alert on any failed SAPconnect operations within the last hour"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 0"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS = ERROR"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR = R"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTER > 0"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION = 1"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT = H"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Monitor stuck send requests waiting for processing longer than 4 hours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 1"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT = X"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION > 4"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT = H"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTER > 5"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Monitor email processing failures from specific sender in last 30 minutes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 0"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDART = EMAIL*"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR = X"
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD = SENDER"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION = 30"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT = M"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Monitor long-running communication processing over 1 hour with high request count"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 0"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS = TRANSIT"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR = Y"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION > 1"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT = H"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTER > 3"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 5: Monitor multiple status types with UTC time management in global environment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 2"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_ERROR = X"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAT_WAIT = X"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION = 2"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT = H"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC = X"
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD = RC_NAME"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "ADDRESS",
+          "Name in address management",
+          "CHAR(35)",
+          "SO_ADRNAM"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "ADRNR",
+          "Addresses: Address Number",
+          "CHAR(10)",
+          "SO_ADR_NR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "ATTLEN",
+          "Total size of all attachments to a document",
+          "CHAR(12)",
+          "SO_ATT_LEN"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "COLOR",
+          "Not More Closely Defined Area, Possibly Used for Patchlevels",
+          "CHAR(4)",
+          "CHAR4"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "COUNTER",
+          "Counter for status entries for this send process",
+          "CHAR(5)",
+          "SO_STA_CNT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "DEF_STAT",
+          "Boolean",
+          "CHAR(1)",
+          "OS_BOOLEAN"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "FORNO",
+          "Forwarder: number from the ID",
+          "CHAR(12)",
+          "SO_FOR_NO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "FORTP",
+          "Forwarder: Object type from ID",
+          "CHAR(3)",
+          "SO_FOR_TP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "FORYR",
+          "Forwarder: year from the ID",
+          "CHAR(2)",
+          "SO_FOR_YR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "ICON",
+          "Carrier field for icons",
+          "CHAR(132)",
+          "ICON_TEXT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "LENGTH",
+          "Size of Document Content",
+          "CHAR(12)",
+          "SO_OBJ_LEN"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MARK",
+          "Boolean",
+          "CHAR(1)",
+          "OS_BOOLEAN"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MESSAGE",
+          "Message Text",
+          "CHAR(220)",
+          "BAPI_MSG"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGID",
+          "Message Class",
+          "CHAR(20)",
+          "SYMSGID"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGNO",
+          "Message Number",
+          "NUMC(3)",
+          "SYMSGNO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGTP",
+          "Type of send request (message or status)",
+          "CHAR(1)",
+          "SO_MSGTP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGTXT",
+          "Text field length 255: texts",
+          "CHAR(255)",
+          "SO_TEXT255"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGTY",
+          "Message Type",
+          "CHAR(1)",
+          "SYMSGTY"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGV1",
+          "Message Variable",
+          "CHAR(50)",
+          "SYMSGV"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGV2",
+          "Message Variable",
+          "CHAR(50)",
+          "SYMSGV"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGV3",
+          "Message Variable",
+          "CHAR(50)",
+          "SYMSGV"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "MSGV4",
+          "Message Variable",
+          "CHAR(50)",
+          "SYMSGV"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "NODE",
+          "Name of SAPconnect Node or Telephony Server",
+          "CHAR(6)",
+          "SX_NODE_ID"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "OBJLEN",
+          "Size of Document Content",
+          "CHAR(12)",
+          "SO_OBJ_LEN"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "OBJNO",
+          "Object: Number from ID",
+          "CHAR(12)",
+          "SO_OBJ_NO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "OBJSNS",
+          "Object: Sensitivity (private, functional, ...)",
+          "CHAR(1)",
+          "SO_OBJ_SNS"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "OBJTP",
+          "Code for document class",
+          "CHAR(3)",
+          "SO_OBJ_TP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "OBJYR",
+          "Object: Year from ID",
+          "CHAR(2)",
+          "SO_OBJ_YR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "RC_NAME",
+          "Full Name of Person",
+          "CHAR(80)",
+          "AD_NAMTEXT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "RECNO",
+          "Recipient number from ID",
+          "CHAR(12)",
+          "SO_REC_NO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "RECTP",
+          "Recipient type from ID",
+          "CHAR(3)",
+          "SO_REC_TP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "RECYR",
+          "Recipient year from the ID",
+          "CHAR(2)",
+          "SO_REC_YR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SCOMNO",
+          "SAPcomm: number of the ID",
+          "CHAR(12)",
+          "SO_SCOM_NO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SCOMTP",
+          "SAPcomm ID: ID type",
+          "CHAR(3)",
+          "SO_SCOM_TP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SCOMYR",
+          "SAPcomm: year of ID",
+          "CHAR(2)",
+          "SO_SCOM_YR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SENDER",
+          "Name in address management",
+          "CHAR(35)",
+          "SO_ADRNAM"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDART",
+          "SAPconnect: Address type",
+          "CHAR(3)",
+          "SX_ADDRTYP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDART_DESC",
+          "Explanatory short text",
+          "CHAR(60)",
+          "DDTEXT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDART_L",
+          "Text field length 50",
+          "CHAR(50)",
+          "SO_TEXT050"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDNO",
+          "Sender number from the ID",
+          "CHAR(12)",
+          "SO_SND_NO"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDREQ",
+          "Globally Unique Identifier",
+          "RAW(16)",
+          "OS_GUID"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDTP",
+          "Sender type from the ID",
+          "CHAR(3)",
+          "SO_SND_TP"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SNDYR",
+          "Sender year from the ID",
+          "CHAR(2)",
+          "SO_SND_YR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SOST_MSGID",
+          "Message Class",
+          "CHAR(20)",
+          "SYMSGID"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "SOST_MSGV1",
+          "Message Variable",
+          "CHAR(50)",
+          "SYMSGV"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STATE_COLOR",
+          "SW: State Color",
+          "CHAR(1)",
+          "/SKN/E_SW_STATE_COLOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STATE_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STATUS",
+          "SAPcomm: status of the sent object",
+          "CHAR(12)",
+          "SO_REC_STA"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STATUS_DESC",
+          "SW: Message",
+          "CHAR(255)",
+          "/SKN/E_SW_TEXT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STAT_DATE",
+          "Date of status",
+          "DATS(8)",
+          "SO_STADATE"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "STAT_TIME",
+          "Time of status",
+          "TIMS(6)",
+          "SO_STATIME"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "TITEL",
+          "Short description of contents",
+          "CHAR(50)",
+          "SO_OBJ_DES"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "USERNAM",
+          "Sender: Name",
+          "CHAR(12)",
+          "SO_SND_NAM"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "WAIT_DATE",
+          "No processing before this date",
+          "DATS(8)",
+          "SO_WAITDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_SOST",
+          "WAIT_TIME",
+          "No processing before this time",
+          "TIMS(6)",
+          "SO_WAITTIM"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_SOST.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_SOST OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_MULTY: STATE_COLOR /SKN/E_SW_STATE_COLOR,\n            DATUM     SY-DATUM,\n            DURATION   /SKN/E_SW_DURATION,\n            SENDER    XUBNAME,\n            SND_DATE SO_DAT_SD,\n            SND_TIME SO_TIM_SD,\n            SNDART   SX_ADDRTYP.\nDATA_SINGLE: BACKDAYS       INT4,\n             LANGU          LANGU,\n             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,\n             NUMBER         SY-TABIX,\n             SUBRC          SY-SUBRC,\n             MANAGE_IN_UTC  CHAR1,\n             MAX_RECORDS    INT4.\nDATA_SINGLE: STAT_WAIT      SOST_STATUS_WAIT,\n             STAT_TRANSIT   SOST_STATUS_TRANSIT,\n             STAT_OK        SOST_STATUS_OK,\n             STAT_ERROR     SOST_STATUS_ERROR,\n             STAT_INCONS    SOST_STATUS_INCONS,\n             STAT_FUTURE    SOST_STATUS_FUTURE,\n             STAT_RETRY     SOST_STATUS_RETRY,\n             STAT_DIRECT    SOST_STATUS_DIRECT,\n             STAT_ACTIVE    SOST_STATUS_ACTIVE.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA : SY_DATLO LIKE SY-DATLO ,\n       SY_TIMLO LIKE SY-TIMLO .\nDATA:  DATE_FROM LIKE SY-DATUM,\n       DATE_TO LIKE SY-DATUM.\nDATA : TIME_DIFF TYPE  INT4 .\n*data : is_out(1) type C.\n*data: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\n*data: R_SND_DATE type SXDATRNGT,\n*      RS_SND_DATE like LINE OF R_SND_DATE.\n*\n*data: R_SND_TIME type SXTIMRNGT,\n*      RS_SND_TIME like LINE OF R_SND_TIME.\nDATA: LS_STATUS TYPE SOSTSTATUS.\n*data: R_SENDER type SXSENDERRNGT,\n*      RS_SENDER like LINE OF R_SENDER.\nDATA: LV_MAXSEL  TYPE TBMAXSEL.\nDATA: LT_SNDRECS TYPE SOXSP2TAB,\n      LS_SNDRECS LIKE LINE OF LT_SNDRECS.\nDATA: LS_DATA LIKE LINE OF T_DATA.\nDATA: LV_DOMNAME TYPE  DDOBJNAME,\n      LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,\n      LS_DD07V TYPE  DD07V.\nDATA: LV_MSG_NUMBER LIKE  BAPIRET2-NUMBER.\nDEFINE SET_STATUS.\n  LS_STATUS-&1 = LV_STAT_&1.\nEND-OF-DEFINITION.\n*-- Fill Selection Option Tables\n   SELECT_MULTY: STATE_COLOR,\n                 DATUM,\n                 DURATION,\n                 SENDER,\n                 SND_DATE,\n                 SND_TIME,\n                 SNDART.\n   LV_LANGU = SY-LANGU.\n   LV_DURATION_UNIT = 'M'.\n   SELECT_SINGLE: BACKDAYS,\n                  DURATION_UNIT,\n                  MANAGE_IN_UTC,\n                  LANGU,\n                  MAX_RECORDS.\n   SELECT_SINGLE: STAT_WAIT,\n                  STAT_TRANSIT,\n                  STAT_OK,\n                  STAT_ERROR,\n                  STAT_INCONS,\n                  STAT_FUTURE,\n                  STAT_RETRY,\n                  STAT_DIRECT,\n                  STAT_ACTIVE.\n DATA_SINGLE:   SW_DEST RFCDEST.\n SELECT_SINGLE: SW_DEST.\n DATA: LV_FM TYPE FUNCNAME.\n DATA_MULTY: STATUS SO_REC_STA.\n SELECT_MULTY: STATUS.\n*** SET_SY_TIME lv_MANAGE_IN_UTC sy_datlo sy_timlo .\n*** TIME_SHIFT sy_datlo sy_timlo . \" TIME_SHIFT parameter\n\"\"_set_sys_date_time lv_sw_dest sy_datlo sy_timlo.\n_GET_CURRENT_DATE_TIME LV_MANAGE_IN_UTC LV_SW_DEST SY_DATLO SY_TIMLO.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n   IF LV_BACKDAYS IS INITIAL.\n     LV_BACKDAYS = 1.\n   ENDIF.\n   IF R_DATUM[] IS INITIAL .\n      RS_DATUM-SIGN = 'I' .\n      RS_DATUM-OPTION = 'GE' .\n***      DATE_FROM = sy-datum - lv_BACKDAYS .\n      DATE_FROM = SY_DATLO - LV_BACKDAYS .\n      RS_DATUM-LOW = DATE_FROM .\n      APPEND RS_DATUM TO R_DATUM.\n   ENDIF.\n  IF R_SND_DATE[] IS INITIAL.\n    R_SND_DATE[] = R_DATUM[].\n   ENDIF.\n*  refresh R_SND_DATE.\n*  loop at R_DATUM into RS_DATUM.\n*    move-corresponding RS_DATUM to RS_SND_DATE.\n*    append RS_SND_DATE to R_SND_DATE.\n*  endloop.\n  \"-- Set Status -----\n   \"-- Set Default Status\n   SET_STATUS: WAIT,\n               TRANSIT,\n               OK,\n               ERROR,\n               INCONS,\n               FUTURE,\n               RETRY,\n               DIRECT,\n               ACTIVE.\n   IF  LS_STATUS IS INITIAL.\n     LS_STATUS-WAIT = 'X'.\n     LS_STATUS-ERROR = 'X'.\n     LS_STATUS-INCONS = 'X'.\n     LS_STATUS-TRANSIT = 'X'.\n     LS_STATUS-OK = 'X'.\n   ENDIF.\n  \"-- Max Records -----\n  LV_MAXSEL = 500.\n  IF LV_MAX_RECORDS IS NOT INITIAL.\n    LV_MAXSEL = LV_MAX_RECORDS.\n  ENDIF.\n   CALL FUNCTION 'SX_SNDREC_SELECT'\n     DESTINATION LV_SW_DEST\n     EXPORTING\n*      SND_ART             =\n       SND_DATE            = R_SND_DATE\n       SND_TIME            = R_SND_TIME\n*      DEL_DATE            =\n*      DEL_TIME            =\n       STATUS              = LS_STATUS\n*      NOTIFICATIONS       =\n       SENDER              = R_SENDER\n       MAXSEL              = LV_MAXSEL\n*      ALL_WAITING         = 'X'\n     IMPORTING\n       SNDRECS             = LT_SNDRECS.\n   DELETE LT_SNDRECS WHERE: SNDART NOT IN R_SNDART.\n   DELETE LT_SNDRECS WHERE: STAT_DATE NOT IN R_SND_DATE.\n   DELETE LT_SNDRECS WHERE: STATUS NOT IN R_STATUS.\n   LOOP AT LT_SNDRECS INTO LS_SNDRECS.\n     MOVE-CORRESPONDING LS_SNDRECS TO LS_DATA.\n     IF LV_SW_DEST IS NOT INITIAL.\n       LV_FM = '/SKN/FC_SW_01_GET_ADDR_DETAILS'.\n     ELSE.\n       LV_FM = '/SKN/F_SW_01_GET_ADDR_DETAILES'.\n     ENDIF.\n     CALL FUNCTION LV_FM  \" '/SKN/F_SW_01_GET_ADDR_DETAILES'\n       EXPORTING\n         ADRNR            = LS_DATA-ADRNR\n       IMPORTING\n         NAME_TEXT        = LS_DATA-RC_NAME\n       EXCEPTIONS\n         NO_DATA          = 1\n         OTHERS           = 2.\n     IF SY-SUBRC <> 0.\n     ENDIF.\n     IF LS_DATA-MSGTY IS INITIAL.\n       IF LS_DATA-STATUS IS NOT INITIAL.\n         LS_DATA-MSGTY = LS_DATA-STATUS+0(1).\n         T_DATA-MSGV1 = '672'.\n       ENDIF.\n     ENDIF.\n     CALL FUNCTION '/SKN/F_SW_01_02_SOST_STATUS'\n       EXPORTING\n         MSGTY             = LS_DATA-MSGTY\n       IMPORTING\n         STATUS_DESC       = LS_DATA-STATUS_DESC\n         STATE_COLOR       = LS_DATA-STATE_COLOR\n         STATE_ICON        = LS_DATA-STATE_ICON.\n     LV_DOMNAME = 'SX_ADDRTYP'.\n     LV_DOMVALUE = LS_DATA-SNDART.\n     CALL FUNCTION 'DDUT_DOMVALUE_TEXT_GET'\n          EXPORTING   NAME          = LV_DOMNAME\n                      VALUE         = LV_DOMVALUE\n                      LANGU         = LV_LANGU\n                      TEXTS_ONLY    = 'X'\n          IMPORTING   DD07V_WA      = LS_DD07V\n          EXCEPTIONS  OTHERS        = 1.\n      IF SY-SUBRC IS INITIAL.\n        LS_DATA-SNDART_DESC = LS_DD07V-DDTEXT.\n      ENDIF.\n     APPEND LS_DATA TO T_DATA.\n   ENDLOOP.\n  DELETE T_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.\n*-- Fill Duration Value\n LOOP AT T_DATA .\n   SY_TABIX = SY-TABIX.\n   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-STAT_DATE\n          T_FROM            = T_DATA-STAT_TIME\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n   MODIFY T_DATA INDEX SY_TABIX .\n ENDLOOP .\n DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n*Add Message text detail\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-MSGID IS INITIAL.\n      LV_MSG_NUMBER = T_DATA-STATUS.\n      IF LV_MSG_NUMBER IS INITIAL.\n        CONTINUE.\n      ENDIF.\n      CALL FUNCTION 'BAPI_MESSAGE_GETDETAIL'\n        DESTINATION LV_SW_DEST\n        EXPORTING\n          ID                = T_DATA-MSGID        \"SOST_MSGID   \"STAMID\n          NUMBER            = LV_MSG_NUMBER\n          LANGUAGE          = LV_LANGU\n          TEXTFORMAT        = 'ASC'\n*         LINKPATTERN       =\n          MESSAGE_V1        = T_DATA-MSGV1        \"STAPA1\n          MESSAGE_V2        = T_DATA-MSGV2        \"STAPA2\n          MESSAGE_V3        = T_DATA-MSGV3         \"STAPA3\n          MESSAGE_V4        = T_DATA-MSGV4         \"STAPA4\n        IMPORTING\n          MESSAGE           = T_DATA-MESSAGE\n*         RETURN            =\n*       TABLES\n*         TEXT              =\n                .\n      MODIFY T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

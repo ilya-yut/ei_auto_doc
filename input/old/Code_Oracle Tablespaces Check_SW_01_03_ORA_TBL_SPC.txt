@@ -1,0 +1,87 @@
+FUNCTION /SKN/F_SW_01_03_ORA_TBL_SPACES.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_ORA_TBL_SPACES
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU  LANGU,
+             DEST RFCDEST.
+DATA_MULTY: TS        TS,
+            STATUS    STATUS_,
+            TSIZE     TSIZE1,
+            TFREE     TFREE1,
+            TPCTUSED  TPCTUSED,
+            TEXTENTS  TEXTENTS,
+            TSEGMENTS TSEGMENTS,
+            TSAU      DB_TSAU,
+            TSAUPCT   DB_TSAUPCT.
+*-- Fill Selection Option Tables
+  SELECT_MULTY: TS,
+            STATUS,
+            TSIZE ,
+            TFREE ,
+            TPCTUSED,
+            TEXTENTS,
+            TSEGMENTS,
+            TSAU  ,
+            TSAUPCT.
+   LV_LANGU = SY-LANGU.
+   SELECT_SINGLE: LANGU,
+                  MANAGE_IN_UTC,
+                  DEST.
+DATA: LS_TS TYPE TABLE_SPC,
+      LT_TS LIKE TABLE OF LS_TS.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : IS_OUT(1) TYPE C.
+DATA :NTMP(15) TYPE N,
+      ITMP TYPE TSIZE1.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    LV_DEST = LV_SW_DEST.
+  ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+   CALL FUNCTION 'DB02_ORA_FILL_TS'
+     DESTINATION        LV_DEST
+     EXPORTING
+       FLAG_REFRESH       = 'X'
+*    IMPORTING
+*      CURR_TIME          =
+*      CURR_DATE          =
+*      DATETIME           =
+     TABLES
+       TS                 = LT_TS.
+   LOOP AT LT_TS INTO LS_TS.
+     MOVE-CORRESPONDING LS_TS TO T_DATA.
+     " Convert to MB
+     T_DATA-TSIZE = T_DATA-TSIZE / 1024.
+     T_DATA-TFREE = T_DATA-TFREE / 1024.
+     NTMP = T_DATA-TSAU.
+      ITMP = NTMP.
+       ITMP = ITMP / 1024.
+        T_DATA-TSAU = ITMP.
+     APPEND T_DATA.
+   ENDLOOP.
+   DELETE T_DATA WHERE TS NOT IN R_TS.
+   DELETE T_DATA WHERE STATUS NOT IN R_STATUS.
+   DELETE T_DATA WHERE TSIZE NOT IN R_TSIZE.
+   DELETE T_DATA WHERE TFREE NOT IN R_TFREE.
+   DELETE T_DATA WHERE TPCTUSED NOT IN R_TPCTUSED.
+   DELETE T_DATA WHERE TEXTENTS NOT IN R_TEXTENTS.
+   DELETE T_DATA WHERE TSEGMENTS NOT IN R_TSEGMENTS.
+   DELETE T_DATA WHERE TSAU NOT IN R_TSAU.
+   DELETE T_DATA WHERE TSAUPCT NOT IN R_TSAUPCT.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

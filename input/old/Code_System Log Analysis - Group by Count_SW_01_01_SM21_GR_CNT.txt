@@ -1,0 +1,59 @@
+  FUNCTION /SKN/F_SW_01_01_SM21_GRP_CNT.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM21_GRP_CNT OPTIONAL
+*"----------------------------------------------------------------------
+DATA : LV_ALERT TYPE  CHAR1.
+DATA : LS_DET TYPE /SKN/S_SW_01_01_SM21,
+       LT_DET LIKE TABLE OF LS_DET.
+DATA: LS_T_DATA LIKE LINE OF T_DATA,
+      LT_T_DATA LIKE TABLE OF LS_T_DATA.
+DATA : LV_CNT TYPE I.
+DATA_MULTY: REQ_CNT /SKN/E_SW_CNT.
+SELECT_MULTY: REQ_CNT.
+DATA_SINGLE: AGGR_PERIOD CHAR1.
+SELECT_SINGLE: AGGR_PERIOD.
+DATA_SINGLE: WITH_MESSAGE CHAR1.
+SELECT_SINGLE: WITH_MESSAGE.
+   REFRESH T_DATA.
+   CALL FUNCTION '/SKN/F_SW_01_01_SM21'
+    IMPORTING
+       IS_ALERT       = LV_ALERT
+     TABLES
+       T_SELECT       = T_SELECT
+       T_DATA         = LT_DET.
+    IS_ALERT = LV_ALERT.
+    LOOP AT LT_DET INTO LS_DET.
+      MOVE-CORRESPONDING LS_DET TO LS_T_DATA.
+      LS_T_DATA-REQ_CNT = 1.
+      IF LV_WITH_MESSAGE IS INITIAL.
+        CLEAR LS_T_DATA-TEXT.  " !!!
+      ENDIF.
+      CASE LV_AGGR_PERIOD.
+        WHEN 'D'.
+          CLEAR: "ls_t_data-SLGDATE,
+                 LS_T_DATA-SLGTIME.
+        WHEN 'H'.
+          LS_T_DATA-SLGTIME+2(4) = '0000'.
+        WHEN 'M'.
+          LS_T_DATA-SLGTIME+4(2) = '00'.
+        WHEN OTHERS.
+          CLEAR: LS_T_DATA-SLGDATE,
+                 LS_T_DATA-SLGTIME.
+      ENDCASE.
+      COLLECT LS_T_DATA INTO LT_T_DATA.
+    ENDLOOP.
+    LOOP AT LT_T_DATA INTO LS_T_DATA.
+      IF LS_T_DATA-REQ_CNT IN R_REQ_CNT.
+        APPEND LS_T_DATA TO T_DATA.
+      ENDIF.
+    ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

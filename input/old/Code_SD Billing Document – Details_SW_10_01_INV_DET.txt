@@ -1,0 +1,196 @@
+FUNCTION /SKN/F_SW_10_01_INV_DET.
+*"--------------------------------------.--------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_INV_DET OPTIONAL
+*"----------------------------------------------------------------------
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : DATE_FROM LIKE SY-DATUM .
+DATA : REF_DATE TYPE D .
+DATA : LV_TIME_DIFF TYPE INT4 .
+DATA : FLD(60) TYPE C .
+FIELD-SYMBOLS:  TYPE ANY .
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU  LANGU,
+             BACKDAYS INT4,
+             DATE_REF_FLD NAME_FELD,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+ LV_BACKDAYS = 1.
+ LV_DATE_REF_FLD = 'FKDAT'.
+ LV_DURATION_UNIT = 'D'.
+ SELECT_SINGLE: MANAGE_IN_UTC,
+                LANGU,
+                BACKDAYS,
+                DATE_REF_FLD,
+                DURATION_UNIT.
+DATA_MULTY: FKDAT        FKDAT,
+            DATUM        SY-DATUM,
+            ERDAT        ERDAT,
+            ERZET        UZEIT,
+            VBELN        VBELN_VF,
+            NETWR        NETWR_AK,
+            DURATION     /SKN/E_SW_DURATION,
+            FKART        FKART,
+            FKTYP        FKTYP,
+            VBTYP        VBTYP,
+            VKORG        VKORG,
+            VTWEG        VTWEG,
+            KDGRP        KDGRP,
+            BZIRK        BZIRK,
+            KUNRG        KUNRG,
+            KUNAG        KUNAG,
+            ERNAM        ERNAM,
+            AEDAT        AEDAT,
+            RFBSK        RFBSK,
+            FKSTO        FKSTO
+            .
+SELECT_MULTY:
+            FKDAT,
+            DATUM,
+            ERDAT,
+            ERZET,
+            VBELN,
+            NETWR,
+            DURATION,
+            FKART,
+            FKTYP,
+            VBTYP,
+            VKORG,
+            VTWEG,
+            KDGRP,
+            BZIRK,
+            KUNRG,
+            KUNAG,
+            ERNAM,
+            AEDAT,
+            RFBSK,
+            FKSTO
+            .
+CONVERT_MULTY: KUNRG ALPHA,
+               KUNAG ALPHA,
+               VBELN ALPHA.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_INV_DET'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+   IF R_DATUM[] IS INITIAL .
+     IF LV_BACKDAYS IS NOT INITIAL.
+       RS_DATUM-SIGN   = 'I' .
+       RS_DATUM-OPTION = 'GE' .
+       DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+       RS_DATUM-LOW    = DATE_FROM .
+       APPEND RS_DATUM TO R_DATUM.
+     ELSE.
+       RS_DATUM-SIGN   = 'I' .
+       RS_DATUM-OPTION = 'EQ' .
+       RS_DATUM-LOW    = SY-DATUM .
+       APPEND RS_DATUM TO R_DATUM.
+     ENDIF.
+   ENDIF.
+   CASE LV_DATE_REF_FLD.
+     WHEN 'ERDAT'.
+       R_ERDAT[] = R_DATUM[].
+     WHEN OTHERS.
+       R_FKDAT[] = R_DATUM[].
+   ENDCASE.
+*--- Retrieve data (detail only, VBRK only)
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT *
+    FROM VBRK
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE VBELN IN R_VBELN
+      AND FKART IN R_FKART
+      AND FKTYP IN R_FKTYP
+      AND VBTYP IN R_VBTYP
+      AND VKORG IN R_VKORG
+      AND VTWEG IN R_VTWEG
+      AND KDGRP IN R_KDGRP
+      AND BZIRK IN R_BZIRK
+      AND FKDAT IN R_FKDAT
+      AND ERDAT IN R_ERDAT
+      AND ERZET IN R_ERZET
+      AND ERNAM IN R_ERNAM
+      AND AEDAT IN R_AEDAT
+      AND KUNRG IN R_KUNRG
+      AND KUNAG IN R_KUNAG
+      AND NETWR IN R_NETWR
+      AND RFBSK IN R_RFBSK
+      AND FKSTO IN R_FKSTO.
+*--- Calculate duration (reference date/time to now)
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX.
+    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD.
+    ASSIGN (FLD) TO .
+    REF_DATE = .
+    IF NOT REF_DATE IS INITIAL.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM    = REF_DATE
+          T_FROM    = T_DATA-ERZET
+          D_TO      = SY-DATUM
+          T_TO      = SY-UZEIT
+          TIME_UNIT = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF = LV_TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF LV_TIME_DIFF < '999999'.
+          T_DATA-DURATION = LV_TIME_DIFF.
+        ELSE.
+          T_DATA-DURATION = '999999'.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  IF R_DURATION[] IS NOT INITIAL.
+    DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  ENDIF.
+*--- Payer and Sold-to descriptions (business value)
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX.
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR     = T_DATA-KUNRG
+      IMPORTING
+        CUST_DESC = T_DATA-PAYER_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER = 1
+        OTHERS         = 2.
+    IF SY-SUBRC <> 0.
+      CLEAR T_DATA-PAYER_DESC.
+    ENDIF.
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR     = T_DATA-KUNAG
+      IMPORTING
+        CUST_DESC = T_DATA-SOLDTO_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER = 1
+        OTHERS         = 2.
+    IF SY-SUBRC <> 0.
+      CLEAR T_DATA-SOLDTO_DESC.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL IS INITIAL.
+  IS_ALERT = 'X'.
+ENDFUNCTION.

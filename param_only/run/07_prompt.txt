@@ -1,0 +1,78 @@
+# EI Function Structure (structure only) – prompt for param_only pipeline
+
+Use this prompt to generate **only** the **EI Function Structure** section (output fields table). No ABAP Code section. Provide the structure file under the heading at the end, then send the whole thing to the LLM.
+
+---
+
+## Role and task
+
+You are documenting the **EI Function Structure** (output fields table) for an SAP Exception Indicator (EI) / function module. You will receive **one** input:
+
+1. **Output structure / fields file** – the structure file (e.g. `Structure_*.xlsx` or its table content) listing all output fields of the EI, with columns such as Structure Name, Field Name, Description, Data Type, Component Type.
+
+**Your task:** Produce **only** the **EI Function Structure** section:
+
+- **EI Function Structure** – A table containing **all** rows from the structure file. Use the constant intro sentence from the benchmark (see below). Table columns: **Structure Name**, **Field Name**, **Description**, **Data Type**, **Component Type**. Copy every row verbatim from the structure input; do not add, remove, or merge rows. If the structure file has Data Type and length in separate columns, combine them in the output as e.g. `DATS(8)`, `CHAR(4)`, `CURR(15,2)` so the table matches the benchmark style. Do **not** produce an ABAP Code section.
+
+---
+
+## How to produce the EI Function Structure section
+
+1. **Heading:** Use exactly: `### EI Function Structure`
+
+2. **Intro (constant text):** Use this sentence verbatim from the benchmark, immediately after the heading:
+   **"This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."**
+
+3. **Table:** Insert a markdown table with header row:
+   | Structure Name | Field Name | Description | Data Type | Component Type |
+
+4. **Table body:** Copy **every** data row from the structure input file into the table. Preserve Structure Name, Field Name, Description, Data Type, and Component Type. If the source has "Data Type" and "Length" (and optionally "Decimal") in separate columns, format the Data Type column in the output as e.g. `DATS(8)`, `CHAR(4)`, `CURR(15,2)`, `INT4(10)`, `TIMS(6)`, `CUKY(5)` so it matches the benchmark. Otherwise use the values from the structure file as provided.
+
+5. **No omissions:** Do not skip any row from the structure file. The output table must have the same number of rows as the structure input (excluding the header row).
+
+---
+
+## Output format (follow exactly)
+
+Output **strictly** the following. Nothing else. No ABAP Code section.
+
+Use **exactly one** heading line: `### EI Function Structure`. Do **not** also output `## EI Function Structure` below it (the full EI document uses `##` for that section; this params-only bundle uses `###` only—duplicating both creates two identical titles in Word).
+
+### EI Function Structure
+
+This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations.
+
+| Structure Name | Field Name | Description | Data Type | Component Type |
+|----------------|------------|-------------|-----------|----------------|
+| [copy all rows from structure input]
+
+---
+
+## Rules
+
+- **EI Function Structure only:** Include **all** rows from the structure file. Use the exact intro sentence from the benchmark. Table columns: Structure Name, Field Name, Description, Data Type, Component Type. Data Type in benchmark style (e.g. DATS(8), CHAR(4)) when the source has type and length; otherwise copy as provided. Do not add, remove, or merge rows.
+- **No ABAP Code:** Do not output any ABAP Code section or code block.
+- **Constant text:** Use the benchmark intro for EI Function Structure exactly as given: "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+- **Output scope:** Only the EI Function Structure section (heading, intro, table). No document title, no preamble, no other sections.
+
+---
+
+## Benchmark reference (structure and constant text – do not copy table content)
+
+Use the **EI Function Structure** section in the benchmark for layout, heading, intro sentence, and table format. The **content** (table rows) must come from your structure input file.
+
+**Source:** `reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.md` (section "EI Function Structure").
+
+**Structure in benchmark:** The full document uses `## EI Function Structure` as a top-level section; **your output must use only** `### EI Function Structure` **once**—do not repeat the title with `##`. One intro sentence: "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations." Then a markdown table with columns: Structure Name, Field Name, Description, Data Type, Component Type. Data types shown with length in parentheses (e.g. DATS(8), CHAR(4), CURR(15,2), INT4(10), TIMS(6), CUKY(5)). One row per output field.
+
+---
+
+## Input (provide below)
+
+**Output structure / fields file** (path or paste – e.g. Structure_*.xlsx or table content):
+
+C:\vibe code dev\ei_auto_doc\input\Structure_SKN_S_SW_01_AUD_SM20_TR_START.xlsx
+
+---
+
+Respond with **only** the "### EI Function Structure" section (heading, intro sentence, and full table from structure input). No other sections or text.

@@ -1,0 +1,2251 @@
+{
+  "scope": "Part 1 conv .md paired with Part 1 .docx (manifest.json); parameters listed in ≥2 distinct files' Parameters Reference Table.",
+  "file_count": 33,
+  "shared_parameter_count": 121,
+  "rows": [
+    {
+      "parameter": "ADRNR",
+      "explanation": "ADRNR carries the address number reference stored on the client row so distributed teams can tie an exception back to the same address record they maintain in standard business partner workflows.",
+      "suggested_explanation": "Central address reference (ADRNR / business address) tying a result row to address master (ADRC) for ownership and partner traceability.",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "ADRNR",
+      "explanation": "Explains why two monitoring passes differ: only the pass with stricter address number on ADRNR surfaces the disputed rows.",
+      "suggested_explanation": "Central address reference (ADRNR / business address) tying a result row to address master (ADRC) for ownership and partner traceability.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "ADRNR",
+      "explanation": "ADRNR carries address number for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis.",
+      "suggested_explanation": "Central address reference (ADRNR / business address) tying a result row to address master (ADRC) for ownership and partner traceability.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc. Backdays is based on the DATE_REF_FLD field.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc. Backdays is based on the DATE_REF_FLD field.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc. Backdays is based on the DATE_REF_FLD field.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc. Backdays is based on VBDATE",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc. Backdays is based on VBDATE",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc. Backdays is based on CREDATE",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc. Backdays is based on ERDAT",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc. Backdays is based on DATE_REF_FLD field. BCDA1 - BCDA5 (Date of Last Password Change) Gives auditors traceable criteria because date of last password change on BCDA1 is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md"
+    },
+    {
+      "parameter": "BACKDAYS",
+      "explanation": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.",
+      "suggested_explanation": "Default lookback length in calendar days from the evaluation date when operators omit explicit from/to ranges; in code it is mapped onto the active date axis (often paired with DATE_REF_FLD or the primary DATS selection field).",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "BTCJOBCNT",
+      "explanation": "When combined with cloud-destination discipline, job no. on BTCJOBCNT keeps both breadth and depth of the extract intentional.",
+      "suggested_explanation": "Scheduler job counter (JOBCOUNT / BTCJOBCNT) forming part of the batch job key together with job name on CCMS / work-process aggregate extracts.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "BTCJOBCNT",
+      "explanation": "When combined with destination discipline, job no. on BTCJOBCNT keeps both breadth and depth of the extract intentional.",
+      "suggested_explanation": "Scheduler job counter (JOBCOUNT / BTCJOBCNT) forming part of the batch job key together with job name on CCMS / work-process aggregate extracts.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "BTCJOBNAME",
+      "explanation": "Mirrors how administrators slice work-process lists: job name (BTCJOBNAME) is one lever that shapes which rows are comparable run over run.",
+      "suggested_explanation": "Scheduler job name (TBTCO-JOBNAME / BTCJOB) used to correlate work-process rows with the owning background job.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "BTCJOBNAME",
+      "explanation": "Mirrors how administrators slice operational lists: job name (BTCJOBNAME) is one lever that shapes which rows are comparable run over run.",
+      "suggested_explanation": "Scheduler job name (TBTCO-JOBNAME / BTCJOB) used to correlate work-process rows with the owning background job.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "CNT",
+      "explanation": "Prevents accidental global scans when number of result records (CNT) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Cardinality gate after the monitor has built its working set—accept interval for row count, grouped queue depth, or work-process totals depending on the function’s aggregation logic.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "CNT",
+      "explanation": "Supports operational control by evaluating items count through CNT for each candidate record.",
+      "suggested_explanation": "Cardinality gate after the monitor has built its working set—accept interval for row count, grouped queue depth, or work-process totals depending on the function’s aggregation logic.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "CNT",
+      "explanation": "CNT is the final queue item count filter applied after grouped aggregation, used to keep only queue groups within the required volume range.",
+      "suggested_explanation": "Cardinality gate after the monitor has built its working set—accept interval for row count, grouped queue depth, or work-process totals depending on the function’s aggregation logic.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "CNT",
+      "explanation": "Prevents accidental global scans when number of result records (CNT) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Cardinality gate after the monitor has built its working set—accept interval for row count, grouped queue depth, or work-process totals depending on the function’s aggregation logic.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "CUAPROGRAM",
+      "explanation": "Captures edge cases where cua program name (CUAPROGRAM) must be non-default to reproduce a customer-specific monitoring scenario.",
+      "suggested_explanation": "CUA program name (structure WPTOTINFCP) identifying the transaction / dialog stack behind a work process in SM50/SM66-style totals.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "CUAPROGRAM",
+      "explanation": "Captures edge cases where cua program name (CUAPROGRAM) must be non-default to reproduce a customer-specific monitoring scenario.",
+      "suggested_explanation": "CUA program name (structure WPTOTINFCP) identifying the transaction / dialog stack behind a work process in SM50/SM66-style totals.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "DATE_REF_FLD",
+      "explanation": "DATE_REF_FLD chooses which date context should drive date-oriented logic when multiple date fields are available.",
+      "suggested_explanation": "Name of the DATS/TIMS anchor field that receives the implicit BACKDAYS window and drives duration-from-reference logic (`CASE LV_DATE_REF_FLD` pattern in `/SKN` job and security monitors).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DATE_REF_FLD",
+      "explanation": "DATE_REF_FLD chooses date context used for date-oriented selection logic.",
+      "suggested_explanation": "Name of the DATS/TIMS anchor field that receives the implicit BACKDAYS window and drives duration-from-reference logic (`CASE LV_DATE_REF_FLD` pattern in `/SKN` job and security monitors).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DATE_REF_FLD",
+      "explanation": "Selects which job timestamp column receives the default lookback window from BACKDAYS inside the delegated background-job monitor.",
+      "suggested_explanation": "Name of the DATS/TIMS anchor field that receives the implicit BACKDAYS window and drives duration-from-reference logic (`CASE LV_DATE_REF_FLD` pattern in `/SKN` job and security monitors).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "DATE_REF_FLD",
+      "explanation": "Selects which job timestamp column receives the default lookback window from BACKDAYS before rows are read from the job overview source.",
+      "suggested_explanation": "Name of the DATS/TIMS anchor field that receives the implicit BACKDAYS window and drives duration-from-reference logic (`CASE LV_DATE_REF_FLD` pattern in `/SKN` job and security monitors).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "DATE_REF_FLD",
+      "explanation": "Names the date field used as the reference for lookback and time-window filtering when explicit from/to dates are not set.",
+      "suggested_explanation": "Name of the DATS/TIMS anchor field that receives the implicit BACKDAYS window and drives duration-from-reference logic (`CASE LV_DATE_REF_FLD` pattern in `/SKN` job and security monitors).",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "DATUM is the explicit monitoring date selector used as the primary date window when supplied.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "DATUM provides explicit date-window selection for the counting run.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "DATUM is the explicit date selector for dump retrieval window.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "Aligns exception volume with the chosen scope by testing date via DATUM before alert evaluation.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "Guards against oversized extracts when date on DATUM is narrowed together with client, user, or session filters.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "When left open per framework rules, DATUM does not restrict date; when set, only matching rows remain.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "DATUM",
+      "explanation": "When harmonized with related filters, date on DATUM isolates the highest-risk record families.",
+      "suggested_explanation": "Explicit as-of calendar date overriding SY-DATUM for selection windows and aging calculations when the run must not use the batch start day.",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "DEST",
+      "explanation": "Combines with user, transaction, and generic object filters so rfc destination on DEST refines which locks reach duration checks.",
+      "suggested_explanation": "Logical RFC destination (RFCDEST) or enqueue destination key used to scope remote lock / RFC-based extracts.",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "DEST",
+      "explanation": "Supports escalation where rfc destination on DEST signals ownership for follow-up between Basis and functional teams.",
+      "suggested_explanation": "Logical RFC destination (RFCDEST) or enqueue destination key used to scope remote lock / RFC-based extracts.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "DEST",
+      "explanation": "DEST restricts analysis to selected RFC destinations so queue pressure can be examined per target system landscape.",
+      "suggested_explanation": "Logical RFC destination (RFCDEST) or enqueue destination key used to scope remote lock / RFC-based extracts.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "DIRECT",
+      "explanation": "DIRECT applies selection on IDoc direction (inbound/outbound) so monitoring focuses on the relevant integration flow.",
+      "suggested_explanation": "IDoc direction flag from EDIDC-DIRECT (1=outbound, 2=inbound relative to the captured system) for ALE/EDI traffic splits.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DIRECT",
+      "explanation": "DIRECT limits document/message classification scope that feeds the counted result set.",
+      "suggested_explanation": "IDoc direction flag from EDIDC-DIRECT (1=outbound, 2=inbound relative to the captured system) for ALE/EDI traffic splits.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DOCNUM",
+      "explanation": "DOCNUM selects specific IDoc numbers for record-level investigation and incident follow-up.",
+      "suggested_explanation": "IDoc number EDIDC-DOCNUM for single-document selection or incident drill-down.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DOCNUM",
+      "explanation": "DOCNUM limits document/message classification scope that feeds the counted result set.",
+      "suggested_explanation": "IDoc number EDIDC-DOCNUM for single-document selection or incident drill-down.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DUMPS_CNT",
+      "explanation": "DUMPS_CNT is the final threshold/range check against the counted number of dump records returned from the base function.",
+      "suggested_explanation": "Alert band on the counted short-dump rows (ST22/SNAP) returned after PROGRAMNAME/SY filters—distinct from runtime DURATION aging.",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "DUMPS_CNT",
+      "explanation": "DUMPS_CNT is the final threshold/range check against the counted number of dump records returned from the base function.",
+      "suggested_explanation": "Alert band on the counted short-dump rows (ST22/SNAP) returned after PROGRAMNAME/SY filters—distinct from runtime DURATION aging.",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION defines the elapsed-time threshold used to prioritize aged or delayed IDoc processing.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION controls aging threshold used by the base function before counting.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION sets elapsed-time threshold used after dump timestamp comparison with current time.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION is the aging threshold applied in the base function before records are counted.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION is the aging threshold applied in the base function before records are counted.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Valuable when comparing volume before and after a release—hold duration in time units on DURATION constant while varying JOBS_CNT.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Helps monitoring stay readable by requiring duration from start in d.unit (DURATION) to match organizational or technical selectors when set.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Uses duration in time units from the lock context so only records with DURATION inside declared values proceed.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Documents expected operator behavior—duration in time units on DURATION should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "After the date window from BACKDAYS is applied, DURATION supplies the numeric width for the secondary age check measured in the unit given by DURATION_UNIT, so only update lines whose scheduling age still fits the declared span remain eligible for counting.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Interprets duration in time units as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on DURATION.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Works downstream of the initial queue read so duration in time units on DURATION still participates in row-level deletion rules.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION receives the computed age returned by the shared time-difference helper after each client row is evaluated, and only rows whose age still fits the declared interval remain in the alert set.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Helps monitoring stay readable by requiring duration in time units (DURATION) to match organizational or technical selectors when set.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Interprets duration in time units as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on DURATION.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "DURATION is the numeric aging threshold used after status timestamp comparison; it controls when an item is treated as overdue for exception focus.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Uses duration in time units from the source context so only records with DURATION inside declared values proceed.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Ensures reporting respects duration in time units constraints carried by DURATION.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Interprets duration in time units as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on DURATION.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Mirrors how administrators slice operational lists: duration(from last logon) (DURATION) is one lever that shapes which rows are comparable run over run.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "When tightened, duration in time units (DURATION) removes rows that would otherwise dilute attention from failing or stuck cases.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md"
+    },
+    {
+      "parameter": "DURATION",
+      "explanation": "Uses duration in time units from the source context so only records with DURATION inside declared values proceed.",
+      "suggested_explanation": "Relative-age filter: elapsed interval from the row’s reference timestamp to evaluation time, expressed in DURATION_UNIT (distinct from batch wall-clock DURATION_H/M on job monitors).",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "DURATION_H",
+      "explanation": "Captures edge cases where execution time(hours) (DURATION_H) must be non-default to reproduce a customer-specific counting scenario.",
+      "suggested_explanation": "Batch job gross runtime in hours (end timestamp minus start) for TBTCO / job-list style monitors—not the same semantic as DURATION “age since reference”.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "DURATION_H",
+      "explanation": "Stabilizes week-over-week metrics by fixing execution time(hours) (DURATION_H) while allowing runtime or age thresholds to move.",
+      "suggested_explanation": "Batch job gross runtime in hours (end timestamp minus start) for TBTCO / job-list style monitors—not the same semantic as DURATION “age since reference”.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "DURATION_M",
+      "explanation": "Interprets execution time(minutes) as part of the selection contract passed through to the job monitor: open ranges follow its defaults; restricted ranges apply strict matching on DURATION_M.",
+      "suggested_explanation": "Batch job gross runtime in minutes—paired with DURATION_H for sub-hour job runtime SLAs.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "DURATION_M",
+      "explanation": "Supports escalation where execution time(minutes) on DURATION_M signals ownership for follow-up between Basis and application teams.",
+      "suggested_explanation": "Batch job gross runtime in minutes—paired with DURATION_H for sub-hour job runtime SLAs.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines the unit used for DURATION calculations, changing whether thresholds are interpreted in minutes/hours/days.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines time unit for DURATION evaluation in the underlying IDoc-state logic.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines the measurement unit for DURATION calculations.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines time unit for DURATION evaluation in underlying dump processing.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines time unit for DURATION evaluation in underlying dump processing.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for the relative-age measure computed inside the delegated job monitor from the reference timestamp to the evaluation moment.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for the relative-age measure from the reference timestamp chosen by DATE_REF_FLD to the evaluation moment.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each lock’s enqueue date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Specifies the unit used when computing elapsed time from each line's scheduling timestamp to the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Selects the calendar meaning applied to DURATION when the monitor evaluates how long each update request has been pending relative to the run timestamp.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each line’s start date and time and the evaluation clock used after the snapshot is built.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session’s creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT tells the aging helper whether to measure elapsed time in minutes, hours, days, or full-day buckets before comparing the result with the configured interval.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "DURATION_UNIT defines the time unit for DURATION comparison, which directly changes whether thresholds are interpreted as minutes, hours, or days.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md"
+    },
+    {
+      "parameter": "DURATION_UNIT",
+      "explanation": "Unit for elapsed time between each session's creation date and time and the evaluation clock.",
+      "suggested_explanation": "Unit for DURATION-style aging: domain /SKN/D_SW_DURATION_UNIT (H hours, M minutes, D days, F full-day helper mode where implemented).",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "DYNPRONR",
+      "explanation": "Improves readability of exported lists because screen number or transaction (DYNPRONR) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Current dynpro (screen) number for batch-input / SHDB-related extracts where UI context matters.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "DYNPRONR",
+      "explanation": "Improves readability of exported lists because screen number or transaction (DYNPRONR) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Current dynpro (screen) number for batch-input / SHDB-related extracts where UI context matters.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "ENDDATE",
+      "explanation": "Reflects real batch-monitoring usage where job end date on ENDDATE is routinely restricted to a single productive window.",
+      "suggested_explanation": "Background job logical end date (TBTCO-ENDDATE) for CCMS job list selection.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "ENDDATE",
+      "explanation": "Supports batch operations review by evaluating execution date through ENDDATE for each job header candidate.",
+      "suggested_explanation": "Background job logical end date (TBTCO-ENDDATE) for CCMS job list selection.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "ENDTIME",
+      "explanation": "Interprets batch job end time as part of the selection contract passed through to the job monitor: open ranges follow its defaults; restricted ranges apply strict matching on ENDTIME.",
+      "suggested_explanation": "Background job end time paired with ENDDATE to bound the execution window.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "ENDTIME",
+      "explanation": "When tightened, start time (ENDTIME) removes jobs that would otherwise dilute attention from long-running or failed work.",
+      "suggested_explanation": "Background job end time paired with ENDDATE to bound the execution window.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "ERDAT",
+      "explanation": "For operations, created date on ERDAT indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "Record creation date (ERDAT) on the underlying business object—generic master/document Created-on axis.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "ERDAT",
+      "explanation": "Reflects real administration where creation date of user master on ERDAT is routinely restricted to a single productive client or object family.",
+      "suggested_explanation": "Record creation date (ERDAT) on the underlying business object—generic master/document Created-on axis.",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "FCODE",
+      "explanation": "Documents expected operator behavior—fcode on FCODE should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "GUI function code (SY-UCOMM class) when monitoring must distinguish user commands inside a transaction.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "FCODE",
+      "explanation": "Documents expected operator behavior—fcode on FCODE should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "GUI function code (SY-UCOMM class) when monitoring must distinguish user commands inside a transaction.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "HOST",
+      "explanation": "Uses host name from the source context so only records with HOST inside declared values proceed.",
+      "suggested_explanation": "Application server host name (instance level) to restrict extracts to one app node.",
+      "file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md"
+    },
+    {
+      "parameter": "HOST",
+      "explanation": "Helps distinguish technical versus business attributes when host name on HOST correlates with counters or status fields.",
+      "suggested_explanation": "Application server host name (instance level) to restrict extracts to one app node.",
+      "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md"
+    },
+    {
+      "parameter": "HOST",
+      "explanation": "Helps distinguish technical versus business attributes when host name on HOST correlates with counters or status fields.",
+      "suggested_explanation": "Application server host name (instance level) to restrict extracts to one app node.",
+      "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md"
+    },
+    {
+      "parameter": "IDOCTP",
+      "explanation": "IDOCTP restricts to basic type, which is key when troubleshooting a specific message structure.",
+      "suggested_explanation": "IDoc basic type / extension family (EDIDC-IDOCTP) for interface-type filtering.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "IDOCTP",
+      "explanation": "IDOCTP limits document/message classification scope that feeds the counted result set.",
+      "suggested_explanation": "IDoc basic type / extension family (EDIDC-IDOCTP) for interface-type filtering.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "INCLUDENAME",
+      "explanation": "INCLUDENAME narrows monitoring to includes related to problematic call stacks.",
+      "suggested_explanation": "ABAP include name narrowing short-dump selection (SNAP/SYREPORT lineage) to a code object family.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "INCLUDENAME",
+      "explanation": "INCLUDENAME narrows the base dataset to include-level code context before final count is calculated.",
+      "suggested_explanation": "ABAP include name narrowing short-dump selection (SNAP/SYREPORT lineage) to a code object family.",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "INCLUDENAME",
+      "explanation": "INCLUDENAME narrows the base dataset to include-level code context before final count is calculated.",
+      "suggested_explanation": "ABAP include name narrowing short-dump selection (SNAP/SYREPORT lineage) to a code object family.",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "JOBNAME",
+      "explanation": "Treats job name as a discriminator between similar jobs that would otherwise change the counted volume in unexpected ways.",
+      "suggested_explanation": "Background job name key (TBTCO-JOBNAME) for SM37/CCMS style job monitors.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "JOBNAME",
+      "explanation": "Ensures reporting on programs and schedulers respects job name constraints carried by JOBNAME.",
+      "suggested_explanation": "Background job name key (TBTCO-JOBNAME) for SM37/CCMS style job monitors.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "When harmonized with remaining-number filters, languege for description on LANGU isolates the highest-risk interval families.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_01_NUM_RNG - Number Range Control Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Connects to alert semantics: lines removed for failing description language on LANGU never reach duration filtering.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Works downstream of the initial snapshot read so language for texts on LANGU still participates in row-level deletion rules.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Stabilizes week-over-week metrics by fixing language (LANGU) while allowing duration thresholds to move.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "LANGU applies language for texts as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Improves readability of exported lists because language for texts (LANGU) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Works downstream of the initial read so language for texts on LANGU still participates in row-level deletion rules.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Explains why two monitoring passes differ: only the pass with stricter language for texts on LANGU surfaces the disputed rows.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "LANGU",
+      "explanation": "Interprets description language as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on LANGU.",
+      "suggested_explanation": "Logon / text language (LANGU) controlling SY-LANGU class text reads and user master language slices.",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "LASTCHNAME",
+      "explanation": "Allows phased rollout: first widen LASTCHNAME for last job change/made by, then tighten JOBS_CNT once baseline volumes are understood.",
+      "suggested_explanation": "User who last edited the job definition (TBTCO-LASTCHNAME) for segregation-of-duties on scheduler changes.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "LASTCHNAME",
+      "explanation": "Mirrors how administrators slice job lists: last job change/made by (LASTCHNAME) is one lever that shapes which rows are comparable run over run.",
+      "suggested_explanation": "User who last edited the job definition (TBTCO-LASTCHNAME) for segregation-of-duties on scheduler changes.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "MANAGE_IN_UTC controls whether current-time comparison uses UTC normalization or local-time interpretation.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "MANAGE_IN_UTC controls UTC vs local-time interpretation for current-time comparisons.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether the monitor normalizes evaluation timestamps to UTC or keeps local application-server time context.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether the monitor normalizes evaluation timestamps to UTC or keeps local application-server time context.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Chooses whether duration math and cross-system comparisons normalize timestamps to UTC or stay on the application server’s local clock context.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether the monitor normalizes evaluation timestamps to UTC or keeps local application-server time context.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "MANAGE_IN_UTC controls whether current-time comparison is normalized to UTC or evaluated in local system time, which affects cross-time-zone consistency.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "MANAGE_IN_UTC",
+      "explanation": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time.",
+      "suggested_explanation": "Framework flag: normalize evaluation timestamps to UTC before comparisons when systems span time zones (cloud/ALM integrations).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "MANDT",
+      "explanation": "MANDT is the primary key for selection; supply the productive or non-productive numbers the runbook names so the extract matches the landscape segment under review.",
+      "suggested_explanation": "SAP client (MANDT) mandatory organizational key on all client-dependent tables.",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "MANDT",
+      "explanation": "Narrows retrieved rows where client (MANDT) must match the configured selection for this monitor.",
+      "suggested_explanation": "SAP client (MANDT) mandatory organizational key on all client-dependent tables.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "MANDT",
+      "explanation": "MANDT scopes queue records by SAP client to avoid cross-client mixing when outbound queue analysis is performed.",
+      "suggested_explanation": "SAP client (MANDT) mandatory organizational key on all client-dependent tables.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "MANDT",
+      "explanation": "When populated, keeps the extract focused so client id (MANDT) aligns with the intended triage slice.",
+      "suggested_explanation": "SAP client (MANDT) mandatory organizational key on all client-dependent tables.",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "MAX_RECORDS",
+      "explanation": "Clarifies hand-offs between Basis and functional teams: maximum no. records on MAX_RECORDS often determines which team owns remediation.",
+      "suggested_explanation": "Hard cap on returned rows after selection to protect dialog runtime and export size.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "MAX_RECORDS",
+      "explanation": "MAX_RECORDS caps extracted result volume to keep runtime predictable while still returning the highest-priority exception population.",
+      "suggested_explanation": "Hard cap on returned rows after selection to protect dialog runtime and export size.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "MEMSUM",
+      "explanation": "Helps monitoring stay readable by requiring extended memory (MEMSUM) to match organizational or technical selectors when set.",
+      "suggested_explanation": "Collector memory aggregate (heap/extension) from application-server memory snapshots—used for capacity trending vs. thresholds.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "MEMSUM",
+      "explanation": "Helps monitoring stay readable by requiring extended memory (MEMSUM) to match organizational or technical selectors when set.",
+      "suggested_explanation": "Collector memory aggregate (heap/extension) from application-server memory snapshots—used for capacity trending vs. thresholds.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "MESSAGE",
+      "explanation": "MESSAGE holds resolved status text and supports direct, human-readable triage of IDoc issues.",
+      "suggested_explanation": "SY-/application message number or pattern filter (message class context depends on monitor—typically batch input or status log).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "MESSAGE",
+      "explanation": "MESSAGE applies message text as a selection/enrichment control in SOST monitoring, influencing which records are returned and how results are interpreted.",
+      "suggested_explanation": "SY-/application message number or pattern filter (message class context depends on monitor—typically batch input or status log).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "MESTYP",
+      "explanation": "MESTYP is the primary message-type filter used to segment monitoring by business integration process.",
+      "suggested_explanation": "Single-character SAP message type (S/I/W/E/A) for severity-based filtering of batch-input or log lines.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "MESTYP",
+      "explanation": "MESTYP limits document/message classification scope that feeds the counted result set.",
+      "suggested_explanation": "Single-character SAP message type (S/I/W/E/A) for severity-based filtering of batch-input or log lines.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "MSGTXT",
+      "explanation": "MSGTXT contains the rendered long text payload (up to field length) that analysts read directly when diagnosing the communication event.",
+      "suggested_explanation": "Message short text fragment for fuzzy matching on application status lines.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "MSGTXT",
+      "explanation": "Connects to alert semantics: rows removed for failing description on MSGTXT never reach downstream filtering.",
+      "suggested_explanation": "Message short text fragment for fuzzy matching on application status lines.",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "NO_DATE_RESTRICTION",
+      "explanation": "When set active, suppresses the default calendar window inside the delegated monitor so counting reflects only the remaining filters.",
+      "suggested_explanation": "Suppresses automatic BACKDAYS→range mapping so date filters rely solely on explicit DATS ranges (common on TBTCO job extracts).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "NO_DATE_RESTRICTION",
+      "explanation": "When set active, clears the default calendar window so date-driven selection does not constrain the job list beyond other filters.",
+      "suggested_explanation": "Suppresses automatic BACKDAYS→range mapping so date filters rely solely on explicit DATS ranges (common on TBTCO job extracts).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "OBJSNS",
+      "explanation": "For operations, not used on OBJSNS indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "Object sensitivity (SO_OBJ_SNS / OBJSNS): SAPoffice visibility class on SOST objects; may be unused placeholder in other extracts—interpret via DDIC element on that EI.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "OBJSNS",
+      "explanation": "OBJSNS contributes sensitivity to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage.",
+      "suggested_explanation": "Object sensitivity (SO_OBJ_SNS / OBJSNS): SAPoffice visibility class on SOST objects; may be unused placeholder in other extracts—interpret via DDIC element on that EI.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "PERIODIC",
+      "explanation": "Allows phased rollout: first widen PERIODIC for periodic job, then tighten JOBS_CNT once baseline volumes are understood.",
+      "suggested_explanation": "Periodic-job indicator (TBTCO-PERIODIC) distinguishing one-off vs. repeating scheduler definitions.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "PERIODIC",
+      "explanation": "Reflects real job-monitoring usage where periodic job on PERIODIC is routinely restricted to a single productive window.",
+      "suggested_explanation": "Periodic-job indicator (TBTCO-PERIODIC) distinguishing one-off vs. repeating scheduler definitions.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "PRIVSUM",
+      "explanation": "Separates cross-server noise from in-scope work when heap (private) memory on PRIVSUM correlates with host or client attributes.",
+      "suggested_explanation": "Private-memory slice from the same server snapshot as MEMSUM—private heap pressure indicator.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "PRIVSUM",
+      "explanation": "Separates cross-client noise from in-scope work when heap (private) memory on PRIVSUM correlates with client or user attributes.",
+      "suggested_explanation": "Private-memory slice from the same server snapshot as MEMSUM—private heap pressure indicator.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "PROCESS_ICON",
+      "explanation": "PROCESS_ICON provides quick visual emphasis for non-green/problematic IDoc rows during triage.",
+      "suggested_explanation": "Technical icon key (/SKN/E_SW_STATE_ICON) driving alert visualization independent of STATE_COLOR text buckets.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "PROCESS_ICON",
+      "explanation": "Reflects real SM12 usage where state icon on PROCESS_ICON is routinely restricted to a single productive client or user.",
+      "suggested_explanation": "Technical icon key (/SKN/E_SW_STATE_ICON) driving alert visualization independent of STATE_COLOR text buckets.",
+      "file": "SW_01_01_SM12 - Application Locks Monitoring.md"
+    },
+    {
+      "parameter": "PROGNAME",
+      "explanation": "For operations, rept name on PROGNAME indicates whether a job line belongs in the population whose size is compared to JOBS_CNT.",
+      "suggested_explanation": "Executable program name linked to the batch job step (report/variant context) for job-list monitors.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "PROGNAME",
+      "explanation": "Ensures reporting on programs and schedulers respects rept name constraints carried by PROGNAME.",
+      "suggested_explanation": "Executable program name linked to the batch job step (report/variant context) for job-list monitors.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "PROGRAMNAME",
+      "explanation": "PROGRAMNAME targets ABAP program context to isolate unstable components.",
+      "suggested_explanation": "ABAP program name for short-dump selection (SY-REPORT / SNAP) in dump-count/detail monitors.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "PROGRAMNAME",
+      "explanation": "PROGRAMNAME narrows base dump events by ABAP program ownership before count aggregation.",
+      "suggested_explanation": "ABAP program name for short-dump selection (SY-REPORT / SNAP) in dump-count/detail monitors.",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "PROGRAMNAME",
+      "explanation": "PROGRAMNAME narrows base dump events by ABAP program ownership before count aggregation.",
+      "suggested_explanation": "ABAP program name for short-dump selection (SY-REPORT / SNAP) in dump-count/detail monitors.",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "QNAME",
+      "explanation": "Connects to alert semantics: rows removed for failing queue on QNAME never reach downstream filtering.",
+      "suggested_explanation": "Inbound/outbound qRFC queue name (TBQMON/TBQ1 context) for queue depth monitors.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "QNAME",
+      "explanation": "QNAME narrows monitoring to specific outbound queue names, enabling focused troubleshooting of queue-specific congestion.",
+      "suggested_explanation": "Inbound/outbound qRFC queue name (TBQMON/TBQ1 context) for queue depth monitors.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "QRFCFNAM",
+      "explanation": "Reflects real administration where rfc fm on QRFCFNAM is routinely restricted to a single productive client or object family.",
+      "suggested_explanation": "qRFC target function module name registered for the queue entry.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "QRFCFNAM",
+      "explanation": "QRFCFNAM filters queues by RFC function module context to isolate queue volume related to particular integration flows.",
+      "suggested_explanation": "qRFC target function module name registered for the queue entry.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "QRFCUSER",
+      "explanation": "When left open per framework rules, QRFCUSER does not restrict rfc user; when set, only matching rows remain.",
+      "suggested_explanation": "OS or RFC user context executing the queued function module.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "QRFCUSER",
+      "explanation": "QRFCUSER limits results to records associated with selected qRFC users for ownership-oriented operational investigation.",
+      "suggested_explanation": "OS or RFC user context executing the queued function module.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "QSTATE",
+      "explanation": "Limits sessions to the queue processing state values you declare, so monitoring can target only problematic or finished bands.",
+      "suggested_explanation": "Queue state flag from qRFC monitoring (ready, running, stopped) per TBQMON semantics.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "QSTATE",
+      "explanation": "Limits rows to the queue or processing state values you declare, so monitoring can target only selected outcome bands.",
+      "suggested_explanation": "Queue state flag from qRFC monitoring (ready, running, stopped) per TBQMON semantics.",
+      "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md"
+    },
+    {
+      "parameter": "QSTATE",
+      "explanation": "QSTATE filters by queue processing state, helping distinguish active, waiting, or problematic queue populations during review.",
+      "suggested_explanation": "Queue state flag from qRFC monitoring (ready, running, stopped) per TBQMON semantics.",
+      "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md"
+    },
+    {
+      "parameter": "RCVPOR",
+      "explanation": "RCVPOR constrains receiver port for endpoint-specific troubleshooting.",
+      "suggested_explanation": "IDoc partner port number of the receiver (EDIDC-RCVPOR) for logical endpoint filtering.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "RCVPOR",
+      "explanation": "RCVPOR narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "IDoc partner port number of the receiver (EDIDC-RCVPOR) for logical endpoint filtering.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "RCVPRN",
+      "explanation": "RCVPRN applies selection on receiver partner number for partner-specific incident analysis.",
+      "suggested_explanation": "IDoc partner number (receiver) EDIDC-RCVPRN (customer number, vendor no., logical system, … depending on partner type).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "RCVPRN",
+      "explanation": "RCVPRN narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "IDoc partner number (receiver) EDIDC-RCVPRN (customer number, vendor no., logical system, … depending on partner type).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "RCVPRT",
+      "explanation": "RCVPRT targets receiver partner type to separate business-partner categories in monitoring.",
+      "suggested_explanation": "IDoc partner type (KU/LI/LS/…) qualifying RCVPRN decoding rules.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "RCVPRT",
+      "explanation": "RCVPRT narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "IDoc partner type (KU/LI/LS/…) qualifying RCVPRN decoding rules.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "REPID",
+      "explanation": "REPID constrains program name that touched/generated the record, supporting source-program root-cause analysis.",
+      "suggested_explanation": "IDoc mapping / processing program id (EDI_REPID) or reserved technical id—check DDIC element on the EI; distinguishes inbound FM path for an IDoc type.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "REPID",
+      "explanation": "For operations, not used on REPID indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "IDoc mapping / processing program id (EDI_REPID) or reserved technical id—check DDIC element on the EI; distinguishes inbound FM path for an IDoc type.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "RFCDEST",
+      "explanation": "Supports escalation where rfc destination on RFCDEST signals ownership for follow-up between Basis and functional teams.",
+      "suggested_explanation": "RFC destination name used for RFC ping/state or generic RFC-based selection (SM59 destination key).",
+      "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md"
+    },
+    {
+      "parameter": "RFCDEST",
+      "explanation": "For operations, rfc destination on RFCDEST indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "RFC destination name used for RFC ping/state or generic RFC-based selection (SM59 destination key).",
+      "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md"
+    },
+    {
+      "parameter": "SDLSTRTDT",
+      "explanation": "Connects to alert semantics: the alert flag from the delegated run is preserved only when the resulting population size lies inside JOBS_CNT.",
+      "suggested_explanation": "Planned start date of the background job (scheduler STRTDATE class field on TBTCO views).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "SDLSTRTDT",
+      "explanation": "Documents expected operator behavior—start date on SDLSTRTDT should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "Planned start date of the background job (scheduler STRTDATE class field on TBTCO views).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "SDLSTRTTM",
+      "explanation": "Connects to alert semantics: the alert flag from the delegated run is preserved only when the resulting population size lies inside JOBS_CNT.",
+      "suggested_explanation": "Planned start time paired with SDLSTRTDT for exact slot monitoring.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "SDLSTRTTM",
+      "explanation": "Allows phased rollout: first widen SDLSTRTTM for start time, then tighten once baseline noise is understood.",
+      "suggested_explanation": "Planned start time paired with SDLSTRTDT for exact slot monitoring.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "SDLUNAME",
+      "explanation": "Separates test noise from productive work when job scheduler on SDLUNAME correlates with scheduler or program attributes.",
+      "suggested_explanation": "User who scheduled the job (SDLUNAME) for SoD on scheduler actions.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "SDLUNAME",
+      "explanation": "Works downstream of the initial selection so job scheduler on SDLUNAME still participates in row-level deletion rules.",
+      "suggested_explanation": "User who scheduled the job (SDLUNAME) for SoD on scheduler actions.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "SERIALNR",
+      "explanation": "When tightened, serial number (SERIALNR) removes rows that would otherwise dilute attention from failing or stuck cases.",
+      "suggested_explanation": "Collector serial (COLLSERNR) disambiguating repeated AMS/performance samples on the same host interval.",
+      "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md"
+    },
+    {
+      "parameter": "SERIALNR",
+      "explanation": "Stabilizes week-over-week metrics by fixing serial number (SERIALNR) while allowing duration thresholds to move.",
+      "suggested_explanation": "Collector serial (COLLSERNR) disambiguating repeated AMS/performance samples on the same host interval.",
+      "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md"
+    },
+    {
+      "parameter": "SERVER",
+      "explanation": "Gives auditors traceable criteria because server name on SERVER is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Application instance / server key for CPU/memory telemetry (RZ10 instance naming, not necessarily RFCDEST).",
+      "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md"
+    },
+    {
+      "parameter": "SERVER",
+      "explanation": "Aligns exception volume with the chosen scope by testing server name via SERVER before alert evaluation.",
+      "suggested_explanation": "Application instance / server key for CPU/memory telemetry (RZ10 instance naming, not necessarily RFCDEST).",
+      "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md"
+    },
+    {
+      "parameter": "SNDART",
+      "explanation": "SNDART contributes addrtype to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage.",
+      "suggested_explanation": "SAPoffice / IDoc sender object type (document type discriminator on SOST / partner segments).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "SNDART",
+      "explanation": "Helps distinguish technical versus business attributes when addrtype on SNDART correlates with counters or status fields.",
+      "suggested_explanation": "SAPoffice / IDoc sender object type (document type discriminator on SOST / partner segments).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "SNDNO",
+      "explanation": "SNDNO contributes sender no. to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage.",
+      "suggested_explanation": "Sender object key / number (SAPoffice object id component) for SOST addressing.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "SNDNO",
+      "explanation": "Prevents accidental global scans when sender no. (SNDNO) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Sender object key / number (SAPoffice object id component) for SOST addressing.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "SNDPOR",
+      "explanation": "SNDPOR pins down sender port to isolate source endpoint behavior.",
+      "suggested_explanation": "Sender port (EDIDC-SNDPOR) on IDoc control for partner pipeline filtering.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "SNDPOR",
+      "explanation": "SNDPOR narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "Sender port (EDIDC-SNDPOR) on IDoc control for partner pipeline filtering.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "SNDPRN",
+      "explanation": "SNDPRN segments sender partner number for sender-specific monitoring.",
+      "suggested_explanation": "Sender partner number (EDIDC-SNDPRN) with semantics driven by SNDPRT.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "SNDPRN",
+      "explanation": "SNDPRN narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "Sender partner number (EDIDC-SNDPRN) with semantics driven by SNDPRT.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "SNDPRT",
+      "explanation": "SNDPRT applies selection on sender partner type to separate sender categories in analysis.",
+      "suggested_explanation": "Sender partner type (KU, LI, LS, …) qualifying SNDPRN.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "SNDPRT",
+      "explanation": "SNDPRT narrows sender/receiver partner-routing scope before final count aggregation.",
+      "suggested_explanation": "Sender partner type (KU, LI, LS, …) qualifying SNDPRN.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "SNDTP",
+      "explanation": "SNDTP contributes sender type to routing/object identity context so analysts can isolate exception patterns by transport path and object lineage.",
+      "suggested_explanation": "Sender partner function / transmission type qualifier where the monitor distinguishes technical vs. logical sender roles.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "SNDTP",
+      "explanation": "Improves readability of exported lists because sender type (SNDTP) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Sender partner function / transmission type qualifier where the monitor distinguishes technical vs. logical sender roles.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STARTDATE",
+      "explanation": "Supports escalation where start date on STARTDATE signals ownership for follow-up between Basis and application teams.",
+      "suggested_explanation": "Primary start date axis on the monitored object (document / queue / job—check structure) for windowing; not always identical to STRTDATE on TBTCO extracts.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "STARTDATE",
+      "explanation": "Prevents accidental global scans when start date (STARTDATE) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Primary start date axis on the monitored object (document / queue / job—check structure) for windowing; not always identical to STRTDATE on TBTCO extracts.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "STARTDATE",
+      "explanation": "Supports escalation where start date on STARTDATE signals ownership for follow-up between Basis and functional teams.",
+      "suggested_explanation": "Primary start date axis on the monitored object (document / queue / job—check structure) for windowing; not always identical to STRTDATE on TBTCO extracts.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "STARTTIME",
+      "explanation": "For operations, start time on STARTTIME indicates whether a line belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "Primary start time paired with STARTDATE for timestamp-level selection.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "STARTTIME",
+      "explanation": "When tightened, start time (STARTTIME) removes sessions that would otherwise dilute attention from failing or stuck drivers.",
+      "suggested_explanation": "Primary start time paired with STARTDATE for timestamp-level selection.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "STARTTIME",
+      "explanation": "For operations, start time on STARTTIME indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "Primary start time paired with STARTDATE for timestamp-level selection.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "STATE_COLOR is the severity/state selector used for quick triage via color-coded processing outcomes.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "STATE_COLOR selects severity/state groups and can drive derived status selection.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters the delegated job list by color bucket before counting so only severity-aligned rows contribute to the final population size.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters jobs after status enrichment so only rows whose color bucket matches the configured severity set remain.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters update-request rows by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Maps each surviving update line into the monitor’s red / yellow / green style buckets so you can require only the severity band that should influence the count going into the threshold test.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters batch input lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "STATE_COLOR is filled by the routine after interpreting cross-client maintenance indicators, giving alert consumers an at-a-glance severity token that downstream icon logic can reuse.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "STATE_COLOR is the visual severity/state classifier used after status mapping so analysts can triage exception rows quickly by color-coded risk level.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "STATE_COLOR",
+      "explanation": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework.",
+      "suggested_explanation": "Derived traffic-light bucket (/SKN color domain) used for alert triage after status evaluation.",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "STATE_ICON is the visual state marker derived from state color for dashboard-style scanning.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "Ensures reporting on programs and schedulers respects state icon constraints carried by STATE_ICON.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "Improves readability of exported lists because state icon (STATE_ICON) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "Uses state icon from the batch input context so only records with STATE_ICON inside declared values proceed.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "STATE_ICON stores the icon token returned by the shared state-icon routine so alert layouts can show the same glyph users already recognize from other monitors.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "When left open per framework rules, STATE_ICON does not restrict state icon; when set, only matching rows remain.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "Stabilizes week-over-week metrics by fixing state icon (STATE_ICON) while allowing duration thresholds to move.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "STATE_ICON provides state icon used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "Gives auditors traceable criteria because state icon on STATE_ICON is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "STATE_ICON",
+      "explanation": "For distributed landscapes, state icon on STATE_ICON often anchors which application server or destination appears in results.",
+      "suggested_explanation": "Icon column paired with STATE_COLOR for UI/ALM rendering of severity.",
+      "file": "SW_01_20_USR_PWD - User Password State Monitoring.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "STATUS is the IDoc status filter that controls which lifecycle states are included in the result set.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "STATUS explicitly selects IDoc lifecycle states to include before count aggregation.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "Restricts the delegated population to the configured batch job lifecycle codes before counting and threshold evaluation.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "Restricts rows to the batch job lifecycle codes present in the technical job status field before color and duration filters run.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "STATUS is the lifecycle state filter for SOST requests and is used to separate waiting, in-process, successful, and failed communication outcomes.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "Restricts the extract to the operational status values you configure for this EI's object type.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STATUS",
+      "explanation": "Restricts the extract to the operational status values you configure for this EI's object type.",
+      "suggested_explanation": "Domain-specific status code filter (IDoc status, queue state, job status—interpret with the EI’s DDIC structure).",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "STATUS_DESC is the resolved short description for STATUS and supports business-readable interpretation.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "Allows phased rollout: first widen STATUS_DESC for sw message, then tighten once baseline noise is understood.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "Documents expected operator behavior—sw message on STATUS_DESC should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "Improves readability of exported lists because sw message (STATUS_DESC) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "STATUS_DESC carries the full sentence that explains the openness posture in business language, which is what email or ticketing integrations should surface to non-Basis readers.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "Aligns exception volume with the chosen scope by testing short text via STATUS_DESC before alert evaluation.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "STATUS_DESC",
+      "explanation": "STATUS_DESC provides sw message used in status/message interpretation, helping convert raw send-request records into actionable diagnostic context.",
+      "suggested_explanation": "Textual status / message description field for human-readable filtering of result lines.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STAT_ERROR",
+      "explanation": "STAT_ERROR is the explicit selector switch for ERROR state inclusion, typically used for remediation-oriented exception slices.",
+      "suggested_explanation": "IDoc error-state bucket flag (status group) for isolating failed IDocs in status monitors.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STAT_ERROR",
+      "explanation": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions.",
+      "suggested_explanation": "IDoc error-state bucket flag (status group) for isolating failed IDocs in status monitors.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STAT_OK",
+      "explanation": "STAT_OK is the explicit selector switch for OK state inclusion when successful deliveries must remain visible in control evidence.",
+      "suggested_explanation": "Successful final-state bucket for IDoc status monitors.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STAT_OK",
+      "explanation": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions.",
+      "suggested_explanation": "Successful final-state bucket for IDoc status monitors.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STAT_TRANSIT",
+      "explanation": "STAT_TRANSIT is the explicit selector switch for TRANSIT state inclusion to monitor in-flight processing latency.",
+      "suggested_explanation": "In-transit / intermediate-state bucket for IDocs still being processed.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STAT_TRANSIT",
+      "explanation": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions.",
+      "suggested_explanation": "In-transit / intermediate-state bucket for IDocs still being processed.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "STAT_WAIT",
+      "explanation": "STAT_WAIT is the explicit selector switch for WAIT state inclusion, allowing queue-state-focused monitoring runs.",
+      "suggested_explanation": "Hold / wait-state bucket for IDocs blocked in downstream systems.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "STAT_WAIT",
+      "explanation": "Optional send-state selector: when set, the monitor applies this outcome flag together with the other active status dimensions.",
+      "suggested_explanation": "Hold / wait-state bucket for IDocs blocked in downstream systems.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "SUBTYPE",
+      "explanation": "Documents expected operator behavior—saposcol subtype on SUBTYPE should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "IDoc extension / segment subtype (CIMTYPE family) for filtering extension scenarios.",
+      "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md"
+    },
+    {
+      "parameter": "SUBTYPE",
+      "explanation": "Ensures reporting respects saposcol subtype constraints carried by SUBTYPE.",
+      "suggested_explanation": "IDoc extension / segment subtype (CIMTYPE family) for filtering extension scenarios.",
+      "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "SW_DEST selects cloud destination/rfc destination context used for remote execution path.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "SW_DEST controls optional cloud-destination execution path for this monitoring logic.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "Interprets cloud destination as part of the SM13 selection contract: empty ranges follow framework defaults; non-empty ranges apply strict matching on SW_DEST.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "Routes the underlying update read through the declared cloud or RFC-capable destination when your template evaluates a central hub instead of the local instance only.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "Reflects real batch-input administration where cloud destination on SW_DEST is routinely restricted to a single productive client or session family.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "When tightened, cloud destination (SW_DEST) removes rows that would otherwise dilute attention from failing or stuck cases.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_02_XI_MESS - XI Message Monitoring.md"
+    },
+    {
+      "parameter": "SW_DEST",
+      "explanation": "Connects to alert semantics: rows removed for failing cloud destination on SW_DEST never reach downstream filtering.",
+      "suggested_explanation": "Cloud ALM / Side-by-Side extension destination key used to forward execution to the managed landscape.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "SYHOST",
+      "explanation": "SYHOST segments dump events by application host to detect node-specific instability.",
+      "suggested_explanation": "Host where the dump occurred (SY-HOST / SNAP host) for node-specific dump counts.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "SYHOST",
+      "explanation": "SYHOST scopes base dump selection by host to identify node-specific instability contributions to total count.",
+      "suggested_explanation": "Host where the dump occurred (SY-HOST / SNAP host) for node-specific dump counts.",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "SYHOST",
+      "explanation": "SYHOST scopes base dump selection by host to identify node-specific instability contributions to total count.",
+      "suggested_explanation": "Host where the dump occurred (SY-HOST / SNAP host) for node-specific dump counts.",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "SYUSER",
+      "explanation": "SYUSER narrows events by user context to support ownership-based investigation.",
+      "suggested_explanation": "User context on the dump row (SY-UNAME class) for ownership-based dump trending.",
+      "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md"
+    },
+    {
+      "parameter": "SYUSER",
+      "explanation": "SYUSER scopes base dump selection by user context for ownership-based surge analysis.",
+      "suggested_explanation": "User context on the dump row (SY-UNAME class) for ownership-based dump trending.",
+      "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md"
+    },
+    {
+      "parameter": "SYUSER",
+      "explanation": "SYUSER scopes base dump selection by user context for ownership-based surge analysis.",
+      "suggested_explanation": "User context on the dump row (SY-UNAME class) for ownership-based dump trending.",
+      "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md"
+    },
+    {
+      "parameter": "TCODE",
+      "explanation": "Improves readability of exported lists because transaction code (TCODE) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Transaction code filter (SY-TCODE / enqueue GTCODE) narrowing extracts to a functional area.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "TCODE",
+      "explanation": "For operations, communication strategy on TCODE indicates whether a row belongs in the current monitoring pass versus historical noise.",
+      "suggested_explanation": "Transaction code filter (SY-TCODE / enqueue GTCODE) narrowing extracts to a functional area.",
+      "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md"
+    },
+    {
+      "parameter": "TCODE",
+      "explanation": "Interprets transaction code as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on TCODE.",
+      "suggested_explanation": "Transaction code filter (SY-TCODE / enqueue GTCODE) narrowing extracts to a functional area.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "TCODE",
+      "explanation": "Supports operational control by evaluating transaction code through TCODE for each candidate record.",
+      "suggested_explanation": "Transaction code filter (SY-TCODE / enqueue GTCODE) narrowing extracts to a functional area.",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "TYPE",
+      "explanation": "Prevents accidental global scans when saposcoltype (TYPE) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Technical category flag on the monitored object (message type, object type—resolve via structure column help on that EI).",
+      "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md"
+    },
+    {
+      "parameter": "TYPE",
+      "explanation": "Improves readability of exported lists because saposcoltype (TYPE) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Technical category flag on the monitored object (message type, object type—resolve via structure column help on that EI).",
+      "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md"
+    },
+    {
+      "parameter": "UDATE",
+      "explanation": "Allows phased rollout: first widen UDATE for date, then tighten thresholds once baseline noise is understood.",
+      "suggested_explanation": "Last-change date on update-task / VBHDR-derived rows (SM13 family) for recency filtering.",
+      "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md"
+    },
+    {
+      "parameter": "UDATE",
+      "explanation": "Supports operational control by evaluating udate through UDATE for each candidate record.",
+      "suggested_explanation": "Last-change date on update-task / VBHDR-derived rows (SM13 family) for recency filtering.",
+      "file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md"
+    },
+    {
+      "parameter": "UNAME",
+      "explanation": "UNAME pins down user context for ownership and change-trace analysis.",
+      "suggested_explanation": "SAP user name (12-char) on the business record—generic user dimension for logs, IDocs, or jobs.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "UNAME",
+      "explanation": "UNAME narrows counting scope to user-context ownership segments.",
+      "suggested_explanation": "SAP user name (12-char) on the business record—generic user dimension for logs, IDocs, or jobs.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "UPDDAT",
+      "explanation": "UPDDAT narrows review to last change date and is used for recency-focused exception monitoring.",
+      "suggested_explanation": "Last-changed date on IDoc control (EDIDC-UPDDAT) or analogous change-date axis for integration monitors.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "UPDDAT",
+      "explanation": "UPDDAT constrains selection by last-change date in the base result set.",
+      "suggested_explanation": "Last-changed date on IDoc control (EDIDC-UPDDAT) or analogous change-date axis for integration monitors.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "UPDTIM",
+      "explanation": "UPDTIM refines last change time boundaries in the selected update-date window.",
+      "suggested_explanation": "Last-changed time paired with UPDDAT for sub-day IDoc / change-pointer windows.",
+      "file": "SW_01 _02_IDOCS - IDOCs State.md"
+    },
+    {
+      "parameter": "UPDTIM",
+      "explanation": "UPDTIM refines the last-change time window used before counting.",
+      "suggested_explanation": "Last-changed time paired with UPDDAT for sub-day IDoc / change-pointer windows.",
+      "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md"
+    },
+    {
+      "parameter": "USERID",
+      "explanation": "When left open per framework rules, USERID does not restrict user id; when set, only matching sessions remain.",
+      "suggested_explanation": "Session or batch-input user id filter (BDC log / security audit) distinct from USERNAM display fields on SAPoffice headers.",
+      "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md"
+    },
+    {
+      "parameter": "USERID",
+      "explanation": "Gives auditors traceable criteria because user on USERID is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Session or batch-input user id filter (BDC log / security audit) distinct from USERNAM display fields on SAPoffice headers.",
+      "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md"
+    },
+    {
+      "parameter": "USERNAM",
+      "explanation": "USERNAM carries sender name for actor/recipient traceability, enabling ownership-level investigation and communication accountability in exception analysis.",
+      "suggested_explanation": "Physical sender user name on SAPoffice / SOST objects (actor display) paired with partner numbers.",
+      "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md"
+    },
+    {
+      "parameter": "USERNAM",
+      "explanation": "After data is read, lines are removed unless sender on USERNAM still satisfies the active multivalued selection.",
+      "suggested_explanation": "Physical sender user name on SAPoffice / SOST objects (actor display) paired with partner numbers.",
+      "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "UTIME",
+      "explanation": "Guards against oversized extracts when time on UTIME is narrowed together with client, user, or session filters.",
+      "suggested_explanation": "Last-change time of day paired with UDATE on update-request / snapshot structures.",
+      "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md"
+    },
+    {
+      "parameter": "UTIME",
+      "explanation": "Helps distinguish technical versus business attributes when utime on UTIME correlates with counters or status fields.",
+      "suggested_explanation": "Last-change time of day paired with UDATE on update-request / snapshot structures.",
+      "file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md"
+    },
+    {
+      "parameter": "VBCLIINFO",
+      "explanation": "After reading VBHDR-derived lines, the monitor keeps only records whose bytes on VBCLIINFO still matches active filter criteria.",
+      "suggested_explanation": "Client-specific update info flag on VBHDR-derived SM13 data—controls client-dependent update behavior in the extract.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBCLIINFO",
+      "explanation": "Holds optional raw client logon metadata bytes; when restricted, it keeps the population aligned with diagnostics that already identified a specific client fingerprint.",
+      "suggested_explanation": "Client-specific update info flag on VBHDR-derived SM13 data—controls client-dependent update behavior in the extract.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBCLINAME",
+      "explanation": "For distributed systems, update server name on VBCLINAME often anchors which application server or context appears in the exception list.",
+      "suggested_explanation": "Logical update server / client name dimension on VBAPPL_LOG / VBHDR join for SM13 workload grouping.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBCLINAME",
+      "explanation": "Filters on the update-server name resolved from the client logon metadata pair, which is useful when you split traffic across named update gateways and need the count scoped to one gateway’s view.",
+      "suggested_explanation": "Logical update server / client name dimension on VBAPPL_LOG / VBHDR join for SM13 workload grouping.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBCONTEXT",
+      "explanation": "Gives auditors traceable criteria because update context on VBCONTEXT is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Update context (VBMOD/VBHDR context key) classifying V1/V2 update kinds in the captured VBHDR set.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBCONTEXT",
+      "explanation": "Isolates update work tagged with a particular VBCONTEXT value so batch versus dialog versus inbound-idoc contexts do not inflate each other’s counts.",
+      "suggested_explanation": "Update context (VBMOD/VBHDR context key) classifying V1/V2 update kinds in the captured VBHDR set.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBLANG",
+      "explanation": "Separates cross-client noise from in-scope work by evaluating logon language through VBLANG for the monitored client list.",
+      "suggested_explanation": "Logon language recorded on the update header for multilingual update processing.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBLANG",
+      "explanation": "Restricts the population to update records created under a specific logon language, which matters when language-specific posting paths generate different queue volumes.",
+      "suggested_explanation": "Logon language recorded on the update header for multilingual update processing.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBMANDT",
+      "explanation": "For controllers, client on VBMANDT signals whether a line belongs in the current monitoring wave versus background noise.",
+      "suggested_explanation": "Client key on the update (VBHDR) row—mandatory tenant slice for SM13 monitors.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBMANDT",
+      "explanation": "Pins the population to one or more productive or regression clients before the tally runs, preventing cross-client noise from masking a spike in a single client.",
+      "suggested_explanation": "Client key on the update (VBHDR) row—mandatory tenant slice for SM13 monitors.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBNAME",
+      "explanation": "Connects to alert semantics: lines removed for failing update server name on VBNAME never reach duration or state-color filtering.",
+      "suggested_explanation": "Update module / object name dimension identifying which update function created the VB entry.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBNAME",
+      "explanation": "Targets the update-server name stored on the update header itself (distinct from the client-resolved name), which is the field operators usually recognize in SM13-style listings tied to the VBHDR scheduler.",
+      "suggested_explanation": "Update module / object name dimension identifying which update function created the VB entry.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBRC",
+      "explanation": "Stabilizes week-over-week metrics by fixing update return code (VBRC) while allowing duration thresholds to move.",
+      "suggested_explanation": "Update return code from the VB execution (success vs. error) for filtering failed update records.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBRC",
+      "explanation": "Limits counting to lines whose SAP update return code still matches your declared band, so benign informational codes do not dilute alerts aimed at hard failures.",
+      "suggested_explanation": "Update return code from the VB execution (success vs. error) for filtering failed update records.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBREPORT",
+      "explanation": "After reading VBHDR-derived lines, the monitor keeps only records whose generating program on VBREPORT still matches active filter criteria.",
+      "suggested_explanation": "Generating ABAP report / include name on the update record for defect clustering.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBREPORT",
+      "explanation": "Narrows the population to updates spawned by specific generating programs, which is how functional teams watch a single custom include or report driver.",
+      "suggested_explanation": "Generating ABAP report / include name on the update record for defect clustering.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBSTATE",
+      "explanation": "Separates cross-client noise from in-scope work by evaluating status through VBSTATE for the monitored client list.",
+      "suggested_explanation": "VB execution state (active, finished, error) on SM13-style update logs.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBSTATE",
+      "explanation": "Keeps only update lines whose numeric processing state matches the configured selection, letting you alert on paused versus active versus finished buckets independently.",
+      "suggested_explanation": "VB execution state (active, finished, error) on SM13-style update logs.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBTCODE",
+      "explanation": "Separates cross-client noise from in-scope work by evaluating tcode through VBTCODE for the monitored client list.",
+      "suggested_explanation": "Transaction that enqueued the update (VBHDR-TCODE) for functional-area scoping.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBTCODE",
+      "explanation": "Scopes the tally to updates that originated from named transactions, which is ideal when month-end closing transactions are the only ones you want reflected in the count.",
+      "suggested_explanation": "Transaction that enqueued the update (VBHDR-TCODE) for functional-area scoping.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBUSR",
+      "explanation": "Documents expected operator behavior—user on VBUSR should be set when that dimension is part of the control objective.",
+      "suggested_explanation": "SAP user who created or owns the update entry—SoD-relevant dimension on SM13 extracts.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBUSR",
+      "explanation": "Restricts the population to updates owned by particular batch or dialog users before the framework compares the resulting quantity to UPD_REQ_CNT.",
+      "suggested_explanation": "SAP user who created or owns the update entry—SoD-relevant dimension on SM13 extracts.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "VBZONLO",
+      "explanation": "Guards against oversized extracts when local time zone on VBZONLO is narrowed together with server, user, or status filters.",
+      "suggested_explanation": "Local time zone of the update server used when reconciling timestamps vs. UTC.",
+      "file": "SW_01_01_SM13 - Update Requests Monitoring.md"
+    },
+    {
+      "parameter": "VBZONLO",
+      "explanation": "Aligns interpretation of local timestamps with the update owner’s recorded time-zone token so duration and BACKDAYS comparisons stay consistent for globally distributed user populations.",
+      "suggested_explanation": "Local time zone of the update server used when reconciling timestamps vs. UTC.",
+      "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md"
+    },
+    {
+      "parameter": "WP_ACTION",
+      "explanation": "Uses action from the work process context so only records with WP_ACTION inside declared values proceed to elapsed-time checks.",
+      "suggested_explanation": "Dispatcher-reported work process action state (run, hold, stop) on SM50 extracts.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_ACTION",
+      "explanation": "Reduces false positives during peak windows by tightening action through WP_ACTION alongside state filters.",
+      "suggested_explanation": "Dispatcher-reported work process action state (run, hold, stop) on SM50 extracts.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_BNAME",
+      "explanation": "Explains why two monitoring passes differ: only the pass with stricter user names on WP_BNAME surfaces the disputed lines.",
+      "suggested_explanation": "OS-level batch user executing the work process (RZ11 kernel WP context).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_BNAME",
+      "explanation": "When populated, keeps the extract focused so user names (WP_BNAME) aligns with the intended triage slice.",
+      "suggested_explanation": "OS-level batch user executing the work process (RZ11 kernel WP context).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_CPU",
+      "explanation": "When left open per framework rules, WP_CPU does not restrict cpu; when set, only matching rows remain.",
+      "suggested_explanation": "CPU milliseconds consumed by the work process step for hot-spot detection.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_CPU",
+      "explanation": "Connects to alert semantics: rows removed for failing cpu on WP_CPU never reach downstream filtering.",
+      "suggested_explanation": "CPU milliseconds consumed by the work process step for hot-spot detection.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_DUMPS",
+      "explanation": "Helps distinguish dialog versus background work when dumps on WP_DUMPS correlates with process-type attributes.",
+      "suggested_explanation": "Count of ABAP short dumps raised inside the work process during the observation window.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_DUMPS",
+      "explanation": "Pairs with duration logic: once WP_DUMPS passes list selection, elapsed time from the reference timestamp still must fit configured duration windows.",
+      "suggested_explanation": "Count of ABAP short dumps raised inside the work process during the observation window.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_ELTIME",
+      "explanation": "Separates cross-server noise from in-scope work when runtime on WP_ELTIME correlates with host or client attributes.",
+      "suggested_explanation": "Elapsed (wall) time of the current WP step for long-step detection.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_ELTIME",
+      "explanation": "Explains why two monitoring passes differ: only the pass with stricter runtime on WP_ELTIME surfaces the disputed rows.",
+      "suggested_explanation": "Elapsed (wall) time of the current WP step for long-step detection.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_IACTION",
+      "explanation": "Helps distinguish dialog versus background work when action on WP_IACTION correlates with process-type attributes.",
+      "suggested_explanation": "Internal dispatcher action code for the WP state machine (kernel-internal, rarely user-set).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_IACTION",
+      "explanation": "Pairs with duration logic: once WP_IACTION passes list selection, elapsed time from the reference timestamp still must fit configured duration windows.",
+      "suggested_explanation": "Internal dispatcher action code for the WP state machine (kernel-internal, rarely user-set).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_INDEX",
+      "explanation": "After the activity snapshot is read, rows are dropped unless wp index on WP_INDEX still satisfies the active multivalued selection.",
+      "suggested_explanation": "Sequential WP list index in the collector snapshot (technical row key, not business data).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_INDEX",
+      "explanation": "Ensures reporting respects wp index constraints carried by WP_INDEX.",
+      "suggested_explanation": "Sequential WP list index in the collector snapshot (technical row key, not business data).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_IRESTRT",
+      "explanation": "Interprets restart as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_IRESTRT.",
+      "suggested_explanation": "Restart / recovery indicator on the WP row after enqueue or resource events.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_IRESTRT",
+      "explanation": "For distributed landscapes, restart on WP_IRESTRT often anchors which application server or destination appears in results.",
+      "suggested_explanation": "Restart / recovery indicator on the WP row after enqueue or resource events.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_ISTATUS",
+      "explanation": "Improves readability of exported lists because status (WP_ISTATUS) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Internal numeric WP status from kernel (dialog, update, batch, spool, … coded values).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_ISTATUS",
+      "explanation": "Interprets status as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_ISTATUS.",
+      "suggested_explanation": "Internal numeric WP status from kernel (dialog, update, batch, spool, … coded values).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_ITYPE",
+      "explanation": "Keeps the extract aligned with process category when WP_ITYPE is restricted for this work-process overview pass.",
+      "suggested_explanation": "Work process type code (D/B/V/… kernel typology) for SM50 workload classification.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_ITYPE",
+      "explanation": "Separates cross-client noise from in-scope work when process category on WP_ITYPE correlates with client or user attributes.",
+      "suggested_explanation": "Work process type code (D/B/V/… kernel typology) for SM50 workload classification.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_IWAIT",
+      "explanation": "Improves readability of exported lists because reason for wait (WP_IWAIT) columns stay aligned with the configured filter intent.",
+      "suggested_explanation": "Wait-state bitmask / code showing semaphore, enqueue, RFC, DB, or idle wait reasons.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_IWAIT",
+      "explanation": "Interprets reason for wait as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_IWAIT.",
+      "suggested_explanation": "Wait-state bitmask / code showing semaphore, enqueue, RFC, DB, or idle wait reasons.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_MANDT",
+      "explanation": "Helps distinguish dialog versus background work when client on WP_MANDT correlates with process-type attributes.",
+      "suggested_explanation": "Client on the collected WP row when WP data is joined with user sessions.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_MANDT",
+      "explanation": "Pairs with duration logic: once WP_MANDT passes list selection, elapsed time from the reference timestamp still must fit configured duration windows.",
+      "suggested_explanation": "Client on the collected WP row when WP data is joined with user sessions.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_NO",
+      "explanation": "Gives auditors traceable criteria because work process number on WP_NO is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Dispatcher work process number on the application instance (SM50 index) unique at snapshot time.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_NO",
+      "explanation": "When combined with destination discipline, work process number on WP_NO keeps both breadth and depth of the extract intentional.",
+      "suggested_explanation": "Dispatcher work process number on the application instance (SM50 index) unique at snapshot time.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_PID",
+      "explanation": "Captures edge cases where work process pid (WP_PID) must be non-default to reproduce a customer-specific monitoring scenario.",
+      "suggested_explanation": "OS process id of the work process for correlation with OS-level traces.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_PID",
+      "explanation": "Narrows retrieved rows where work process pid (WP_PID) must match the configured selection for this monitor.",
+      "suggested_explanation": "OS process id of the work process for correlation with OS-level traces.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_REPORT",
+      "explanation": "Guards against oversized extracts when report on WP_REPORT is narrowed together with client, user, or server filters.",
+      "suggested_explanation": "Currently executing ABAP program / report name in the WP (SY-REPORT class).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_REPORT",
+      "explanation": "When harmonized with related filters, report on WP_REPORT isolates the highest-risk record families.",
+      "suggested_explanation": "Currently executing ABAP program / report name in the WP (SY-REPORT class).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_RESTART",
+      "explanation": "Interprets restart as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_RESTART.",
+      "suggested_explanation": "Number of automatic WP restarts—signals instability if high.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_RESTART",
+      "explanation": "For distributed landscapes, restart on WP_RESTART often anchors which application server or destination appears in results.",
+      "suggested_explanation": "Number of automatic WP restarts—signals instability if high.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_SEM",
+      "explanation": "Allows phased rollout: first widen WP_SEM for semaphore no., then tighten duration thresholds once baseline noise is understood.",
+      "suggested_explanation": "Semaphore / enqueue object name currently blocking the WP (when in lock wait).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_SEM",
+      "explanation": "Supports operational control by evaluating semaphore no. through WP_SEM for each candidate record.",
+      "suggested_explanation": "Semaphore / enqueue object name currently blocking the WP (when in lock wait).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_SEMSTAT",
+      "explanation": "Aligns exception volume with the chosen scope by testing process category via WP_SEMSTAT before alert evaluation.",
+      "suggested_explanation": "Detailed semaphore state text/code from the enqueue client.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_SEMSTAT",
+      "explanation": "Gives auditors traceable criteria because process category on WP_SEMSTAT is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Detailed semaphore state text/code from the enqueue client.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_SERVER",
+      "explanation": "Works downstream of the initial snapshot read so server name on WP_SERVER still participates in row-level deletion rules.",
+      "suggested_explanation": "Application server name owning the WP (SM51 instance key).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_SERVER",
+      "explanation": "After data is read, lines are removed unless server name on WP_SERVER still satisfies the active multivalued selection.",
+      "suggested_explanation": "Application server name owning the WP (SM51 instance key).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_SERVER",
+      "explanation": "Pairs with duration logic: once WP_SERVER passes list selection, elapsed time from the reference timestamp still must fit configured duration windows.",
+      "suggested_explanation": "Application server name owning the WP (SM51 instance key).",
+      "file": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.md"
+    },
+    {
+      "parameter": "WP_STATUS",
+      "explanation": "Guards against oversized extracts when status on WP_STATUS is narrowed together with client, user, or server filters.",
+      "suggested_explanation": "High-level WP status text (running, waiting, stopped) for operator dashboards.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_STATUS",
+      "explanation": "When harmonized with related filters, status on WP_STATUS isolates the highest-risk record families.",
+      "suggested_explanation": "High-level WP status text (running, waiting, stopped) for operator dashboards.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_TABLE",
+      "explanation": "Combines with process-type and status filters so table on WP_TABLE refines which application-server work processes remain visible.",
+      "suggested_explanation": "Primary database table currently opened by the WP (VBHDR, etc.) for table-hotspot analysis.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_TABLE",
+      "explanation": "Supports escalation where table on WP_TABLE signals ownership for follow-up between Basis and functional teams.",
+      "suggested_explanation": "Primary database table currently opened by the WP (VBHDR, etc.) for table-hotspot analysis.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_TYP",
+      "explanation": "Captures edge cases where process type (WP_TYP) must be non-default to reproduce a customer-specific monitoring scenario.",
+      "suggested_explanation": "Legacy / alternate WP type field mirroring WP_ITYPE in some collectors—same kernel semantics.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_TYP",
+      "explanation": "Narrows retrieved rows where process type (WP_TYP) must match the configured selection for this monitor.",
+      "suggested_explanation": "Legacy / alternate WP type field mirroring WP_ITYPE in some collectors—same kernel semantics.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_WAITINF",
+      "explanation": "Treats wait info as a discriminator between similar work-process rows that would otherwise look identical in a raw extract.",
+      "suggested_explanation": "Structured wait-info string from dispatcher (DB, enqueue, RFC target) for root-cause triage.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_WAITINF",
+      "explanation": "Prevents accidental global scans when wait info (WP_WAITINF) is meant to stay within a controlled application slice.",
+      "suggested_explanation": "Structured wait-info string from dispatcher (DB, enqueue, RFC target) for root-cause triage.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_WAITING",
+      "explanation": "Explains why two monitoring passes differ: only the pass with stricter waiting for on WP_WAITING surfaces the disputed lines.",
+      "suggested_explanation": "Flag that the WP is in a non-running wait state (complements WP_IWAIT detail).",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_WAITING",
+      "explanation": "When populated, keeps the extract focused so waiting for (WP_WAITING) aligns with the intended triage slice.",
+      "suggested_explanation": "Flag that the WP is in a non-running wait state (complements WP_IWAIT detail).",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    },
+    {
+      "parameter": "WP_WAITTIM",
+      "explanation": "Gives auditors traceable criteria because waiting since on WP_WAITTIM is applied consistently before any alert flag is raised.",
+      "suggested_explanation": "Cumulative wait milliseconds attributed to the WP step—key for enqueue/RFC delay SLAs.",
+      "file": "SW_01_01_SM50 - Work Process Monitoring.md"
+    },
+    {
+      "parameter": "WP_WAITTIM",
+      "explanation": "When combined with destination discipline, waiting since on WP_WAITTIM keeps both breadth and depth of the extract intentional.",
+      "suggested_explanation": "Cumulative wait milliseconds attributed to the WP step—key for enqueue/RFC delay SLAs.",
+      "file": "SW_01_20_SM66 - Global Work Process Overview.md"
+    }
+  ]
+}

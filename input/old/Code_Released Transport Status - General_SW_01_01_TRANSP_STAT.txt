@@ -1,0 +1,184 @@
+FUNCTION /SKN/F_SW_01_01_TRANSP_STAT.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_TRANSP_STAT OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE:
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT,
+               BACKDAYS       INT4.
+*             NO_DATE_RESTRICTION CHAR1,
+*             DATE_REF_FLD        NAME_FELD.
+  DATA_MULTY: DURATION     /SKN/E_SW_DURATION,
+              DOMNAM       TMSDOMNAM,
+              SYSNAM       TMSSYSNAM,
+              TRKORR       TRKORR,
+              MAXRC        TRRETCODE,
+              INT_MAXRC    INT1,
+              TARCLI       TRTARCLI,
+              TRFUNC       TRFUNCTION,
+              OWNER        TMSOWNER,
+              COMSYS       TMSSYSNAM,
+              SRCCLI       TRCLIENT,
+              TRSTATUS     TRSTATUS,
+              STATE_COLOR   /SKN/E_SW_STATE_COLOR,
+              STATUS        BTCSTATUS,
+              DATUM         SY-DATUM .
+   LV_DURATION_UNIT = 'H'.
+   LV_BACKDAYS = 1.
+   SELECT_SINGLE: BACKDAYS,
+                  DURATION_UNIT.
+*                  NO_DATE_RESTRICTION,
+*                  DATE_REF_FLD.
+   SELECT_MULTY:
+              DURATION,
+              DOMNAM ,
+              SYSNAM,
+              TRKORR,
+              MAXRC,
+              INT_MAXRC,
+              TARCLI,
+              TRFUNC,
+              OWNER,
+              COMSYS,
+              SRCCLI,
+              TRSTATUS,
+              STATE_COLOR,
+              STATUS,
+              DATUM.
+"--- Run Clood Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_TRANSP_STAT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Clood Mode -----
+  DATA :   IS_GENERAL(1) TYPE C.
+  DATA : DATE_FROM LIKE SY-DATUM ,
+         BACKDAYS  TYPE I .
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA :  ENDDATE LIKE SY-DATUM,
+          ENDTIME LIKE SY-UZEIT.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : MAX_RC TYPE TRRETCODE,
+         MAX_RC_N(4) TYPE N.
+  DATA :   SY_DATLO LIKE SY-DATLO ,
+           SY_TIMLO LIKE SY-TIMLO .
+*?????????
+*    "TIME_DELAY_TO_CHECK time_delay_for_check .
+* SET_SY_TIME MANAGE_IN_UTC sy_datlo sy_timlo .
+* TIME_SHIFT sy_datlo sy_timlo . " TIME_SHIFT parameter
+    SY_DATLO = SY-DATUM .        " Appl Server's Date
+    SY_TIMLO = SY-UZEIT.
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+      DATE_FROM = SY-DATUM - LV_BACKDAYS .
+      RS_DATUM-LOW = DATE_FROM .
+      APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+    LOOP AT R_INT_MAXRC INTO RS_INT_MAXRC.
+      CLEAR RS_MAXRC.
+      RS_MAXRC-SIGN = RS_INT_MAXRC-SIGN .
+      RS_MAXRC-OPTION = RS_INT_MAXRC-OPTION .
+      MAX_RC_N = RS_INT_MAXRC-LOW.
+      RS_MAXRC-LOW = MAX_RC_N.
+      MAX_RC_N = RS_INT_MAXRC-HIGH.
+      RS_MAXRC-HIGH = MAX_RC_N.
+      APPEND RS_MAXRC TO R_MAXRC.
+    ENDLOOP.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  SELECT *
+     FROM TMSBUFFER AS T
+        INNER JOIN E070 AS E ON ( T~TRKORR = E~TRKORR )
+     INTO CORRESPONDING FIELDS OF TABLE T_DATA
+     WHERE  T~DOMNAM IN R_DOMNAM
+       AND  T~SYSNAM IN R_SYSNAM
+       AND  T~TRKORR IN R_TRKORR
+       AND  T~MAXRC  IN R_MAXRC
+       AND  T~TARCLI IN R_TARCLI
+       AND  T~TRFUNC IN R_TRFUNC
+       AND  T~OWNER  IN R_OWNER
+       AND  T~COMSYS IN R_COMSYS
+       AND  T~SRCCLI IN R_SRCCLI
+       AND  E~AS4DATE IN R_DATUM
+       AND  E~TRSTATUS IN R_TRSTATUS
+           .
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+    MAX_RC = T_DATA-MAXRC.
+**
+*    CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+*      EXPORTING
+*        state_color = t_data-state_color
+*      IMPORTING
+*        state_icon  = t_data-state_icon.
+      CASE T_DATA-MAXRC. " MAX_RC.
+       WHEN   '0008' .
+        T_DATA-STATE_COLOR = 'R'.
+        T_DATA-STATE_ICON = STATE_ICON_RED .
+       WHEN  '0012'.
+         T_DATA-STATE_COLOR = 'R'.
+         T_DATA-STATE_ICON = '@AG@'. "ICON_ALERT
+       WHEN   '0000'.
+        T_DATA-STATE_COLOR ='G'.
+        T_DATA-STATE_ICON = STATE_ICON_GREEN.
+       WHEN   '0004'.
+        T_DATA-STATE_COLOR ='Y'.
+        T_DATA-STATE_ICON = STATE_ICON_YELLOW.
+       WHEN ''.
+        T_DATA-STATE_ICON = '@BZ@'.  "ICON_LED_INACTIVE "'@HM@'. "ICON_PS_MILESTONE
+     ENDCASE.
+*
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*
+*
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.
+      DELETE T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-AS4DATE
+          T_FROM            = T_DATA-AS4TIME
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

@@ -1,0 +1,1091 @@
+{
+  "source_file": "SW_01_01_NUM_RNG - Number Range Control Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Number Range Control Monitoring (SW_01_01_NUM_RNG)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP Number Range objects to ensure business continuity and prevent number range exhaustion scenarios that could disrupt critical business processes. Number ranges are fundamental SAP components that provide unique sequential numbering for business documents, master data records, and transactional objects across all SAP modules."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Number Range objects in SAP control the automatic assignment of unique identifiers for various business entities including document numbers, material numbers, customer numbers, vendor numbers, and other critical business objects. When number ranges approach exhaustion, it can lead to system errors, process interruptions, and potential business disruptions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed number range monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Range utilization analysis to monitor current usage levels and identify ranges approaching exhaustion"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage-based monitoring for proactive alerting based on configurable thresholds"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Daily consumption tracking to analyze usage patterns and predict future exhaustion dates"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Statistical analysis for capacity planning and optimization of number range configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-client support for enterprise-wide number range monitoring across distributed SAP landscapes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes number range data from the NRIV table (Number Range Intervals) and provides enhanced analytical capabilities including usage percentages, remaining capacity calculations, daily consumption statistics, and predictive analytics for proactive number range management."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP Number Range objects are functioning efficiently and identifies potential exhaustion scenarios before they impact business operations."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Number range exhaustion and poor utilization indicate critical system configuration issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Continuity Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Number range exhaustion preventing creation of new business documents and master data records"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Document posting failures due to unavailable number assignments disrupting business processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System errors and transaction failures when number ranges reach maximum values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process interruptions affecting time-critical business operations and compliance requirements"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inefficient number range configurations causing performance degradation during number assignment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Fragmented number ranges leading to suboptimal database performance and index efficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory consumption issues from excessive number range processing workload"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database locking issues during high-volume number assignment operations affecting system responsiveness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Operational Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from number range-related processing delays impacting service level commitments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from unreliable number assignment affecting operational continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data consistency problems due to number range conflicts across distributed systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance issues from inability to create required business documents within regulatory timeframes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Planning and Capacity Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of visibility into number range consumption patterns preventing proactive capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unpredictable exhaustion scenarios causing emergency system maintenance and business disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inadequate number range sizing leading to frequent range extensions and system interventions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor utilization tracking preventing optimization of number range configurations"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate number ranges with high utilization percentages (>80%) for immediate capacity assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check ranges approaching exhaustion using SNRO transaction for detailed analysis and extension planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review daily consumption patterns to identify unusual spikes or trends requiring immediate attention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze external number ranges and custom objects for potential configuration issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor number range utilization trends and consumption patterns for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate current range sizing against business volume projections for adequate capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check number range buffering settings and optimization parameters for performance improvement"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze number range assignment patterns by object type and business process for efficiency optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Extend number ranges approaching exhaustion with adequate buffer capacity for continued operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize number range configurations and buffering settings for improved performance and reliability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement proactive number range monitoring and alerting procedures for early issue detection"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan number range capacity upgrades based on consumption analysis and business growth projections"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preventive Measures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular number range utilization reviews and capacity planning procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring for critical number ranges with appropriate alert thresholds"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create documentation and procedures for number range management and emergency extensions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on number range volume analysis and processing requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "AVAILABLE_DEC",
+          "Available Numbers (Dec Value)",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "2",
+          "AVG_DAILY",
+          "P value",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "3",
+          "AVG_DAILY_NZ",
+          "P value",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "4",
+          "EXTERNIND",
+          "External ('X')",
+          "CHAR",
+          "1",
+          "0",
+          "NRIND",
+          "XFELD"
+        ],
+        [
+          "5",
+          "FROMNUMBER",
+          "From number",
+          "CHAR",
+          "20",
+          "0",
+          "NRFROM",
+          "CHAR20"
+        ],
+        [
+          "6",
+          "FROMNUMBER_DEC",
+          "From Number (Dec Value)",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "7",
+          "LANGU",
+          "Languege for description",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "8",
+          "LEFT_DAYS",
+          "Days left (generally)",
+          "INT4",
+          "10",
+          "0",
+          "INT4",
+          "INT4"
+        ],
+        [
+          "9",
+          "LEFT_DAYS_ESTIMATION",
+          "X - Estimate the left days",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "10",
+          "LEFT_DAYS_NZ",
+          "Days left (with activities)",
+          "INT4",
+          "10",
+          "0",
+          "INT4",
+          "INT4"
+        ],
+        [
+          "11",
+          "LEFT_DEC",
+          "Left Numbers",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "12",
+          "LEFT_PER",
+          "Left Numbers (%)",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "13",
+          "NRLEVEL",
+          "Current Number",
+          "NUMC",
+          "20",
+          "0",
+          "NRLEVEL",
+          "NUMC20"
+        ],
+        [
+          "14",
+          "NRLEVEL_DEC",
+          "Current Number (Dec Value)",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "15",
+          "NRRANGENR",
+          "Number range number",
+          "CHAR",
+          "2",
+          "0",
+          "NRNR",
+          "CHAR2"
+        ],
+        [
+          "16",
+          "OBJECT",
+          "Object name",
+          "CHAR",
+          "10",
+          "0",
+          "NROBJ",
+          "NROBJ"
+        ],
+        [
+          "17",
+          "STATISTICS_ALERT",
+          "Alert Instance (Code) for stat",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "18",
+          "STATISTICS_DAYS",
+          "Days for statistics",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "19",
+          "SUBOBJECT",
+          "Subobject value",
+          "CHAR",
+          "6",
+          "0",
+          "NRSOBJ",
+          "CHAR6"
+        ],
+        [
+          "20",
+          "TONUMBER",
+          "To number",
+          "CHAR",
+          "20",
+          "0",
+          "NRTO",
+          "CHAR20"
+        ],
+        [
+          "21",
+          "TONUMBER_DEC",
+          "To Number (Dec Value)",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "22",
+          "TOYEAR",
+          "To year",
+          "NUMC",
+          "4",
+          "0",
+          "NRYEAR",
+          "GJAHR"
+        ],
+        [
+          "23",
+          "TXT",
+          "Long text",
+          "CHAR",
+          "60",
+          "0",
+          "NROBJTXT",
+          "TEXT60"
+        ],
+        [
+          "24",
+          "TXTSHORT",
+          "Short text",
+          "CHAR",
+          "20",
+          "0",
+          "NROBJSTXT",
+          "TEXT20"
+        ],
+        [
+          "25",
+          "USED_DEC",
+          "Used Numbers",
+          "DEC",
+          "25",
+          "0",
+          "DEC_25",
+          "DEC_25"
+        ],
+        [
+          "26",
+          "USED_PER",
+          "Used Numbers (%)",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 26 parameters listed in the Parameters Reference Table when tuning this EI; each influences which number range intervals are retrieved, enriched with utilization, and optionally projected with runway days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AVAILABLE_DEC (Available Numbers (Dec Value))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how teams reason about SNRO traffic: available numbers (dec value) (AVAILABLE_DEC) is one lever that shapes which intervals are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AVG_DAILY (P value)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen AVG_DAILY for p value, then tighten percentage bands once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AVG_DAILY_NZ (P value)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After reading number range intervals, rows are removed unless p value on AVG_DAILY_NZ still satisfies the active filter criteria."
+    },
+    {
+      "kind": "paragraph",
+      "text": "EXTERNIND (External ('X'))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: lines removed for failing external ('x') on EXTERNIND never reach optional day-estimation enrichment."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FROMNUMBER (From number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses from number from the interval context so only records with FROMNUMBER inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FROMNUMBER_DEC (From Number (Dec Value))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—from number (dec value) on FROMNUMBER_DEC should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Languege for description)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with remaining-number filters, languege for description on LANGU isolates the highest-risk interval families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DAYS (Days left (generally))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where days left (generally) on LEFT_DAYS signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DAYS_ESTIMATION (X - Estimate the left days)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Enables optional statistical projection that estimates how many days of runway remain based on recent consumption velocity."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DAYS_ESTIMATION Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Run historical consumption analysis and populate average daily usage and projected left-day fields when prerequisites are met."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — Skip statistical estimation so only direct NRIV utilization fields drive filtering and alerts."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DAYS_NZ (Days left (with activities))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treats days left (with activities) as a discriminator between similar intervals that would otherwise look identical in a raw extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DEC (Left Numbers)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish fiscal variants when left numbers on LEFT_DEC correlates with year or numbering level attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_PER (Left Numbers (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where left numbers (%) (LEFT_PER) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NRLEVEL (Current Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses current number from the interval context so only records with NRLEVEL inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NRLEVEL_DEC (Current Number (Dec Value))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses current number (dec value) from the interval context so only records with NRLEVEL_DEC inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NRRANGENR (Number range number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting on ranges respects number range number constraints carried by NRRANGENR before any alert fires."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJECT (Object name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when object name (OBJECT) is meant to stay within a controlled object catalog slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATISTICS_ALERT (Alert Instance (Code) for stat)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Identifies which packaged monitoring statistic to read when estimating consumption; when left initial, the routine may default to the current monitor’s own analysis code if available."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATISTICS_DAYS (Days for statistics)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Defines how many recent calendar days feed the consumption statistics when left-day estimation is active."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SUBOBJECT (Subobject value)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with remaining-number filters, subobject value on SUBOBJECT isolates the highest-risk interval families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TONUMBER (To number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where to number on TONUMBER signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TONUMBER_DEC (To Number (Dec Value))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when to number (dec value) on TONUMBER_DEC is narrowed together with fiscal year or external-indicators filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TOYEAR (To year)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After reading number range intervals, rows are removed unless to year on TOYEAR still satisfies the active filter criteria."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TXT (Long text)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: lines removed for failing long text on TXT never reach optional day-estimation enrichment."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TXTSHORT (Short text)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish fiscal variants when short text on TXTSHORT correlates with year or numbering level attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USED_DEC (Used Numbers)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets used numbers as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on USED_DEC."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USED_PER (Used Numbers (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Combines with object and subobject filters so used numbers (%) on USED_PER refines which intervals reach utilization and percentage checks."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The number range monitoring function provides both percentage-based and absolute"
+    },
+    {
+      "kind": "paragraph",
+      "text": "value parameters to accommodate different monitoring scenarios and business requirements:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage vs. Absolute Value Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage Parameters (_PER):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       LEFT_PER - Remaining capacity as percentage of total range"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       USED_PER - Utilized capacity as percentage of total range"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Absolute Value"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Parameters (_DEC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·      AVAILABLE_DEC - Total numbers available in the range"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·      LEFT_DEC - Absolute count of remaining numbers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·      USED_DEC - Absolute count of consumed numbers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·      NRLEVEL_DEC - Current number level in decimal format"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Both Options Exist:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The dual parameter approach provides monitoring flexibility for different business contexts. Percentage-based thresholds work well for ranges of varying sizes (e.g., alert when any range drops below 20% capacity), while absolute value thresholds are essential for business-critical ranges where specific minimum quantities must be maintained (e.g., always keep at least 1,000 invoice numbers available regardless of total range size)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Statistical Analysis and Forecasting Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Statistics Configuration:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       STATISTICS_DAYS - Defines the historical period (in days) used to calculate average daily consumption patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       LEFT_DAYS_ESTIMATION - Boolean flag enabling/disabling predictive"
+    },
+    {
+      "kind": "paragraph",
+      "text": "analytics based on consumption trends"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Calculated Forecasting  Fields:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·   LEFT_DAYS - Estimated days until range exhaustion based on historical average daily usage"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·   LEFT_DAYS_NZ - Estimated days until exhaustion using non-zero daily averages only"
+    },
+    {
+      "kind": "paragraph",
+      "text": "(excludes days with no consumption)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·      AVG_DAILY - Average daily consumption including zero-usage days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       AVG_DAILY_NZ - Average daily consumption excluding zero-usage days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This statistical approach enables proactive capacity management by combining current utilization levels with historical consumption patterns to predict when intervention will be required."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STATISTICS_DAYS - 30 from the preset before the statistics read when the caller does not override it."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Material numbering with runway projection"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Monitor a specific material number range with two-week consumption statistics and estimation enabled."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJECT = MATERIAL\n SUBOBJECT = *\n NRRANGENR = 01\n TOYEAR = 2025\n LEFT_DAYS_ESTIMATION = X\n STATISTICS_DAYS = 14\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Utilization percentage alert band"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Flag intervals that are at least three-quarters consumed while a meaningful absolute remainder still exists."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USED_PER = 75\n LEFT_DEC = 500\n AVAILABLE_DEC = 2000\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Statistics source and language"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Keep a thirty-day statistics window with an explicit analysis code and English descriptions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LEFT_DAYS_ESTIMATION = X\n STATISTICS_ALERT = NUMRNG01\n STATISTICS_DAYS = 30\n LANGU = E\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "AVAILABLE_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "AVG_DAILY",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "AVG_DAILY_NZ",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "EXTERNIND",
+          "Internal (' ') or external ('X') number range flag",
+          "CHAR(1)",
+          "NRIND"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "FROMNUMBER",
+          "From number",
+          "CHAR(20)",
+          "NRFROM"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "FROMNUMBER_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "LEFT_DAYS",
+          "Natural Number",
+          "INT4(10)",
+          "INT4"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "LEFT_DAYS_NZ",
+          "Natural Number",
+          "INT4(10)",
+          "INT4"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "LEFT_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "LEFT_PER",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "NRLEVEL",
+          "Number range status",
+          "NUMC(20)",
+          "NRLEVEL"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "NRLEVEL_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "NRRANGENR",
+          "Number range number",
+          "CHAR(2)",
+          "NRNR"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "OBJECT",
+          "Name of number range object",
+          "CHAR(10)",
+          "NROBJ"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "SUBOBJECT",
+          "Number range object subobject value",
+          "CHAR(6)",
+          "NRSOBJ"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "TONUMBER",
+          "To number",
+          "CHAR(20)",
+          "NRTO"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "TONUMBER_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "TOYEAR",
+          "To fiscal year",
+          "NUMC(4)",
+          "NRYEAR"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "TXT",
+          "Number range object text",
+          "CHAR(60)",
+          "NROBJTXT"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "TXTSHORT",
+          "Number range object text",
+          "CHAR(20)",
+          "NROBJSTXT"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "USED_DEC",
+          "P field, 25 character",
+          "DEC(25)",
+          "DEC_25"
+        ],
+        [
+          "/SKN/S_SW_01_01_NUM_RNG",
+          "USED_PER",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_NUM_RNG.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_NUM_RNG OPTIONAL\n*\"----------------------------------------------------------------------\n  \" variables definition\n  DATA_MULTY:   OBJECT         NROBJ,\n                SUBOBJECT      NRSOBJ,\n                NRRANGENR      NRNR,\n                NRLEVEL        NRLEVEL,\n                TOYEAR         NRYEAR,\n                BNAME         XUBNAME,\n                CLASS         XUCLASS,\n                TONUMBER      NRTO,\n                FROMNUMBER    NRLEVEL,\n                NRLEVEL_DEC    DEC_25,\n                FROMNUMBER_DEC DEC_25,\n                TONUMBER_DEC   DEC_25,\n                AVAILABLE_DEC  DEC_25,\n                LEFT_DEC       DEC_25,\n                USED_DEC       DEC_25,\n                LEFT_PER       /SKN/E_SW_PRC,\n                USED_PER       /SKN/E_SW_PRC,\n                EXTERNIND     NRIND.\n  DATA_SINGLE:  LANGU         LANGU,\n                MANAGE_IN_UTC CHAR1,\n                SW_DEST       RFCDEST.\n  DATA :        SY_TABIX      LIKE SY-TABIX,\n                SY_DATLO      LIKE SY-DATLO,\n                SY_TIMLO      LIKE SY-TIMLO,\n                DOMVALUE      LIKE DD07V-DOMVALUE_L,\n                DDTEXT        LIKE DD07V-DDTEXT.\n  FIELD-SYMBOLS: <T_DATA_WA_FS> LIKE LINE OF T_DATA.\n***data: lv_freenumabs(20) type N,\n***      lv_THRESHOLDABS(20) type N,\n***      lv_normalizednrlev(20) type N,\n***      lv_availnumrange(20) type N,\n***      lv_THRESHOLDPERC type I.\nDATA: LV_F TYPE F.\n  \" variables population\n  SELECT_MULTY: OBJECT,\n                SUBOBJECT,\n                NRRANGENR,\n                NRLEVEL,\n                TOYEAR,\n                BNAME,\n                CLASS,\n                TONUMBER,\n                FROMNUMBER,\n                NRLEVEL_DEC,\n                FROMNUMBER_DEC,\n                TONUMBER_DEC,\n                AVAILABLE_DEC,\n                LEFT_DEC,\n                USED_DEC,\n                LEFT_PER,\n                USED_PER,\n                EXTERNIND.\n*** convert_multy: nrlevel     ALPHA,\n***                freenumabs   ALPHA,\n***                thresholdabs ALPHA,\n***                tonumber     ALPHA,\n***                fromnumber   ALPHA.\n  LV_LANGU = SY-LANGU.\n  SELECT_SINGLE: MANAGE_IN_UTC,\n                 LANGU,\n                 SW_DEST.\n  \"--- Days estimation\n  DATA_SINGLE: LEFT_DAYS_ESTIMATION CHAR1,\n               STATISTICS_DAYS      INT2,\n               STATISTICS_ALERT     /SKN/E_SW_AN_CODE.\n  LV_STATISTICS_DAYS = 30.\n  SELECT_SINGLE: LEFT_DAYS_ESTIMATION,\n                 STATISTICS_DAYS,\n                 STATISTICS_ALERT.\n  DATA_MULTY:   AVG_DAILY    DEC_25,\n                AVG_DAILY_NZ DEC_25,\n                LEFT_DAYS    INT4,\n                LEFT_DAYS_NZ INT4.\n  SELECT_MULTY: AVG_DAILY,\n                AVG_DAILY_NZ,\n                LEFT_DAYS,\n                LEFT_DAYS_NZ.\n DATA: LV_STAT_DATE_FROM TYPE  /SKN/E_SW_AN_LG_DATE,\n       LV_STAT_DATE_TO TYPE  /SKN/E_SW_AN_LG_DATE.\n DATA: LS_DAILY_STAT TYPE /SKN/S_SW_01_NUM_RNG_STAT,\n       LT_DAILY_STAT LIKE TABLE OF LS_DAILY_STAT.\n DATA: LS_SW_SYST TYPE  /SKN/S_SW_SYST.\n\"--- Days estimation\n  \" if sw_dest is empty then on premise, else on cloud\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_01_NUM_RNG'\n      IMPORTING\n        IS_ALERT = IS_ALERT\n      TABLES\n        T_SELECT = T_SELECT\n        T_DATA   = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n  \" time filling and shifting\n  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO.\n  TIME_SHIFT SY_DATLO SY_TIMLO.\n  CLEAR IS_ALERT.\n  REFRESH T_DATA.\n  \" retrieve the data\n  SELECT *\n    FROM NRIV\n    INTO CORRESPONDING FIELDS OF TABLE T_DATA\n    WHERE OBJECT        IN R_OBJECT\n      AND SUBOBJECT     IN R_SUBOBJECT\n      AND NRRANGENR     IN R_NRRANGENR\n      AND TOYEAR        IN R_TOYEAR\n      AND TONUMBER      IN R_TONUMBER\n      AND NRLEVEL       IN R_NRLEVEL\n      AND FROMNUMBER    IN R_FROMNUMBER\n      AND EXTERNIND     IN R_EXTERNIND.\n  DATA: TONUMBER_STR      TYPE STRING,\n        FROMNUMBER_STR    TYPE STRING,\n        NRLEVEL_STR       TYPE STRING,\n        NORMALIZEDNRLEV   TYPE NRTO.\n  DATA: LV_N(20) TYPE N.\n  \" data post processing\n  LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.\n    IF <T_DATA_WA_FS>-EXTERNIND IS INITIAL.\n      <T_DATA_WA_FS>-NRLEVEL_DEC    = <T_DATA_WA_FS>-NRLEVEL.\n      LV_N = <T_DATA_WA_FS>-FROMNUMBER.\n       <T_DATA_WA_FS>-FROMNUMBER_DEC   = LV_N.\n      LV_N = <T_DATA_WA_FS>-TONUMBER.\n      <T_DATA_WA_FS>-TONUMBER_DEC   = LV_N.\n      <T_DATA_WA_FS>-AVAILABLE_DEC = <T_DATA_WA_FS>-TONUMBER_DEC - <T_DATA_WA_FS>-FROMNUMBER_DEC + 1.\n      IF <T_DATA_WA_FS>-NRLEVEL_DEC > 0.\n        <T_DATA_WA_FS>-USED_DEC = <T_DATA_WA_FS>-NRLEVEL_DEC - <T_DATA_WA_FS>-FROMNUMBER_DEC + 1.\n        <T_DATA_WA_FS>-LEFT_DEC = <T_DATA_WA_FS>-TONUMBER_DEC - <T_DATA_WA_FS>-NRLEVEL_DEC.\n      ELSE.\n        CLEAR <T_DATA_WA_FS>-USED_DEC.\n        <T_DATA_WA_FS>-LEFT_DEC = <T_DATA_WA_FS>-AVAILABLE_DEC.\n      ENDIF.\n      IF <T_DATA_WA_FS>-AVAILABLE_DEC > 0.\n        LV_F = <T_DATA_WA_FS>-LEFT_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100.\n        <T_DATA_WA_FS>-LEFT_PER = LV_F.\n        LV_F = <T_DATA_WA_FS>-USED_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100.\n        <T_DATA_WA_FS>-USED_PER = LV_F.\n      ENDIF.\n    ENDIF.\n  ENDLOOP.\n  \" clean-up the data\n  DELETE T_DATA WHERE NRLEVEL_DEC    NOT IN R_NRLEVEL_DEC.\n  DELETE T_DATA WHERE FROMNUMBER_DEC   NOT IN R_FROMNUMBER_DEC.\n  DELETE T_DATA WHERE TONUMBER_DEC  NOT IN R_TONUMBER_DEC.\n  DELETE T_DATA WHERE AVAILABLE_DEC NOT IN R_AVAILABLE_DEC.\n  DELETE T_DATA WHERE LEFT_DEC NOT IN R_LEFT_DEC.\n  DELETE T_DATA WHERE USED_DEC NOT IN R_USED_DEC.\n  DELETE T_DATA WHERE LEFT_PER NOT IN R_LEFT_PER.\n  DELETE T_DATA WHERE USED_PER NOT IN R_USED_PER.\n  LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.\n    CALL FUNCTION '/SKN/F_SW_01_GET_RANGE_DESC'\n      EXPORTING\n        OBJECT           = <T_DATA_WA_FS>-OBJECT\n        LANGU            = LV_LANGU\n      IMPORTING\n        TXT              = <T_DATA_WA_FS>-TXT\n        TXTSHORT         = <T_DATA_WA_FS>-TXTSHORT\n      EXCEPTIONS\n        WRONG_CODE       = 1\n        OTHERS           = 2.\n    IF SY-SUBRC <> 0.\n    ENDIF.\n  ENDLOOP.\n  \"--- Left Days Estimation\n  IF LV_LEFT_DAYS_ESTIMATION IS NOT INITIAL.\n     CALL FUNCTION '/SKN/F_SW_GET_SW_SYST'\n       IMPORTING\n         SW_SYST         = LS_SW_SYST\n       TABLES\n         T_SW_SYST       = T_SELECT.\n     IF LV_STATISTICS_ALERT IS INITIAL.\n       \"--- Get myself\n       LV_STATISTICS_ALERT = LS_SW_SYST-AN_CODE.\n     ENDIF.\n     IF LV_STATISTICS_ALERT IS NOT INITIAL.\n       LV_STAT_DATE_TO = SY-DATUM.\n       LV_STAT_DATE_FROM = LV_STAT_DATE_TO - LV_STATISTICS_DAYS.\n       CALL FUNCTION '/SKN/F_SW_01_NUM_RNG_STAT'\n         EXPORTING\n           AN_CODE                = LV_STATISTICS_ALERT\n           SW_CLIENT              = LS_SW_SYST-SW_CLIENT\n           DATE_FROM              = LV_STAT_DATE_FROM\n           DATE_TO                = LV_STAT_DATE_TO\n         TABLES\n           T_DAILY_STAT           = LT_DAILY_STAT\n         EXCEPTIONS\n           EXTRUCTION_ERROR       = 1\n           OTHERS                 = 2.\n       IF SY-SUBRC = 0.\n         SORT LT_DAILY_STAT BY OBJECT SUBOBJECT NRRANGENR TOYEAR.\n         LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.\n           READ TABLE LT_DAILY_STAT INTO LS_DAILY_STAT\n                                    WITH KEY OBJECT    = <T_DATA_WA_FS>-OBJECT\n                                             SUBOBJECT = <T_DATA_WA_FS>-SUBOBJECT\n                                             NRRANGENR = <T_DATA_WA_FS>-NRRANGENR\n                                             TOYEAR    = <T_DATA_WA_FS>-TOYEAR\n                                    BINARY SEARCH.\n           IF SY-SUBRC IS INITIAL.\n             <T_DATA_WA_FS>-AVG_DAILY = LS_DAILY_STAT-AVG_DAILY.\n             <T_DATA_WA_FS>-AVG_DAILY_NZ = LS_DAILY_STAT-AVG_DAILY_NZ.\n             IF LS_DAILY_STAT-AVG_DAILY > 0.\n                LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY .\n*                CATCH SYSTEM-EXCEPTIONS conversion_errors = 1.\n*                  <t_data_wa_fs>-LEFT_DAYS = lv_f.\n*                ENDCATCH.\n*                if sy-subrc <> 0.\n*                  <t_data_wa_fs>-LEFT_DAYS = 999999.\n*                endif.\n                TRY.\n                 <T_DATA_WA_FS>-LEFT_DAYS = LV_F.\n                CATCH CX_SY_CONVERSION_ERROR.\n                 <T_DATA_WA_FS>-LEFT_DAYS = 999999.\n                ENDTRY.\n             ENDIF.\n             IF LS_DAILY_STAT-AVG_DAILY_NZ > 0.\n*               CATCH SYSTEM-EXCEPTIONS conversion_errors = 1.\n*               lv_f = <t_data_wa_fs>-LEFT_DEC / ls_DAILY_STAT-AVG_DAILY_NZ .\n*              <t_data_wa_fs>-LEFT_DAYS_NZ = lv_f.\n*                ENDCATCH.\n*                if sy-subrc <> 0.\n*                  <t_data_wa_fs>-LEFT_DAYS_NZ = 999999.\n*                endif.\n               TRY.\n                LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY_NZ .\n                <T_DATA_WA_FS>-LEFT_DAYS_NZ = LV_F.\n               CATCH CX_SY_CONVERSION_ERROR.\n                <T_DATA_WA_FS>-LEFT_DAYS_NZ = 999999.\n               ENDTRY.\n             ENDIF.\n           ENDIF.\n         ENDLOOP.\n       ENDIF.\n       \"--- Filtering Stat parameters\n       DELETE T_DATA WHERE AVG_DAILY NOT IN R_AVG_DAILY.\n       DELETE T_DATA WHERE AVG_DAILY_NZ NOT IN R_AVG_DAILY_NZ.\n       DELETE T_DATA WHERE LEFT_DAYS NOT IN R_LEFT_DAYS.\n       DELETE T_DATA WHERE LEFT_DAYS_NZ NOT IN R_LEFT_DAYS_NZ.\n     ENDIF.\n  ENDIF.\n  \"--- Left Days Estimation\n  \" check alert information\n  READ TABLE T_DATA   INDEX 1.\n  CHECK NOT  SY-TFILL IS INITIAL.\n  IS_ALERT = 'X'.\nENDFUNCTION.\n"
+    }
+  ]
+}

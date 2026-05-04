@@ -1,43 +1,64 @@
 ### Default Values
 
-- **BACKDAYS** — Default: `10` (when no date range is supplied, the EI uses a 10-day lookback from today for the monitoring window).
-- **DURATION_UNIT** — Default: `D` (duration is expressed in days when not supplied).
-- **LAST_ONLY** — Default: initial (empty); when not supplied, the EI includes all release steps where the approver equals the creator (not only the last release per order).
+- **PERIOD_CLOSING_DAY** - 15
+- **BACKDAYS** - 10
+- **DATE_REF_FLD** - CPUDT
+- **DURATION_UNIT** - D
+- **LANGU** - EN
+- **DURATION** - initial - treated as empty range keeps rows by code
 
-**Note:** The reference date field used for the monitoring window and for duration calculation is set in the code to a default (e.g. PO date) when not supplied by the caller; other single-value parameters that are used when initial effectively default to "no restriction" where the code allows.
+### Practical Example of Parameter Configuration
 
-### Practical Configuration Examples
+**Use Case 1: Company-wide prior-period posting scan**
 
-**Use Case 1: Last 10 days, creator = approver (default lookback)**
-
+**Purpose:** Keep month-end focused on all company codes while using the default creation-date reference and day-based aging.
 ```
-BACKDAYS = 10
-```
-
-**Purpose:** Monitor purchase orders where the creator is also the approver, for the last 10 days. Suitable for routine weekly or biweekly segregation-of-duties review.
-
-**Use Case 2: By company code and purchasing organization**
-
-```
-BUKRS = 1000, 2000
-EKORG = 1000, 2000
+BUKRS = 1000 - 1999
+BACKDAYS = 14
+DATE_REF_FLD = CPUDT
+DURATION = 5 - 999999
+DURATION_UNIT = D
 ```
 
-**Purpose:** Limit results to specific company codes and purchasing organizations. Supports regional or organizational control and delegation review.
+**Use Case 2: Full-day age filter for high-risk accounts**
 
-**Use Case 3: Only last release per order**
-
+**Purpose:** Highlight only lines that are at least thirty full days old after the date window is applied.
 ```
-LAST_ONLY = X
-```
-
-**Purpose:** Keep only the most recent release per order and flag it only if that last approver is the order creator. Reduces duplicate rows and focuses on the current release state.
-
-**Use Case 4: Duration in full days (specific day filtering)**
-
-```
+HKONT = 200000 - 299999
+BACKDAYS = 30
+DURATION = 30
 DURATION_UNIT = F
-DURATION = 0–30
+PERIOD_CLOSING_DAY = 25
 ```
 
-**Purpose:** Express duration in full days and restrict to orders with duration between 0 and 30 full days since the reference date. Useful for age-based prioritization (e.g. recent approvals only).
+**Use Case 3: Explicit close-week window**
+
+**Purpose:** Anchor the run to a known reopening week instead of relative lookback alone.
+```
+DATUM = 20250325 - 20250331
+BUKRS = 1000
+BLART = SA - ZP
+DURATION_UNIT = H
+DURATION = 0 - 48
+```
+
+**Use Case 4: Vendor subledger slice with document-type control**
+
+**Purpose:** Narrow to vendor account-type cluster paths while still applying language and posting-date filters.
+```
+KOART = K
+BUDAT = 20250101 - 20250131
+LANGU = EN
+TCODE = FB60
+```
+
+**Use Case 5: Material document references and user accountability**
+
+**Purpose:** Tie exceptions to external reference numbers and preparers for targeted follow-up.
+```
+XBLNR = INV2025*
+USNAM = BATCH01 - BATCH99
+CPUDT = 20250401 - 20250415
+WRBTR = 10000 - 999999999
+SW_DEST = PROD_FIN
+```

@@ -4,7 +4,7 @@ Your task: Produce ONLY two subsections in this order:
 
 1. Default Values — List parameters that have a default that can be overridden. Include both: (a) parameters with an explicit default value in the code (e.g. assignment when empty, assignment before read), and (b) parameters that effectively default to initial (empty for CHAR1/flag, 0 for numeric) when not supplied — document as "Default: initial (empty)" or "Default: initial (0)" with brief meaning. Only parameters from the Parameters (Name (Description)) file belong here. If none found after double-checking the code, omit this subsection entirely. There is typically at least one such parameter per EI.
 
-2. Practical Configuration Examples — Mandatory. Produce 1–5 use cases (see rules below) as code blocks with a business-meaning title and a Purpose: paragraph per use case. When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case; use a subset per use case so business logic stays clear and easily understandable for SAP business/technical professionals. Each use case must reflect real business meaning.
+2. Practical Configuration Examples — Mandatory. Produce 1–5 use cases (see rules below) as code blocks with a business-meaning title and a Purpose: paragraph per use case (one blank line between the **Use Case N: …** title line and **Purpose:**). When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case; use a subset per use case so business logic stays clear and easily understandable for SAP business/technical professionals. Each use case must reflect real business meaning.
 
 Default Values subsection:
 - Systematic check: For every parameter in the Parameters (Name (Description)) file that is read as a single value (e.g. SELECT_SINGLE, DATA_SINGLE), determine: (a) Is it assigned a value before being read from the caller? (b) Is it assigned a value when initial? (c) If not supplied, does it remain initial and is that value used in the logic? If (a), (b), or (c), include it in Default Values.
@@ -18,8 +18,10 @@ Practical Configuration Examples subsection:
   - Very few parameters (e.g. only counter): 1–2 use cases.
   - Multiple parameters (typical): 3–4 use cases.
   - Many very specific parameters (aggregation, pseudo-SQL fields, fancy date relationships): 4–5 use cases.
+- Parameter count per example: Each use case code block must have **at least 2 parameters**. **At least one use case (and preferably more) must have 3–5 parameters** in its code block; do not produce only 2-parameter examples for every use case. Vary parameter count across use cases.
 - When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case. Use a subset per use case so business logic stays clear and easily understandable for professionals in the respective SAP business/technical domain.
-- Each use case: **Use Case N: [Business-meaning title]** then code block (PARAM = value per line), then **Purpose:** one or two sentences (business scenario and what the configuration achieves).
+- Each use case: **Use Case N: [Business-meaning title]**, one blank line, **Purpose:** one or two sentences on the next line (business scenario and what the configuration achieves), then the code block (PARAM = value per line). Pipeline verify requires the blank line before **Purpose:**.
+- **Range format:** For range parameters (low–high), write **PARAM = low - high** (e.g. SMRATIO = 0 - 0.5), not PARAM = low high.
 - Use only parameters from the Parameters (Name (Description)) file for this EI.
 
 OUTPUT FORMAT (follow exactly):
@@ -37,25 +39,28 @@ OUTPUT FORMAT (follow exactly):
 ### Practical Configuration Examples
 
 **Use Case 1: [Business-meaning title]**
+
+**Purpose:** [One or two sentences: business scenario and what the configuration achieves.]
 ```
 PARAM1 = value
 PARAM2 = value
 ...
 ```
-**Purpose:** [One or two sentences: business scenario and what the configuration achieves.]
 
 **Use Case 2: [Business-meaning title]**
+
+**Purpose:** ...
 ```
 ...
 ```
-**Purpose:** ...
 
 (Continue for 1–5 use cases. This subsection is mandatory; at least one use case required.)
 
 Rules:
 - Default Values: include (1) explicit default in code (assignment when empty, assignment before read), (2) effective default to initial (empty for CHAR1/flag, 0 for numeric) when not supplied — document as "Default: initial (empty)" or "Default: initial (0)" with brief meaning. For every single-value parameter in the Parameters file, check (a) assigned before read, (b) assigned when initial, (c) used when initial; if any, include it. If none found after double-check, omit subsection. No line numbers.
-- Practical Examples: mandatory; 1–5 use cases; each with business-meaning title and Purpose paragraph. When multiple date-related params exist (BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, etc.), do not use them all in one use case; use a subset per use case for clarity.
+- Practical Examples: mandatory; 1–5 use cases; each with business-meaning title, blank line, then Purpose paragraph, then code block. Each example at least 2 parameters; at least one use case must have 3–5 parameters (do not produce only 2-parameter examples). When multiple date-related params exist (BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, etc.), do not use them all in one use case; use a subset per use case for clarity.
 - Parameter scope: mention ONLY parameters from the Parameters (Name (Description)) file for this EI.
+- Range format: for range parameters (low–high), write PARAM = low - high (e.g. SMRATIO = 0 - 0.5), not PARAM = low high.
 - Tone: professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
 - Non-standard entities: avoid Z*, Y*, /SKN/* unless necessary.
 - Output: ONLY the two subsections in order (Default Values when present, Practical Examples always). No other sections, no document title, no preamble.

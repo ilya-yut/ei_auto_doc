@@ -1,0 +1,987 @@
+[
+  {
+    "file": "SW_01 _02_IDOCS - IDOCs State.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        LANGU - system language (SY-LANGU)\n\n·        DURATION_UNIT - M\n\n·        BACKDAYS - 1 (today and yesterday)",
+    "default_bullets": [
+      "·        LANGU - system language (SY-LANGU)",
+      "·        DURATION_UNIT - M",
+      "·        BACKDAYS - 1 (today and yesterday)"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STATE_COLOR = R_STATE_COLOR-LOW."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = '@15@'."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = PARAM_VAL."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 9427
+  },
+  {
+    "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION_UNIT - M\n\n·        ONLY_HEADER - X",
+    "default_bullets": [
+      "·        DURATION_UNIT - M",
+      "·        ONLY_HEADER - X"
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = LV_ALERT."
+      }
+    ],
+    "abap_chars": 1255
+  },
+  {
+    "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION_UNIT - H\n\n·        BACKDAYS - 1 (today and yesterday)",
+    "default_bullets": [
+      "·        DURATION_UNIT - H",
+      "·        BACKDAYS - 1 (today and yesterday)"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'H'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 6122
+  },
+  {
+    "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION_UNIT - H\n\n·        BACKDAYS - 1 (today and yesterday)",
+    "default_bullets": [
+      "·        DURATION_UNIT - H",
+      "·        BACKDAYS - 1 (today and yesterday)"
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = LV_ALERT."
+      }
+    ],
+    "abap_chars": 982
+  },
+  {
+    "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION_UNIT - H\n\n·        BACKDAYS - 1 (today and yesterday)",
+    "default_bullets": [
+      "·        DURATION_UNIT - H",
+      "·        BACKDAYS - 1 (today and yesterday)"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_REF_FLD_ORG = LV_DATE_REF_FLD."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_REF_FLD = 'STRTDATE'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM  = REF_DATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_FROM  = REF_TIME."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO    = SY_DATLO."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_TO    = SY_TIMLO."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM  = T_DATA-STRTDATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_FROM  = T_DATA-STRTTIME."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO    = T_DATA-ENDDATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_TO    = T_DATA-ENDTIME."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      },
+      {
+        "kind": "BACKDAYS_DEFAULT",
+        "line": "SIGN   = 'I'.       RS_DATUM-OPTION = 'GE'.       BACKDAYS     = '1' .  \"--- Default       DA"
+      }
+    ],
+    "abap_chars": 12009
+  },
+  {
+    "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - 1 from the delegated monitor’s default when the caller does not override the lookback before the internal job read.\n\n·        DURATION_UNIT - M from the delegated preset before duration calculations when the caller does not override it.\n\n·        DURATION - initial — when the duration selection range is left empty, the delegated routine does not filter rows out by the relative-age measure until a range is supplied.",
+    "default_bullets": [
+      "·        BACKDAYS - 1 from the delegated monitor’s default when the caller does not override the lookback before the internal job read.",
+      "·        DURATION_UNIT - M from the delegated preset before duration calculations when the caller does not override it.",
+      "·        DURATION - initial — when the duration selection range is left empty, the delegated routine does not filter rows out by the relative-age measure until a range is supplied."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = LV_ALERT."
+      }
+    ],
+    "abap_chars": 951
+  },
+  {
+    "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - 1 from the default applied when no overriding selection supplies a different lookback before the main read.\n\n·        DURATION_UNIT - M from the preset before duration calculations when the caller does not override it.\n\n·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by the relative-age measure until a range is supplied.",
+    "default_bullets": [
+      "·        BACKDAYS - 1 from the default applied when no overriding selection supplies a different lookback before the main read.",
+      "·        DURATION_UNIT - M from the preset before duration calculations when the caller does not override it.",
+      "·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by the relative-age measure until a range is supplied."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_REF_FLD_ORG = LV_DATE_REF_FLD."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_REF_FLD = 'STRTDATE'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM  = REF_DATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_FROM  = REF_TIME."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO    = SY_DATLO."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_TO    = SY_TIMLO."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM  = T_DATA-STRTDATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_FROM  = T_DATA-STRTTIME."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO    = T_DATA-ENDDATE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_T_TO    = T_DATA-ENDTIME."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      },
+      {
+        "kind": "BACKDAYS_DEFAULT",
+        "line": "SIGN   = 'I'.       RS_DATUM-OPTION = 'GE'.       BACKDAYS     = '1' .  \"--- Default       DA"
+      }
+    ],
+    "abap_chars": 12009
+  },
+  {
+    "file": "SW_01_01_NUM_RNG - Number Range Control Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        STATISTICS_DAYS - 30 from the preset before the statistics read when the caller does not override it.",
+    "default_bullets": [
+      "·        STATISTICS_DAYS - 30 from the preset before the statistics read when the caller does not override it."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LANGU = SY-LANGU."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STATISTICS_DAYS = 30."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_N = <T_DATA_WA_FS>-FROMNUMBER."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_N = <T_DATA_WA_FS>-TONUMBER."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_F = <T_DATA_WA_FS>-LEFT_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_F = <T_DATA_WA_FS>-USED_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STATISTICS_ALERT = LS_SW_SYST-AN_CODE."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STAT_DATE_TO = SY-DATUM."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STAT_DATE_FROM = LV_STAT_DATE_TO - LV_STATISTICS_DAYS."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY ."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY_NZ ."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X'."
+      }
+    ],
+    "abap_chars": 9792
+  },
+  {
+    "file": "SW_01_01_SM12 - Application Locks Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION_UNIT - M from the preset before the selection read when the caller does not override it.\n\n·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by computed age until a range is supplied.",
+    "default_bullets": [
+      "·        DURATION_UNIT - M from the preset before the selection read when the caller does not override it.",
+      "·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by computed age until a range is supplied."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = ICON_DELETE."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 5206
+  },
+  {
+    "file": "SW_01_01_SM13 - Update Requests Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - 1 from the preset logic when the caller leaves the lookback unset and no explicit monitoring interval overrides it.\n\n·        DURATION_UNIT - M from the preset before the selection read when the caller does not override it.\n\n·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by computed age until a range is supplied.",
+    "default_bullets": [
+      "·        BACKDAYS - 1 from the preset logic when the caller leaves the lookback unset and no explicit monitoring interval overrides it.",
+      "·        DURATION_UNIT - M from the preset before the selection read when the caller does not override it.",
+      "·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by computed age until a range is supplied."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      },
+      {
+        "kind": "LV_BACKDAYS_INIT",
+        "line": "IF LV_BACKDAYS IS INITIAL. LV_BACKDAYS = 1."
+      }
+    ],
+    "abap_chars": 6805
+  },
+  {
+    "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial  - treated as 1 by code (today + tomorrow)\n\n·        DURATION - initial – treated as empty by code (no time range defined)\n\n·        DURATION_UNIT - initial —treated as M by code (minutes).",
+    "default_bullets": [
+      "·        BACKDAYS - initial  - treated as 1 by code (today + tomorrow)",
+      "·        DURATION - initial – treated as empty by code (no time range defined)",
+      "·        DURATION_UNIT - initial —treated as M by code (minutes)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = LV_ALERT."
+      }
+    ],
+    "abap_chars": 986
+  },
+  {
+    "file": "SW_01_01_SM50 - Work Process Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION - initial - treated as empty by code (no duration range; age filter off).\n\n·        DURATION_UNIT - initial - treated as M by code (minutes).",
+    "default_bullets": [
+      "·        DURATION - initial - treated as empty by code (no duration range; age filter off).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = ICON_DELETE."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 7177
+  },
+  {
+    "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus 1 day lower bound when DATUM and BACKDAYS selections do not fill the range).\n\n·        DURATION - initial - treated as empty by code (no duration range; age filter off).\n\n·        DURATION_UNIT - initial - treated as M by code (minutes).",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus 1 day lower bound when DATUM and BACKDAYS selections do not fill the range).",
+      "·        DURATION - initial - treated as empty by code (no duration range; age filter off).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 5299
+  },
+  {
+    "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION - initial - treated as unconstrained multi-value selection by code (empty interval table keeps every computed age value until explicit bounds are supplied).\n\n·        DURATION_UNIT - D set in code before the single-value read completes by code (day-based aging math runs unless the caller overrides the unit afterward).",
+    "default_bullets": [
+      "·        DURATION - initial - treated as unconstrained multi-value selection by code (empty interval table keeps every computed age value until explicit bounds are supplied).",
+      "·        DURATION_UNIT - D set in code before the single-value read completes by code (day-based aging math runs unless the caller overrides the unit afterward)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'D'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 3884
+  },
+  {
+    "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 4219
+  },
+  {
+    "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables).\n\n·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed age value until explicit bounds are supplied on the selection interface).\n\n·        DURATION_UNIT - initial - treated as M by code (minute-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward).",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables).",
+      "·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed age value until explicit bounds are supplied on the selection interface).",
+      "·        DURATION_UNIT - initial - treated as M by code (minute-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 7166
+  },
+  {
+    "file": "SW_01_02_QRFC_IN_CNT - qRFC Inbound Queue Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 11221
+  },
+  {
+    "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 4219
+  },
+  {
+    "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 5171
+  },
+  {
+    "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables).\n\n·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed duration value until explicit bounds are supplied on the selection interface).\n\n·        DURATION_UNIT - initial - treated as D by code (day-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward).",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables).",
+      "·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed duration value until explicit bounds are supplied on the selection interface).",
+      "·        DURATION_UNIT - initial - treated as D by code (day-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LANGU = SY-LANGU."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'D'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 4867
+  },
+  {
+    "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md",
+    "section_found": false,
+    "section_error": "no Default Values heading found",
+    "default_section_text": "",
+    "default_bullets": [],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LANGU = SY-LANGU."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_MAXSEL = 500."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_MAXSEL = LV_MAX_RECORDS."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_FM = '/SKN/FC_SW_01_GET_ADDR_DETAILS'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_FM = '/SKN/F_SW_01_GET_ADDR_DETAILES'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DOMNAME = 'SX_ADDRTYP'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DOMVALUE = LS_DATA-SNDART."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_MSG_NUMBER = T_DATA-STATUS."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      },
+      {
+        "kind": "LV_BACKDAYS_INIT",
+        "line": "IF LV_BACKDAYS IS INITIAL. LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "MAXSEL_DEFAULT",
+        "line": "LV_MAXSEL = 500 (when LV_MAX_RECORDS initial)"
+      }
+    ],
+    "abap_chars": 8448
+  },
+  {
+    "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 by code (one day of lookback when building the default monitoring date window from the evaluation clock).\n\n·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied).\n\n·        DURATION_UNIT - initial - treated as M by code (minutes as the unit for elapsed-time calculation when the parameter remains blank at read time).\n\nNote: Default handling for lookback and duration is implemented in the called detail routine; this count wrapper forwards selection tables and reads the alert flag from that routine before comparing the resulting table size to the configured count limit.",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 by code (one day of lookback when building the default monitoring date window from the evaluation clock).",
+      "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes as the unit for elapsed-time calculation when the parameter remains blank at read time).",
+      "Note: Default handling for lookback and duration is implemented in the called detail routine; this count wrapper forwards selection tables and reads the alert flag from that routine before comparing the resulting table size to the configured count limit."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = LV_ALERT."
+      }
+    ],
+    "abap_chars": 974
+  },
+  {
+    "file": "SW_01_02_TRFC - tRFC Transactional RFC Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).\n·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read).",
+    "default_bullets": [
+      "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read)."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 22241
+  },
+  {
+    "file": "SW_01_02_XI_MESS - XI Message Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 by code (one calendar day of lookback applied when building the default lower date bound for message selection).\n\n·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).\n\n·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read).\n\nNote: The code seeds default lookback and unit values before reading the selection table so that duration math and date lower bounds remain defined even when operators leave some inputs blank.",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 by code (one calendar day of lookback applied when building the default lower date bound for message selection).",
+      "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read).",
+      "Note: The code seeds default lookback and unit values before reading the selection table so that duration math and date lower bounds remain defined even when operators leave some inputs blank."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 9614
+  },
+  {
+    "file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DEST = LV_SW_DEST."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_NO_SERVER_LIST = 'X'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LOG_DEST = LS_SERVER_LIST-NAME."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_FREE_PRC = T_DATA-FREE / T_DATA-CAPACITY * 100."
+      }
+    ],
+    "abap_chars": 8383
+  },
+  {
+    "file": "SW_01_20_SM66 - Global Work Process Overview.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).\n\n·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read).\n\nNote: Start timestamps on each work process row participate in duration calculation once rows are returned; keep duration windows aligned with the same clock interpretation chosen for MANAGE_IN_UTC when that parameter is used.",
+    "default_bullets": [
+      "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection).",
+      "·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read).",
+      "Note: Start timestamps on each work process row participate in duration calculation once rows are returned; keep duration windows aligned with the same clock interpretation chosen for MANAGE_IN_UTC when that parameter is used."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = ICON_DELETE."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 7177
+  },
+  {
+    "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_NO_SERVER_LIST = 'X'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LOGICAL_DESTINATION = LS_SRV_LIST-NAME."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = ICON_DELETE."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 7667
+  },
+  {
+    "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values are defined for this EI.",
+    "default_bullets": [
+      "No default values are defined for this EI."
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'M'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_NO_SERVER_LIST = 'X'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LOGICAL_DESTINATION = LS_SRV_LIST-NAME."
+      },
+      {
+        "kind": "FIELD_ASSIGN",
+        "line": "PROCESS_ICON = ICON_DELETE."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 8394
+  },
+  {
+    "file": "SW_01_20_USR_PWD - User Password State Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 3000 by code\n\n·        DURATION - initial - treated as unconstrained by code\n\n·        DURATION_UNIT - initial - treated as D by code",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 3000 by code",
+      "·        DURATION - initial - treated as unconstrained by code",
+      "·        DURATION_UNIT - initial - treated as D by code"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_LANGU = SY-LANGU."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'D'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 10248
+  },
+  {
+    "file": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        AGGR_LEVEL - T",
+    "default_bullets": [
+      "·        AGGR_LEVEL - T"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_AGGR_LEVEL = 'T'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_WP_TYP = LS_WP-WP_TYP."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_WP_TYP = 'BTC'."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 6405
+  },
+  {
+    "file": "SW_01_AMS_BUFF_STAT - AMS Buffer Statistics Monitoring_.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "No default values.",
+    "default_bullets": [
+      "No default values."
+    ],
+    "code_evidence": [
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 3479
+  },
+  {
+    "file": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 day backward window by code\n\n·        DURATION - initial - treated as no extra duration filter by code\n\n·        DURATION_UNIT - initial - treated as D day units by code",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 day backward window by code",
+      "·        DURATION - initial - treated as no extra duration filter by code",
+      "·        DURATION_UNIT - initial - treated as D day units by code"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'D'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM  = SY_DATLO - LV_BACKDAYS ."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM = SY-DATUM - 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_FROM = RS_DATUM-LOW."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO = SY-DATUM - 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO = RS_DATUM-LOW."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_D_TO = RS_DATUM-HIGH."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 5426
+  },
+  {
+    "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md",
+    "section_found": true,
+    "section_error": "",
+    "default_section_text": "·        BACKDAYS - initial - treated as 1 day backward window by code\n\n·        DURATION - initial - treated as no extra duration filter by code\n\n·        DURATION_UNIT - initial - treated as D day units by code\n\n·        PACKAGE_INTERVAL - 10",
+    "default_bullets": [
+      "·        BACKDAYS - initial - treated as 1 day backward window by code",
+      "·        DURATION - initial - treated as no extra duration filter by code",
+      "·        DURATION_UNIT - initial - treated as D day units by code",
+      "·        PACKAGE_INTERVAL - 10"
+    ],
+    "code_evidence": [
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DURATION_UNIT = 'D'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_BACKDAYS = 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_PACKAGE_INTERVAL = 10.  \" 10 days"
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_INTERVAL = DATE_FROM - DATE_TO + 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_STAT_AUTH_OK = 'X'."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_PAGES = 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_INTERVAL = DATE_TO - DATE_FROM + 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_PAGES = ROUND( VAL = ( LV_DATE_INTERVAL / LV_PACKAGE_INTERVAL ) DEC  = 0 MODE = CL_ABAP_MATH=>ROUND_UP )."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_FROM = DATE_FROM."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_TO = LV_DATE_FROM + LV_PACKAGE_INTERVAL."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_FROM = LV_DATE_TO + 1."
+      },
+      {
+        "kind": "LV_ASSIGN",
+        "line": "LV_DATE_TO = DATE_TO."
+      },
+      {
+        "kind": "ALERT_FLAG",
+        "line": "IS_ALERT = 'X' ."
+      }
+    ],
+    "abap_chars": 6660
+  }
+]

@@ -1,0 +1,741 @@
+{
+  "source_file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Exception Indicator: Update Requests Count Monitoring (SW_01_01_SM13_CNT)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) monitors and counts the total number of update requests that occur within a specified time period and filtering criteria. The EI acts as a high-level system health indicator that provides count-based monitoring rather than detailed request analysis, using the same data sources as SM13 (Update Records) but focusing on aggregate metrics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The EI catches:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High-frequency update request occurrences indicating systemic processing issues or degraded system performance\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unusual spikes in update volumes that may signal underlying technical problems, processing bottlenecks, or infrastructure issues\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Zero-request periods for validation that update processing is functioning normally (when monitoring for minimum thresholds)\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Threshold breaches where the number of update requests exceeds acceptable operational limits\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This EI provides aggregate count monitoring for system administrators who need to track overall update request volumes and patterns without analyzing individual request details."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High update request counts indicate system processing instability causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing queue bottlenecks and resource exhaustion"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database update conflicts causing retry scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Infrastructure problems affecting update processing servers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process Disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Update processing failures preventing data consistency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction processing delays blocking critical operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance degradation during peak update periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data inconsistency due to incomplete update processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations due to processing delays"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Downstream system impacts from missing updates"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate update request patterns using SM13 transaction analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system resource levels and database performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review system logs for processing errors and bottlenecks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor update processing performance and queue lengths"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check database locks and resource availability during peak periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze update volume patterns and error frequencies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Apply system fixes and database optimizations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize update processing parameters and scheduling"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive update volume monitoring and automated resolution procedures"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "BACKDAYS",
+          "Days Backward from today",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "2",
+          "DURATION",
+          "Duration In Time Units",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "3",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "4",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "5",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "6",
+          "SW_DEST",
+          "Cloud Destination",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "7",
+          "UPD_REQ_CNT",
+          "Count",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_CNT",
+          ""
+        ],
+        [
+          "8",
+          "VBCLIINFO",
+          "Bytes",
+          "RAW",
+          "1",
+          "0",
+          "THRAW1",
+          "THRAW1"
+        ],
+        [
+          "9",
+          "VBCLINAME",
+          "Update Server Name",
+          "CHAR",
+          "64",
+          "0",
+          "VBNAME",
+          "VBNAME"
+        ],
+        [
+          "10",
+          "VBCONTEXT",
+          "Update context",
+          "CHAR",
+          "20",
+          "0",
+          "VBCONTEXT",
+          "VBCONTEXT"
+        ],
+        [
+          "11",
+          "VBLANG",
+          "Logon Language",
+          "LANG",
+          "1",
+          "0",
+          "XULANGU",
+          "LANG"
+        ],
+        [
+          "12",
+          "VBMANDT",
+          "Client",
+          "CLNT",
+          "3",
+          "0",
+          "VBMANDT",
+          "MANDT"
+        ],
+        [
+          "13",
+          "VBNAME",
+          "Update Server Name",
+          "CHAR",
+          "64",
+          "0",
+          "VBNAME",
+          "VBNAME"
+        ],
+        [
+          "14",
+          "VBRC",
+          "Update return code",
+          "INT4",
+          "10",
+          "0",
+          "VBRC",
+          "VBRC"
+        ],
+        [
+          "15",
+          "VBREPORT",
+          "Generating program",
+          "CHAR",
+          "40",
+          "0",
+          "VBREPORT",
+          "WPREPORT"
+        ],
+        [
+          "16",
+          "VBSTATE",
+          "Status",
+          "INT1",
+          "3",
+          "0",
+          "VBSTATE",
+          "INT1"
+        ],
+        [
+          "17",
+          "VBTCODE",
+          "TCODE",
+          "CHAR",
+          "20",
+          "0",
+          "VBTCODE",
+          "VBTCODE"
+        ],
+        [
+          "18",
+          "VBUSR",
+          "User",
+          "CHAR",
+          "12",
+          "0",
+          "VBBNAME",
+          "UBNAME"
+        ],
+        [
+          "19",
+          "VBZONLO",
+          "Local time zone",
+          "CHAR",
+          "6",
+          "0",
+          "VBZONLO",
+          "VBZONLO"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 19 parameters listed in the Parameters Reference Table when tuning this EI; each shapes which update requests participate in the population pass before the final row tally is compared to your count band."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Days Backward from today)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Backdays is based on VBDATE"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After the date window from BACKDAYS is applied, DURATION supplies the numeric width for the secondary age check measured in the unit given by DURATION_UNIT, so only update lines whose scheduling age still fits the declared span remain eligible for counting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Selects the calendar meaning applied to DURATION when the monitor evaluates how long each update request has been pending relative to the run timestamp."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours between the update scheduling timestamp and the evaluation moment."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes for short-interval operations reviews."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Whole-day style spacing when you reason in business days rather than clock minutes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day counting style used by the duration helper when the template expects day-bucket alignment instead of raw clock math."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Chooses whether duration math and cross-system comparisons normalize timestamps to UTC or stay on the application server’s local clock context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Compare pending times in UTC so distributed landscapes share one clock reference."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — Keep local application-server time for operators who work entirely in one time zone."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Maps each surviving update line into the monitor’s red / yellow / green style buckets so you can require only the severity band that should influence the count going into the threshold test."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R — Error-style or failed processing bucket."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G — Successful or cleared bucket."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y — Warning or in-flight bucket."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Additional literals may exist where the framework extends the palette for neutral states."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST (Cloud Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Routes the underlying update read through the declared cloud or RFC-capable destination when your template evaluates a central hub instead of the local instance only."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_REQ_CNT (Count)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Declares the inclusive count window for the number of update-request lines returned after the population pass; the monitor raises its alert only when that line count lies inside UPD_REQ_CNT exactly as you configured the multivalued selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_REQ_CNT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Single value — Fire only when the population contains exactly that many lines."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Low - high — Fire when the population size falls between the bounds, inclusive."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Open upper bound — Use the framework’s open-ended pattern when any count at or above a floor should qualify."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBCLIINFO (Bytes)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Holds optional raw client logon metadata bytes; when restricted, it keeps the population aligned with diagnostics that already identified a specific client fingerprint."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBCLINAME (Update Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Filters on the update-server name resolved from the client logon metadata pair, which is useful when you split traffic across named update gateways and need the count scoped to one gateway’s view."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBCONTEXT (Update context)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Isolates update work tagged with a particular VBCONTEXT value so batch versus dialog versus inbound-idoc contexts do not inflate each other’s counts."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBLANG (Logon Language)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Restricts the population to update records created under a specific logon language, which matters when language-specific posting paths generate different queue volumes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBMANDT (Client)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pins the population to one or more productive or regression clients before the tally runs, preventing cross-client noise from masking a spike in a single client."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBNAME (Update Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Targets the update-server name stored on the update header itself (distinct from the client-resolved name), which is the field operators usually recognize in SM13-style listings tied to the VBHDR scheduler."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBRC (Update return code)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Limits counting to lines whose SAP update return code still matches your declared band, so benign informational codes do not dilute alerts aimed at hard failures."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBREPORT (Generating program)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows the population to updates spawned by specific generating programs, which is how functional teams watch a single custom include or report driver."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBSTATE (Status)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Keeps only update lines whose numeric processing state matches the configured selection, letting you alert on paused versus active versus finished buckets independently."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBTCODE (TCODE)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Scopes the tally to updates that originated from named transactions, which is ideal when month-end closing transactions are the only ones you want reflected in the count."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBUSR (User)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Restricts the population to updates owned by particular batch or dialog users before the framework compares the resulting quantity to UPD_REQ_CNT."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBZONLO (Local time zone)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns interpretation of local timestamps with the update owner’s recorded time-zone token so duration and BACKDAYS comparisons stay consistent for globally distributed user populations."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS, DURATION, and DURATION_UNIT work as successive narrowing steps on the same update population: the historical window comes first, then the age-of-line test removes work that is either too fresh or too stale for the scenario you are counting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC should stay aligned with how your team reads timestamps in SM13; mixing UTC-normalized duration math with locally interpreted BACKDAYS expectations can make the same physical queue look larger or smaller than operators expect."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR and the detailed VB selectors (client, user, transaction, return code, program, status, server names, context, language, time zone) should be configured together so the headline UPD_REQ_CNT* test measures the same logical slice your administrators would defend in an incident review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST must be populated when the count should reflect a remote hub; otherwise the tally may describe only the local instance while management believes it covers the full landscape."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_REQ_CNT does not replace those filters—it only decides whether the quantity of rows that survived them is itself exceptional, which is why tightening VB filters without revisiting the count band often creates unwanted churn or silence."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - initial  - treated as 1 by code (today + tomorrow)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial – treated as empty by code (no time range defined)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - initial —treated as M by code (minutes)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Production client spike watch"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Catch when more than a handful of update lines simultaneously match a tight productive-client slice, using full-day duration alignment for the age leg."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBMANDT = 100\n BACKDAYS = 2\n DURATION = 1\n DURATION_UNIT = F\n UPD_REQ_CNT = 10 - 999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Batch user backlog"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Monitor a known integration user and require a minimum queue size before paging overnight operations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VBUSR = RFC_BATCH_01\n VBTCODE = ME21N\n UPD_REQ_CNT = 25 - 999999\n MANAGE_IN_UTC = X\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Error-colored short window"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight bursts of error-bucket traffic within a short clock window for war-room visibility."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR = R\n DURATION = 45\n DURATION_UNIT = M\n VBRC = 1 - 9999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Program-specific cloud hub"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Count updates spawned by a custom driver through a named cloud destination while keeping language-specific noise out."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST = MY_CLOUD_CONN\n VBREPORT = ZUPDATE_DRIVER\n VBLANG = E\n UPD_REQ_CNT = 1 - 5\n\n "
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM13_CNT",
+          "UPD_REQ_CNT",
+          "SW: Count",
+          "INT4(10)",
+          "/SKN/E_SW_CNT"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_SM13_CNT.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM13_CNT OPTIONAL\n*\"----------------------------------------------------------------------\nDATA : LV_ALERT TYPE  CHAR1.\nDATA : LS_DATA TYPE /SKN/S_SW_01_01_SM13,\n       LT_DATA LIKE TABLE OF LS_DATA.\nDATA : LV_CNT TYPE I.\nDATA_MULTY: UPD_REQ_CNT /SKN/E_SW_CNT.\nSELECT_MULTY: UPD_REQ_CNT.\n   REFRESH T_DATA.\n   CALL FUNCTION '/SKN/F_SW_01_01_SM13'\n    IMPORTING\n       IS_ALERT       = LV_ALERT\n     TABLES\n       T_SELECT       = T_SELECT\n       T_DATA         = LT_DATA.\n    IS_ALERT = LV_ALERT.\n    DESCRIBE TABLE LT_DATA LINES LV_CNT.\n    IF LV_CNT IN R_UPD_REQ_CNT.\n      T_DATA-UPD_REQ_CNT = LV_CNT.\n      APPEND T_DATA.\n      IS_ALERT = LV_ALERT.\n    ELSE.\n      CLEAR IS_ALERT.\n    ENDIF.\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -19,19 +19,21 @@ OUTPUT FORMAT (follow exactly):
 
 ## Suggested Resolution
 
-3. Exactly three bold subsections, each with 4–8 bullets:
+3. Exactly three bold subsections, each with 4–8 bullets—**no fourth subsection**:
    - **Immediate Response** — first-line actions (review flagged data, verify high-value items, check status, clarify business context). Base on what the EI outputs and which transactions the code uses. Describe in **business language**; do not name parameters, fields, or structures.
    - **System Assessment** — analysis steps (e.g. time period and dimension review, comparison to prior periods). Base on the function's logic. Describe in **business language**; do not name parameters, fields, or structures (e.g. no BACKDAYS, DATE_REF_FLD, DURATION, T_DATA).
    - **Corrective Actions** — follow-up actions (correct erroneous data, escalate, update master data, adjust monitoring scope, document, schedule recurring runs). Base on the function's domain. Describe in **business language**; transaction codes (e.g. VA02, VL03N) are allowed when they help the reader act; do not name parameters, fields, or structures.
+   - **Do not** add extra bold subsections such as **Training**, **Training and Awareness**, **Education**, **User enablement**, **Process Improvements** (as a fourth block), or similar. The benchmark has only the three titles above. If you need training- or awareness-style guidance, express it as **one or more bullets under Corrective Actions**, not as its own subsection.
 
 Rules:
 - This section is business-oriented; keep technical details minimal.
 - Never include in the narrative: BACKDAYS, FORWDAYS, DURATION (or DURATION_UNIT, etc.), DATE_REF_FLD, T_DATA, or similar parameter/structure names. Mention only the most important tables and central fields when understanding would otherwise be lacking; no joins, no output structure names.
 - Infer domain and wording from the code, structure, and parameters. Do not copy a fixed template; the text must match this specific function.
-- Match the structure and depth of the benchmark: same number of subsections (exactly three for Problem Description, exactly three for Suggested Resolution), same type of intro sentence and bullets. Adapt subsection titles to the function's domain (e.g. Financial and Reporting; Operational/Control or Procurement/Sales Operations; Management Visibility; System Stability; Government Compliance as appropriate).
+- Match the structure and depth of the benchmark: same number of subsections (exactly three for Problem Description, exactly three for Suggested Resolution), same type of intro sentence and bullets. Adapt subsection titles to the function's domain (e.g. Financial and Reporting; Operational/Control or Procurement/Sales Operations; Management Visibility; System Stability; Government Compliance as appropriate). Under **Suggested Resolution**, subsection titles must be only **Immediate Response**, **System Assessment**, and **Corrective Actions**—never **Training** or other fourth headings.
 - Tone: professional, concise. No implementation details (no internal function names, line numbers, custom namespaces). Bullets must be in business language (what goes wrong, what to do); do not list parameter names, field names, or structure names. Transaction codes (e.g. VA03, VL03N) are allowed when they help the reader act.
 - In the narrative, mention only SAP standard entities (e.g. tables, fields, transaction codes) when necessary. Do not mention custom objects (Z*, /SKN/*, etc.) unless essential to explain the EI's functionality.
 - Output ONLY the two sections: heading "## Problem Description" then the intro and three subsections; heading "## Suggested Resolution" then the three subsections. No document title, no other sections, no preamble.
+- **Single heading per section:** Use exactly one `##` line for each title. Do **not** also output `### Problem Description` or `### Suggested Resolution` above the matching `##` line (duplicates create two headings in Word).
 - **Optional Hint:** After the input file locations you may provide a short phrase under "Hint:". If Hint is empty or omitted, analyze and write as above. If Hint is provided, use it to guide code analysis and align the explanation with that hint (e.g. emphasize purchase-side view, vendor dimension, or a specific use case); the text must still be grounded in the code and parameters.
 
 Benchmark example (format and approach only — do not copy; infer content for the function you are given). Source: reference files\Explanation_Credit Memo Monthly volume by Payer_$1M in LC_200019_000012__EI__SW_10_01_ORD_VAL_TOT.md

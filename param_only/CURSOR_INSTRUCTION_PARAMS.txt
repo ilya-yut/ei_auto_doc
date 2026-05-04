@@ -1,0 +1,56 @@
+Generate the Parameters sections (03, 04, 05, 06), plus the EI Function Structure section (07, structure only – no ABAP code), and write each to a file. Do not add a document title or preamble.
+
+1. Read each prompt file from this project in order:
+   - param_only/run/03_prompt.txt
+   - param_only/run/04_prompt.txt
+   - param_only/run/05_prompt.txt
+   - param_only/run/06_prompt.txt
+   - param_only/run/07_prompt.txt
+
+2. For each prompt file, follow the instructions in it. Use the file paths given inside the prompt to read the input files from the workspace (input folder or paths specified in the prompt). For 07, use only the structure file (no code file); output the EI Function Structure table only.
+
+3. Write the output for each prompt to the corresponding response file (only the section content requested by the prompt, no extra title or preamble):
+   - 03_prompt.txt → param_only/run/03_response.md
+   - 04_prompt.txt → param_only/run/04_response.md
+   - 05_prompt.txt → param_only/run/05_response.md
+   - 06_prompt.txt → param_only/run/06_response.md
+   - 07_prompt.txt → param_only/run/07_response.md
+
+4. Produce exactly 5 response files. When all 5 are written, run Verification 04 and Verification 06, then the pipeline verify and assemble steps (see step 5).
+
+5. Verification (before declaring done):
+   (a0) **No duplicate Markdown headings:** In each `NN_response.md`, do not use the same section title twice as `### Title` then `## Title`. For this pipeline, sections 03–07 use **`###` only** (including 07: `### EI Function Structure` only—do not add `## EI Function Structure`). `python param_only/param_pipeline.py verify` fails if duplicates are present.
+   (a) For the Parameter Configuration Guidelines (04_response.md), run the verification prompt and overwrite the file:
+       - Run prompts/PROMPT_Verification_04_Parameter_Configuration_Guidelines.md on param_only/run/04_response.md.
+       - Overwrite param_only/run/04_response.md with the full corrected subsection it returns.
+   (b) For Default Values and Practical Configuration Examples (06_response.md), run the verification prompt and overwrite the file:
+       - Run prompts/PROMPT_Verification_06_Default_Values_and_Practical_Examples.md on param_only/run/06_response.md.
+       - Overwrite param_only/run/06_response.md with the full corrected output. Ensure each use case has at least 2 parameters in its code block and at least one use case has 3–5 (or more) parameters.
+   (c) Then run:
+       - python param_only/param_pipeline.py verify
+       - python param_only/param_pipeline.py assemble
+   If verify fails, fix the reported issues (e.g. edit 04_response.md or 06_response.md) and run verify and assemble again.
+
+Section 4 only (04_response.md)
+
+When generating or editing only Section 4 (Parameter Configuration Guidelines):
+
+- Use param_only/run/04_prompt.txt as the single source of rules. Follow every rule in it, including "No generic or useless sentences" and "Business-oriented language."
+- For each parameter's main explanation, run the self-check: "If I replaced this parameter name with another, would this sentence still be true?" If yes, delete or replace that sentence with function- or parameter-specific content (where the value comes from, when/where in the process it is used, or business meaning).
+- Do not use SELECT, DELETE, WHERE, JOIN, or table/field names (e.g. EKKO, EKPO, EKKN) in the narrative unless the guideline cannot be clear without them. Prefer business wording: what the parameter is (company code, vendor, order date) and when/where in the process it is used (order header, schedule line, monitoring window).
+- Avoid filler phrases such as "set to focus on," "set to narrow by," "when relevant to the data flow," "when needed," "when applicable." The pipeline verify step will fail if these appear too often.
+- After writing 04_response.md, run prompts/PROMPT_Verification_04_Parameter_Configuration_Guidelines.md on 04_response.md and overwrite param_only/run/04_response.md with the corrected output.
+- After that, run: python param_only/param_pipeline.py verify  and  python param_only/param_pipeline.py assemble  before considering the section done.
+
+Section 6 only (06_response.md)
+
+When generating or editing only Section 6 (Default Values and Practical Configuration Examples):
+- Use param_only/run/06_prompt.txt as the single source of rules. Each use case must have at least 2 parameters in its code block; at least one use case must have 3–5 (or more) parameters.
+- After writing 06_response.md, run prompts/PROMPT_Verification_06_Default_Values_and_Practical_Examples.md on 06_response.md and overwrite param_only/run/06_response.md with the corrected output.
+- Then run: python param_only/param_pipeline.py verify  and  python param_only/param_pipeline.py assemble  before considering the section done.
+
+Section 7 only (07_response.md – EI Function Structure, no ABAP)
+
+When generating or editing only Section 7 (EI Function Structure):
+- Use param_only/run/07_prompt.txt. Output only the EI Function Structure section (heading, intro sentence, full table from structure file). Do not include any ABAP Code section.
+- Then run: python param_only/param_pipeline.py verify  and  python param_only/param_pipeline.py assemble  before considering the section done.

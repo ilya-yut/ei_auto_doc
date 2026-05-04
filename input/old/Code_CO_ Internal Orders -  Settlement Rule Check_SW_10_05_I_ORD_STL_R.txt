@@ -1,0 +1,300 @@
+FUNCTION /SKN/F_SW_10_05_INT_ORD_STL_RL .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_05_INT_ORD_STL_RL OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC     CHAR1 ,
+             LANGU             LANGU,
+             BACKDAYS          INT4,
+             DATE_REF_FLD      NAME_FELD,
+             DURATION_UNIT     /SKN/E_SW_DURATION_UNIT,
+             FIELD_FOR_CHECK   NAME_FELD "FIELDNAME,
+             .
+CONSTANTS: LC_NO_SETTLEMENT(200) TYPE C VALUE 'Order does not have any settlement rule'.
+CONSTANTS: LC_NO_COMPLETENESS(200) TYPE C VALUE 'Order has Settlement rule lower then 100%'.
+ LV_BACKDAYS = 1.
+ LV_DATE_REF_FLD = 'AEDAT'.  "Change order master date
+ LV_DURATION_UNIT = 'D'.
+ LV_FIELD_FOR_CHECK = 'KOSTL'.
+ SELECT_SINGLE: MANAGE_IN_UTC,
+                LANGU,
+                BACKDAYS,
+                DATE_REF_FLD,
+                DURATION_UNIT,
+                FIELD_FOR_CHECK
+                .
+DATA_MULTY: AUFNR        AUFNR,
+            AUART        AUFART,
+            AUTYP        AUFTYP,
+            OBJNR        J_OBJNR,
+            KOSTL           BRGKOSTL,
+            GABJA           GABJA,
+            GABPE           GABPE,
+            GBISJ           GBISJ,
+            GBISP           GBISP,
+            PS_PSP_PNR      PS_PSP_PNR,
+            SUM_PROZS       BRGPROZS,
+            BUKRS           BUKRS,
+            WERKS           WERKS_D,
+            GSBER           GSBER,
+            KOKRS           KOKRS,
+            AEDAT           AUFAEDAT, "Changed on
+            ERDAT           AUFERFDAT, "Date on Which Record Was Created
+            STDAT           AUFSTDAT, "Date of last status change
+            DATUM            SY-DATUM,
+            DURATION        /SKN/E_SW_DURATION,
+            ERR_TYPE        CHAR1
+             .
+SELECT_MULTY: AUFNR ,
+            AUART,
+            AUTYP,
+            OBJNR,
+            KOSTL,
+            GABJA,
+            GABPE,
+            GBISJ,
+            GBISP,
+            PS_PSP_PNR,
+            SUM_PROZS,
+            BUKRS,
+            WERKS,
+            GSBER,
+            KOKRS,
+            AEDAT, "Changed on
+            ERDAT, "Date on Which Record Was Created
+            STDAT, "Date of last status change
+            DATUM,
+            DURATION,
+            ERR_TYPE
+            .
+CONVERT_MULTY: AUFNR ALPHA,
+               "GJAHR GJAHR,
+               KOSTL ALPHA.
+CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+*convert_multy: KUNNR ALPHA,
+*               VBELN ALPHA,
+*               BP1_CODE ALPHA,
+*               BP2_CODE ALPHA,
+*               BP3_CODE ALPHA.
+*ranges : R_FLD_NAME for DD03P-FIELDNAME,
+*         R_FLD_VAL for DD03P-FIELDNAME .
+*
+*data :   FLD_NAME type FIELDNAME.
+*data : i type I,
+*       ci(1) type c,
+*       nfields type I value 3.   "
+DATA : BACKDAYS  TYPE I ,
+       FORWDAYS TYPE I,
+       DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM .
+DATA : LANGU LIKE SY-LANGU .
+DATA : IS_OUT(1) TYPE C.
+DATA : TIME_DIFF TYPE  INT4 .
+*data : W_DATA like line of T_DATA .
+*data : wa_VBPA type VBPA.
+*data : lv_VBELN type VBELN,
+*       lv_POSNR type POSNR,
+*       lv_PARVW type PARVW,
+*       lv_KUNNR TYPE  KUNNR,
+*       lv_KUNNR_NAME TYPE  NAME1_GP,
+*       lv_LIFNR TYPE  LIFNR,
+*       lv_LIFNR_NAME TYPE  NAME1_GP,
+*       lv_PERNR TYPE  PERNR_D,
+*       lv_PERNR_NAME TYPE  NAME1_GP,
+*       lv_NRART type NRART.
+*data: lv_VBTYP type VBTYP.
+  DATA: LT_DATA LIKE T_DATA[],
+        LWA_DATA LIKE LINE OF T_DATA,
+        LTW_DATA LIKE TABLE OF LWA_DATA.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : FLD(60) TYPE C .
+DATA : REF_DATE TYPE D.
+FIELD-SYMBOLS:  TYPE ANY ,
+               <FS_V> TYPE ANY .
+DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+  INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+DATA : END OF SW_STRUCTURE .
+DATA : LS_VBPA TYPE VBPA,
+       LT_VBPA LIKE TABLE OF LS_VBPA.
+DATA : LV_DATA_POSNR TYPE POSNR.
+DATA: LS_STATUS TYPE JSTAT,
+      LT_STATUS LIKE TABLE OF LS_STATUS,
+      LV_STATUS TYPE J_STATUS,
+      LV_STATUS_OK(1) TYPE C.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_05_IN_ORD_STL_RL'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+   IF R_DATUM[] IS INITIAL .
+     RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+       DATE_FROM = SY-DATUM - LV_BACKDAYS .
+       RS_DATUM-LOW = DATE_FROM .
+        APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+ "--- Set Reference Date Field
+   CASE LV_DATE_REF_FLD.
+     WHEN 'ERDAT'.
+       R_ERDAT[] = R_DATUM[]. "Document created
+     WHEN  'STDAT'.
+       R_STDAT[] = R_DATUM[]. ""Date of last status change
+     WHEN 'AEDAT'.
+       R_AEDAT[] = R_DATUM[]. "changed on
+     WHEN OTHERS.
+       R_AEDAT[] = R_DATUM[]. "changed on
+   ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+     SELECT A~AUFNR A~AUART A~AUTYP C~OBJNR C~KOSTL C~GABJA C~GABPE C~GBISJ C~GBISP C~PS_PSP_PNR
+            C~PROZS A~ERNAM A~ERDAT A~AENAM A~AEDAT A~STDAT A~BUKRS A~WERKS A~GSBER A~KOKRS
+      FROM AUFK AS A
+      LEFT OUTER JOIN COBRB AS C
+      ON A~OBJNR = C~OBJNR
+      INTO CORRESPONDING FIELDS OF TABLE LT_DATA
+      WHERE  A~OBJNR IN R_OBJNR
+         AND A~AUFNR IN R_AUFNR
+         AND A~AUART IN R_AUART
+         AND A~AUTYP IN R_AUTYP
+         AND A~ERDAT IN R_ERDAT
+         AND A~AEDAT IN R_AEDAT
+         AND A~STDAT IN R_STDAT
+         AND A~BUKRS IN R_BUKRS
+         AND A~WERKS IN R_WERKS
+         AND A~GSBER IN R_GSBER
+         AND A~KOKRS IN R_KOKRS.
+*         AND c~KOSTL in R_KOSTL
+*         AND c~GABJA in R_GABJA
+*         AND c~GABPE in R_GABPE
+*         AND c~GBISJ in R_GBISJ
+*         AND c~GBISP in R_GBISP.
+***************************************************************************
+  "--- Get no settlement population
+   LOOP AT LT_DATA INTO LWA_DATA WHERE OBJNR IS INITIAL.
+     SY_TABIX = SY-TABIX.
+     LWA_DATA-ERR_TYPE = 'S'.
+     LWA_DATA-ERR_MSG = LC_NO_SETTLEMENT.
+     APPEND LWA_DATA TO T_DATA.
+     DELETE LT_DATA INDEX SY_TABIX.
+   ENDLOOP.
+  "--- Remove non relevant population
+  CASE LV_FIELD_FOR_CHECK.
+       WHEN 'KOSTL'.
+         DELETE LT_DATA WHERE KOSTL IS INITIAL .
+       WHEN 'PS_PSP_PNR'.
+         DELETE LT_DATA WHERE PS_PSP_PNR IS INITIAL .
+       WHEN OTHERS.
+     ENDCASE.
+     DELETE LT_DATA WHERE GBISJ IS NOT INITIAL .
+     DELETE LT_DATA WHERE GBISP IS NOT INITIAL .
+     DELETE LT_DATA WHERE KOSTL  NOT IN R_KOSTL .
+     DELETE LT_DATA WHERE PS_PSP_PNR NOT IN R_PS_PSP_PNR.
+     DELETE LT_DATA WHERE GABJA NOT IN R_GABJA.
+     DELETE LT_DATA WHERE GABPE NOT IN R_GABPE.
+  "--- Check no settlement completness (100%)
+  REFRESH LTW_DATA.
+   SORT LT_DATA BY AUFNR OBJNR.
+   LOOP AT LT_DATA INTO LWA_DATA.
+     CLEAR LWA_DATA-PERBZ.
+     COLLECT LWA_DATA INTO LTW_DATA.
+   ENDLOOP.
+   "delete ltw_data where PROZS <> 100.
+   LOOP AT LTW_DATA INTO LWA_DATA WHERE PROZS <> 100.
+     SY_TABIX = SY-TABIX.
+     LWA_DATA-ERR_TYPE = 'C'.
+     LWA_DATA-ERR_MSG = LC_NO_COMPLETENESS.
+     APPEND LWA_DATA TO T_DATA.
+   ENDLOOP.
+   DELETE T_DATA WHERE ERR_TYPE NOT IN R_ERR_TYPE.
+*  loop at lt_data into lwa_data.
+*     CASE lv_FIELD_FOR_CHECK.
+*       WHEN 'KOSTL'.
+*          "if lwa_data-AUART in R_AUART.
+*            if lwa_data-KOSTL IS NOT INITIAL .
+*               if ( lwa_data-GBISJ IS INITIAL
+*                   AND lwa_data-GBISP IS INITIAL ).
+*                 "--- Relevant population
+*                 if lwa_data-PROZS is initial .
+*                   " No settlement
+*                 else.
+*                   "== check 100
+*                 endif.
+*               else.
+*                 "if lwa_data-ERR_MSG is INITIAL.
+*                 "ERR_MSG :"Order & doesn't have any settlement rule"
+*               endif.
+*             endif.
+*          "endif.
+*       WHEN 'PS_PSP_PNR'.
+*           if lwa_data-AUART in R_AUART.
+*              if lwa_data-PS_PSP_PNR IS NOT INITIAL .
+*               if ( lwa_data-GABJA IS INITIAL
+*                   AND  lwa_data-GABPE IS INITIAL
+*                   AND lwa_data-GBISJ IS INITIAL
+*                   AND lwa_data-GBISP IS INITIAL )
+*                 OR
+*                  ( lwa_data-GABJA IS NOT INITIAL
+*                   AND  lwa_data-GABPE IS NOT INITIAL
+*                   AND lwa_data-GBISJ IS INITIAL
+*                   AND lwa_data-GBISP IS INITIAL ).
+*               else.
+*                 "ERR_MSG :"Order & doesn't have any settlement rule"
+*               endif.
+*             endif.
+*           endif.
+*       WHEN OTHERS.
+*     ENDCASE.
+*  endloop.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    IF  IS NOT ASSIGNED.
+      CONTINUE.
+    ENDIF.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = REF_DATE
+          T_FROM            = SY-UZEIT
+          D_TO              = SY-DATUM
+          T_TO              = SY-UZEIT
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+         T_DATA-DURATION = '999999'.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+******************************************************************************
+************************************************************************
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

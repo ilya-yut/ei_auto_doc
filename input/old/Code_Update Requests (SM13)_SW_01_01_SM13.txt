@@ -1,0 +1,203 @@
+FUNCTION /SKN/F_SW_01_01_SM13.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM13 OPTIONAL
+*"----------------------------------------------------------------------
+DATA_MULTY: DURATION   /SKN/E_SW_DURATION,   "From NOW to Job Start Time point -in duration units
+            STATE_COLOR /SKN/E_SW_STATE_COLOR,
+            DATUM     SY-DATUM,
+            VBMANDT   VBMANDT,
+            VBUSR     VBBNAME,
+            VBREPORT  VBREPORT,
+            VBTCODE   VBTCODE,
+            VBRC      VBRC,
+            VBNAME    VBNAME,
+            VBCONTEXT VBCONTEXT,
+            VBSTATE   VBSTATE,
+            VBCLIINFO THRAW1,
+            VBLANG    XULANGU,
+            VBCLINAME VBNAME,
+            VBZONLO   VBZONLO.
+DATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             BACKDAYS INT4,
+             LANGU LANGU,
+             NUMBER SY-TABIX,
+             SUBRC SY-SUBRC,
+             MANAGE_IN_UTC CHAR1,
+             MAX_RECORDS INT4.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+DATA: DATE_FROM LIKE SY-DATUM,
+      DATE_TO LIKE SY-DATUM.
+DATA : TIME_DIFF TYPE  INT4 .
+*data : is_out(1) type C.
+*data: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.
+DATA: VBHDR_NAME(20) VALUE 'VBHDR',
+      MAX_RECORDS  TYPE I VALUE '99999',
+      VBHDR_LINE TYPE VBHDR,
+      VBDATE_FROM LIKE VBHDR-VBDATE,
+      VBDATE_TO LIKE VBHDR-VBDATE.
+*-- Fill Selection Option Tables
+   SELECT_MULTY: DURATION,
+                 STATE_COLOR,
+                 DATUM,
+                 VBMANDT,
+                 VBUSR,
+                 VBREPORT,
+                 VBTCODE,
+                 VBRC,
+                 VBNAME,
+                 VBCONTEXT,
+                 VBSTATE,
+                 VBCLIINFO,
+                 VBLANG,
+                 VBCLINAME,
+                 VBZONLO.
+   LV_DURATION_UNIT = 'M'.
+   SELECT_SINGLE: DURATION_UNIT,
+                  BACKDAYS,
+                  MANAGE_IN_UTC,
+                  LANGU,
+                  MAX_RECORDS.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_SM13'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+ SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+ TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+  IF LV_MAX_RECORDS IS NOT INITIAL.
+    MAX_RECORDS = LV_MAX_RECORDS.
+  ENDIF.
+* PROCESS_ICON = ICON_DELETE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+      CLEAR VBDATE_FROM.
+      VBDATE_FROM+0(8) = SY_DATLO.
+      VBDATE_TO   = '99991231235959'.
+      IF LV_BACKDAYS IS INITIAL.
+        LV_BACKDAYS = 1.
+      ENDIF.
+      IF R_DATUM[] IS NOT INITIAL .
+        READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+        IF SY-SUBRC IS INITIAL.
+          DATE_FROM = RS_DATUM-LOW.
+          IF DATE_FROM IS INITIAL.
+            DATE_FROM = SY_DATLO.
+          ENDIF.
+          DATE_TO = RS_DATUM-HIGH.
+          IF DATE_TO IS INITIAL.
+            DATE_TO = '99991231'.
+          ENDIF.
+        ENDIF.
+      ELSE.
+        DATE_FROM = SY_DATLO - LV_BACKDAYS .
+        DATE_TO = '99991231'.
+      ENDIF.
+      VBDATE_FROM+0(8) = DATE_FROM.
+      VBDATE_TO+0(8) = DATE_TO.
+      SELECT * UP TO MAX_RECORDS ROWS FROM (VBHDR_NAME)
+            INTO CORRESPONDING FIELDS OF VBHDR_LINE
+            WHERE VBMANDT IN R_VBMANDT
+                  AND VBUSR IN R_VBUSR
+                  AND VBSTATE IN R_VBSTATE "     BETWEEN vbstate_from AND vbstate_to
+                  AND VBRC  IN R_VBRC "  BETWEEN vbrc_from AND vbrc_to
+                  AND VBDATE BETWEEN VBDATE_FROM AND VBDATE_TO
+                  AND VBNAME  IN R_VBNAME "  LIKE vbserver
+            ORDER BY VBDATE DESCENDING.
+          MOVE-CORRESPONDING VBHDR_LINE TO T_DATA.
+          T_DATA-VDATE = T_DATA-VBDATE+0(8).
+          T_DATA-VTIME = T_DATA-VBDATE+8(6).
+          APPEND T_DATA.
+        ENDSELECT.
+  DELETE T_DATA WHERE: VBREPORT NOT IN R_VBREPORT,
+                       VBTCODE NOT IN R_VBTCODE,
+                       VBCONTEXT NOT IN R_VBCONTEXT,
+                       VBCLIINFO NOT IN R_VBCLIINFO,
+                       VBLANG NOT IN R_VBLANG,
+                       VBCLINAME NOT IN R_VBCLINAME,
+                       VBZONLO NOT IN R_VBZONLO.
+*   loop at t_data.
+*     sy_tabix = sy-tabix.
+*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*        EXPORTING
+*          D_FROM            = t_data-VDATE
+*          T_FROM            = t_data-VTIME
+*          D_TO              = sy_datlo
+*          T_TO              = sy_timlo
+*          TIME_UNIT         = 'M'
+*        IMPORTING
+*          TIME_DIFF         = TIME_DIFF
+*        EXCEPTIONS
+*          WRONG_VALUE       = 1
+*          OTHERS            = 2    .
+*      IF SY-SUBRC = 0.
+*        if TIME_DIFF < '999999'.
+*          t_data-DURATION_M = TIME_DIFF .
+*        else.
+*          t_data-DURATION_M = '999999'.
+*        endif.
+*        t_data-DURATION_H = t_data-DURATION_M / 60.
+*        CALL FUNCTION '/SKN/F_SW_01_01_SM13_STATUS'
+*          EXPORTING
+*            status            = t_data-vbrc
+*          IMPORTING
+*            STATUS_DESC       = t_data-STATUS_DESC
+*            STATE_COLOR       = t_data-STATE_COLOR.
+*
+*         CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+*          EXPORTING
+*            state_color = t_data-state_color
+*          IMPORTING
+*            state_icon  = t_data-state_icon.
+*
+*        modify t_data index sy_tabix.
+*      ENDIF.
+*    endloop.
+*
+*  delete t_data where DURATION_M not in R_DURATION_M.
+*  delete t_data where DURATION_H not in R_DURATION_H.
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-VDATE
+          T_FROM            = T_DATA-VTIME
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+ DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  DELETE T_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

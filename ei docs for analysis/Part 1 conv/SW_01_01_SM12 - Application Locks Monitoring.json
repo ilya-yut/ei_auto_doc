@@ -1,0 +1,1056 @@
+{
+  "source_file": "SW_01_01_SM12 - Application Locks Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "paragraph",
+      "text": "Exception Indicator: Application Locks Monitoring (SW_01_01_SM12)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Application locks are essential for maintaining data consistency in SAP systems by preventing concurrent access to the same data objects. The SM12 transaction provides visibility into all active locks in the system. For system administrators, monitoring application locks is crucial to identify deadlocks, long-running processes, and potential performance bottlenecks that could impact system operations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides comprehensive application lock monitoring to detect issues before they escalate into system-wide problems. In the event of lock conflicts or long-running locks, the responsibility for analysis and resolution typically lies with system administrators and application specialists who must identify the root cause and take corrective action."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This EI acts as a comprehensive system health indicator that provides detailed application lock information for:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lock duration monitoring that may signal hung processes, deadlocks, or inefficient application behavior\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lock conflict analysis for validation that critical business processes are not being blocked by long-running transactions\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Detailed lock information where administrators need comprehensive data for troubleshooting performance issues and system bottlenecks\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A few examples of application lock issues are transaction timeouts due to lock conflicts, hung batch jobs holding critical locks, authorization-related lock problems, and performance degradation caused by lock queuing. This EI provides detailed application lock analysis using data from the system enqueue table with enhanced filtering and monitoring capabilities."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether Application Locks used for data consistency are functioning properly or causing system performance issues."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High numbers of long-running or problematic application locks indicate system processing instability causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data Processing Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lock conflicts preventing business transactions from completing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Deadlock situations causing transaction rollbacks and data inconsistency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance bottlenecks due to lock queuing and wait conditions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process Disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction timeouts preventing users from completing critical operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job failures due to lock conflicts with online processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System response time degradation during peak processing periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "User productivity loss due to transaction blocking and timeouts"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations due to processing delays caused by lock conflicts"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data integrity risks from incomplete transactions and rollback scenarios"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate long-running locks using SM12 transaction analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check for deadlock patterns and lock escalation scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review system workload distribution and processing schedules"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor lock duration patterns and peak usage periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check application design for inefficient locking strategies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze user behavior and transaction processing workflows"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize application code to reduce lock duration and scope"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement lock timeout strategies and retry mechanisms"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive lock monitoring and automated resolution procedures"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "DEST",
+          "RFC Destination",
+          "CHAR",
+          "32",
+          "0",
+          "RFCDEST",
+          "RFCDEST"
+        ],
+        [
+          "2",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "3",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "4",
+          "GARG",
+          "Lock Argument",
+          "CHAR",
+          "150",
+          "0",
+          "EQEGRAARG",
+          "EQDARG"
+        ],
+        [
+          "5",
+          "GBCKTYPE",
+          "Backup flag",
+          "CHAR",
+          "1",
+          "0",
+          "EQEBCKTYPE",
+          "CHAR1"
+        ],
+        [
+          "6",
+          "GCLIENT",
+          "Client",
+          "CHAR",
+          "3",
+          "0",
+          "EQECLIENT",
+          "CHAR3"
+        ],
+        [
+          "7",
+          "GMODE",
+          "Lock mode",
+          "CHAR",
+          "1",
+          "0",
+          "EQEGRAMODE",
+          "CHAR1"
+        ],
+        [
+          "8",
+          "GNAME",
+          "Table name",
+          "CHAR",
+          "30",
+          "0",
+          "EQEGRANAME",
+          "CHAR30"
+        ],
+        [
+          "9",
+          "GOBJ",
+          "Lock Object Name",
+          "CHAR",
+          "16",
+          "0",
+          "EQEOBJ",
+          "CHAR16"
+        ],
+        [
+          "10",
+          "GTARG",
+          "Lock argument",
+          "CHAR",
+          "50",
+          "0",
+          "EQEGTARG",
+          "TEXT50"
+        ],
+        [
+          "11",
+          "GTCODE",
+          "Transaction Code",
+          "CHAR",
+          "20",
+          "0",
+          "EQETCODE",
+          "TCODE"
+        ],
+        [
+          "12",
+          "GTDATE",
+          "Time Stamp",
+          "DATS",
+          "8",
+          "0",
+          "EQEDATE",
+          "DATUM"
+        ],
+        [
+          "13",
+          "GTHOST",
+          "Host name",
+          "CHAR",
+          "32",
+          "0",
+          "EQEHOST",
+          "TEXT32"
+        ],
+        [
+          "14",
+          "GTMARK",
+          "Selected",
+          "CHAR",
+          "1",
+          "0",
+          "EQEMARK",
+          "CHAR1"
+        ],
+        [
+          "15",
+          "GTSYSNR",
+          "SAP System Number",
+          "NUMC",
+          "2",
+          "0",
+          "EQESYSNR",
+          "NUM02"
+        ],
+        [
+          "16",
+          "GTTIME",
+          "Time",
+          "TIMS",
+          "6",
+          "0",
+          "EQETIME",
+          "UZEIT"
+        ],
+        [
+          "17",
+          "GTUSEC",
+          "Microseconds",
+          "NUMC",
+          "6",
+          "0",
+          "EQEUSEC",
+          "NUM06"
+        ],
+        [
+          "18",
+          "GTWP",
+          "Work Process Number",
+          "NUMC",
+          "2",
+          "0",
+          "EQEWP",
+          "NUM02"
+        ],
+        [
+          "19",
+          "GUNAME",
+          "User name",
+          "CHAR",
+          "12",
+          "0",
+          "EQEUNAME",
+          "CHAR12"
+        ],
+        [
+          "20",
+          "GUSE",
+          "Cumulative Counter 1",
+          "INT4",
+          "10",
+          "0",
+          "EQEUSE",
+          ""
+        ],
+        [
+          "21",
+          "GUSETXT",
+          "Cumulative Counter",
+          "NUMC",
+          "10",
+          "0",
+          "EQEUSETXT",
+          "NUM10"
+        ],
+        [
+          "22",
+          "GUSEVB",
+          "Cumulative Counter 2",
+          "INT4",
+          "10",
+          "0",
+          "EQEUSEVB",
+          ""
+        ],
+        [
+          "23",
+          "GUSEVBT",
+          "Cumulative Counter 2",
+          "NUMC",
+          "10",
+          "0",
+          "EQEUSEVBT",
+          "NUM10"
+        ],
+        [
+          "24",
+          "GUSR",
+          "Lock Owner",
+          "CHAR",
+          "58",
+          "0",
+          "EQEUSR",
+          "EQDUSR"
+        ],
+        [
+          "25",
+          "GUSRVB",
+          "Lock Owner 2",
+          "CHAR",
+          "58",
+          "0",
+          "EQEUSRVB",
+          "EQDUSR"
+        ],
+        [
+          "26",
+          "LANGU",
+          "Description Lanfuage",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "27",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "28",
+          "PROCESS_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "29",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 29 parameters listed in the Parameters Reference Table when tuning this EI; each influences which application locks are retrieved, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEST (RFC Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Combines with user, transaction, and generic object filters so rfc destination on DEST refines which locks reach duration checks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses duration in time units from the lock context so only records with DURATION inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unit for elapsed time between each lock’s enqueue date and time and the evaluation clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes (preset in code before the selection read when not overridden)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day style counting where applicable to the duration helper."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GARG (Lock Argument)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing lock argument via GARG before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GBCKTYPE (Backup flag)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting on transactions and lock modes respects backup flag constraints carried by GBCKTYPE."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GCLIENT (Client)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports Basis and development control by evaluating client through GCLIENT for each lock candidate."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GMODE (Lock mode)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring lock mode (GMODE) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GNAME (Table name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen GNAME for table name, then tighten duration thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GOBJ (Lock Object Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because lock object name (GOBJ) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTARG (Lock argument)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when lock argument on GTARG correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTCODE (Transaction Code)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treats transaction code as a discriminator between similar lock rows that would otherwise look identical in a raw extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTDATE (Time Stamp)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where time stamp on GTDATE signals ownership for follow-up between Basis and application teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTHOST (Host name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Combines with user, transaction, and generic object filters so host name on GTHOST refines which locks reach duration checks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTMARK (Selected)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where selected on GTMARK signals ownership for follow-up between Basis and application teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTSYSNR (SAP System Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen GTSYSNR for sap system number, then tighten duration thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTTIME (Time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when time on GTTIME correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTUSEC (Microseconds)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows enqueue lock rows where microseconds (GTUSEC) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GTWP (Work Process Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Valuable when comparing lock health before and after a release—hold work process number on GTWP constant while varying other filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUNAME (User name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when user name on GUNAME correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSE (Cumulative Counter 1)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how administrators slice SM12: cumulative counter 1 (GUSE) is one lever that shapes which locks are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSETXT (Cumulative Counter)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when cumulative counter on GUSETXT is narrowed together with client, user, or host filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSEVB (Cumulative Counter 2)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing cumulative counter 2 (GUSEVB) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSEVBT (Cumulative Counter 2)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where cumulative counter 2 on GUSEVBT signals ownership for follow-up between Basis and application teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSR (Lock Owner)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After ENQUEUE_READ results are mapped, rows are removed unless lock owner on GUSR still satisfies the active filter criteria."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUSRVB (Lock Owner 2)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so lock owner 2 (GUSRVB) aligns with the intended SM12-style triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Description Language)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: lines removed for failing description language on LANGU never reach duration filtering."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls whether the monitor normalizes evaluation timestamps to UTC or keeps local application-server time context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — Manage timing comparisons in UTC for consistent cross-time-zone batch results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — Use local-time handling consistent with the application server clock context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PROCESS_ICON (State Icon)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real SM12 usage where state icon on PROCESS_ICON is routinely restricted to a single productive client or user."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC should be chosen consistently with how operations teams interpret lock timestamps, because both the duration calculation and any cross-system comparisons assume the same clock normalization."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION and DURATION_UNIT work together as an age filter measured from each row’s enqueue date and time to the evaluation moment; only locks whose elapsed time fits the configured duration selection remain after the loop."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEST (when restricted) steers the enqueue read to the intended RFC destination so client, user, and transaction filters are evaluated in the correct server context before duration logic runs."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - M from the preset before the selection read when the caller does not override it."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial — when the duration selection range is left empty, the routine does not filter rows out by computed age until a range is supplied."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Client-scoped exclusive locks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Review exclusive locks in one productive client with minute-based aging and local server time."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GCLIENT = 100\n GMODE = E\n DURATION_UNIT = M\n DURATION = 120\n MANAGE_IN_UTC =\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Program and user slice"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight locks owned by a batch user for a specific main program name."
+    },
+    {
+      "kind": "paragraph",
+      "text": "GUNAME = BATCHUSER01\n GTCODE = VA01\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: UTC-normalized host sweep"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Compare lock age across hosts using coordinated clocks and a modest duration ceiling."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC = X\n DURATION = 60\n DURATION_UNIT = M\n GTHOST = *\n\n "
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "DEST",
+          "Logical Destination (Specified in Function Call)",
+          "CHAR(32)",
+          "RFCDEST"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GARG",
+          "Argument String (=Key Fields) of Lock Entry",
+          "CHAR(150)",
+          "EQEGRAARG"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GBCKTYPE",
+          "Backup flag for lock entry",
+          "CHAR(1)",
+          "EQEBCKTYPE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GCLIENT",
+          "Client in the lock entry",
+          "CHAR(3)",
+          "EQECLIENT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GMODE",
+          "Lock Mode (Shared/Exclusive) of a Lock Entry",
+          "CHAR(1)",
+          "EQEGRAMODE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GNAME",
+          "Elementary Lock of Lock Entry (Table Name)",
+          "CHAR(30)",
+          "EQEGRANAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GOBJ",
+          "Name of Lock Object in the Lock Entry",
+          "CHAR(16)",
+          "EQEOBJ"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTARG",
+          "Argument String of Lock Entry (Table Key Fields)",
+          "CHAR(50)",
+          "EQEGTARG"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTCODE",
+          "Transaction Code in the Lock Entry",
+          "CHAR(20)",
+          "EQETCODE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTDATE",
+          "Date within lock owner ID",
+          "DATS(8)",
+          "EQEDATE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTHOST",
+          "Host Name in the Lock Owner ID",
+          "CHAR(32)",
+          "EQEHOST"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTMARK",
+          "Selection Indicator of Lock Entry",
+          "CHAR(1)",
+          "EQEMARK"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTSYSNR",
+          "SAP System Number in Lock Owner ID",
+          "NUMC(2)",
+          "EQESYSNR"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTTIME",
+          "Time in Lock Owner ID",
+          "TIMS(6)",
+          "EQETIME"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTUSEC",
+          "Time/Microseconds Share in Lock Owner ID",
+          "NUMC(6)",
+          "EQEUSEC"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GTWP",
+          "Work Process Number in Lock Owner ID",
+          "NUMC(2)",
+          "EQEWP"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUNAME",
+          "User name in lock entry",
+          "CHAR(12)",
+          "EQEUNAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSE",
+          "Cumulative Counter for Lock Entry /Dialog",
+          "INT4(10)",
+          "EQEUSE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSETXT",
+          "Cumulative Counter for Lock Entry /Dialog",
+          "NUMC(10)",
+          "EQEUSETXT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSEVB",
+          "Cumulative Counter for Lock Entry / Update Task",
+          "INT4(10)",
+          "EQEUSEVB"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSEVBT",
+          "Cumulative Counter for Lock Entry / Update Task",
+          "NUMC(10)",
+          "EQEUSEVBT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSR",
+          "Lock Owner, ID of Logical Unit of Work (LUW)",
+          "CHAR(58)",
+          "EQEUSR"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "GUSRVB",
+          "Lock Owner, ID of Logical Unit of Work (LUW) /Update Task",
+          "CHAR(58)",
+          "EQEUSRVB"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM12",
+          "PROCESS_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_SM12.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM12 OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_MULTY: DURATION   /SKN/E_SW_DURATION,   \"From NOW to Job Start Time point -in duration units\n            GCLIENT EQECLIENT,\n            GUNAME  EQEUNAME,\n            GMODE   EQEGRAMODE,\n            GTARG   EQEGTARG,\n            GTCODE  EQETCODE,\n            GUSR    EQEUSR,\n            GNAME   EQEGRANAME,\n            GARG    EQEGRAARG,\n            GTHOST  EQEHOST.\nDATA_SINGLE: LANGU LANGU,\n             NUMBER SY-TABIX,\n             SUBRC SY-SUBRC,\n             MANAGE_IN_UTC CHAR1,\n             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,\n             DEST RFCDEST.\nDATA : LS_ENQ TYPE SEQG3,\n       LT_ENQ LIKE TABLE OF LS_ENQ.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\nDATA : IS_OUT(1) TYPE C.\nDATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\n*-- Fill Selection Option Tables\n   SELECT_MULTY: DURATION,\n                 GCLIENT,\n                 GUNAME,\n                 GMODE,\n                 GTARG,\n                 GTCODE,\n                 GUSR,\n                 GNAME,\n                 GARG ,\n                 GTHOST.\n  LV_DURATION_UNIT = 'M'.\n  SELECT_SINGLE: DURATION_UNIT,\n                 MANAGE_IN_UTC,\n                 DEST.\n  \"--- Run Cloud Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_01_SM12'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Cloud Mode -----\n SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n PROCESS_ICON = ICON_DELETE.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  REFRESH LT_ENQ.\n  CALL FUNCTION 'ENQUEUE_READ'\n    DESTINATION        LV_DEST\n    EXPORTING\n      GCLIENT                     = ' '  \" SY-MANDT\n*     GNAME                       = ' '\n*     GARG                        = ' '\n      GUNAME                      = ' '  \" SY-UNAME\n*     LOCAL                       = ' '\n*     FAST                        = ' '\n*     GARGNOWC                    = ' '\n    IMPORTING\n      NUMBER                      = LV_NUMBER\n      SUBRC                       = LV_SUBRC\n    TABLES\n      ENQ                         = LT_ENQ\n   EXCEPTIONS\n     COMMUNICATION_FAILURE       = 1\n     SYSTEM_FAILURE              = 2\n     OTHERS                      = 3.\n  IF SY-SUBRC <> 0.\n    EXIT.\n  ENDIF.\n  DELETE LT_ENQ WHERE GCLIENT NOT IN R_GCLIENT.\n  DELETE LT_ENQ WHERE GUNAME NOT IN R_GUNAME.\n  DELETE LT_ENQ WHERE GMODE NOT IN R_GMODE.\n  DELETE LT_ENQ WHERE GTARG NOT IN R_GTARG.\n  DELETE LT_ENQ WHERE GTCODE NOT IN R_GTCODE.\n  DELETE LT_ENQ WHERE GTHOST NOT IN R_GTHOST.\n  DELETE LT_ENQ WHERE GUSR NOT IN R_GUSR.\n  DELETE LT_ENQ WHERE GNAME NOT IN R_GNAME.\n  DELETE LT_ENQ WHERE GARG NOT IN R_GARG.\n  LOOP AT LT_ENQ INTO LS_ENQ.\n    CLEAR T_DATA.\n    MOVE-CORRESPONDING LS_ENQ TO T_DATA.\n    T_DATA-DEST = LV_DEST.\n    APPEND T_DATA.\n  ENDLOOP.\n*   loop at t_data.\n*     sy_tabix = sy-tabix.\n*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n*        EXPORTING\n*          D_FROM            = t_data-GTDATE\n*          T_FROM            = t_data-GTTIME\n*          D_TO              = sy_datlo\n*          T_TO              = sy_timlo\n*          TIME_UNIT         = 'M'\n*        IMPORTING\n*          TIME_DIFF         = TIME_DIFF\n*        EXCEPTIONS\n*          WRONG_VALUE       = 1\n*          OTHERS            = 2    .\n*      IF SY-SUBRC = 0.\n*        if TIME_DIFF < '999999'.\n*          t_data-DURATION_M = TIME_DIFF .\n*        else.\n*          t_data-DURATION_M = '999999'.\n*        endif.\n*        t_data-DURATION_H = t_data-DURATION_M / 60.\n*        t_data-PROCESS_ICON = PROCESS_ICON.\n*        modify t_data index sy_tabix.\n*      ENDIF.\n*    endloop.\n*\n*  delete t_data where DURATION_M not in R_DURATION_M.\n*  delete t_data where DURATION_H not in R_DURATION_H.\n*-- Fill Duration Value\n LOOP AT T_DATA .\n   SY_TABIX = SY-TABIX.\n   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-GTDATE\n          T_FROM            = T_DATA-GTTIME\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n   MODIFY T_DATA INDEX SY_TABIX .\n ENDLOOP .\n DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

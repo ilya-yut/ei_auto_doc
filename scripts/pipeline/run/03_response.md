@@ -2,47 +2,54 @@
 
 This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic.
 
-| # | Parameter | Description | Type | Length | Decimal | Data Element | Domain |
-|---|-----------|-------------|------|--------|---------|--------------|--------|
-| 1 | AEDAT | Created on | DATS | 8 | 0 | ERDAT | DATUM |
-| 2 | BACKDAYS | Backdays |  | 0 | 0 |  |  |
-| 3 | BEDAT | Document Date | DATS | 8 | 0 | EBDAT | DATUM |
-| 4 | BSAKZ | Control indicator | CHAR | 1 | 0 | BSAKZ | BSAKZ |
-| 5 | BSART | Purchasing Doc. Type | CHAR | 4 | 0 | ESART | BSART |
-| 6 | BSART_DESC | Doc. Type Descript. | CHAR | 20 | 0 | BATXT | TEXT20 |
-| 7 | BSTYP | Purch. Doc. Category | CHAR | 1 | 0 | EBSTYP | EBSTYP |
-| 8 | BSTYP_DESC | Short Descript. | CHAR | 60 | 0 | VAL_TEXT | DDTEXT |
-| 9 | BUKRS | Company Code | CHAR | 4 | 0 | BUKRS | BUKRS |
-| 10 | CHANGENR | Document Number | CHAR | 10 | 0 | CDCHANGENR | CDCHANGENR |
-| 11 | DURATION | Duration In Time Units | INT4 | 10 | 0 | /SKN/E_SW_DURATION |  |
-| 12 | DURATION_UNIT | Duration Unit | CHAR | 1 | 0 | /SKN/E_SW_DURATION_UNIT | /SKN/D_SW_DURATION_UNIT |
-| 13 | EBELN | Purchasing Document | CHAR | 10 | 0 | EBELN | EBELN |
-| 14 | EKGRP | Purchasing Group | CHAR | 3 | 0 | BKGRP | EKGRP |
-| 15 | EKGRP_DESC | Description p. group | CHAR | 18 | 0 | EKNAM | TEXT18 |
-| 16 | EKORG | Purch. Organization | CHAR | 4 | 0 | EKORG | EKORG |
-| 17 | EKORG_DESC | Description | CHAR | 20 | 0 | EKOTX | TEXT20 |
-| 18 | ERNAM | Created by | CHAR | 12 | 0 | ERNAM | USNAM |
-| 19 | FRGC | Release code | CHAR | 2 | 0 | FRGCO | FRGCO |
-| 20 | FRGGR | Release group | CHAR | 2 | 0 | FRGGR | FRGGR |
-| 21 | FRGKE | Release indicator | CHAR | 1 | 0 | FRGKE | FRGKE |
-| 22 | FRGRL | Subject to release | CHAR | 1 | 0 | FRGRL | XFELD |
-| 23 | FRGSX | Release Strategy | CHAR | 2 | 0 | FRGSX | FRGSX |
-| 24 | FRGZU | Release State | CHAR | 8 | 0 | FRGZU | FRGZU |
-| 25 | KDATB | Validity Per. Start | DATS | 8 | 0 | KDATB | DATUM |
-| 26 | KDATE | Validity Period End | DATS | 8 | 0 | KDATE | DATUM |
-| 27 | LAST_ONLY | Only last approver is checked |  | 0 | 0 |  |  |
-| 28 | LIFNR | Vendor | CHAR | 10 | 0 | ELIFN | LIFNR |
-| 29 | LOEKZ | Deletion Indicator | CHAR | 1 | 0 | ELOEK | ELOEK |
-| 30 | PROCSTAT | Purch. doc. proc. state | CHAR | 2 | 0 | MEPROCSTATE | MEPROCSTATE |
-| 31 | PROCSTAT_DESC | Short Descript. | CHAR | 60 | 0 | VAL_TEXT | DDTEXT |
-| 32 | RESWK | Supplying Plant | CHAR | 4 | 0 | RESWK | WERKS |
-| 33 | RESWK_DESC | Name 1 | CHAR | 30 | 0 | NAME1 | TEXT30 |
-| 34 | RLWRT | Total val. upon release | CURR | 15 | 2 | RLWRT | WERT15 |
-| 35 | STATU | Status | CHAR | 1 | 0 | ESTAK | ESTAK |
-| 36 | STATU_DESC | Short Descript. | CHAR | 60 | 0 | VAL_TEXT | DDTEXT |
-| 37 | UDATE | Date | DATS | 8 | 0 | CDDATUM | DATUM |
-| 38 | USERNAME | User | CHAR | 12 | 0 | CDUSERNAME | CHAR12 |
-| 39 | UTIME | Time | TIMS | 6 | 0 | CDUZEIT | UZEIT |
-| 40 | VENDOR_DESC | Name | CHAR | 35 | 0 | NAME1_GP | NAME |
-| 41 | WAERS | Currency | CUKY | 5 | 0 | WAERS | WAERS |
-| 42 | ZTERM | Terms of Payment | CHAR | 4 | 0 | DZTERM | ZTERM |
+| # | Field | Description | Type | Length | Decimal | Data Element | Domain |
+|---|-------|-------------|------|--------|---------|--------------|--------|
+| 1 | AEDAT | Aedat | CHAR | 50 | 0 | AEDAT | AEDAT |
+| 2 | BACKDAYS | Backdays | INT4 | 10 | 0 | BACKDAYS | BACKDAYS |
+| 3 | BELNR | Belnr | CHAR | 50 | 0 | BELNR | BELNR |
+| 4 | BKTXT | Bktxt | CHAR | 50 | 0 | BKTXT | BKTXT |
+| 5 | BLART | Blart | CHAR | 50 | 0 | BLART | BLART |
+| 6 | BLDAT | Bldat | CHAR | 50 | 0 | BLDAT | BLDAT |
+| 7 | BSCHL | Bschl | CHAR | 50 | 0 | BSCHL | BSCHL |
+| 8 | BSTAT | Bstat | CHAR | 50 | 0 | BSTAT | BSTAT |
+| 9 | BUDAT | Budat | CHAR | 50 | 0 | BUDAT | BUDAT |
+| 10 | BUKRS | Bukrs | CHAR | 50 | 0 | BUKRS | BUKRS |
+| 11 | BUZEI | Buzei | CHAR | 50 | 0 | BUZEI | BUZEI |
+| 12 | CPUDT | Cpudt | CHAR | 50 | 0 | CPUDT | CPUDT |
+| 13 | DATE_REF_FLD | Date Ref Fld | CHAR | 30 | 0 | NAME_FELD | NAME_FELD |
+| 14 | DATUM | Datum | CHAR | 50 | 0 | DATUM | DATUM |
+| 15 | DMBE2 | Dmbe2 | CHAR | 50 | 0 | DMBE2 | DMBE2 |
+| 16 | DMBE3 | Dmbe3 | CHAR | 50 | 0 | DMBE3 | DMBE3 |
+| 17 | DMBTR | Dmbtr | CHAR | 50 | 0 | DMBTR | DMBTR |
+| 18 | DURATION | Duration | INT4 | 10 | 0 | DURATION | DURATION |
+| 19 | DURATION_UNIT | Duration Unit | CHAR | 1 | 0 | DURATION_UNIT | DURATION_UNIT |
+| 20 | FORWDAYS | Forwdays | INT4 | 10 | 0 | FORWDAYS | FORWDAYS |
+| 21 | GJAHR | Gjahr | CHAR | 50 | 0 | GJAHR | GJAHR |
+| 22 | GRPID | Grpid | CHAR | 50 | 0 | GRPID | GRPID |
+| 23 | GVTYP | Gvtyp | CHAR | 50 | 0 | GVTYP | GVTYP |
+| 24 | HKONT | Hkont | CHAR | 50 | 0 | HKONT | HKONT |
+| 25 | HWAE2 | Hwae2 | CHAR | 50 | 0 | HWAE2 | HWAE2 |
+| 26 | HWAE3 | Hwae3 | CHAR | 50 | 0 | HWAE3 | HWAE3 |
+| 27 | HWAER | Hwaer | CHAR | 50 | 0 | HWAER | HWAER |
+| 28 | KOART | Koart | CHAR | 50 | 0 | KOART | KOART |
+| 29 | KTOPL | Ktopl | CHAR | 50 | 0 | KTOPL | KTOPL |
+| 30 | KURS2 | Kurs2 | CHAR | 50 | 0 | KURS2 | KURS2 |
+| 31 | KURS3 | Kurs3 | CHAR | 50 | 0 | KURS3 | KURS3 |
+| 32 | KURSF | Kursf | CHAR | 50 | 0 | KURSF | KURSF |
+| 33 | KZBTR | Kzbtr | CHAR | 50 | 0 | KZBTR | KZBTR |
+| 34 | LANGU | Langu | CHAR | 1 | 0 | LANGU | LANGU |
+| 35 | MONAT | Monat | CHAR | 50 | 0 | MONAT | MONAT |
+| 36 | PERIOD_CLOSING_DAY | Period Closing Day | NUMC | 2 | 0 | PERIOD_CLOSING_DAY | PERIOD_CLOSING_DAY |
+| 37 | SGTXT | Sgtxt | CHAR | 50 | 0 | SGTXT | SGTXT |
+| 38 | SHKZG | Shkzg | CHAR | 1 | 0 | SHKZG | SHKZG |
+| 39 | STBLG | Stblg | CHAR | 50 | 0 | STBLG | STBLG |
+| 40 | SW_DEST | Sw Dest | CHAR | 32 | 0 | RFCDEST | RFCDEST |
+| 41 | TCODE | Tcode | CHAR | 50 | 0 | TCODE | TCODE |
+| 42 | TIME_REF_FLD | Time Ref Fld | CHAR | 30 | 0 | NAME_FELD | NAME_FELD |
+| 43 | UPDDT | Upddt | CHAR | 50 | 0 | UPDDT | UPDDT |
+| 44 | USNAM | Usnam | CHAR | 50 | 0 | USNAM | USNAM |
+| 45 | WAERS | Waers | CHAR | 50 | 0 | WAERS | WAERS |
+| 46 | WAERS_T001 | Waers T001 | CHAR | 50 | 0 | WAERS_T001 | WAERS_T001 |
+| 47 | WRBTR | Wrbtr | CHAR | 50 | 0 | WRBTR | WRBTR |
+| 48 | XBLNR | Xblnr | CHAR | 50 | 0 | XBLNR | XBLNR |
+| 49 | XREVERSAL | Xreversal | CHAR | 50 | 0 | XREVERSAL | XREVERSAL |

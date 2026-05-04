@@ -1,0 +1,318 @@
+FUNCTION /SKN/F_SW_10_05_CO_OPN_CMMT.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_05_CO_OPN_CMMT OPTIONAL
+*"----------------------------------------------------------------------
+"DATA t_data2 TYPE STANDARD TABLE OF /SKN/S_SW_10_05_CO_OPN_CMMT.
+DATA_SINGLE: REFBT NUMC3,
+             BACKDAYS INT4,
+             DATE_REF_FLD NAME_FELD,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             POPR_TYPE      /SKN/E_SW_POPR_TYPE
+             .
+DATA_MULTY: REFBN   CHAR10,
+            LIFNR   CHAR10,
+            SAKTO   CHAR10,
+            VBUND   CHAR6,
+            BLDAT   DATS,
+            BUDAT   DATS,
+            BUKRS   CHAR4,
+            MATNR   CHAR18,
+            MATKL   CHAR9,
+            ORGWTH  WERTH1,
+            WHGBTR  WHGXXX,
+            ORGWTK  WERTK1,
+            WKGBTR  WKGXXX,
+            ORGWTT  WERTT1,
+            WTGBTR  WTGXXX,
+            LOEKZ   CHAR1,
+            EKORG   CHAR4,
+            EKGRP   CHAR3,
+            BSART   CHAR4,
+            AEDAT   DATS,
+            WEPOS   CHAR1,
+            WEUNB   CHAR1,
+            ELIKZ   CHAR1,
+            EREKZ   CHAR1,
+            KZWOB   CHAR1,
+            FRGKE	  CHAR1,
+            FRGZU	  CHAR8,
+            FRGRL   CHAR1,
+            TWAER   CHAR5,
+            DURATION    /SKN/E_SW_DURATION,
+            DATUM   SY-DATUM
+            .
+"backdays/date section
+LV_BACKDAYS = 1.
+LV_DATE_REF_FLD = 'BUDAT'.
+LV_DURATION_UNIT = 'D'.
+LV_POPR_TYPE = 'PO'.
+SELECT_SINGLE: REFBT,
+               BACKDAYS,
+               DATE_REF_FLD,
+               DURATION_UNIT,
+               POPR_TYPE
+             .
+SELECT_MULTY: REFBN,
+              LIFNR,
+              SAKTO,
+              VBUND,
+              BUKRS,
+              MATNR,
+              MATKL,
+              ORGWTH,
+              WHGBTR,
+              ORGWTK,
+              WKGBTR,
+              ORGWTT,
+              WTGBTR,
+              LOEKZ,
+              EKORG,
+              EKGRP,
+              BSART,
+              AEDAT,
+              WEPOS,
+              WEUNB,
+              ELIKZ,
+              EREKZ,
+              KZWOB,
+              FRGKE,
+              FRGZU,
+              FRGRL,
+              TWAER,
+              DURATION,
+              DATUM
+              .
+FIELD-SYMBOLS:  TYPE ANY ,
+               <FS_V> TYPE ANY,
+               <FS_DATA> TYPE /SKN/S_SW_10_05_CO_OPN_CMMT .
+DATA : SY_TABIX LIKE SY-TABIX ,
+       FLD(60) TYPE C ,
+       REF_DATE TYPE D.
+DATA : BACKDAYS  TYPE I ,
+       DATE_FROM LIKE SY-DATUM,
+       TIME_DIFF TYPE  INT4  .
+IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+ENDIF.
+*"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_05_CO_OPN_CMMT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*"--- Run Cloud Mode -----
+"--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+  WHEN 'BUDAT'.
+    R_BUDAT[] = R_DATUM[]. "Expected debit date
+  WHEN 'AEDAT'.
+    R_AEDAT[] = R_DATUM[]. "Date on Which Record Was Created
+  WHEN OTHERS.
+    R_BLDAT[] = R_DATUM[]. "Document date
+  ENDCASE.
+*--- Retrieve data
+ CLEAR IS_ALERT.
+ REFRESH T_DATA.
+IF LV_POPR_TYPE = 'PO' OR LV_POPR_TYPE = '' .
+ SELECT *
+   INTO CORRESPONDING FIELDS OF TABLE T_DATA
+   FROM COOI AS A
+   INNER JOIN EKKO AS B
+      ON A~REFBN = B~EBELN
+   INNER JOIN EKPO AS C
+      ON A~REFBN = C~EBELN
+      AND A~RFPOS = C~EBELP
+   INNER JOIN T006 AS T
+      ON A~MEINH = T~MSEHI
+   WHERE A~REFBT = '020'
+   AND A~ORGWTT > 0
+   AND A~REFBN IN R_REFBN
+   AND A~LIFNR IN R_LIFNR
+   AND A~SAKTO IN R_SAKTO
+   AND A~VBUND IN R_VBUND
+   AND A~BUKRS IN R_BUKRS
+   AND A~MATNR IN R_MATNR
+   AND A~MATKL IN R_MATKL
+   AND A~ORGWTH IN R_ORGWTH
+   AND A~WHGBTR IN R_WHGBTR
+   AND A~ORGWTK IN R_ORGWTK
+   AND A~WKGBTR IN R_WKGBTR
+   AND A~ORGWTT IN R_ORGWTT
+   AND A~WTGBTR IN R_WTGBTR
+   AND A~TWAER IN R_TWAER
+   AND A~BUDAT IN R_BUDAT
+   AND A~BLDAT IN R_BLDAT
+   AND A~LOEKZ IN R_LOEKZ
+   AND B~EKORG IN R_EKORG
+   AND B~EKGRP IN R_EKGRP
+   AND B~BSART IN R_BSART
+   AND B~AEDAT IN R_AEDAT
+   AND B~FRGKE IN R_FRGKE
+   AND B~FRGZU IN R_FRGZU
+   AND B~FRGRL IN R_FRGRL
+   AND C~WEPOS IN R_WEPOS
+   AND C~WEUNB IN R_WEUNB
+   AND C~ELIKZ IN R_ELIKZ
+   AND C~EREKZ IN R_EREKZ
+   AND T~KZWOB IN R_KZWOB
+   .
+ELSEIF LV_POPR_TYPE = 'PR'.
+ SELECT *
+   INTO CORRESPONDING FIELDS OF TABLE T_DATA
+   FROM COOI AS A
+   LEFT OUTER JOIN EBAN AS B
+      ON A~REFBN = B~BANFN
+      AND A~RFPOS = B~BNFPO
+   INNER JOIN T006 AS T
+      ON A~MEINH = T~MSEHI
+   WHERE A~REFBT = '010'
+   AND A~ORGWTT > 0
+    AND A~REFBN IN R_REFBN
+   AND A~LIFNR IN R_LIFNR
+   AND A~SAKTO IN R_SAKTO
+   AND A~VBUND IN R_VBUND
+   AND A~BUKRS IN R_BUKRS
+   AND A~MATNR IN R_MATNR
+   AND A~MATKL IN R_MATKL
+   AND A~ORGWTH IN R_ORGWTH
+   AND A~WHGBTR IN R_WHGBTR
+   AND A~ORGWTK IN R_ORGWTK
+   AND A~WKGBTR IN R_WKGBTR
+   AND A~ORGWTT IN R_ORGWTT
+   AND A~WTGBTR IN R_WTGBTR
+   AND A~LOEKZ IN R_LOEKZ
+   AND A~TWAER IN R_TWAER
+   AND A~BUDAT IN R_BUDAT
+   AND A~BLDAT IN R_BLDAT
+   AND T~KZWOB IN R_KZWOB
+   .
+ENDIF.
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = REF_DATE
+          T_FROM            = SY-UZEIT
+          D_TO              = SY-DATUM
+          T_TO              = SY-UZEIT
+          TIME_UNIT         = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+*       "--- Get  Decriptions
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+*
+    SY_TABIX = SY-TABIX.
+    IF <FS_DATA>-LIFNR IS NOT INITIAL.
+      "--- Get  Vendor Decriptions
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        =     <FS_DATA>-LIFNR" Account Number of Vendor or Creditor
+        IMPORTING
+          VENDOR_DESC  =     <FS_DATA>-NAME1" Name 1
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2
+        .
+      IF SY-SUBRC <> 0.
+*       message id sy-msgid type sy-msgty number sy-msgno
+*                  with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+    ENDIF.
+    IF <FS_DATA>-SAKTO IS NOT INITIAL AND <FS_DATA>-BUKRS IS NOT INITIAL.
+* G/L Account Description
+      CALL FUNCTION '/SKN/F_SW_10_SAKTO_DESC'
+        EXPORTING
+          SPRAS      = SY-LANGU    " Language Key
+          BUKRS      =  <FS_DATA>-BUKRS   " Company Code
+*          KTOPL      =     " Chart of Accounts
+          SAKNR      =     <FS_DATA>-SAKTO" G/L Account Number
+        IMPORTING
+          ACC_DESC   =     <FS_DATA>-GL_ACC_TXT" G/L account short text
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2
+        .
+      IF SY-SUBRC <> 0.
+*       message id sy-msgid type sy-msgty number sy-msgno
+*                  with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+    ENDIF.
+    IF <FS_DATA>-BUKRS IS NOT INITIAL.
+* Material group desc.
+      CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+        EXPORTING
+          BUKRS          =     <FS_DATA>-BUKRS" Company Code
+        IMPORTING
+          COMP_CODE_DESC =     <FS_DATA>-BUTXT " Name of Company Code or Company
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2
+        .
+      IF SY-SUBRC <> 0.
+       " Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+    IF <FS_DATA>-MATKL IS NOT INITIAL.
+* Material group desc.
+      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+        EXPORTING
+          MATKL        =     <FS_DATA>-MATKL" Material Group
+          LANGU        = SY-LANGU    " Language Key
+        IMPORTING
+          MATKL_DESC   =     <FS_DATA>-WGBEZ" Material Group Description
+*          MATKL_DESC_L =     " Long text describing the material group
+        EXCEPTIONS
+          WRONG_CODE   = 1
+          OTHERS       = 2
+        .
+      IF SY-SUBRC <> 0.
+*       message id sy-msgid type sy-msgty number sy-msgno
+*                  with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+      ENDIF.
+    ENDIF.
+    IF LV_POPR_TYPE = 'PR'.
+      <FS_DATA>-POPR_TYPE = 'PR'.
+    ELSE.
+      <FS_DATA>-POPR_TYPE = 'PO'.
+    ENDIF.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

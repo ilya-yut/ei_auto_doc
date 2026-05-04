@@ -1,0 +1,305 @@
+FUNCTION /SKN/F_SW_01_03_TAB_CONTENT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_TAB_CONTENT OPTIONAL
+*"----------------------------------------------------------------------
+DATA: R_COND TYPE RANGE OF SO_TEXT.
+DATA: RS_COND LIKE LINE OF R_COND.
+" ---data_multy: COND SO_TEXT.
+"--- Add Parameter for Compare State & Attr Compare String
+"--- data_single: DEST RFCDEST.
+DATA: LV_DEST TYPE RFCDEST,
+      LV_TAB  TYPE TABNAME ,
+      LV_FLD01 TYPE FIELDNAME,
+      LV_FLD02 TYPE FIELDNAME,
+      LV_FLD03 TYPE FIELDNAME,
+      LV_FLD04 TYPE FIELDNAME,
+      LV_FLD05 TYPE FIELDNAME,
+      LV_FLD06 TYPE FIELDNAME,
+      LV_FLD07 TYPE FIELDNAME,
+      LV_FLD08 TYPE FIELDNAME,
+      LV_FLD09 TYPE FIELDNAME,
+      LV_FLD10 TYPE FIELDNAME.
+DATA: LV_SKIPROWS TYPE SYTABIX,
+      LV_MAXROWS TYPE SYTABIX.
+"------------------------------------------
+DATA: LS_FIELDS TYPE RFC_DB_FLD,
+      LS_COND TYPE  RFC_DB_OPT,
+      LS_TAB_FIELDS TYPE  RFC_DB_FLD ,
+      LS_TAB_DATA TYPE TAB512.
+DATA: LT_FIELDS LIKE TABLE OF LS_FIELDS,
+      LT_COND LIKE TABLE OF LS_COND,
+      LT_TAB_FIELDS LIKE TABLE OF LS_TAB_FIELDS ,
+      LT_TAB_DATA LIKE TABLE OF LS_TAB_DATA.
+DATA: LT_ALL_FIELDS LIKE TABLE OF LS_TAB_FIELDS,
+      LS_OPTIONS_ALL TYPE  RFC_DB_OPT,
+      LT_OPTIONS_ALL LIKE TABLE OF LS_OPTIONS_ALL,
+      LS_DATA_ALL TYPE  TAB512,
+      LT_DATA_ALL LIKE TABLE OF LS_DATA_ALL.
+"------------------------------------------
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LV_TEMP TYPE STRING.
+DATA: IND TYPE I.
+DATA: LV_KEY_LEN TYPE I.
+CONSTANTS: LC_IS_PROBLEM_ATTR(1) TYPE C VALUE 'X'.
+DATA: LV_DISPLAY_ATTR(1) TYPE C,
+      LC_SHIFT TYPE I.
+*--- Date Fiels Accosoating ----
+DATA : FLD(60) TYPE C .
+DATA : REF_DATE TYPE D,
+       REF_TIME TYPE T.
+DATA : IS_CHECK_DATE(1) TYPE C.
+DATA : IS_OUT(1) TYPE C.
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : DATE_FROM LIKE SY-DATUM.
+*FIELD-SYMBOLS:  TYPE ANY ,
+*               <fs_v> TYPE ANY .
+DATA_SINGLE: BACKDAYS INT4,
+             DATE_REF_FLD NAME_FELD,
+             TIME_REF_FLD NAME_FELD,
+             TIME_DIFF_UNIT CHAR1.
+DATA_MULTY:  TIME_DIFF  INT4,
+             DATUM     SY-DATUM.
+ LV_BACKDAYS = 1.
+ LV_TIME_DIFF_UNIT = 'D'.
+ SELECT_SINGLE: BACKDAYS,
+                DATE_REF_FLD,
+                TIME_REF_FLD,
+                TIME_DIFF_UNIT.
+SELECT_MULTY: DATUM,
+              TIME_DIFF.
+*data : sy_datlo like sy-datlo ,
+*       sy_timlo like SY-timlo .
+*
+*_set_sys_date_time lv_sw_dest sy_datlo sy_timlo.
+   IF R_DATUM[] IS INITIAL .
+     RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+      DATE_FROM = SY-DATUM - LV_BACKDAYS .
+***       DATE_FROM = sy_datlo - lv_BACKDAYS .
+       RS_DATUM-LOW = DATE_FROM .
+        APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+*--- Date Fiels Accosoating ----
+DATA : SY_TABIX LIKE SY-TABIX .
+DEFINE POPULATE_FIELD .
+  " &1 - Field Index  (XX)
+ CLEAR LS_FIELDS.
+ IF LV_FLD&1 IS NOT INITIAL.
+   LS_FIELDS-FIELDNAME = LV_FLD&1.
+   APPEND LS_FIELDS TO LT_FIELDS.
+  ENDIF.
+END-OF-DEFINITION .
+DEFINE POPULATE_OUTPUT_FIELD .
+  " &1 - Field Index
+* read table lt_TAB_DATA into ls_TAB_DATA index ls_KEY_OUT-LINE&1.
+* if sy-subrc is initial.
+   IND = &1.
+   "read table lt_FIELDS into ls_FIELDS index ind. " &1.
+   "if sy-subrc = 0.
+   IF LV_FLD&1 IS NOT INITIAL.
+     READ TABLE LT_TAB_FIELDS INTO LS_TAB_FIELDS
+                   WITH KEY FIELDNAME = LV_FLD&1. " ls_FIELDS-FIELDNAME.
+     IF SY-SUBRC = 0.
+       LV_TEMP = LS_TAB_DATA-WA+LS_TAB_FIELDS-OFFSET(LS_TAB_FIELDS-LENGTH).
+       LS_DATA-FLD&1_V = LV_TEMP.
+       LS_DATA-FLD&1 = LS_FIELDS-FIELDNAME.
+     ENDIF.
+   ENDIF.
+* endif.
+END-OF-DEFINITION .
+DEFINE POPULATE_OUTPUT_SET .
+ POPULATE_OUTPUT_FIELD 01.
+ POPULATE_OUTPUT_FIELD 02.
+ POPULATE_OUTPUT_FIELD 03.
+ POPULATE_OUTPUT_FIELD 04.
+ POPULATE_OUTPUT_FIELD 05.
+ POPULATE_OUTPUT_FIELD 06.
+ POPULATE_OUTPUT_FIELD 07.
+ POPULATE_OUTPUT_FIELD 08.
+ POPULATE_OUTPUT_FIELD 09.
+ POPULATE_OUTPUT_FIELD 10.
+END-OF-DEFINITION .
+DEFINE POPULATE_DATE_TIME_REF_FIELD .
+  CLEAR : REF_DATE,
+          REF_TIME,
+          IS_CHECK_DATE.
+   IF LV_DATE_REF_FLD IS NOT INITIAL.
+     READ TABLE LT_TAB_FIELDS INTO LS_TAB_FIELDS
+                   WITH KEY FIELDNAME = LV_DATE_REF_FLD.
+     IF SY-SUBRC = 0.
+       IF LS_TAB_FIELDS-TYPE = 'D'.
+         LV_TEMP = LS_TAB_DATA-WA+LS_TAB_FIELDS-OFFSET(LS_TAB_FIELDS-LENGTH).
+         REF_DATE = LV_TEMP.
+         IS_CHECK_DATE = 'X'.
+       ENDIF.
+     ENDIF.
+     REF_TIME = SY_TIMLO.  "!!!!
+   ENDIF.
+   IF LV_TIME_REF_FLD IS NOT INITIAL.
+     READ TABLE LT_TAB_FIELDS INTO LS_TAB_FIELDS
+                   WITH KEY FIELDNAME = LV_TIME_REF_FLD.
+     IF SY-SUBRC = 0.
+       IF LS_TAB_FIELDS-TYPE = 'T'.
+         LV_TEMP = LS_TAB_DATA-WA+LS_TAB_FIELDS-OFFSET(LS_TAB_FIELDS-LENGTH).
+         REF_TIME = LV_TEMP.
+       ENDIF.
+     ENDIF.
+   ENDIF.
+END-OF-DEFINITION .
+"----------------------------------------------------
+**-- Fill Selection Option Tables
+SELECT_SINGLE: DEST,
+               TAB,
+               FLD01,
+               FLD02,
+               FLD03,
+               FLD04,
+               FLD05,
+               FLD06,
+               FLD07,
+               FLD08,
+               FLD09,
+               FLD10,
+               SKIPROWS,
+               MAXROWS.
+SELECT_MULTY: COND.
+ DATA_SINGLE:   SW_DEST RFCDEST.
+ SELECT_SINGLE: SW_DEST.
+ IF LV_DEST IS INITIAL.
+   LV_DEST = LV_SW_DEST.
+ ENDIF.
+DATA: SY_DATLO LIKE SY-DATUM,
+      SY_TIMLO LIKE SY-UZEIT.
+""_set_sys_date_time lv_sw_dest sy_datlo sy_timlo.
+_GET_CURRENT_DATE_TIME ' ' LV_SW_DEST SY_DATLO SY_TIMLO.
+ CLEAR IS_ALERT .
+ REFRESH T_DATA.
+ "---- Prepare Input Parameters (tables)
+ REFRESH: LT_FIELDS,
+          LT_COND.
+  POPULATE_FIELD: 01,
+                  02,
+                  03,
+                  04,
+                  05,
+                  06,
+                  07,
+                  08,
+                  09,
+                  10.
+ "--- Fill Condition Criteria
+ REFRESH LT_COND.
+ CLEAR LS_COND.
+ LOOP AT R_COND INTO RS_COND.
+   LS_COND-TEXT = RS_COND-LOW.
+   APPEND LS_COND TO LT_COND.
+ ENDLOOP.
+ "--- Date Condition
+ IF LV_DATE_REF_FLD IS NOT INITIAL.
+   CALL FUNCTION 'RFC_READ_TABLE'
+     DESTINATION    LV_DEST
+     EXPORTING
+       QUERY_TABLE                = LV_TAB
+*      DELIMITER                  = ' '
+       NO_DATA                    = 'X'
+*      ROWSKIPS                   = 0
+*      ROWCOUNT                   = 0
+     TABLES
+       OPTIONS                    = LT_OPTIONS_ALL
+       FIELDS                     = LT_ALL_FIELDS
+       DATA                       = LT_DATA_ALL
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE        = 1
+      TABLE_WITHOUT_DATA         = 2
+      OPTION_NOT_VALID           = 3
+      FIELD_NOT_VALID            = 4
+      NOT_AUTHORIZED             = 5
+      DATA_BUFFER_EXCEEDED       = 6
+      OTHERS                     = 7.
+   IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+   ENDIF.
+     READ TABLE LT_ALL_FIELDS INTO LS_TAB_FIELDS
+           WITH KEY FIELDNAME = LV_DATE_REF_FLD.
+     IF SY-SUBRC = 0.
+       DATE_FROM = SY-DATUM - LV_BACKDAYS .
+       CONCATENATE '''' DATE_FROM '''' INTO LV_TEMP.
+       CONCATENATE LV_DATE_REF_FLD 'GE' LV_TEMP
+          INTO LS_COND-TEXT SEPARATED BY ' '.
+       IF LT_COND[] IS NOT INITIAL.
+         CONCATENATE 'AND' LS_COND-TEXT INTO LS_COND-TEXT SEPARATED BY ' '.
+       ENDIF.
+       APPEND LS_COND-TEXT TO LT_COND.
+     ENDIF.
+ ENDIF.
+  "--- Retrieve Table data
+    CALL FUNCTION '/SKN/F_SW_READ_TAB_REMOTE'
+      EXPORTING
+        DEST                       = LV_DEST
+        TAB_NAME                   = LV_TAB
+        SKIPROWS                   = LV_SKIPROWS
+        MAXROWS                    = LV_MAXROWS
+      IMPORTING
+        KEY_LEN                    = LV_KEY_LEN
+      TABLES
+        T_KEY_FIELDS               = LT_FIELDS
+*       T_ATTR_FIELDS              =
+        T_COND                     = LT_COND
+        T_FIELDS                   = LT_TAB_FIELDS
+        T_DATA                     = LT_TAB_DATA
+      EXCEPTIONS
+        TABLE_NOT_AVAILABLE        = 1
+        TABLE_WITHOUT_DATA         = 2
+        OPTION_NOT_VALID           = 3
+        FIELD_NOT_VALID            = 4
+        NOT_AUTHORIZED             = 5
+        DATA_BUFFER_EXCEEDED       = 6
+        UNDETECTED_PROBLEM         = 7
+        OTHERS                     = 8.
+    IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+    ENDIF.
+    "--- Fill Output Table
+    REFRESH T_DATA.
+    LOOP AT LT_TAB_DATA INTO LS_TAB_DATA.
+      CLEAR IS_OUT.
+      CLEAR LS_DATA.
+      LS_DATA-TAB = LV_TAB.
+      POPULATE_OUTPUT_SET .
+      POPULATE_DATE_TIME_REF_FIELD .
+      IF IS_CHECK_DATE IS NOT INITIAL.
+        IF REF_DATE NOT IN R_DATUM.
+          CONTINUE.
+        ENDIF.
+        CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+          EXPORTING
+            D_FROM            = REF_DATE
+            T_FROM            = REF_TIME
+            D_TO              = SY_DATLO
+            T_TO              = SY_TIMLO
+            TIME_UNIT         = LV_TIME_DIFF_UNIT " 'D'
+          IMPORTING
+            TIME_DIFF         = TIME_DIFF
+          EXCEPTIONS
+            WRONG_VALUE       = 1
+            OTHERS            = 2    .
+          IF SY-SUBRC = 0.
+            IF TIME_DIFF NOT IN R_TIME_DIFF.
+              CONTINUE.
+            ENDIF.
+          ENDIF.
+      ENDIF.
+      LS_DATA-DURATION = TIME_DIFF.
+      LS_DATA-DURATION_UNIT = LV_TIME_DIFF_UNIT.
+      LS_DATA-DEST = LV_DEST.
+      APPEND LS_DATA TO T_DATA.
+    ENDLOOP.
+ DESCRIBE TABLE T_DATA LINES SY-TFILL .
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

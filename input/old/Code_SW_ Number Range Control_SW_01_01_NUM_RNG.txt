@@ -1,0 +1,254 @@
+FUNCTION /SKN/F_SW_01_01_NUM_RNG.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_NUM_RNG OPTIONAL
+*"----------------------------------------------------------------------
+  " variables definition
+  DATA_MULTY:   OBJECT         NROBJ,
+                SUBOBJECT      NRSOBJ,
+                NRRANGENR      NRNR,
+                NRLEVEL        NRLEVEL,
+                TOYEAR         NRYEAR,
+                BNAME         XUBNAME,
+                CLASS         XUCLASS,
+                TONUMBER      NRTO,
+                FROMNUMBER    NRLEVEL,
+                NRLEVEL_DEC    DEC_25,
+                FROMNUMBER_DEC DEC_25,
+                TONUMBER_DEC   DEC_25,
+                AVAILABLE_DEC  DEC_25,
+                LEFT_DEC       DEC_25,
+                USED_DEC       DEC_25,
+                LEFT_PER       /SKN/E_SW_PRC,
+                USED_PER       /SKN/E_SW_PRC,
+                EXTERNIND     NRIND.
+  DATA_SINGLE:  LANGU         LANGU,
+                MANAGE_IN_UTC CHAR1,
+                SW_DEST       RFCDEST.
+  DATA :        SY_TABIX      LIKE SY-TABIX,
+                SY_DATLO      LIKE SY-DATLO,
+                SY_TIMLO      LIKE SY-TIMLO,
+                DOMVALUE      LIKE DD07V-DOMVALUE_L,
+                DDTEXT        LIKE DD07V-DDTEXT.
+  FIELD-SYMBOLS: <T_DATA_WA_FS> LIKE LINE OF T_DATA.
+***data: lv_freenumabs(20) type N,
+***      lv_THRESHOLDABS(20) type N,
+***      lv_normalizednrlev(20) type N,
+***      lv_availnumrange(20) type N,
+***      lv_THRESHOLDPERC type I.
+DATA: LV_F TYPE F.
+  " variables population
+  SELECT_MULTY: OBJECT,
+                SUBOBJECT,
+                NRRANGENR,
+                NRLEVEL,
+                TOYEAR,
+                BNAME,
+                CLASS,
+                TONUMBER,
+                FROMNUMBER,
+                NRLEVEL_DEC,
+                FROMNUMBER_DEC,
+                TONUMBER_DEC,
+                AVAILABLE_DEC,
+                LEFT_DEC,
+                USED_DEC,
+                LEFT_PER,
+                USED_PER,
+                EXTERNIND.
+*** convert_multy: nrlevel     ALPHA,
+***                freenumabs   ALPHA,
+***                thresholdabs ALPHA,
+***                tonumber     ALPHA,
+***                fromnumber   ALPHA.
+  LV_LANGU = SY-LANGU.
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 SW_DEST.
+  "--- Days estimation
+  DATA_SINGLE: LEFT_DAYS_ESTIMATION CHAR1,
+               STATISTICS_DAYS      INT2,
+               STATISTICS_ALERT     /SKN/E_SW_AN_CODE.
+  LV_STATISTICS_DAYS = 30.
+  SELECT_SINGLE: LEFT_DAYS_ESTIMATION,
+                 STATISTICS_DAYS,
+                 STATISTICS_ALERT.
+  DATA_MULTY:   AVG_DAILY    DEC_25,
+                AVG_DAILY_NZ DEC_25,
+                LEFT_DAYS    INT4,
+                LEFT_DAYS_NZ INT4.
+  SELECT_MULTY: AVG_DAILY,
+                AVG_DAILY_NZ,
+                LEFT_DAYS,
+                LEFT_DAYS_NZ.
+ DATA: LV_STAT_DATE_FROM TYPE  /SKN/E_SW_AN_LG_DATE,
+       LV_STAT_DATE_TO TYPE  /SKN/E_SW_AN_LG_DATE.
+ DATA: LS_DAILY_STAT TYPE /SKN/S_SW_01_NUM_RNG_STAT,
+       LT_DAILY_STAT LIKE TABLE OF LS_DAILY_STAT.
+ DATA: LS_SW_SYST TYPE  /SKN/S_SW_SYST.
+"--- Days estimation
+  " if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_NUM_RNG'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  " time filling and shifting
+  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO.
+  TIME_SHIFT SY_DATLO SY_TIMLO.
+  CLEAR IS_ALERT.
+  REFRESH T_DATA.
+  " retrieve the data
+  SELECT *
+    FROM NRIV
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE OBJECT        IN R_OBJECT
+      AND SUBOBJECT     IN R_SUBOBJECT
+      AND NRRANGENR     IN R_NRRANGENR
+      AND TOYEAR        IN R_TOYEAR
+      AND TONUMBER      IN R_TONUMBER
+      AND NRLEVEL       IN R_NRLEVEL
+      AND FROMNUMBER    IN R_FROMNUMBER
+      AND EXTERNIND     IN R_EXTERNIND.
+  DATA: TONUMBER_STR      TYPE STRING,
+        FROMNUMBER_STR    TYPE STRING,
+        NRLEVEL_STR       TYPE STRING,
+        NORMALIZEDNRLEV   TYPE NRTO.
+  DATA: LV_N(20) TYPE N.
+  " data post processing
+  LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.
+    IF <T_DATA_WA_FS>-EXTERNIND IS INITIAL.
+      <T_DATA_WA_FS>-NRLEVEL_DEC    = <T_DATA_WA_FS>-NRLEVEL.
+      LV_N = <T_DATA_WA_FS>-FROMNUMBER.
+       <T_DATA_WA_FS>-FROMNUMBER_DEC   = LV_N.
+      LV_N = <T_DATA_WA_FS>-TONUMBER.
+      <T_DATA_WA_FS>-TONUMBER_DEC   = LV_N.
+      <T_DATA_WA_FS>-AVAILABLE_DEC = <T_DATA_WA_FS>-TONUMBER_DEC - <T_DATA_WA_FS>-FROMNUMBER_DEC + 1.
+      IF <T_DATA_WA_FS>-NRLEVEL_DEC > 0.
+        <T_DATA_WA_FS>-USED_DEC = <T_DATA_WA_FS>-NRLEVEL_DEC - <T_DATA_WA_FS>-FROMNUMBER_DEC + 1.
+        <T_DATA_WA_FS>-LEFT_DEC = <T_DATA_WA_FS>-TONUMBER_DEC - <T_DATA_WA_FS>-NRLEVEL_DEC.
+      ELSE.
+        CLEAR <T_DATA_WA_FS>-USED_DEC.
+        <T_DATA_WA_FS>-LEFT_DEC = <T_DATA_WA_FS>-AVAILABLE_DEC.
+      ENDIF.
+      IF <T_DATA_WA_FS>-AVAILABLE_DEC > 0.
+        LV_F = <T_DATA_WA_FS>-LEFT_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100.
+        <T_DATA_WA_FS>-LEFT_PER = LV_F.
+        LV_F = <T_DATA_WA_FS>-USED_DEC / <T_DATA_WA_FS>-AVAILABLE_DEC * 100.
+        <T_DATA_WA_FS>-USED_PER = LV_F.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  " clean-up the data
+  DELETE T_DATA WHERE NRLEVEL_DEC    NOT IN R_NRLEVEL_DEC.
+  DELETE T_DATA WHERE FROMNUMBER_DEC   NOT IN R_FROMNUMBER_DEC.
+  DELETE T_DATA WHERE TONUMBER_DEC  NOT IN R_TONUMBER_DEC.
+  DELETE T_DATA WHERE AVAILABLE_DEC NOT IN R_AVAILABLE_DEC.
+  DELETE T_DATA WHERE LEFT_DEC NOT IN R_LEFT_DEC.
+  DELETE T_DATA WHERE USED_DEC NOT IN R_USED_DEC.
+  DELETE T_DATA WHERE LEFT_PER NOT IN R_LEFT_PER.
+  DELETE T_DATA WHERE USED_PER NOT IN R_USED_PER.
+  LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.
+    CALL FUNCTION '/SKN/F_SW_01_GET_RANGE_DESC'
+      EXPORTING
+        OBJECT           = <T_DATA_WA_FS>-OBJECT
+        LANGU            = LV_LANGU
+      IMPORTING
+        TXT              = <T_DATA_WA_FS>-TXT
+        TXTSHORT         = <T_DATA_WA_FS>-TXTSHORT
+      EXCEPTIONS
+        WRONG_CODE       = 1
+        OTHERS           = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+  ENDLOOP.
+  "--- Left Days Estimation
+  IF LV_LEFT_DAYS_ESTIMATION IS NOT INITIAL.
+     CALL FUNCTION '/SKN/F_SW_GET_SW_SYST'
+       IMPORTING
+         SW_SYST         = LS_SW_SYST
+       TABLES
+         T_SW_SYST       = T_SELECT.
+     IF LV_STATISTICS_ALERT IS INITIAL.
+       "--- Get myself
+       LV_STATISTICS_ALERT = LS_SW_SYST-AN_CODE.
+     ENDIF.
+     IF LV_STATISTICS_ALERT IS NOT INITIAL.
+       LV_STAT_DATE_TO = SY-DATUM.
+       LV_STAT_DATE_FROM = LV_STAT_DATE_TO - LV_STATISTICS_DAYS.
+       CALL FUNCTION '/SKN/F_SW_01_NUM_RNG_STAT'
+         EXPORTING
+           AN_CODE                = LV_STATISTICS_ALERT
+           SW_CLIENT              = LS_SW_SYST-SW_CLIENT
+           DATE_FROM              = LV_STAT_DATE_FROM
+           DATE_TO                = LV_STAT_DATE_TO
+         TABLES
+           T_DAILY_STAT           = LT_DAILY_STAT
+         EXCEPTIONS
+           EXTRUCTION_ERROR       = 1
+           OTHERS                 = 2.
+       IF SY-SUBRC = 0.
+         SORT LT_DAILY_STAT BY OBJECT SUBOBJECT NRRANGENR TOYEAR.
+         LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.
+           READ TABLE LT_DAILY_STAT INTO LS_DAILY_STAT
+                                    WITH KEY OBJECT    = <T_DATA_WA_FS>-OBJECT
+                                             SUBOBJECT = <T_DATA_WA_FS>-SUBOBJECT
+                                             NRRANGENR = <T_DATA_WA_FS>-NRRANGENR
+                                             TOYEAR    = <T_DATA_WA_FS>-TOYEAR
+                                    BINARY SEARCH.
+           IF SY-SUBRC IS INITIAL.
+             <T_DATA_WA_FS>-AVG_DAILY = LS_DAILY_STAT-AVG_DAILY.
+             <T_DATA_WA_FS>-AVG_DAILY_NZ = LS_DAILY_STAT-AVG_DAILY_NZ.
+             IF LS_DAILY_STAT-AVG_DAILY > 0.
+                LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY .
+*                CATCH SYSTEM-EXCEPTIONS conversion_errors = 1.
+*                  <t_data_wa_fs>-LEFT_DAYS = lv_f.
+*                ENDCATCH.
+*                if sy-subrc <> 0.
+*                  <t_data_wa_fs>-LEFT_DAYS = 999999.
+*                endif.
+                TRY.
+                 <T_DATA_WA_FS>-LEFT_DAYS = LV_F.
+                CATCH CX_SY_CONVERSION_ERROR.
+                 <T_DATA_WA_FS>-LEFT_DAYS = 999999.
+                ENDTRY.
+             ENDIF.
+             IF LS_DAILY_STAT-AVG_DAILY_NZ > 0.
+*               CATCH SYSTEM-EXCEPTIONS conversion_errors = 1.
+*               lv_f = <t_data_wa_fs>-LEFT_DEC / ls_DAILY_STAT-AVG_DAILY_NZ .
+*              <t_data_wa_fs>-LEFT_DAYS_NZ = lv_f.
+*                ENDCATCH.
+*                if sy-subrc <> 0.
+*                  <t_data_wa_fs>-LEFT_DAYS_NZ = 999999.
+*                endif.
+               TRY.
+                LV_F = <T_DATA_WA_FS>-LEFT_DEC / LS_DAILY_STAT-AVG_DAILY_NZ .
+                <T_DATA_WA_FS>-LEFT_DAYS_NZ = LV_F.
+               CATCH CX_SY_CONVERSION_ERROR.
+                <T_DATA_WA_FS>-LEFT_DAYS_NZ = 999999.
+               ENDTRY.
+             ENDIF.
+           ENDIF.
+         ENDLOOP.
+       ENDIF.
+       "--- Filtering Stat parameters
+       DELETE T_DATA WHERE AVG_DAILY NOT IN R_AVG_DAILY.
+       DELETE T_DATA WHERE AVG_DAILY_NZ NOT IN R_AVG_DAILY_NZ.
+       DELETE T_DATA WHERE LEFT_DAYS NOT IN R_LEFT_DAYS.
+       DELETE T_DATA WHERE LEFT_DAYS_NZ NOT IN R_LEFT_DAYS_NZ.
+     ENDIF.
+  ENDIF.
+  "--- Left Days Estimation
+  " check alert information
+  READ TABLE T_DATA   INDEX 1.
+  CHECK NOT  SY-TFILL IS INITIAL.
+  IS_ALERT = 'X'.
+ENDFUNCTION.

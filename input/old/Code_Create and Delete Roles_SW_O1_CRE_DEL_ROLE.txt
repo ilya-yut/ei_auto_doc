@@ -1,0 +1,185 @@
+FUNCTION /SKN/F_SW_O1_CRE_DEL_ROLE .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_O1_CRE_DEL_ROLE OPTIONAL
+*"----------------------------------------------------------------------
+  DATA: LV_PROFS     TYPE XUPROFS,
+        LV_ROWCOUNT  TYPE I,
+        LV_REF_DATE  TYPE D,
+        LV_TIME_DIFF TYPE INT4,
+        LV_FLD       TYPE FIELDNAME,
+        LV_TABIX     TYPE I.
+  DATA: LS_USER_RANGE TYPE CDUSERNAME_RANGE,
+        LS_PROF_RANGE TYPE USSELPROF,
+        LS_EDITPOS    TYPE  CDRED,
+        LS_DATA       TYPE /SKN/S_SW_O1_ROLE_AUTH_DATA.
+  DATA: LT_USER_RANGE     TYPE CDUSERNAME_RANGE_TAB,
+        LT_CHG_USER_RANGE TYPE CDUSERNAME_RANGE_TAB,
+        LT_PROF_ASS_RANGE TYPE SUSR_T_SEL_OPT_PROF,
+        LT_PROF_DEL_RANGE TYPE SUSR_T_SEL_OPT_PROF,
+        LT_ROLE_RANGE     TYPE RSELOPTION,
+        LT_OUT_ROLE       TYPE SUSR_T_USRCD,
+        LT_EDITPOS        TYPE STANDARD TABLE OF CDRED.
+  FIELD-SYMBOLS: <FS_FLD>  TYPE ANY,
+                 <FS_DATA> LIKE LINE OF T_DATA[].
+  DATA_SINGLE: LANGU LANGU.
+  LV_LANGU = 'EN'.
+  DATA_SINGLE: DURATION_UNIT /SKN/E_SW_DURATION_UNIT.
+  DATA_SINGLE: BACKDAYS /SKN/E_MN_AN_BACKDAYS.
+  DATA_SINGLE: FORWDAYS /SKN/E_MN_AN_FORWDAYS.
+  DATA_SINGLE: SW_DEST RFCDEST.
+  DATA_SINGLE: DATE_TO       CDDATUM.
+  DATA_SINGLE: DATE_FROM     CDDATUM.
+  DATA_SINGLE: DATLO         SY-DATLO.
+  DATA_SINGLE: TIMLO         SY-TIMLO.
+  DATA_MULTY: OBJECTCLASS   CDOBJECTCL.
+  DATA_MULTY: TABLENAME     TABNAME.
+  DATA_MULTY: MODDA      XUMODDATE.   " Modification Date
+  LV_BACKDAYS = '10'.
+*  DATA_MULTY: DURATION   /SKN/E_SW_DURATION.
+  SELECT_SINGLE: SW_DEST.
+  SELECT_SINGLE: BACKDAYS.
+  SELECT_SINGLE: FORWDAYS.
+*  SELECT_SINGLE: ARCHIVE.
+  SELECT_SINGLE: LANGU.
+  SELECT_SINGLE: DURATION_UNIT.
+  SELECT_MULTY: OBJECTCLASS.
+  SELECT_MULTY: TABLENAME.
+  SELECT_MULTY: MODDA.
+*
+  CONVERT_SINGLE: LANGU ISOLA.
+  _GET_CURRENT_DATE_TIME ' ' LV_SW_DEST LV_DATLO LV_TIMLO.
+  BREAK : MISHAMI.
+  IF R_MODDA[] IS INITIAL.
+    IF LV_FORWDAYS IS INITIAL.
+      LV_DATE_FROM = LV_DATLO - LV_BACKDAYS.
+      LV_DATE_TO   = LV_DATLO.
+    ELSE.
+      IF LV_BACKDAYS IS NOT INITIAL.
+        LV_DATE_FROM = LV_DATLO - LV_BACKDAYS.
+        LV_DATE_TO   = LV_DATLO + LV_FORWDAYS.
+      ELSE.
+        LV_DATE_FROM = LV_DATLO + LV_FORWDAYS.
+      ENDIF.
+    ENDIF.
+  ELSE.
+    READ TABLE R_MODDA INTO RS_MODDA INDEX 1.
+    IF SY-SUBRC IS INITIAL.
+      LV_DATE_FROM = RS_MODDA-LOW.
+      IF RS_MODDA-HIGH IS NOT INITIAL.
+        LV_DATE_TO   = RS_MODDA-HIGH.
+      ELSE.
+        LV_DATE_TO = LV_DATE_FROM.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+  REFRESH:   R_TABLENAME,
+             R_OBJECTCLASS.
+  RS_OBJECTCLASS-SIGN  =  'I'.
+  RS_OBJECTCLASS-OPTION = 'EQ'.
+  RS_OBJECTCLASS-LOW    = 'PFCG'.
+  APPEND RS_OBJECTCLASS TO R_OBJECTCLASS.
+  RS_TABLENAME-SIGN  =  'I'.
+  RS_TABLENAME-OPTION = 'EQ'.
+  RS_TABLENAME-LOW    = 'AGR_DEFINE'.
+  APPEND RS_TABLENAME TO R_TABLENAME.
+* Get Authorization Data for Role.
+  REFRESH: LT_EDITPOS.
+  CALL FUNCTION '/SKN/F_CHANGEDOCUMENT_READ_RAN'
+    EXPORTING
+*     ARCHIVE_HANDLE             = 0
+*     CHANGENUMBER_TAB           =
+      DATE_OF_CHANGE             = LV_DATE_FROM
+      OBJECTCLASS_TAB            = R_OBJECTCLASS
+*     OBJECTID_TAB               =
+*     TABLEKEY_TAB               =
+      TABLENAME_TAB              = R_TABLENAME
+*     TIME_OF_CHANGE             = '000000'
+*     USERNAME_TAB               =
+*     LOCAL_TIME                 = ' '
+*     TIME_ZONE                  = 'UTC'
+*     TABLEKEY254_TAB            =
+*     KEYGUID_TAB                =
+      DATE_UNTIL                 = LV_DATLO
+*     TIME_UNTIL                 = '235959'
+*     KEYGUID_STR_TAB            =
+      SW_DEST                    = LV_SW_DEST
+*   IMPORTING
+*     ET_CDRED_STR               =
+    TABLES
+      EDITPOS                    = LT_EDITPOS
+    EXCEPTIONS
+      NO_POSITION_FOUND          = 1
+      WRONG_ACCESS_TO_ARCHIVE    = 2
+      TIME_ZONE_CONVERSION_ERROR = 3
+      OTHERS                     = 4.
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
+  SORT LT_EDITPOS.
+  DELETE ADJACENT DUPLICATES FROM LT_EDITPOS COMPARING ALL FIELDS.
+  SORT LT_EDITPOS BY OBJECTID
+   UDATE UTIME CHANGENR TCODE CHNGIND TABKEY.
+  DATA:
+      LS_TABKEY       TYPE CD1251,
+      LS_OUT          LIKE LINE OF T_DATA[].
+  FIELD-SYMBOLS:
+    <FS_CDRED> TYPE CDRED.
+*    <fs_DATA>  TYPE /SKN/S_SW_O1_ROLE_AUTH_DATA.
+*-----------------------------------------------------------------------
+  REFRESH T_DATA.
+  LOOP AT LT_EDITPOS ASSIGNING <FS_CDRED>.
+    IF  <FS_CDRED>-TABKEY IS INITIAL. "skip dummy record
+      CONTINUE.
+    ENDIF.
+    LS_TABKEY = <FS_CDRED>-TABKEY.
+    MOVE-CORRESPONDING LS_TABKEY  TO LS_OUT.
+    MOVE-CORRESPONDING <FS_CDRED> TO LS_OUT.                "#EC ENHOK
+*    IF abap_false = gr_tools->auth_check_agr_08(
+*                                            id_agr = ls_out-objectid ).
+*      CONTINUE.
+*    ENDIF.
+*    MOVE-CORRESPONDING gr_tools->get_user_adr( ls_out-username )
+*                    TO ls_out.
+    CASE <FS_CDRED>-CHNGIND.
+      WHEN 'I'.
+        LS_OUT-ACTION = 'New role'(222).                    "#EC *
+*        ls_out-f_new = gd_tx_unknown.
+*        ls_out-fname = gd_tx_unknown.
+      WHEN 'E' OR 'D'.   "Note 1759556
+        LS_OUT-ACTION = 'Role deleted'(224).                "#EC *
+      WHEN 'U'.
+        LS_OUT-ACTION = 'Parent role changed'(226).         "#EC *
+      WHEN OTHERS.
+        LS_OUT-ACTION = <FS_CDRED>-CHNGIND.
+    ENDCASE.
+    APPEND LS_OUT TO T_DATA.
+  ENDLOOP.
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+    IF <FS_DATA>-USERNAME IS NOT INITIAL AND
+       ( <FS_DATA>-NAME_FIRST IS INITIAL OR <FS_DATA>-NAME_LAST IS INITIAL ).
+      CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+        EXPORTING
+          BNAME      = <FS_DATA>-USERNAME
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          NAME_FIRST = <FS_DATA>-NAME_FIRST
+          NAME_LAST  = <FS_DATA>-NAME_LAST
+          NAME_TEXT  = <FS_DATA>-NAME_TEXT
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+      IF SY-SUBRC IS NOT INITIAL.
+        CLEAR: <FS_DATA>-NAME_FIRST, <FS_DATA>-NAME_LAST, <FS_DATA>-NAME_TEXT.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+* Finishing (Set IS_ALERT parameter)
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

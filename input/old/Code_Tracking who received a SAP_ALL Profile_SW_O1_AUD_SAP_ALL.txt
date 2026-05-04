@@ -1,0 +1,292 @@
+FUNCTION /SKN/F_SW_O1_AUD_PROF_AND_ROLE .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_O1_AUD_PROF_AND_ROLE OPTIONAL
+*"----------------------------------------------------------------------
+  DATA: LV_PROFS     TYPE XUPROFS,
+        LV_FORWDAYS  TYPE I,
+        LV_ROWCOUNT  TYPE I,
+        LV_REF_DATE  TYPE D,
+        LV_TIME_DIFF TYPE INT4,
+        LV_FLD       TYPE FIELDNAME,
+        LV_TABIX     TYPE I.
+  DATA: LS_USER_RANGE TYPE CDUSERNAME_RANGE,
+        LS_PROF_RANGE TYPE USSELPROF,
+        LS_OUT        TYPE USRCD,
+        LS_DATA       TYPE /SKN/S_SW_01_20_USER_CHG_DOC.
+  DATA: LT_USER_RANGE     TYPE CDUSERNAME_RANGE_TAB,
+        LT_CHG_USER_RANGE TYPE CDUSERNAME_RANGE_TAB,
+        LT_PROF_ASS_RANGE TYPE SUSR_T_SEL_OPT_PROF,
+        LT_PROF_DEL_RANGE TYPE SUSR_T_SEL_OPT_PROF,
+        LT_ROLE_RANGE     TYPE RSELOPTION,
+        LT_OUT            TYPE SUSR_T_USRCD,
+        LT_OUT_ROLE      TYPE SUSR_T_USRCD.
+  FIELD-SYMBOLS: <FS_FLD>  TYPE ANY,
+                 <FS_DATA> LIKE LINE OF T_DATA[].
+  DATA_SINGLE: DATLO         SY-DATLO.
+  DATA_SINGLE: TIMLO         SY-TIMLO.
+  DATA_SINGLE: DATE_FROM     CDDATUM.
+  DATA_SINGLE: DATE_TO       CDDATUM.
+  DATA_SINGLE: TIME_FROM     CDUZEIT.
+  DATA_SINGLE: TIME_TO       CDUZEIT.
+  DATA_SINGLE: USER_CRT      C.
+  DATA_SINGLE: USER_DEL      C.
+  DATA_SINGLE: PASS          C.
+  DATA_SINGLE: TYPE          C.
+  DATA_SINGLE: ALOCK_S       C.
+  DATA_SINGLE: ALOCK_D       C.
+  DATA_SINGLE: FLOCK_S       C.
+  DATA_SINGLE: FLOCK_D       C.
+  DATA_SINGLE: TVAL          C.
+  DATA_SINGLE: ACCNT         C.
+  DATA_SINGLE: GROUP         C.
+  DATA_SINGLE: PROF_ASS      C.
+  DATA_SINGLE: PROF_DEL      C.
+  DATA_SINGLE: VIEW          US_CD_VIEW.
+  DATA_SINGLE: ARCHIVE       C.
+  DATA_SINGLE: SECU          C.
+  DATA_SINGLE: ROLE          C.
+  DATA_SINGLE: DURATION_UNIT /SKN/E_SW_DURATION_UNIT.
+  DATA_SINGLE: BACKDAYS /SKN/E_MN_AN_BACKDAYS.
+  LV_BACKDAYS = '10'.
+*  data_single: date_ref_fld name_feld.
+  DATA_SINGLE: LANGU LANGU.
+  LV_LANGU = 'EN'.
+  DATA_SINGLE: SW_DEST RFCDEST.
+  DATA_MULTY: DATUM      DATUM.
+  DATA_MULTY: BNAME      XUBNAME.     " User
+  DATA_MULTY: MODBE      XUMODIFIER.  " Changed by(User)
+  DATA_MULTY: MODDA      XUMODDATE.   " Modification Date
+  DATA_MULTY: MODTI      XUMODTIME.   " Modification Time
+  DATA_MULTY: ACTION     XUACT_CD.    " Type of the Change Doc.
+  DATA_MULTY: PROF_ASS_T XUPROFILE.   " Profile assignment
+  DATA_MULTY: PROF_DEL_T XUPROFILE.   " Profile delete
+  DATA_MULTY: ROLE_T     RSDSSELOP_.  " Role assignment
+  DATA_MULTY: DURATION   /SKN/E_SW_DURATION.
+  SELECT_SINGLE: SW_DEST.
+  SELECT_SINGLE: BACKDAYS.
+  SELECT_SINGLE: USER_CRT.
+  SELECT_SINGLE: USER_DEL.
+  SELECT_SINGLE: PASS.
+  SELECT_SINGLE: TYPE.
+  SELECT_SINGLE: ALOCK_S.
+  SELECT_SINGLE: ALOCK_D.
+  SELECT_SINGLE: FLOCK_S.
+  SELECT_SINGLE: FLOCK_D.
+  SELECT_SINGLE: TVAL.
+  SELECT_SINGLE: ACCNT.
+  SELECT_SINGLE: GROUP.
+  SELECT_SINGLE: PROF_ASS.
+  SELECT_SINGLE: PROF_DEL.
+  SELECT_SINGLE: ROLE.
+  SELECT_SINGLE: VIEW.
+  SELECT_SINGLE: ARCHIVE.
+  SELECT_SINGLE: SECU.
+  SELECT_SINGLE: LANGU.
+  SELECT_SINGLE: DURATION_UNIT.
+  SELECT_MULTY: BNAME.
+  SELECT_MULTY: MODBE.
+  SELECT_MULTY: MODDA.
+  SELECT_MULTY: MODTI.
+  SELECT_MULTY: ACTION.
+  SELECT_MULTY: PROF_ASS_T.
+  SELECT_MULTY: PROF_DEL_T.
+  SELECT_MULTY: ROLE_T.
+  CONVERT_SINGLE: LANGU ISOLA.
+  _GET_CURRENT_DATE_TIME ' ' LV_SW_DEST LV_DATLO LV_TIMLO.
+*  BREAK : MISHAMI.
+  IF R_MODDA[] IS INITIAL.
+    IF LV_FORWDAYS IS INITIAL.
+      LV_DATE_FROM = LV_DATLO - LV_BACKDAYS.
+      LV_DATE_TO   = LV_DATLO.
+    ELSE.
+      IF LV_BACKDAYS IS NOT INITIAL.
+        LV_DATE_FROM = LV_DATLO - LV_BACKDAYS.
+        LV_DATE_TO   = LV_DATLO + LV_FORWDAYS.
+      ELSE.
+        LV_DATE_FROM = LV_DATLO + LV_FORWDAYS.
+      ENDIF.
+    ENDIF.
+  ELSE.
+    READ TABLE R_MODDA INTO RS_MODDA INDEX 1.
+    IF SY-SUBRC IS INITIAL.
+      LV_DATE_FROM = RS_MODDA-LOW.
+      IF RS_MODDA-HIGH IS NOT INITIAL.
+        LV_DATE_TO   = RS_MODDA-HIGH.
+      ELSE.
+        LV_DATE_TO = LV_DATE_FROM.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+  IF R_MODTI[] IS NOT INITIAL.
+    READ TABLE R_MODTI INTO RS_MODTI INDEX 1.
+    IF SY-SUBRC IS INITIAL.
+      LV_TIME_FROM = RS_MODTI-LOW.
+      IF RS_MODTI-HIGH IS NOT INITIAL.
+        LV_TIME_TO = RS_MODTI-HIGH.
+      ELSE.
+        LV_TIME_TO = '235959'.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+* Set "User" Range Values
+  LT_USER_RANGE[] = R_BNAME[].
+* Set "Changed by" Range Values
+  LT_CHG_USER_RANGE[] = R_MODBE[].
+* Set "Profile Assignment" Range Values
+  LT_PROF_ASS_RANGE[]  = R_PROF_ASS_T[].
+* Set "Profile Delete" Range Values
+  LT_PROF_DEL_RANGE[] = R_PROF_DEL_T[].
+* Set "Role Assignment" Range Values
+  LT_ROLE_RANGE[]  = R_ROLE_T[].
+* Get User Change Doc PROFILES.
+  REFRESH: LT_OUT, LT_OUT_ROLE.
+  IF LV_PROF_ASS  = 'X'  OR
+    LV_PROF_DEL  = 'X'.
+    CALL FUNCTION '/SKN/FC_USER_CHANGE_DOC'
+      EXPORTING
+        SW_DEST         = LV_SW_DEST
+        IT_USERNAME     = LT_USER_RANGE[]
+        IT_CDUSERNAME   = LT_CHG_USER_RANGE[]
+        IV_FDATE        = LV_DATE_FROM
+        IV_TDATE        = LV_DATE_TO
+        IV_FTIME        = LV_TIME_FROM
+        IV_TTIME        = LV_TIME_TO
+        IV_USER_CRT     = LV_USER_CRT
+        IV_USER_DEL     = LV_USER_DEL
+        IV_PASS         = LV_PASS
+        IV_TYPE         = LV_TYPE
+        IV_ALOCK_S      = LV_ALOCK_S
+        IV_ALOCK_D      = LV_ALOCK_D
+        IV_FLOCK_S      = LV_FLOCK_S
+        IV_FLOCK_D      = LV_FLOCK_D
+        IV_TVAL         = LV_TVAL
+        IV_ACCNT        = LV_ACCNT
+        IV_GROUP        = LV_GROUP
+        IV_PROF_ASS     = LV_PROF_ASS
+        IT_PROF_ASS     = LT_PROF_ASS_RANGE[]
+        IV_PROF_DEL     = LV_PROF_DEL
+        IT_PROF_DEL     = LT_PROF_DEL_RANGE[]
+        IV_VIEW         = 'C'
+        IV_ARCHIVE      = LV_ARCHIVE
+        IV_SECU         = LV_SECU
+*       IV_ROLE         = LV_ROLE
+*       IT_ROLE         = LT_ROLE_RANGE[]
+      IMPORTING
+        ET_CDRED_OUTPUT = LT_OUT[].
+  ENDIF.
+*   Get User Change Doc ROLES.
+  IF LV_ROLE  =  'X'.
+    CALL FUNCTION '/SKN/FC_USER_CHANGE_DOC_ROLE'
+      EXPORTING
+        SW_DEST         = LV_SW_DEST
+        IT_USERNAME     = LT_USER_RANGE[]
+        IT_CDUSERNAME   = LT_CHG_USER_RANGE[]
+        IV_FDATE        = LV_DATE_FROM
+        IV_TDATE        = LV_DATE_TO
+        IV_FTIME        = LV_TIME_FROM
+        IV_TTIME        = LV_TIME_TO
+        IV_USER_CRT     = LV_USER_CRT
+        IV_USER_DEL     = LV_USER_DEL
+        IV_PASS         = LV_PASS
+        IV_TYPE         = LV_TYPE
+        IV_ALOCK_S      = LV_ALOCK_S
+        IV_ALOCK_D      = LV_ALOCK_D
+        IV_FLOCK_S      = LV_FLOCK_S
+        IV_FLOCK_D      = LV_FLOCK_D
+        IV_TVAL         = LV_TVAL
+        IV_ACCNT        = LV_ACCNT
+        IV_GROUP        = LV_GROUP
+        IV_PROF_ASS     = LV_PROF_ASS
+        IT_PROF_ASS     = LT_PROF_ASS_RANGE[]
+        IV_PROF_DEL     = LV_PROF_DEL
+        IT_PROF_DEL     = LT_PROF_DEL_RANGE[]
+        IV_VIEW         = 'C'
+        IV_ARCHIVE      = LV_ARCHIVE
+        IV_SECU         = LV_SECU
+        IV_ROLE         = LV_ROLE
+        IT_ROLE         = LT_ROLE_RANGE[]
+      IMPORTING
+        ET_CDRED_OUTPUT = LT_OUT_ROLE[].
+    APPEND LINES OF LT_OUT_ROLE TO LT_OUT.
+  ENDIF.
+  LOOP AT LT_OUT INTO LS_OUT.
+    MOVE-CORRESPONDING LS_OUT TO LS_DATA.
+    LS_DATA-ACTION_DESC    =  LS_OUT-ACTION.
+    IF LS_DATA-BNAME IS NOT INITIAL AND
+       ( LS_DATA-NAME_FIRST IS INITIAL OR LS_DATA-NAME_LAST IS INITIAL ).
+      CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+        EXPORTING
+          BNAME      = LS_DATA-BNAME
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          NAME_FIRST = LS_DATA-NAME_FIRST
+          NAME_LAST  = LS_DATA-NAME_LAST
+          NAME_TEXT  = LS_DATA-NAME_TEXT
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+      IF SY-SUBRC IS NOT INITIAL.
+        CLEAR: LS_DATA-NAME_FIRST, LS_DATA-NAME_LAST, LS_DATA-NAME_TEXT.
+      ENDIF.
+    ENDIF.
+    IF LS_DATA-MODBE IS NOT INITIAL.
+      CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+        EXPORTING
+          BNAME      = LS_DATA-MODBE
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          NAME_FIRST = LS_DATA-MODBE_NAME_FIRST
+          NAME_LAST  = LS_DATA-MODBE_NAME_LAST
+*         name_text  = ls_data-name_text
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+      IF SY-SUBRC IS NOT INITIAL.
+        CLEAR: LS_DATA-NAME_FIRST, LS_DATA-NAME_LAST, LS_DATA-NAME_TEXT.
+      ENDIF.
+    ENDIF.
+    APPEND LS_DATA TO T_DATA.
+    CLEAR LS_DATA.
+  ENDLOOP.
+* Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    LV_TABIX = SY-TABIX .
+*    CONCATENATE 'T_DATA-' lv_date_ref_fld INTO lv_fld .
+*    ASSIGN (lv_fld) TO <fs_fld>.
+*    lv_ref_date = <fs_fld> .
+*
+*    IF NOT lv_ref_date IS INITIAL.
+    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = LV_DATE_FROM
+        T_FROM      = LV_TIME_FROM
+        D_TO        = LV_DATE_TO
+        T_TO        = LV_TIME_TO
+        TIME_UNIT   = LV_DURATION_UNIT   "'D'
+      IMPORTING
+        TIME_DIFF   = LV_TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC IS INITIAL.
+      IF LV_TIME_DIFF < '999999'.
+        T_DATA-DURATION = LV_TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+    ENDIF.
+    MODIFY T_DATA INDEX LV_TABIX.
+*    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+* Finishing (Set IS_ALERT parameter)
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

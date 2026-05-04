@@ -1,0 +1,1407 @@
+{
+  "source_file": "SW_01_20_SM66 - Global Work Process Overview.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Work Process Monitoring (SW_01_01_SM66)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP Work Processes to ensure optimal system performance, resource utilization, and application server stability. Work Process monitoring is essential for maintaining system health as work processes are the fundamental execution units that handle user requests, background jobs, and system operations in SAP environments."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work Processes are the core execution threads within SAP application servers that process user dialogues, execute background jobs, handle RFC calls, and manage system operations. Each work process has specific characteristics including type (Dialog, Background, Update, etc.), status, and resource consumption patterns. Effective monitoring of work processes enables identification of performance bottlenecks, resource contention, and system stability issues before they impact business operations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed work process monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work Process type analysis to monitor different process categories (Dialog, Background, Update, Enqueue, Message, Gateway, Spool) and their resource utilization patterns\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process status tracking to identify stuck, waiting, or failed work processes that may impact system performance and user experience\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Duration-based monitoring for detecting long-running processes that may indicate performance problems or resource contention issues\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Action and operation analysis to understand current work process activities and identify patterns in system workload distribution\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Dump analysis for tracking work process failures and system errors that require immediate attention and resolution\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource consumption assessment for identifying work processes consuming excessive system resources and impacting overall performance\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes work process statistics similar to data available through the SM50 (Work Process Overview) and SM66 (System-wide Work Process Overview) transactions, providing enhanced filtering capabilities to focus on specific process types, states, users, and time periods. This enables targeted analysis of work process performance characteristics and identification of system-related issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP work processes are functioning efficiently and identifies potential issues that may impact system performance, user experience, and business process execution."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor work process performance and processing failures indicate system resource and performance issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance and Resource Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stuck or long-running work processes consuming system resources and preventing efficient request processing\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work process dumps indicating system errors, memory issues, or application failures affecting system stability\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource contention from excessive work process workload causing system performance degradation and response time issues\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work process type imbalances leading to inefficient resource allocation and processing bottlenecks in specific operation categories\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "User Experience and Application Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Dialog work process problems causing user session delays, timeouts, and poor response times affecting productivity\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Background job processing failures from work process issues disrupting automated business operations and scheduled tasks\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Update work process problems causing database update failures and data consistency issues in business transactions\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC processing delays from communication work process issues affecting system integration and external connectivity\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Stability and Availability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Frequent work process restarts indicating underlying system instability and configuration problems\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory-related work process failures compromising system reliability and requiring immediate intervention\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work process queue saturation leading to system overload conditions and potential service interruptions\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process execution failures causing transaction rollbacks and business process disruptions affecting operational continuity\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from work process performance issues impacting service level commitments and user satisfaction\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from unreliable work process execution affecting operational efficiency and productivity\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data processing delays causing bottlenecks in time-critical business operations and reporting activities\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System unavailability from work process failures compromising business continuity and operational resilience\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate stuck and long-running work processes using SM50/SM66 transactions for detailed analysis and resolution\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system resource utilization (CPU, memory) during work process activity periods for capacity assessment\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review work process dump logs and system messages for root cause identification and error pattern analysis\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze work process distribution and workload patterns across different process types for optimization opportunities\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor work process performance trends and processing duration patterns for proactive capacity planning\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate system sizing and work process configuration parameters for optimal resource allocation\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check application server configuration and work process instance settings for performance tuning\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze work process activity patterns by user, transaction, and time periods for workload optimization\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize work process parameters and system configurations for improved performance and resource efficiency\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement work process monitoring and alerting procedures for early issue detection and prevention\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive capacity management based on work process utilization analysis and business growth projections\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on work process volume analysis and performance requirements\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "BTCJOBCNT",
+          "Job no.",
+          "CHAR",
+          "8",
+          "0",
+          "BTCJOBCNT",
+          "CHAR8"
+        ],
+        [
+          "2",
+          "BTCJOBNAME",
+          "Job name",
+          "CHAR",
+          "32",
+          "0",
+          "BTCJOB",
+          "CHAR32"
+        ],
+        [
+          "3",
+          "CNT",
+          "Number of Result Records",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "4",
+          "CUAPROGRAM",
+          "CUA program name",
+          "CHAR",
+          "40",
+          "0",
+          "WPTOTINFCP",
+          "PROGNAME"
+        ],
+        [
+          "5",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "6",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "7",
+          "DYNPRONR",
+          "Screen number or transaction",
+          "CHAR",
+          "4",
+          "0",
+          "STA_DYNPNO",
+          "STAT_DYNPR"
+        ],
+        [
+          "8",
+          "FCODE",
+          "FCode",
+          "CHAR",
+          "4",
+          "0",
+          "WPTOTINFFC",
+          "SYCHAR04"
+        ],
+        [
+          "9",
+          "LANGU",
+          "Language for texts",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "10",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "11",
+          "MEMSUM",
+          "Extended memory",
+          "DEC",
+          "20",
+          "0",
+          "MEMSUM",
+          "ABAP_MSIZE"
+        ],
+        [
+          "12",
+          "PRIVSUM",
+          "Heap (private) Memory",
+          "DEC",
+          "20",
+          "0",
+          "PRIVSUM",
+          "ABAP_MSIZE"
+        ],
+        [
+          "13",
+          "STARTDATE",
+          "Start date",
+          "DATS",
+          "8",
+          "0",
+          "WPTOTINFSD",
+          "SYDATS"
+        ],
+        [
+          "14",
+          "STARTTIME",
+          "Start time",
+          "TIMS",
+          "6",
+          "0",
+          "WPTOTINFST",
+          "SYTIME"
+        ],
+        [
+          "15",
+          "SW_DEST",
+          "Cloud Destination",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "16",
+          "TCODE",
+          "Transaction code",
+          "CHAR",
+          "20",
+          "0",
+          "STA_TCODE4",
+          "TCODE"
+        ],
+        [
+          "17",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "18",
+          "WP_ACTION",
+          "Action",
+          "CHAR",
+          "25",
+          "0",
+          "WPACTION",
+          "WPACTION"
+        ],
+        [
+          "19",
+          "WP_BNAME",
+          "User Names",
+          "CHAR",
+          "12",
+          "0",
+          "WPBNAME",
+          "UBNAME"
+        ],
+        [
+          "20",
+          "WP_CPU",
+          "CPU",
+          "CHAR",
+          "8",
+          "0",
+          "WPCPU",
+          "WPCPU"
+        ],
+        [
+          "21",
+          "WP_DUMPS",
+          "Dumps",
+          "CHAR",
+          "2",
+          "0",
+          "WPDUMPS",
+          "WPDUMPS"
+        ],
+        [
+          "22",
+          "WP_ELTIME",
+          "Runtime",
+          "CHAR",
+          "6",
+          "0",
+          "WPELZEIT",
+          "WPELZEIT"
+        ],
+        [
+          "23",
+          "WP_IACTION",
+          "Action",
+          "INT1",
+          "3",
+          "0",
+          "WPIACTION",
+          "INT1"
+        ],
+        [
+          "24",
+          "WP_INDEX",
+          "WP index",
+          "INT4",
+          "10",
+          "0",
+          "WPINDEX",
+          "WPINDEX"
+        ],
+        [
+          "25",
+          "WP_IRESTRT",
+          "Restart",
+          "INT1",
+          "3",
+          "0",
+          "WPIRESTART",
+          "WPIRESTART"
+        ],
+        [
+          "26",
+          "WP_ISTATUS",
+          "Status",
+          "INT1",
+          "3",
+          "0",
+          "WPISTATUS",
+          "WPISTATUS"
+        ],
+        [
+          "27",
+          "WP_ITYPE",
+          "Process Category",
+          "INT1",
+          "3",
+          "0",
+          "WPITYPE",
+          "WPITYPE"
+        ],
+        [
+          "28",
+          "WP_IWAIT",
+          "Reason for wait",
+          "INT1",
+          "3",
+          "0",
+          "WPIWAITING",
+          "WPIWAITING"
+        ],
+        [
+          "29",
+          "WP_MANDT",
+          "Client",
+          "CLNT",
+          "3",
+          "0",
+          "MANDT",
+          "MANDT"
+        ],
+        [
+          "30",
+          "WP_NO",
+          "Work Process Number",
+          "CHAR",
+          "2",
+          "0",
+          "WPNO",
+          "WPNO"
+        ],
+        [
+          "31",
+          "WP_PID",
+          "Work process PID",
+          "CHAR",
+          "8",
+          "0",
+          "WPPID",
+          "WPPID"
+        ],
+        [
+          "32",
+          "WP_REPORT",
+          "Report",
+          "CHAR",
+          "40",
+          "0",
+          "WPREPORT",
+          "WPREPORT"
+        ],
+        [
+          "33",
+          "WP_RESTART",
+          "Restart",
+          "CHAR",
+          "4",
+          "0",
+          "WPRESTART",
+          "WPRESTART"
+        ],
+        [
+          "34",
+          "WP_SEM",
+          "Semaphore no.",
+          "CHAR",
+          "2",
+          "0",
+          "WPSEM",
+          "WPSEM"
+        ],
+        [
+          "35",
+          "WP_SEMSTAT",
+          "Process Category",
+          "INT1",
+          "3",
+          "0",
+          "WPITYPE",
+          "WPITYPE"
+        ],
+        [
+          "36",
+          "WP_SERVER",
+          "Server Name",
+          "CHAR",
+          "20",
+          "0",
+          "MSNAME",
+          "MSNAME"
+        ],
+        [
+          "37",
+          "WP_STATUS",
+          "Status",
+          "CHAR",
+          "7",
+          "0",
+          "WPSTATUS",
+          "WPSTATUS"
+        ],
+        [
+          "38",
+          "WP_TABLE",
+          "Table",
+          "CHAR",
+          "30",
+          "0",
+          "WPTABLE",
+          "CHAR30"
+        ],
+        [
+          "39",
+          "WP_TYP",
+          "Process type",
+          "CHAR",
+          "3",
+          "0",
+          "WPTYP",
+          "WPTYP"
+        ],
+        [
+          "40",
+          "WP_WAITINF",
+          "Wait info",
+          "CHAR",
+          "40",
+          "0",
+          "WPWAITINF",
+          "WPWAITINF"
+        ],
+        [
+          "41",
+          "WP_WAITING",
+          "waiting for",
+          "CHAR",
+          "5",
+          "0",
+          "WPWAITING",
+          "WPWAITING"
+        ],
+        [
+          "42",
+          "WP_WAITTIM",
+          "waiting since",
+          "CHAR",
+          "8",
+          "0",
+          "WPWAITTIME",
+          "UDTIME"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 42 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTCJOBCNT (Job no.)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, job no. on BTCJOBCNT keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTCJOBNAME (Job name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how administrators slice operational lists: job name (BTCJOBNAME) is one lever that shapes which rows are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CNT (Number of Result Records)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when number of result records (CNT) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CUAPROGRAM (CUA program name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where cua program name (CUAPROGRAM) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets duration in time units as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on DURATION."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unit for elapsed time between each session's creation date and time and the evaluation clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes (preset in code before the selection read when not overridden)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day style counting where applicable to the duration helper."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DYNPRONR (Screen number or transaction)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because screen number or transaction (DYNPRONR) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FCODE (FCode)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—fcode on FCODE should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Language for texts)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Works downstream of the initial read so language for texts on LANGU still participates in row-level deletion rules."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — UTC mode for the relevant timestamp comparisons."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — local time / framework default for the application server clock context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MEMSUM (Extended memory)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring extended memory (MEMSUM) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PRIVSUM (Heap (private) Memory)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when heap (private) memory on PRIVSUM correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STARTDATE (Start date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where start date on STARTDATE signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STARTTIME (Start time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, start time on STARTTIME indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST (Cloud Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: rows removed for failing cloud destination on SW_DEST never reach downstream filtering."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TCODE (Transaction code)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets transaction code as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on TCODE."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_ACTION (Action)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening action through WP_ACTION alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_BNAME (User Names)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so user names (WP_BNAME) aligns with the intended triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_CPU (CPU)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: rows removed for failing cpu on WP_CPU never reach downstream filtering."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_DUMPS (Dumps)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pairs with duration logic: once WP_DUMPS passes list selection, elapsed time from the reference timestamp still must fit configured duration windows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_ELTIME (Runtime)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter runtime on WP_ELTIME surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_IACTION (Action)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pairs with duration logic: once WP_IACTION passes list selection, elapsed time from the reference timestamp still must fit configured duration windows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_INDEX (WP index)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects wp index constraints carried by WP_INDEX."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_IRESTRT (Restart)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, restart on WP_IRESTRT often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_ISTATUS (Status)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets status as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_ISTATUS."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_ITYPE (Process Category)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when process category on WP_ITYPE correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_IWAIT (Reason for wait)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets reason for wait as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on WP_IWAIT."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_MANDT (Client)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pairs with duration logic: once WP_MANDT passes list selection, elapsed time from the reference timestamp still must fit configured duration windows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_NO (Work Process Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, work process number on WP_NO keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_PID (Work process PID)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where work process pid (WP_PID) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_REPORT (Report)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, report on WP_REPORT isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_RESTART (Restart)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, restart on WP_RESTART often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_SEM (Semaphore no.)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating semaphore no. through WP_SEM for each candidate record."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_SEMSTAT (Process Category)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Gives auditors traceable criteria because process category on WP_SEMSTAT is applied consistently before any alert flag is raised."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_SERVER (Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After data is read, lines are removed unless server name on WP_SERVER still satisfies the active multivalued selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_STATUS (Status)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, status on WP_STATUS isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_TABLE (Table)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where table on WP_TABLE signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_TYP (Process type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where process type (WP_TYP) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_WAITINF (Wait info)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when wait info (WP_WAITINF) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_WAITING (waiting for)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so waiting for (WP_WAITING) aligns with the intended triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_WAITTIM (waiting since)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, waiting since on WP_WAITTIM keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial - treated as unset by code (the duration interval filter does not remove rows until a populated duration range is supplied on selection)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - initial - treated as M by code (minutes preset on the duration unit variable before selection values are read)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note: Start timestamps on each work process row participate in duration calculation once rows are returned; keep duration windows aligned with the same clock interpretation chosen for MANAGE_IN_UTC when that parameter is used."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Dialog on hold"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight dialog work processes in a wait state on a named server with a runtime guard."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_TYP = DIA\n WP_STATUS = running\n WP_WAITING = ENQ\n WP_SERVER = PRD_APP01\n DURATION = 120\n DURATION_UNIT = M\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Update process pressure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Track update-type processes with elevated CPU and a transaction focus."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_TYP = UPD\n WP_CPU = 00005000-99999999\n TCODE = VA01\n WP_MANDT = 100\n MANAGE_IN_UTC = X\n USER_FLD = WP_BNAME\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Batch correlation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Tie processes to batch jobs while bounding memory and client."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTCJOBNAME = ZNIGHT_AGG\n BTCJOBCNT = 00001234\n MEMSUM = 100000000-5000000000\n WP_MANDT = 200\n WP_REPORT = ZCL_*\n SW_DEST = CLOUD_MON\n WP_NO = 01\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "BTCJOBCNT",
+          "Job ID",
+          "CHAR(8)",
+          "BTCJOBCNT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "BTCJOBNAME",
+          "Background job name",
+          "CHAR(32)",
+          "BTCJOB"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "CUAPROGRAM",
+          "CUA program name",
+          "CHAR(40)",
+          "WPTOTINFCP"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "DYNPRONR",
+          "Screen number or transaction name",
+          "CHAR(4)",
+          "STA_DYNPNO"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "FCODE",
+          "Function code",
+          "CHAR(4)",
+          "WPTOTINFFC"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "MEMSUM",
+          "Extended memory",
+          "DEC(20)",
+          "MEMSUM"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "PRIVSUM",
+          "Heap (private) Memory",
+          "DEC(20)",
+          "PRIVSUM"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "STARTDATE",
+          "Start date for dialog step",
+          "DATS(8)",
+          "WPTOTINFSD"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "STARTTIME",
+          "Start time for dialog step",
+          "TIMS(6)",
+          "WPTOTINFST"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "TCODE",
+          "Transaction code",
+          "CHAR(20)",
+          "STA_TCODE4"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_ACTION",
+          "Current Activity of the Work Process",
+          "CHAR(25)",
+          "WPACTION"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_BNAME",
+          "User Currently Served",
+          "CHAR(12)",
+          "WPBNAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_CPU",
+          "CPU",
+          "CHAR(8)",
+          "WPCPU"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_DUMPS",
+          "Number of Dumps of the Work Process",
+          "CHAR(2)",
+          "WPDUMPS"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_ELTIME",
+          "Previous Runtime of Request (elapsed)",
+          "CHAR(6)",
+          "WPELZEIT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_IACTION",
+          "Current activity of the work process",
+          "INT1(3)",
+          "WPIACTION"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_INDEX",
+          "Work Process Number",
+          "INT4(10)",
+          "WPINDEX"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_IRESTRT",
+          "Restart After Error",
+          "INT1(3)",
+          "WPIRESTART"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_ISTATUS",
+          "Work process status",
+          "INT1(3)",
+          "WPISTATUS"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_ITYPE",
+          "Internal work process type",
+          "INT1(3)",
+          "WPITYPE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_IWAIT",
+          "Reason for wait",
+          "INT1(3)",
+          "WPIWAITING"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_MANDT",
+          "Client",
+          "CLNT(3)",
+          "MANDT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_NO",
+          "(Deprecated) Use WP_UNDEX",
+          "CHAR(2)",
+          "WPNO"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_PID",
+          "Process Identification",
+          "CHAR(8)",
+          "WPPID"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_REPORT",
+          "Report now running",
+          "CHAR(40)",
+          "WPREPORT"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_RESTART",
+          "Restart work process after dump?",
+          "CHAR(4)",
+          "WPRESTART"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_SEM",
+          "Semaphore that the work process is waiting for",
+          "CHAR(2)",
+          "WPSEM"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_SEMSTAT",
+          "Internal work process type",
+          "INT1(3)",
+          "WPITYPE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_SERVER",
+          "Server Name",
+          "CHAR(20)",
+          "MSNAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_STATUS",
+          "Work process status",
+          "CHAR(7)",
+          "WPSTATUS"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_TABLE",
+          "DB table last accessed by the work process",
+          "CHAR(30)",
+          "WPTABLE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_TYP",
+          "Type",
+          "CHAR(3)",
+          "WPTYP"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_WAITINF",
+          "Additional information about the reason for waiting",
+          "CHAR(40)",
+          "WPWAITINF"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_WAITING",
+          "Why Work Process is Waiting",
+          "CHAR(5)",
+          "WPWAITING"
+        ],
+        [
+          "/SKN/S_SW_01_01_SM66",
+          "WP_WAITTIM",
+          "Time when waiting started",
+          "CHAR(8)",
+          "WPWAITTIME"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_SM66.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM66 OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_MULTY: DURATION   /SKN/E_SW_DURATION,\n            WP_TYP     WPTYP,\n            WP_ISTATUS  WPISTATUS,\n            WP_WAITING WPWAITING,\n            WP_IRESTRT WPIRESTART,\n            WP_RESTART WPRESTART,\n            WP_DUMPS   WPDUMPS,\n            WP_CPU     WPCPU,\n            WP_ELTIME  WPELZEIT,\n            WP_MANDT   MANDT,\n            WP_REPORT  WPREPORT,\n            WP_ACTION  WPACTION,\n            WP_TABLE   WPTABLE,\n            WP_SERVER  MSNAME,\n            WP_WAITINF WPWAITINF,\n            WP_INDEX   WPINDEX,\n            STARTDATE  WPTOTINFSD,\n            STARTTIME  WPTOTINFST,\n            DYNPRONR   STA_DYNPNO,\n            TCODE      STA_TCODE4,\n            CUAPROGRAM WPTOTINFCP,\n            FCODE      WPTOTINFFC,\n            BTCJOBNAME BTCJOB,\n            BTCJOBCNT  BTCJOBCNT.\nDATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,\n             LANGU LANGU,\n             NUMBER SY-TABIX,\n             SUBRC SY-SUBRC,\n             MANAGE_IN_UTC CHAR1.\nDATA : LV_CNT TYPE I.\nDATA_MULTY: CNT /SKN/E_SW_CNT.\nSELECT_MULTY: CNT.\nDATA: LS_WP_TOTAL_INFO TYPE WPTOTLINFO,\n      LT_WP_TOTAL_INFO LIKE TABLE OF LS_WP_TOTAL_INFO,\n      LS_COMMUNICATION_ERRORS TYPE WPTOTLICER,\n      LT_COMMUNICATION_ERRORS LIKE TABLE OF LS_COMMUNICATION_ERRORS,\n      IS_USED_WP TYPE WPTOTLIUWP,\n      IT_USED_WP LIKE TABLE OF IS_USED_WP.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\nDATA : IS_OUT(1) TYPE C.\nDATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\n*-- Fill Selection Option Tables\nSELECT_MULTY: DURATION,\n            WP_TYP,\n            WP_ISTATUS,\n            WP_WAITING,\n            WP_IRESTRT,\n            WP_RESTART,\n            WP_DUMPS,\n            WP_CPU,\n            WP_ELTIME,\n            WP_MANDT,\n            WP_REPORT,\n            WP_ACTION,\n            WP_TABLE,\n            WP_SERVER,\n            WP_WAITINF,\n            WP_INDEX,\n            STARTDATE,\n            STARTTIME,\n            DYNPRONR,\n            TCODE,\n            CUAPROGRAM,\n            FCODE,\n            BTCJOBNAME,\n            BTCJOBCNT.\n LV_DURATION_UNIT = 'M'.\n SELECT_SINGLE: DURATION_UNIT,\n                MANAGE_IN_UTC,\n                LANGU.\n SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n PROCESS_ICON = ICON_DELETE.\n\"--- Run Clood Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_01_SM66'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Clood Mode -----\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  CALL FUNCTION 'STUM_WP_TOTAL_ACTIVITY'\n    EXPORTING\n*     GET_ONLY_RESTRICTED_DATA       = ' '\n      WITH_CPU                       = '1'\n*     SHOW_STATUS_ON_GUI             = ' '\n      GET_NO_DB_LOCK_INFO            = 'X'\n    TABLES\n      WP_TOTAL_INFO                  = LT_WP_TOTAL_INFO\n      COMMUNICATION_ERRORS           = LT_COMMUNICATION_ERRORS\n      USED_WP                        = IT_USED_WP.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_TYP NOT IN R_WP_TYP.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_ISTATUS NOT IN R_WP_ISTATUS.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_WAITING NOT IN R_WP_WAITING.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_IRESTRT NOT IN R_WP_IRESTRT.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_RESTART NOT IN R_WP_RESTART.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_DUMPS NOT IN R_WP_DUMPS.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_CPU NOT IN R_WP_CPU.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_ELTIME NOT IN R_WP_ELTIME.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_MANDT NOT IN R_WP_MANDT.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_REPORT NOT IN R_WP_REPORT.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_ACTION NOT IN R_WP_ACTION.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_TABLE NOT IN R_WP_TABLE.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_SERVER NOT IN R_WP_SERVER.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_WAITINF NOT IN R_WP_WAITINF.\n  DELETE LT_WP_TOTAL_INFO WHERE WP_INDEX NOT IN R_WP_INDEX.\n  DELETE LT_WP_TOTAL_INFO WHERE STARTDATE NOT IN R_STARTDATE.\n  DELETE LT_WP_TOTAL_INFO WHERE STARTTIME NOT IN R_STARTTIME.\n  DELETE LT_WP_TOTAL_INFO WHERE DYNPRONR NOT IN R_DYNPRONR.\n  DELETE LT_WP_TOTAL_INFO WHERE TCODE NOT IN R_TCODE.\n  DELETE LT_WP_TOTAL_INFO WHERE CUAPROGRAM NOT IN R_CUAPROGRAM.\n  DELETE LT_WP_TOTAL_INFO WHERE FCODE NOT IN R_FCODE.\n  DELETE LT_WP_TOTAL_INFO WHERE BTCJOBNAME NOT IN R_BTCJOBNAME.\n  DELETE LT_WP_TOTAL_INFO WHERE BTCJOBCNT NOT IN R_BTCJOBCNT.\n  LOOP AT LT_WP_TOTAL_INFO INTO LS_WP_TOTAL_INFO.\n    CLEAR T_DATA.\n    MOVE-CORRESPONDING LS_WP_TOTAL_INFO TO T_DATA.\n    APPEND T_DATA.\n  ENDLOOP.\n*   loop at t_data.\n*     sy_tabix = sy-tabix.\n*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n*        EXPORTING\n*          D_FROM            = t_data-STARTDATE\n*          T_FROM            = t_data-STARTTIME\n*          D_TO              = sy_datlo\n*          T_TO              = sy_timlo\n*          TIME_UNIT         = 'M'\n*        IMPORTING\n*          TIME_DIFF         = TIME_DIFF\n*        EXCEPTIONS\n*          WRONG_VALUE       = 1\n*          OTHERS            = 2    .\n*      IF SY-SUBRC = 0.\n*        if TIME_DIFF < '999999'.\n*          t_data-DURATION_M = TIME_DIFF .\n*        else.\n*          t_data-DURATION_M = '999999'.\n*        endif.\n*        t_data-DURATION_H = t_data-DURATION_M / 60.\n*        \"t_data-PROCESS_ICON = PROCESS_ICON.\n*        modify t_data index sy_tabix.\n*      ENDIF.\n*    endloop.\n*\n*  delete t_data where DURATION_M not in R_DURATION_M.\n*  delete t_data where DURATION_H not in R_DURATION_H.\n*-- Fill Duration Value\n SY_DATLO = SY-DATUM.   \"--- System Date/Time\n SY_TIMLO = SY-UZEIT.\n LOOP AT T_DATA .\n   SY_TABIX = SY-TABIX.\n   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n   IF T_DATA-STARTDATE IS INITIAL.\n     CONTINUE.\n   ENDIF.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-STARTDATE\n          T_FROM            = T_DATA-STARTTIME\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n   MODIFY T_DATA INDEX SY_TABIX .\n ENDLOOP .\n DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n IF R_CNT[] IS NOT INITIAL.\n   READ TABLE T_DATA INDEX 1.\n   LV_CNT = SY-TFILL.\n   IF LV_CNT NOT IN R_CNT.\n     REFRESH T_DATA.\n   ENDIF.\n ENDIF.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

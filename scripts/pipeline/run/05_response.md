@@ -1,17 +1,15 @@
 ### Parameter Relationships
 
-**Time-Based Selection Parameters:**
+How parameter combinations work together
 
-- When no date range is supplied, the EI builds the monitoring window from today minus the lookback length. The number of days to look back is configured via a single numeric parameter; that value defines the start of the window. The EI then maps this window to a configurable date field (e.g. document created date or PO date) so that purchase orders are selected by the chosen date basis.
+**Explicit calendar window versus relative lookback:** **DATUM** supplies explicit from-and-to calendar bounds for the monitoring pass. When **DATUM** is empty, **BACKDAYS** (and optionally **FORWDAYS**) builds the calendar window relative to the evaluation day before documents are read.
 
-**Duration Calculation Parameters:**
+**Reference date axis:** **DATE_REF_FLD** chooses which header date attribute is mapped into that calendar window for each generated period slice, so the same BACKDAYS span can follow creation, document, change, or update dates depending on configuration.
 
-- The EI computes a duration (in time units) between a reference date taken from each record and the current date. The reference date is taken from the output record using a configurable date field name. The unit in which duration is expressed (e.g. days) is configured separately. Together, the reference date field and the duration unit determine how duration is calculated; a numeric duration filter can then be used to restrict results (e.g. orders with duration within a range).
+**Age filter after dates:** **DURATION** with **DURATION_UNIT** is an additional filter applied after date-oriented selection: each candidate line keeps its place in the result only when the computed age from the reference date and clock fields still fits the configured duration band.
 
-**Release Strategy and Release Code Parameters:**
+**Fiscal period boundary:** **PERIOD_CLOSING_DAY** works with the generated date and posting-date tables to shape how fiscal periods are derived for the selection pass, which indirectly constrains which header lines qualify before line facts are merged.
 
-- Release group, release strategy, release indicator, and release code work together to scope which purchase orders are subject to release and which release states are included. The EI reads release status from the change document (field FRGZU) and resolves it to a release code; the release code filter then determines which orders appear in the result. Setting release group, release strategy, and release code in combination focuses the result set on the relevant release configuration and status.
+**Remote execution path:** **SW_DEST** must be populated so the remote join runs in the monitored system; other organizational filters such as **BUKRS**, **HKONT**, or **KOART** only affect which documents are returned once connectivity is established.
 
-**Creator vs. Approver (LAST_ONLY):**
-
-- When "only last approver" is set, the EI keeps at most one record per order (the most recent change by release date/time) and then checks whether the user who performed that release is the same as the order creator. When not set, the EI includes every release step where the approver equals the creator. This parameter therefore controls whether the result set is limited to the latest release per order or includes all creator-approver same-user release steps.
+**Final selection:** Both the date window logic (explicit **DATUM** or **BACKDAYS**/**FORWDAYS**) and the **DURATION**/**DURATION_UNIT** age test must be satisfied before a row is treated as part of the final exception population for alerting.

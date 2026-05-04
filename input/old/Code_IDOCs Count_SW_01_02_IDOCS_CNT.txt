@@ -1,0 +1,40 @@
+FUNCTION /SKN/F_SW_01_02_IDOCS_CNT.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_02_IDOCS_CNT OPTIONAL
+*"----------------------------------------------------------------------
+DATA : LV_ALERT TYPE  CHAR1.
+DATA : LS_DATA TYPE /SKN/S_SW_01_02_IDOCS,
+       LT_DATA LIKE TABLE OF LS_DATA.
+DATA : LV_CNT TYPE I.
+DATA_MULTY: IDOC_CNT /SKN/E_SW_CNT.
+SELECT_MULTY: IDOC_CNT.
+"=== Add <ONLY_HEADER> parameter.
+DATA: LS_SELECT LIKE LINE OF T_SELECT.
+      LS_SELECT-FIELDNM = 'ONLY_HEADER'.
+       LS_SELECT-SIGN = 'I'.
+        LS_SELECT-OPTION = 'EQ'.
+         LS_SELECT-LOW = 'X'.
+      APPEND LS_SELECT TO T_SELECT.
+"=== Add "ONLY_HEADER " parameter.
+   REFRESH T_DATA.
+   CALL FUNCTION '/SKN/F_SW_01_02_IDOCS'
+    IMPORTING
+       IS_ALERT       = LV_ALERT
+     TABLES
+       T_SELECT       = T_SELECT
+       T_DATA         = LT_DATA.
+    IS_ALERT = LV_ALERT.
+    DESCRIBE TABLE LT_DATA LINES LV_CNT.
+    IF LV_CNT IN R_IDOC_CNT.
+      T_DATA-IDOC_CNT = LV_CNT.
+      APPEND T_DATA.
+      IS_ALERT = LV_ALERT.
+    ELSE.
+      CLEAR IS_ALERT.
+    ENDIF.
+ENDFUNCTION.

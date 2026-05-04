@@ -1,0 +1,96 @@
+FUNCTION /SKN/F_SW_01_03_MSS_DB_SIZE.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_MSS_DB_SIZE
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+               LANGU  LANGU,
+               DEST RFCDEST.
+  DATA_SINGLE: CON_NAME DBCON_NAME ,
+               SCHEMA  MSSSCHEMA ,
+               DB_NAME MSSDB .
+  DATA_MULTY: DB_SIZE     MSS_DBSIZE,
+              DB_ALLOC    MSS_DBALLOC,
+              LOG_SIZE    MSS_LOGSIZE,
+              LOG_ALLOC   MSS_LOGALLOC,
+              DBFREE      MSS_DBFREESIZE,
+              LOGFREE     MSS_LOGFREESIZE,
+              DBFREE_PER  /SKN/E_SW_DBFREE_PER.   " 27.01.23++
+*-- Fill Selection Option Tables
+  SELECT_MULTY: DB_SIZE,
+                DB_ALLOC,
+                LOG_SIZE ,
+                LOG_ALLOC ,
+                DBFREE,
+                LOGFREE,
+                DBFREE_PER.    " 27.01.23++
+  LV_LANGU = SY-LANGU.
+  SELECT_SINGLE: LANGU,
+                 MANAGE_IN_UTC,
+                 DEST.
+  LV_CON_NAME = 'DEFAULT'.
+  SELECT_SINGLE: CON_NAME,
+                 SCHEMA,
+                 DB_NAME.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    LV_DEST = LV_SW_DEST.
+  ENDIF.
+  DATA: LS_INFO TYPE MSSDBSIZEINFO.
+  DATA: LS_DATA LIKE LINE OF T_DATA.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : IS_OUT(1) TYPE C.
+  DATA :NTMP(15) TYPE N,
+        ITMP TYPE TSIZE1.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  CALL FUNCTION 'MSS_GET_DB_SIZE_INFO'
+    DESTINATION LV_DEST
+    EXPORTING
+      CON_NAME             = LV_CON_NAME
+      SCHEMA               = LV_SCHEMA
+      DB_NAME              = LV_DB_NAME
+    IMPORTING
+      DB_SIZEINFO          = LS_INFO
+    EXCEPTIONS
+      NOT_RUNNING_ON_MSSQL = 1
+      DB_ERROR             = 2
+      INTERNAL_ERROR       = 3
+      DB_NOT_FOUND         = 4
+      NO_DB_ACCESS         = 5
+      CONNECT_ERROR        = 6
+      OTHERS               = 7.
+  IF SY-SUBRC = 0.
+    MOVE-CORRESPONDING LS_INFO TO LS_DATA.
+    LS_DATA-DBFREE  = LS_DATA-DB_SIZE  - LS_DATA-DB_ALLOC.
+    LS_DATA-LOGFREE = LS_DATA-LOG_SIZE - LS_DATA-LOG_ALLOC.
+**** 27.01.23++
+    IF LS_DATA-DB_SIZE GT 0.
+      LS_DATA-DBFREE_PER = ( LS_DATA-DBFREE / LS_DATA-DB_SIZE ) * 100.
+    ENDIF.
+**** 27.01.23++
+    APPEND LS_DATA TO T_DATA.
+  ENDIF.
+  DELETE T_DATA WHERE DB_SIZE   NOT IN R_DB_SIZE.
+  DELETE T_DATA WHERE DB_ALLOC  NOT IN R_DB_ALLOC.
+  DELETE T_DATA WHERE LOG_SIZE  NOT IN R_LOG_SIZE.
+  DELETE T_DATA WHERE LOG_ALLOC NOT IN R_LOG_ALLOC.
+  DELETE T_DATA WHERE DBFREE    NOT IN R_DBFREE.
+  DELETE T_DATA WHERE LOGFREE   NOT IN R_LOGFREE.
+**** 27.01.23++
+  DELETE T_DATA WHERE DBFREE_PER NOT IN R_DBFREE_PER.
+**** 27.01.23++
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

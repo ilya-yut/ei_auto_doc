@@ -1,0 +1,283 @@
+FUNCTION /SKN/F_SW_01_01_SP01.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SP01 OPTIONAL
+*"----------------------------------------------------------------------
+DATA_MULTY:
+            RQIDENT      RSPOID,
+            RQOWNER      RSPOUSER,
+            RQCRED       RSPOCREDAT,
+            RQCLIENT     RSTSCLIENT,
+            RQAUTH       RSPOAUTH,
+            RQDESTL      RSPOLNAME,
+            RQTITLE      RSPOTITLE,
+            RQRECEIVER   RSPORECEIV,
+            RQDIVISION   RSPODIVISI,
+            SYS          RSPO_SYS,
+            DATUM        SY-DATUM,
+            DURATION       /SKN/E_SW_DURATION,
+            RQSTATUS_V   RQSTATUS,
+            PAGES        RSPOPAGES.
+DATA_SINGLE: BACKDAYS INT4,
+             LANGU LANGU,
+             DURATION_UNIT /SKN/E_SW_DURATION_UNIT,
+             NUMBER SY-TABIX,
+             SUBRC SY-SUBRC,
+             MANAGE_IN_UTC CHAR1,
+             MAX_RECORDS INT4.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+DATA: DATE_FROM LIKE SY-DATUM,
+      DATE_TO LIKE SY-DATUM.
+DATA : TIME_DIFF TYPE  INT4 .
+DATA: LS_RQCLIE TYPE RQCLIE_T,
+      LT_RQCLIE LIKE TABLE OF LS_RQCLIE.
+DATA: LS_RQOWNE TYPE RQOWNE_T,
+      LT_RQOWNE LIKE TABLE OF LS_RQOWNE.
+DATA: LS_RQCRED TYPE RQCRED_T,
+      LT_RQCRED LIKE TABLE OF LS_RQCRED.
+DATA: LS_RQDESTL TYPE RQDESTL_T,
+      LT_RQDESTL LIKE TABLE OF LS_RQDESTL.
+DATA: LS_RQPAGE TYPE RQPAGE_T,
+      LT_RQPAGE LIKE TABLE OF LS_RQPAGE.
+DATA: LS_RESULT_TSP01 TYPE TSP01SYS,
+      LT_RESULT_TSP01 LIKE TABLE OF LS_RESULT_TSP01.
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LV_RQ_NO_ACCESS LIKE  TSP01-RQIDENT,
+      LV_RQ_ACCESS LIKE TSP01-RQIDENT.
+DATA: STAT_TEXT TYPE RQSTATUS,
+      STAT_COLOR TYPE  C.
+DATA: VBHDR_NAME(20) VALUE 'VBHDR',
+      MAX_RECORDS  TYPE I VALUE '99999',
+      VBHDR_LINE TYPE VBHDR,
+      VBDATE_FROM LIKE VBHDR-VBDATE,
+      VBDATE_TO LIKE VBHDR-VBDATE.
+DATA: LS_TSP01 TYPE TSP01.
+*-- Fill Selection Option Tables
+   SELECT_MULTY:
+            DURATION,
+            DATUM,
+            RQIDENT ,
+            RQOWNER,
+            RQCRED,
+            RQCLIENT,
+            RQAUTH,
+            RQDESTL,
+            RQTITLE,
+            RQRECEIVER,
+            RQDIVISION,
+            SYS,
+            RQSTATUS_V,
+            PAGES.
+   LV_LANGU = SY-LANGU.
+   LV_DURATION_UNIT = 'H'.
+   SELECT_SINGLE: BACKDAYS,
+                  DURATION_UNIT,
+                  MANAGE_IN_UTC,
+                  LANGU,
+                  MAX_RECORDS.
+   "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_SP01'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+ SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+ TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+  IF LV_MAX_RECORDS IS NOT INITIAL.
+    MAX_RECORDS = LV_MAX_RECORDS.
+  ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+      CLEAR VBDATE_FROM.
+      VBDATE_FROM+0(8) = SY_DATLO.
+      VBDATE_TO   = '99991231235959'.
+      IF LV_BACKDAYS IS INITIAL.
+        LV_BACKDAYS = 1.
+      ENDIF.
+      IF R_DATUM[] IS NOT INITIAL .
+        READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+        IF SY-SUBRC IS INITIAL.
+          DATE_FROM = RS_DATUM-LOW.
+          IF DATE_FROM IS INITIAL.
+            DATE_FROM = SY_DATLO.
+          ENDIF.
+          DATE_TO = RS_DATUM-HIGH.
+          IF DATE_TO IS INITIAL.
+            DATE_TO = '99991231'.
+          ENDIF.
+        ENDIF.
+      ELSE.
+        DATE_FROM = SY_DATLO - LV_BACKDAYS .
+        DATE_TO = '99991231'.
+        """""
+*        if R_DATUM[] is initial .
+        RS_DATUM-SIGN = 'I' .
+        RS_DATUM-OPTION = 'GE' .
+        DATE_FROM = SY-DATUM - LV_BACKDAYS .
+        RS_DATUM-LOW = DATE_FROM .
+        APPEND RS_DATUM TO R_DATUM.
+*   endif.
+        """""
+      ENDIF.
+      VBDATE_FROM+0(8) = DATE_FROM.
+      VBDATE_TO+0(8) = DATE_TO.
+    REFRESH LT_RQCLIE.
+    LOOP AT R_RQCLIENT INTO RS_RQCLIENT.
+      MOVE-CORRESPONDING RS_RQCLIENT TO LS_RQCLIE.
+      APPEND LS_RQCLIE TO LT_RQCLIE.
+    ENDLOOP.
+    REFRESH LT_RQOWNE.
+    LOOP AT R_RQOWNER INTO RS_RQOWNER.
+      MOVE-CORRESPONDING RS_RQOWNER TO LS_RQOWNE.
+      APPEND LS_RQOWNE TO LT_RQOWNE.
+    ENDLOOP.
+    REFRESH LT_RQCRED.
+    LOOP AT R_DATUM INTO RS_DATUM.
+      MOVE-CORRESPONDING RS_DATUM TO LS_RQCRED.
+      APPEND LS_RQCRED TO LT_RQCRED.
+    ENDLOOP.
+    REFRESH LT_RQPAGE.
+    LOOP AT R_PAGES INTO RS_PAGES.
+      MOVE-CORRESPONDING RS_PAGES TO LS_RQPAGE.
+      APPEND LS_RQPAGE TO LT_RQPAGE.
+    ENDLOOP.
+     CALL FUNCTION 'RSPO_ISELECT_SPOOLREQS'
+       EXPORTING
+*        RFCSYSTEM          =
+         RQNONE             = 'X'
+         RQPROC             = 'X'
+         RQSUCC             = 'X'
+         RQERR              = 'X'
+         ACCESS             = '    '
+*        PROTO              = ' '
+*        NONEX_DEV          = ' '
+*        RFCDEST            =
+       IMPORTING
+         RQ_NO_ACCESS       = LV_RQ_NO_ACCESS
+         RQ_ACCESS          = LV_RQ_ACCESS
+       TABLES
+*        S_RQIDEN           =
+         S_RQCLIE           = LT_RQCLIE
+*        S_RQ0NAM           =
+*        S_RQ1NAM           =
+*        S_RQ2NAM           =
+         S_RQOWNE           = LT_RQOWNE
+*        S_RQ1DIS           =
+*        S_RQ2DIS           =
+*        S_RQFIN            =
+*        S_RQCOPI           =
+*        S_RQPRIO           =
+*        S_RQPAPE           =
+*        S_RQPJRE           =
+*        S_RQTITL           =
+*        S_RQRECE           =
+*        S_RQDIVI           =
+*        S_RQAUTH           =
+*        S_RQTLAN           =
+*        S_RQTNUM           =
+         S_RQCRED           = LT_RQCRED
+*        S_RQDELD           =
+*        S_RQDESTL          =
+         S_RQPAGE           = LT_RQPAGE
+*        S_RQSAPT           =
+*        S_RQUNXT           =
+         S_RQADESL          = LT_RQDESTL
+*        S_RQSYST           =
+         RESULT_TSP01       = LT_RESULT_TSP01
+       EXCEPTIONS
+         ERROR              = 1
+         OTHERS             = 2.
+     IF SY-SUBRC = 0.
+       LOOP AT LT_RESULT_TSP01 INTO LS_RESULT_TSP01.
+         CLEAR STAT_TEXT.
+         CLEAR STAT_COLOR.
+         CALL FUNCTION 'RSPO_RSTATUS_FOR_SPOOLREQ'
+          EXPORTING
+          SPOOLREQ          = LS_RESULT_TSP01
+          IMPORTING
+          STATUS_TEXT       = STAT_TEXT
+          COLOR             = STAT_COLOR
+          EXCEPTIONS
+          ERROR             = 1
+          OTHERS            = 2
+          .
+          IF SY-SUBRC = 0.
+            LS_DATA-RQSTATUS_V = STAT_TEXT.
+          ENDIF.
+         MOVE-CORRESPONDING LS_RESULT_TSP01 TO LS_DATA.
+         CONCATENATE LS_RESULT_TSP01-RQ0NAME LS_RESULT_TSP01-RQ1NAME
+                     LS_RESULT_TSP01-RQ2NAME
+                INTO LS_DATA-RQTITLE SEPARATED BY ' '.
+         LS_DATA-RQCRED = LS_RESULT_TSP01-RQCRETIME+0(8).
+         LS_DATA-RQCRET = LS_RESULT_TSP01-RQCRETIME+8(6).
+         LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+         CALL FUNCTION 'CONVERSION_EXIT_SPDEV_OUTPUT'
+           EXPORTING
+             INPUT         = LS_DATA-RQDEST
+           IMPORTING
+             OUTPUT        = LS_DATA-RQDESTL.
+         LS_DATA-RQPAGE = LS_RESULT_TSP01-RQAPPRULE.
+         APPEND LS_DATA TO T_DATA.
+       ENDLOOP.
+     ENDIF.
+  DELETE T_DATA WHERE RQDESTL NOT IN R_RQDESTL.
+  DELETE T_DATA WHERE RQDIVISION NOT IN R_RQDIVISION.
+  DELETE T_DATA WHERE SYS NOT IN R_SYS.
+  DELETE T_DATA WHERE RQIDENT NOT IN R_RQIDENT.
+  DELETE T_DATA WHERE RQAUTH NOT IN R_RQAUTH.
+  DELETE T_DATA WHERE RQTITLE NOT IN R_RQTITLE.
+  DELETE T_DATA WHERE RQRECEIVER NOT IN R_RQRECEIVER.
+   LOOP AT T_DATA INTO LS_DATA.
+     SY_TABIX = SY-TABIX.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = LS_DATA-RQCRED
+          T_FROM            = LS_DATA-RQCRET
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        LS_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        LS_DATA-DURATION = '999999'.
+      ENDIF.
+     MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+    ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  DELETE T_DATA WHERE RQSTATUS_V NOT IN R_RQSTATUS_V.
+*  delete t_data where STATE_COLOR not in R_STATE_COLOR.
+*   "-- Additional Attributes
+*   loop at t_data into ls_data.
+*     sy_tabix = sy-tabix.
+*     select single *
+*       from TSP01 into ls_TSP01
+*       where RQIDENT = ls_data-RQIDENT.
+*     if sy-subrc is initial.
+*
+*       modify t_data from ls_data index sy_tabix.
+*     endif.
+*    endloop.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

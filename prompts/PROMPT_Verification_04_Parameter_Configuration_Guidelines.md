@@ -8,12 +8,15 @@ Use this prompt to **verify** an existing `04_response.md` file, **search for us
 
 You are verifying and fixing the **Parameter Configuration Guidelines** section in `04_response.md`. You receive the file (path or pasted content).
 
+**Dictionary + checked list (mandatory when entries exist):** Read **`input/params_dictionary.xlsx`** (sheet **`dictionary`**; columns **`parameter`** and **`suggested/corrected explanation`**) and **`input/checked params.txt`** (one parameter name per line; optional—if missing or empty, ignore highlighting rules). For **each** parameter that appears in the Parameters Reference Table **and** has a row in `params_dictionary.xlsx`, the corresponding `**PARAM**` block in `04_response.md` must contain that dictionary explanation text **verbatim** (same words and punctuation; whitespace/line breaks may differ; strip `<mark>`/`</mark>` when comparing text). If a block is missing that text, **replace** the main explanation so the dictionary wording is included. Do **not** paraphrase dictionary entries. **Highlighting:** when `checked params.txt` is active (non-empty), if the parameter is **in** the dictionary but **not** in that file, the dictionary main paragraph must be wrapped in `<mark>…</mark>` (yellow in Word). If the parameter is **in both** files, the dictionary paragraph must **not** use `<mark>`. Follow the same exceptions as in `prompts/PROMPT_Parameter_Configuration_Guidelines_section.md` rule **0** (`BACKDAYS` mandatory lines; `USER_FLD` / `USR_FLD` DRL first).
+
 **Your task:**
 
-1. **Search** every parameter’s **main explanation** (the paragraph(s) under each `**PARAM** (Description):` before any Options or Connection subsection) for useless or forbidden content — in **any wording**, not only fixed phrases.
+1. **Search** every parameter’s **main explanation** (the paragraph(s) under each `**PARAM** (Description):` before any Options or Connection subsection) for useless or forbidden content — in **any wording**, not only fixed phrases. **When a dictionary entry exists for that parameter,** treat deviation from the dictionary text as a violation to fix (unless it is one of the rule-0 exceptions above).
 2. **Identify** every parameter block whose main explanation contains at least one useless sentence or violates a forbidden principle.
 3. **Replace** each such block: rewrite only the **main explanation** so it complies. Keep the parameter header and any Options/Connection subsections unless they too violate; then fix only those parts. Preserve parameter order and structure; do not remove or merge entries.
 4. **Output** the **full** corrected "### Parameter Configuration Guidelines" subsection (heading through last parameter block). Do not output only the changed blocks.
+5. **Options subsections:** If the section is missing **\[PARAM_NAME] Options:** for any of **STATE_COLOR**, **STATE_ICON**, **WP_TYPE**, **SLGMODE**, **RQARCHSTAT**, **TS**, **STATUS**, **AGGR_LEVEL**, or **AGGLEVEL** (when that parameter appears in the Parameters file), add an Options subsection with value keys and short labels or one-line business meaning derived from code analysis (same treatment as other parameters with a list of available values). For **AGGR_LEVEL/AGGLEVEL**, derive literals from ABAP first (e.g. `'T'`, `'S'`) and list as `- VALUE — short explanation`; if no literals are explicit, use fallback `T` and `S` options. Do not remove existing Options subsections. **Exception — `USER_FLD` / `USR_FLD`:** Do **not** add `**USER_FLD Options:**` or `**USR_FLD Options:**`. Follow `prompts/PROMPT_Parameter_Configuration_Guidelines_section.md` **§3b**: mandatory DRL narrative verbatim, then list explicit ABAP literals for `USER_FLD` **only** if they exist in the code; otherwise add nothing further. Remove any deprecated `No fixed USER_FLD value list…` sentence or `**USER_FLD Sample values:**` heading if present.
 
 ---
 
@@ -85,7 +88,7 @@ Every sentence must add **function- or parameter-specific** information. Remove 
 
 Output the **entire** corrected Parameter Configuration Guidelines section:
 
-- Start with `### Parameter Configuration Guidelines`, then the IMPORTANT line with the correct parameter count, then every parameter block in the **exact same order** as in the input.
+- Start with `### Parameter Configuration Guidelines`, then the IMPORTANT line with the correct parameter count, then every parameter block in the **same A–Z order by Field name** as the Parameters Reference Table (case-insensitive).
 - End with the last parameter block. No document title, preamble, or other sections.
 
 ---

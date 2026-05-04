@@ -1,0 +1,471 @@
+FUNCTION /SKN/F_SW_10_03_PR_APPR_BY_CR .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_PR_APPR_BY_CR OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: LANGU  LANGU,
+               BACKDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               LAST_ONLY CHAR1,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+  LV_BACKDAYS = 10.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU.
+  LV_DATE_REF_FLD = 'BADAT'. "PO date
+  SELECT_SINGLE: LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 LAST_ONLY,
+                 DURATION_UNIT.
+  DATA_MULTY: BANFN        BANFN,
+              BNFPO        BNFPO,
+              BSART        BBSRT,
+              BSTYP        BSTYP,
+              BSAKZ        BSAKZ,
+              STATU        BANST,
+              ESTKZ        ESTKZ,
+              FRGKZ        FRGKZ,
+              EKGRP        EKGRP,
+              ERNAM        ERNAM,
+              FRGRL        FRGRL,
+              EBELN        BSTNR,
+              EKORG        EKORG,
+              FRGGR        FRGGR,
+              FRGST        FRGST,
+              RESWK        RESWK,
+              WERKS	       EWERK,
+              LIFNR        ELIFN,
+              ERDAT        AEDAT,
+              BEDAT        BEDAT,
+              BADAT        BADAT,
+              WAERS        WAERS,
+              DATUM        SY-DATUM,
+              DURATION    /SKN/E_SW_DURATION,
+              LOEKZ       ELOEK,
+              FRGC        FRGCO.
+  SELECT_MULTY:
+              BANFN,
+              BNFPO,
+              BSART,
+              BSTYP,
+              BSAKZ,
+              STATU,
+              ESTKZ,
+              FRGKZ,
+              EKGRP,
+              ERNAM,
+              ERDAT,"Changed on
+              FRGRL,
+              EBELN,
+              EKORG,
+              FRGGR,
+              FRGST,
+              RESWK,
+              WERKS,
+              LIFNR,
+              BEDAT,
+              BADAT,
+              WAERS,
+              DATUM,
+              DURATION,
+              LOEKZ,
+              FRGC.
+  CONVERT_MULTY: EBELN ALPHA,
+                 LIFNR ALPHA.
+  "--- Set default for LOEKZ (not deleted only)
+  READ TABLE R_LOEKZ INTO RS_LOEKZ INDEX 1.
+  IF SY-TFILL = 0.
+    RS_LOEKZ-SIGN = 'I'.
+    RS_LOEKZ-OPTION = 'EQ'.
+    RS_LOEKZ-LOW = ' '.
+    APPEND RS_LOEKZ TO R_LOEKZ.
+  ENDIF.
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+           R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA :   FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+        LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+        LV_DDTEXT LIKE  DD07V-DDTEXT.
+  DATA: LV_FRGCO  TYPE FRGCO.
+  DATA: LS_CDPOS TYPE CDPOS,
+        LT_CDPOS LIKE TABLE OF LS_CDPOS.
+  DATA: BEGIN OF LS_WRK.
+          INCLUDE STRUCTURE /SKN/S_SW_10_03_PR_APPR_BY_CR.
+  DATA: WRK_OBJECTID  TYPE CDOBJECTV.
+  DATA: WRK_TABKEY    TYPE CDPOS-TABKEY.
+  DATA: END OF LS_WRK.
+  DATA: LT_WRK LIKE TABLE OF LS_WRK.
+  DATA: LV_OBJECTCLAS TYPE CDOBJECTCL VALUE 'BANF'.
+  DATA: LV_TABKEY TYPE CDTABKEY.
+  DATA: WRK_OBJECTID  TYPE CDOBJECTV,
+        WRK_TABKEY    TYPE CDPOS-TABKEY.
+  DATA: LS_T161S TYPE T161S,
+        LT_T161S LIKE TABLE OF LS_T161S.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+**********
+  DATA: LV_FRGSX TYPE FRGSX.
+  DATA: LV_RESWK TYPE WERKS_D.
+  DATA: LV_WERKS TYPE WERKS_D.
+  DATA: LV_WLIEF TYPE LIFNR.
+  DATA: LV_BSART TYPE ESART.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_03_PR_APPR_BY_CR'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'BEDAT'.
+      R_BEDAT[] = R_DATUM[]. "Purchase Order Date
+    WHEN 'BADAT'.
+      R_BADAT[] = R_DATUM[]. "Request Order Date
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Changed On
+    WHEN OTHERS.
+      R_BADAT[] = R_DATUM[].
+  ENDCASE.
+  "--- Prepare FRGKZ
+  SELECT *
+    FROM T161S
+    INTO CORRESPONDING FIELDS OF TABLE LT_T161S
+    WHERE FRANG = 'X'          " Indicator: Released for RFQ/quotation processing
+      AND FRGKZ IN R_FRGKZ.
+  REFRESH R_FRGKZ.
+  LOOP AT LT_T161S INTO LS_T161S.
+    RS_FRGKZ-SIGN = 'I'.
+    RS_FRGKZ-OPTION = 'EQ'.
+    RS_FRGKZ-LOW = LS_T161S-FRGKZ.
+    APPEND RS_FRGKZ TO R_FRGKZ.
+  ENDLOOP.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT *
+    FROM EBAN AS E
+      INNER JOIN CDHDR AS CH ON CH~OBJECTID = E~BANFN
+      INTO CORRESPONDING FIELDS OF TABLE LT_WRK
+    WHERE FRGRL IN R_FRGRL    "  EQ 'X'
+      AND FRGGR IN R_FRGGR
+      AND BANFN IN R_BANFN
+      AND EBELN IN R_EBELN
+      AND BSTYP = 'B'    " Reqisition in R_BSTYP
+      AND EKORG IN R_EKORG
+      AND LIFNR IN R_LIFNR
+      AND RESWK IN R_RESWK
+      AND BEDAT IN R_BEDAT
+      AND BADAT IN R_BADAT
+      AND ERDAT IN R_ERDAT
+      AND BSART IN R_BSART
+      AND EKGRP IN R_EKGRP
+      AND ERNAM IN R_ERNAM
+      AND WERKS	IN R_WERKS
+      AND WAERS IN R_WAERS
+      AND LOEKZ EQ SPACE      ""????????
+      AND MEMORY EQ SPACE
+      AND FRGKZ IN R_FRGKZ
+      AND FRGST <>  ''
+      AND   CH~OBJECTCLAS = LV_OBJECTCLAS  " 'EINKBELEG'
+*      AND   e~ernam = ch~username
+      .
+  SORT LT_WRK.
+  DELETE ADJACENT DUPLICATES FROM LT_WRK.
+  LOOP AT LT_WRK INTO LS_WRK.
+    SY_TABIX = SY-TABIX.
+    LS_WRK-WRK_OBJECTID  = LS_WRK-BANFN.
+    MODIFY LT_WRK FROM LS_WRK INDEX SY_TABIX.
+  ENDLOOP.
+  IF LT_WRK[] IS NOT INITIAL.
+    SELECT * FROM CDPOS
+      INTO CORRESPONDING FIELDS OF TABLE LT_CDPOS
+      FOR ALL ENTRIES IN LT_WRK
+      WHERE OBJECTCLAS = LV_OBJECTCLAS
+        AND OBJECTID = LT_WRK-WRK_OBJECTID "  BANFN
+        AND TABNAME = 'EBAN'
+        AND FNAME = 'FRGZU'.
+    SORT LT_CDPOS BY OBJECTCLAS OBJECTID CHANGENR DESCENDING TABKEY.
+    IF LV_LAST_ONLY IS NOT INITIAL. "Only last release is relevant - the rest is deleted.
+      CLEAR: WRK_OBJECTID, WRK_TABKEY.
+      LOOP AT LT_CDPOS INTO LS_CDPOS.
+        SY_TABIX = SY-TABIX.
+        IF WRK_OBJECTID EQ LS_CDPOS-OBJECTID AND
+           WRK_TABKEY   EQ LS_CDPOS-TABKEY.
+          DELETE LT_CDPOS INDEX SY_TABIX.
+          CONTINUE.
+        ELSE.
+          WRK_OBJECTID = LS_CDPOS-OBJECTID.
+          WRK_TABKEY = LS_CDPOS-TABKEY.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
+  REFRESH T_DATA.
+  DATA: LT_WRK_TABIX TYPE INT4.
+  LOOP AT LT_WRK INTO LS_WRK.
+*    MOVE-CORRESPONDING ls_wrk TO t_data.
+    LT_WRK_TABIX = SY-TABIX.
+    IF LS_WRK-GSFRG = 'X'.  " overall release
+      READ TABLE LT_CDPOS INTO LS_CDPOS   " TRANSPORTING NO FIELDS
+                          WITH KEY OBJECTCLAS = LV_OBJECTCLAS
+                                   OBJECTID   = LS_WRK-WRK_OBJECTID
+                                   CHANGENR   = LS_WRK-CHANGENR
+                           BINARY SEARCH.
+      IF NOT SY-SUBRC IS INITIAL.
+        DELETE LT_WRK INDEX LT_WRK_TABIX.
+        CONTINUE.
+      ELSE.
+        LS_WRK-FRGZU = LS_CDPOS-VALUE_NEW.
+        MODIFY LT_WRK FROM LS_WRK INDEX LT_WRK_TABIX.
+      ENDIF.
+    ELSE.
+      CONCATENATE SY-MANDT  LS_WRK-BANFN LS_WRK-BNFPO INTO LV_TABKEY.
+      LS_WRK-WRK_TABKEY = LV_TABKEY.
+      READ TABLE LT_CDPOS INTO LS_CDPOS   " TRANSPORTING NO FIELDS
+                          WITH KEY OBJECTCLAS = LV_OBJECTCLAS
+                                   OBJECTID   = LS_WRK-WRK_OBJECTID
+                                   CHANGENR   = LS_WRK-CHANGENR
+                                   TABKEY     = LV_TABKEY
+                           BINARY SEARCH.
+      IF NOT SY-SUBRC IS INITIAL.
+        DELETE LT_WRK INDEX LT_WRK_TABIX.
+        CONTINUE.
+      ELSE.
+        MODIFY LT_WRK FROM LS_WRK INDEX LT_WRK_TABIX.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  SORT LT_WRK BY WRK_OBJECTID WRK_TABKEY UDATE DESCENDING UTIME DESCENDING.
+  IF LV_LAST_ONLY IS NOT INITIAL. "Only last release is relevant - the rest is deleted.
+    CLEAR: WRK_OBJECTID, WRK_TABKEY.
+    LOOP AT LT_WRK INTO LS_WRK.
+      IF WRK_OBJECTID EQ LS_WRK-WRK_OBJECTID
+          AND WRK_TABKEY   EQ LS_CDPOS-TABKEY
+        .
+        CONTINUE.
+      ELSE.
+        WRK_OBJECTID = LS_WRK-WRK_OBJECTID.
+        WRK_TABKEY   = LS_WRK-WRK_TABKEY.
+        IF LS_WRK-USERNAME EQ LS_WRK-ERNAM.
+          MOVE-CORRESPONDING LS_WRK TO T_DATA.
+          APPEND T_DATA.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ELSE.
+    LOOP AT LT_WRK INTO LS_WRK.
+      IF LS_WRK-USERNAME EQ LS_WRK-ERNAM.
+        MOVE-CORRESPONDING LS_WRK TO T_DATA.
+        APPEND T_DATA.
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+********************************************************************************
+  "--- Get Release Code
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    LV_FRGSX = T_DATA-FRGST.
+    CALL FUNCTION '/SKN/F_SW_10_PO_GET_FRGC'
+      EXPORTING
+        FRGGR             = T_DATA-FRGGR
+        FRGSX             = LV_FRGSX         """t_data-FRGST        "-frgsx
+        FRGZU             = T_DATA-FRGZU
+      IMPORTING
+        FRGC              = T_DATA-FRGC
+      EXCEPTIONS
+        WRONG_COMBINATION = 1
+        OTHERS            = 2.
+    IF SY-SUBRC = 0.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE FRGC  NOT IN R_FRGC .
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+********************************************************************************
+  "--- Set Descriptions
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    "-- BSTYP_DESC
+    LV_DOMNAME = 'BSTYP'.
+    LV_DOMVALUE = T_DATA-BSTYP.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-BSTYP_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- STATU_DESC
+    LV_DOMNAME = 'BANST'.     """''ESTAK'.
+    LV_DOMVALUE = T_DATA-STATU.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-STATU_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- BSART_DESC type ESART
+    LV_BSART = T_DATA-BSART.
+    CALL FUNCTION '/SKN/F_SW_10_BSART_DESC'
+      EXPORTING
+        BSART      = LV_BSART """"t_data-BSART
+        LANGU      = LV_LANGU
+        BSTYP      = T_DATA-BSTYP
+      IMPORTING
+        TYPE_DESC  = T_DATA-BSART_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- Get  Vendor Decriptions type LIFNR
+    LV_WLIEF = T_DATA-LIFNR.
+    CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+      EXPORTING
+        LIFNR        = LV_WLIEF """t_data-LIFNR
+      IMPORTING
+        VENDOR_DESC  = T_DATA-VENDOR_DESC
+      EXCEPTIONS
+        WRONG_VENDOR = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKORG_DESC type EKORG
+    CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+      EXPORTING
+        EKORG        = T_DATA-EKORG
+        "LANGU              = lv_LANGU
+      IMPORTING
+        PUR_ORG_DESC = T_DATA-EKORG_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKGRP_DESC type EKGRP
+    CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+      EXPORTING
+        EKGRP        = T_DATA-EKGRP
+*       LANGU        = lv_LANGU
+      IMPORTING
+        PUR_GRP_DESC = T_DATA-EKGRP_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "---- WERKS_DESC lv_WERKS
+    LV_WERKS = T_DATA-WERKS.
+    CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+      EXPORTING
+        WERKS      = LV_WERKS    """"t_data-RESWK
+*       LANGU      = lv_LANGU
+      IMPORTING
+        PLANT_DESC = T_DATA-WERKS_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- RESWK_DESC (WERKS) type-WERKS_D
+    LV_RESWK = T_DATA-RESWK.
+    CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+      EXPORTING
+        WERKS      = LV_RESWK    """"t_data-RESWK
+*       LANGU      = lv_LANGU
+      IMPORTING
+        PLANT_DESC = T_DATA-RESWK_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

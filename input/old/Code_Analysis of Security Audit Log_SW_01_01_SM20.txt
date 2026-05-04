@@ -1,0 +1,486 @@
+  FUNCTION /SKN/F_SW_01_01_SM20.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM20 OPTIONAL
+*"----------------------------------------------------------------------
+  DATA: LV_SYSTEM_ID          LIKE  BAPITID-MTSYSID,
+        LV_CONTEXT_NAME       LIKE  BAPITID-MTMCNAME,
+        LV_MTE_NAME           LIKE  BAPIMTEGEN-SHORTNAME,
+        LV_EXTERNAL_USER_NAME LIKE  BAPIXMLOGR-EXTUSER,
+        LV_START_TIMESTAMP    LIKE  BAPIPARAMS-TIMESTAMP,
+        LV_END_TIMESTAMP      LIKE  BAPIPARAMS-TIMESTAMP,
+        LV_TIMESTAMP          TYPE TZONREF-TSTAMPL. "tmstmp.
+*  LV_TIMESTAMP"'s type must be compatible with the type(s) "TZONREF-TSTAMPS, TZONREF-TSTAMPL"
+  DATA: LS_TID          LIKE BAPITID,
+        LS_SYSLOG_ENTRY TYPE RSLGENTR.
+  DATA: LT_TREE_NODES         TYPE TABLE OF BAPITNDEXT WITH HEADER LINE,
+        LT_MSG_LINE_TBL       TYPE TABLE OF BAPIMLCVAL WITH HEADER LINE,
+        LT_XMI_RAW_TBL        TYPE TABLE OF BAPIXMIRAW WITH HEADER LINE,
+        LT_XMI_EXT_TBL        TYPE TABLE OF BAPIXMIEXT WITH HEADER LINE,
+        LT_LOG_ENTRIES        TYPE STANDARD TABLE OF RSLGETAB_NEW,
+        GT_ALL_SYSLOG_ENTRIES TYPE STANDARD TABLE OF RSLGETAB_NEW.
+  DATA: MSG_TEXT(80),
+        SESSIONID    LIKE BAPIXMLOGR-SESSIONID,
+        RETURN       LIKE BAPIRET2.
+  DATA: LS_SYSTEM_INFO TYPE RFCSI.
+  CONSTANTS:
+* The name of the XMI-Interface
+    SALX_IFACE_NAME LIKE TXMILOGRAW-INTERFACE  VALUE 'XAL',
+    OBJECT_NAME     LIKE BAPIMTEGEN-OBJECTNAME
+                         VALUE 'Security'.                  "#EC NOTEXT
+  DATA: EXUSER LIKE  BAPIXMLOGR-EXTUSER VALUE 'SecAuditUser'.
+  DATA_MULTY: DURATION   /SKN/E_SW_DURATION,   "From NOW to Job Start Time point -in duration units
+              DATUM    DATUM,
+              INSTANCENAME MSNAME2,
+              SLGLTRM  RSLGTERM,
+              USERID  SYUNAME,
+              MANDT  MANDT,
+              STATE_COLOR /SKN/E_SW_STATE_COLOR,
+              SEVE_LEVEL CHAR1,
+              MSCDATE  DATUM,
+              MSCTIME  UZEIT,
+              MSG     XMIEXTMSG.
+  DATA_MULTY: MTNAMESHRT ALMTNAMESH,
+              ALIDXINTRE ALIDXINTRE.
+  DATA_SINGLE: LANGU LANGU,
+               NUMBER SY-TABIX,
+               SUBRC SY-SUBRC,
+               MANAGE_IN_UTC CHAR1,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               BACKDAYS  INT4,
+               AUDIT_LEVEL  XMILOGAUDI.
+  DATA: LS_SYSLOG TYPE RSLGENTR_NEW,
+        LT_SYSLOG LIKE TABLE OF LS_SYSLOG.
+  DATA: LV_POS                  TYPE I,
+        LV_WRAPCOUNT            TYPE I,
+        LV_FILTER_DATETIME_FROM TYPE  RSLGTIME,
+        LV_FILTER_DATETIME_TO   TYPE  RSLGTIME,
+        LV_INSTANCENAME         TYPE  MSNAME2.
+  DATA: LS_SERVER_LIST TYPE MSXXLIST,
+        LT_SERVER_LIST LIKE TABLE OF LS_SERVER_LIST.
+  DATA: LS_DATA LIKE LINE OF T_DATA,
+        LT_DATA LIKE TABLE OF LS_DATA.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA :   SY_DATLO LIKE SY-DATLO,
+           SY_TIMLO LIKE SY-TIMLO.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA: LV_SLGPROC TYPE RSLGPID.
+  DATA: LV_AREA        LIKE  TSL1D-AREA,
+        LV_SUBID       LIKE  TSL1D-SUBID,
+        LV_CACHE_ENTRY TYPE  RSLGTCACHE.
+  "lv_terminal type RSLG_TERMINAL.
+  DATA : LV_DATE_FROM LIKE SY-DATUM,
+         LV_DATE_TO   LIKE SY-DATUM.
+DATA: LV_NO_SERVER_LIST(1) TYPE C.
+***
+****-- Fill Selection Option Tables
+***
+  SELECT_MULTY: DURATION,
+                DATUM,
+                INSTANCENAME,
+                SLGLTRM,
+                USERID,
+                MANDT,
+                STATE_COLOR,
+                SEVE_LEVEL,
+                MSCDATE,
+                MSCTIME,
+                MSG.
+  SELECT_MULTY: MTNAMESHRT,
+                ALIDXINTRE.
+  IF R_SEVE_LEVEL[] IS INITIAL.
+    RS_SEVE_LEVEL-SIGN = 'I'.
+    RS_SEVE_LEVEL-OPTION = 'EQ'.
+    RS_SEVE_LEVEL-LOW = SEVE_HIGH.
+    APPEND RS_SEVE_LEVEL TO R_SEVE_LEVEL.
+  ENDIF.
+  LV_DURATION_UNIT = 'M'.
+  LV_BACKDAYS = 0.
+  LV_AUDIT_LEVEL = 1.
+  SELECT_SINGLE: DURATION_UNIT,
+                 BACKDAYS,
+                 MANAGE_IN_UTC,
+                 AUDIT_LEVEL.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  DATA_MULTY: ACTUALVAL ALVALUE.
+  DATA: LV_ACTUALVAL_TREE TYPE ALVALUE,
+        LV_ACTUALVAL_HIGH TYPE ALVALUE.
+  IF R_SEVE_LEVEL[] IS NOT INITIAL.
+    LV_ACTUALVAL_HIGH = 9.
+    LOOP AT R_SEVE_LEVEL INTO RS_SEVE_LEVEL.
+      MOVE RS_SEVE_LEVEL-SIGN TO RS_ACTUALVAL-SIGN.
+      MOVE RS_SEVE_LEVEL-OPTION TO RS_ACTUALVAL-OPTION.
+      CASE RS_SEVE_LEVEL-LOW.
+        WHEN SEVE_LOW. " 'L'.
+          RS_ACTUALVAL-LOW = SEVE_VAL_LOW. " '1'.
+        WHEN SEVE_MED. " 'M'.
+          RS_ACTUALVAL-LOW = SEVE_VAL_MED. "'2'.
+        WHEN SEVE_HIGH. " 'H'.
+          RS_ACTUALVAL-LOW = SEVE_VAL_HIGH. "'3'.
+        WHEN OTHERS.
+          RS_ACTUALVAL-LOW = SEVE_VAL_HIGH. "'3'.
+      ENDCASE.
+      CASE RS_SEVE_LEVEL-HIGH.
+        WHEN SEVE_LOW. " 'L'.
+          RS_ACTUALVAL-HIGH = SEVE_VAL_LOW. "'1'.
+        WHEN SEVE_MED. " 'M'.
+          RS_ACTUALVAL-HIGH = SEVE_VAL_MED. "'2'.
+        WHEN SEVE_HIGH. " 'H'.
+          RS_ACTUALVAL-HIGH = SEVE_VAL_HIGH. " '3'.
+        WHEN OTHERS.
+          RS_ACTUALVAL-HIGH = RS_ACTUALVAL-LOW.
+      ENDCASE.
+      APPEND RS_ACTUALVAL TO R_ACTUALVAL.
+      IF LV_ACTUALVAL_HIGH > RS_ACTUALVAL-HIGH.
+        LV_ACTUALVAL_HIGH = RS_ACTUALVAL-HIGH.
+      ENDIF.
+    ENDLOOP.
+    LV_ACTUALVAL_TREE = LV_ACTUALVAL_HIGH.
+  ENDIF.
+***CONSTANTS: SEVE_VAL_LOW      TYPE I VALUE 1,
+***           SEVE_VAL_MED      TYPE I VALUE 2,
+***           SEVE_VAL_HIGH     TYPE I VALUE 3.
+***CONSTANTS: SEVE_LOW(1)      TYPE C VALUE 'L',
+***           SEVE_MED(1)      TYPE C VALUE 'M',
+***           SEVE_HIGH(1)     TYPE C VALUE 'H'.
+  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+  TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    LV_DATE_FROM = RS_DATUM-LOW.
+    LV_DATE_TO = RS_DATUM-HIGH.
+  ELSE.
+    LV_DATE_FROM = SY_DATLO - LV_BACKDAYS .
+    LV_DATE_TO = SY_DATLO.
+  ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH: T_DATA , LT_DATA.
+************************************************************************
+* Open a new XMI session and log on as external partner
+************************************************************************
+  CALL FUNCTION 'BAPI_XMI_LOGON'
+    DESTINATION LV_SW_DEST
+    EXPORTING
+      EXTCOMPANY            = 'SecureCompany'  "#EC NOTEXT
+      EXTPRODUCT            = 'TestProduct1'   "#EC NOTEXT
+      INTERFACE             = SALX_IFACE_NAME
+      VERSION               = '1.0'            "#EC NOTEXT
+    IMPORTING
+      SESSIONID             = SESSIONID
+      RETURN                = RETURN
+    EXCEPTIONS
+      COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+      SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+  IF SY-SUBRC NE 0.
+    "WRITE: / 'BAPI_XMI_LOGON', MSG_TEXT.
+    EXIT.
+  ENDIF.
+  IF RETURN-TYPE = 'E'.
+    LS_DATA-MSG = RETURN-MESSAGE.
+    APPEND LS_DATA TO LT_DATA.
+    T_DATA[] = LT_DATA[].
+    EXIT.
+  ENDIF.
+************************************************************************
+  CALL FUNCTION 'TH_SERVER_LIST'
+    DESTINATION LV_SW_DEST
+*   EXPORTING
+*     SERVICES              = 255
+*     SYSSERVICE            = 0
+*     ACTIVE_SERVER         = 1
+*     SUBSYSTEM_AWARE       = 1
+    TABLES
+      LIST           = LT_SERVER_LIST
+*     LIST_IPV6      =
+    EXCEPTIONS
+      NO_SERVER_LIST = 1
+      OTHERS         = 2.
+  IF SY-SUBRC = 0.
+    CALL FUNCTION 'RFC_SYSTEM_INFO'
+      DESTINATION LV_SW_DEST
+      IMPORTING
+        RFCSI_EXPORT = LS_SYSTEM_INFO
+*       CURRENT_RESOURCES       =
+*       MAXIMAL_RESOURCES       =
+*       RECOMMENDED_DELAY       =
+      .
+    LV_SYSTEM_ID = LS_SYSTEM_INFO-RFCSYSID.
+* Implement suitable error handling here
+  ENDIF.
+  IF SY-SUBRC <> 0.
+    CASE SY-SUBRC.
+      WHEN 1.  " NO_SERVER_LIST
+        LV_NO_SERVER_LIST = 'X'.
+      WHEN OTHERS.
+        EXIT.
+    ENDCASE.
+  ENDIF.
+  IF LV_NO_SERVER_LIST IS NOT INITIAL. " Add fictive Item
+    LS_SERVER_LIST-NAME = LV_SW_DEST.
+    APPEND LS_SERVER_LIST TO LT_SERVER_LIST.
+  ENDIF.
+  LOOP AT LT_SERVER_LIST INTO LS_SERVER_LIST.
+    IF SY-TABIX  > 1.
+      EXIT.
+    ENDIF.
+    CONCATENATE  LV_DATE_FROM '000000' INTO LV_FILTER_DATETIME_FROM.
+    CLEAR LV_FILTER_DATETIME_TO.
+    IF LV_DATE_TO IS NOT INITIAL.
+      CONCATENATE  LV_DATE_TO '235959' INTO LV_FILTER_DATETIME_TO.
+    ENDIF.
+    LV_INSTANCENAME = LS_SERVER_LIST-NAME.
+    IF LV_INSTANCENAME NOT IN R_INSTANCENAME.
+      CONTINUE.
+    ENDIF.
+************************************************************************
+* Set the audit level
+************************************************************************
+    CALL FUNCTION 'BAPI_XMI_SET_AUDITLEVEL'
+      DESTINATION LV_SW_DEST
+      EXPORTING
+        AUDITLEVEL            = LV_AUDIT_LEVEL
+      IMPORTING
+        RETURN                = RETURN
+      EXCEPTIONS
+        COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+        SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+    IF SY-SUBRC NE 0.
+      EXIT.
+    ENDIF.
+    IF RETURN-TYPE = 'E'..
+      LS_DATA-MSG = RETURN-MESSAGE.
+      APPEND LS_DATA TO LT_DATA.
+      T_DATA[] = LT_DATA[].
+      EXIT.
+    ENDIF.
+************************************************************************
+* Get TID of given object
+************************************************************************
+    LV_CONTEXT_NAME = LV_INSTANCENAME.
+    LV_EXTERNAL_USER_NAME = EXUSER.
+    CALL FUNCTION 'BAPI_SYSTEM_MTE_GETTIDBYNAME'
+      DESTINATION LV_SW_DEST
+      EXPORTING
+        SYSTEM_ID             = LV_SYSTEM_ID
+        CONTEXT_NAME          = LV_CONTEXT_NAME
+        OBJECT_NAME           = OBJECT_NAME
+*       mte_name              =
+        EXTERNAL_USER_NAME    = LV_EXTERNAL_USER_NAME
+      IMPORTING
+        TID                   = LS_TID
+        RETURN                = RETURN
+      EXCEPTIONS
+        COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+        SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+    IF SY-SUBRC NE 0.
+      EXIT.
+    ENDIF.
+    IF RETURN-TYPE = 'E'.
+      LS_DATA-MSG = RETURN-MESSAGE.
+      APPEND LS_DATA TO LT_DATA.
+      T_DATA[] = LT_DATA[].
+      EXIT.
+    ENDIF.
+************************************************************************
+* Get tree of MTEs
+************************************************************************
+    CALL FUNCTION 'BAPI_SYSTEM_MTE_GETTREE'
+      DESTINATION LV_SW_DEST
+      EXPORTING
+        TID                   = LS_TID
+*       MAX_TREE_DEPTH        = 0
+*       VISIBLE_LEVEL         = 3
+        EXTERNAL_USER_NAME    = LV_EXTERNAL_USER_NAME
+      IMPORTING
+        RETURN                = RETURN
+      TABLES
+        TREE_NODES            = LT_TREE_NODES
+      EXCEPTIONS
+        COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+        SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+    IF SY-SUBRC NE 0.
+      EXIT.
+    ENDIF.
+    IF RETURN-TYPE = 'E'.
+      LS_DATA-MSG = RETURN-MESSAGE.
+      APPEND LS_DATA TO LT_DATA.
+      T_DATA[] = LT_DATA[].
+      EXIT.
+    ENDIF.
+************************************************************************
+* Loop for all MTEs
+* Ignore first level which is a header
+************************************************************************
+    CLEAR LS_TID.
+    LOOP AT LT_TREE_NODES WHERE ALLEVINTRE > 1.
+      "--  check lt_tree_nodes-ACTUALVAL
+      IF LT_TREE_NODES-ACTUALVAL < LV_ACTUALVAL_TREE.  " not in r_ACTUALVAL.
+        CONTINUE.
+      ENDIF.
+      IF LT_TREE_NODES-MTNAMESHRT NOT IN R_MTNAMESHRT.
+        CONTINUE.
+      ENDIF.
+      IF LT_TREE_NODES-ALIDXINTRE NOT IN R_ALIDXINTRE.
+        CONTINUE.
+      ENDIF.
+      MOVE-CORRESPONDING LT_TREE_NODES TO LS_TID.
+************************************************************************
+* Get Security Audit Log alerts
+************************************************************************
+      REFRESH: LT_MSG_LINE_TBL,
+               LT_XMI_RAW_TBL,
+               LT_XMI_EXT_TBL.
+      LV_START_TIMESTAMP = LV_FILTER_DATETIME_FROM.
+      LV_END_TIMESTAMP = LV_FILTER_DATETIME_TO.
+      CALL FUNCTION 'BAPI_SYSTEM_MTE_GETMLHIS'
+        DESTINATION LV_SW_DEST
+        EXPORTING
+          TID                   = LS_TID
+          START_TIMESTAMP       = LV_START_TIMESTAMP
+          END_TIMESTAMP         = LV_END_TIMESTAMP
+          EXTERNAL_USER_NAME    = LV_EXTERNAL_USER_NAME
+        IMPORTING
+          RETURN                = RETURN
+        TABLES
+          MSG_LINE_DATA         = LT_MSG_LINE_TBL
+          XMI_MSG_RAW           = LT_XMI_RAW_TBL
+          XMI_MSG_EXT           = LT_XMI_EXT_TBL
+        EXCEPTIONS
+          COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+          SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+      IF SY-SUBRC NE 0.
+        EXIT.
+      ENDIF.
+      IF RETURN-TYPE = 'E'.
+        LS_DATA-MSG = RETURN-MESSAGE.
+        APPEND LS_DATA TO LT_DATA.
+        T_DATA[] = LT_DATA[].
+        EXIT.
+      ENDIF.
+****     Export in ENHA. "
+****     Import From Memory, In Program "LSALCF01" FORM "al_msc_get_local_syslog"
+***      IMPORT lt_log_entries FROM DATABASE indx(ar) CLIENT sy-mandt ID 'ZLOGENTRIES' .
+***      IF sy-subrc IS INITIAL.
+***        APPEND LINES OF lt_log_entries TO gt_all_syslog_entries.
+***        DELETE FROM DATABASE indx(ar) CLIENT sy-mandt ID 'ZLOGENTRIES'.
+***        CLEAR: lt_log_entries[].
+***      ENDIF.
+************************************************************************
+* Output
+************************************************************************
+    LOOP AT LT_MSG_LINE_TBL.
+      IF LT_MSG_LINE_TBL-VALUEORIG NOT IN R_ACTUALVAL.
+        CONTINUE.
+      ENDIF.
+      CLEAR: LT_XMI_RAW_TBL, LT_XMI_EXT_TBL.
+      READ TABLE LT_XMI_RAW_TBL INDEX SY-TABIX.
+      READ TABLE LT_XMI_EXT_TBL INDEX SY-TABIX.
+*     Read Current Line
+      READ TABLE GT_ALL_SYSLOG_ENTRIES INTO DATA(LS_ALL_SYSLOG_ENTRIES) INDEX SY-TABIX.
+      LS_SYSLOG_ENTRY = LS_ALL_SYSLOG_ENTRIES-CENTDATA.
+      MOVE-CORRESPONDING LT_MSG_LINE_TBL TO LS_DATA.
+      MOVE-CORRESPONDING LT_XMI_RAW_TBL TO LS_DATA.
+      MOVE-CORRESPONDING LT_XMI_EXT_TBL TO LS_DATA.
+      LS_DATA-INSTANCENAME = LV_INSTANCENAME.
+      MOVE-CORRESPONDING LT_TREE_NODES TO LS_DATA.
+***      ls_data-transaction = ls_syslog_entry-slgtc.  "Transaction
+***      ls_data-program = ls_syslog_entry-slgrepna.   "Program
+*     Set Local Time from fields mscdate && msctime
+      GET TIME STAMP FIELD DATA(LV_LOCAL_TS).
+      LV_LOCAL_TS = LS_DATA-MSCDATE && LS_DATA-MSCTIME.
+*     Convert to Local Time
+      CONVERT TIME STAMP LV_LOCAL_TS TIME ZONE SY-ZONLO
+              INTO DATE DATA(LV_LOCAL_DATE) TIME DATA(LV_LOCAL_TIME).
+      LS_DATA-MSCDATE = LV_LOCAL_DATE.
+      LS_DATA-MSCTIME = LV_LOCAL_TIME.
+      LS_DATA-MSCGLLID+4(14) = LS_DATA-MSCDATE && LS_DATA-MSCTIME.
+      CASE LS_DATA-SEVERORIG.
+        WHEN RSAU_SEVE_HIGH.
+          LS_DATA-STATE_COLOR = 'R'.
+        WHEN RSAU_SEVE_MED.
+          LS_DATA-STATE_COLOR = 'Y'.
+        WHEN RSAU_SEVE_LOW.
+          LS_DATA-STATE_COLOR = 'G'.
+        WHEN OTHERS.
+          LS_DATA-STATE_COLOR = 'Y'.
+      ENDCASE.
+      CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+        EXPORTING
+          STATE_COLOR = LS_DATA-STATE_COLOR
+        IMPORTING
+          STATE_ICON  = LS_DATA-STATE_ICON.
+     IF LS_DATA-STATE_COLOR IN R_STATE_COLOR AND
+        LS_DATA-INSTANCENAME IN R_INSTANCENAME AND
+        LS_DATA-USERID IN R_USERID AND
+        LS_DATA-MANDT IN R_MANDT AND
+        LS_DATA-STATE_COLOR IN R_STATE_COLOR AND
+        LS_DATA-MSCDATE IN R_MSCDATE AND
+        LS_DATA-MSCTIME IN R_MSCTIME AND
+        LS_DATA-MSG IN R_MSG.
+       APPEND LS_DATA TO LT_DATA.
+     ENDIF.
+      CLEAR: LV_TIMESTAMP, LV_LOCAL_DATE, LV_LOCAL_TIME.
+    ENDLOOP.
+    CLEAR: GT_ALL_SYSLOG_ENTRIES[], LT_MSG_LINE_TBL[], LT_XMI_RAW_TBL[], LT_XMI_EXT_TBL[].
+   ENDLOOP.
+  ENDLOOP.
+************************************************************************
+* Close the XMI session and log off as external partner
+************************************************************************
+  CALL FUNCTION 'BAPI_XMI_LOGOFF'
+    DESTINATION LV_SW_DEST
+    EXPORTING
+      INTERFACE             = SALX_IFACE_NAME
+    IMPORTING
+      RETURN                = RETURN
+    EXCEPTIONS
+      COMMUNICATION_FAILURE = 1 MESSAGE MSG_TEXT
+      SYSTEM_FAILURE        = 2 MESSAGE MSG_TEXT.
+  IF SY-SUBRC NE 0.
+    "EXIT.
+  ENDIF.
+************************************************************************
+  DELETE LT_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+  DELETE LT_DATA WHERE INSTANCENAME NOT IN R_INSTANCENAME.
+  DELETE LT_DATA WHERE USERID NOT IN R_USERID.
+  DELETE LT_DATA WHERE MANDT NOT IN R_MANDT.
+  DELETE LT_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+  DELETE LT_DATA WHERE MSCDATE NOT IN R_MSCDATE.
+  DELETE LT_DATA WHERE MSCTIME NOT IN R_MSCTIME.
+  DELETE LT_DATA WHERE MSG NOT IN R_MSG.
+*-- Fill Duration Value
+  LOOP AT LT_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX.
+    LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = LS_DATA-MSCDATE
+        T_FROM      = LS_DATA-MSCTIME
+        D_TO        = SY_DATLO
+        T_TO        = SY_TIMLO
+        TIME_UNIT   = LV_DURATION_UNIT
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      LS_DATA-DURATION = TIME_DIFF .
+    ELSE.
+      LS_DATA-DURATION = '999999'.
+    ENDIF.
+    MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX .
+  ENDLOOP .
+  DELETE LT_DATA WHERE DURATION NOT IN R_DURATION.
+  T_DATA[] =  LT_DATA[].
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

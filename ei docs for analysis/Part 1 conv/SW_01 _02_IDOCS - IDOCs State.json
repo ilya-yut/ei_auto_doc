@@ -1,0 +1,2427 @@
+{
+  "source_file": "SW_01 _02_IDOCS - IDOCs State.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: IDOCs State (SW_01_02_IDOCS)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDOC (Intermediate Document) is SAP's standard document format for business transaction data transfers. The IDOC interface serves as a translator for business data from external systems, enabling seamless data exchange between different platforms and applications."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDOCs function as a data formatting tool that enables easy sharing of data between databases and applications within a company (ALE - Application Link Enabling) as well as serving as an efficient data carrier between different companies (EDI - Electronic Data Interchange)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "An IDOC consists of three main components:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "1. Control Data Record - Contains the IDOC number, direction ('2' indicates inbound/'1' indicates outbound), type of IDOC, sender/receiver data, and partner port information."
+    },
+    {
+      "kind": "paragraph",
+      "text": "2. Data Records - Contains segment names and actual application data."
+    },
+    {
+      "kind": "paragraph",
+      "text": "3. Status Records - Attached to IDOCs at processing milestones or errors, containing status messages like 'IDOC created', 'successfully passed to port', error descriptions, etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of Intermediate Document (IDOC) processing status within SAP systems. Building on SAP's standard IDOC framework, this monitoring solution tracks the complete lifecycle of business data exchanges."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This EI acts as a critical integration health indicator that provides detailed IDOC status information for:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration monitoring to ensure data exchange processes are functioning correctly"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Error detection and analysis for failed or stuck IDOC processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance monitoring to identify processing delays and bottlenecks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance tracking for business-critical data transfers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The system monitors IDOCs across their complete lifecycle, from creation through final processing, providing real-time visibility into integration health and enabling proactive issue resolution."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDOC processing issues indicate integration problems causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data Integration Failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Failed business document transfers between systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Incomplete data synchronization affecting business processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message queue backlogs preventing timely processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Order processing delays due to failed IDOC transfers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inventory synchronization issues affecting supply chain"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Customer data inconsistencies across integrated systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing bottlenecks causing IDOC accumulation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource exhaustion from stuck or looping IDOCs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Network communication failures affecting external partners"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance and Audit Concerns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Missing audit trails for critical business transactions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Regulatory reporting delays due to data transfer failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Partner SLA violations from processing delays"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate failed IDOCs using WE02/WE05 transactions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check IDOC processing status and error messages"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Restart stuck background processes if necessary"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor RFC connections and partner configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check message queues (SMQ1/SMQ2) for processing backlogs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze network connectivity to external partners"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reprocess failed IDOCs after fixing root causes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize IDOC processing parameters and batch sizes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring and alerting procedures"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control data retrieval and processing."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "ARCKEY",
+          "EDI Archive Key",
+          "CHAR",
+          "70",
+          "0",
+          "IDOCCARKEY",
+          "EDI_ARCKEY"
+        ],
+        [
+          "2",
+          "BACKDAYS",
+          "Back Days",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "3",
+          "CIMTYP",
+          "Extension",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_CIMTYP",
+          "EDI_CIMTYP"
+        ],
+        [
+          "4",
+          "COUNTR",
+          "Status counter",
+          "NUMC",
+          "16",
+          "0",
+          "EDI_COUNTR",
+          "EDI_COUNTR"
+        ],
+        [
+          "5",
+          "CREDAT",
+          "Created On",
+          "DATS",
+          "8",
+          "0",
+          "EDI_CCRDAT",
+          "DATUM"
+        ],
+        [
+          "6",
+          "CRETIM",
+          "Created at",
+          "TIMS",
+          "6",
+          "0",
+          "EDI_CCRTIM",
+          "UZEIT"
+        ],
+        [
+          "7",
+          "DATE_REF_FLD",
+          "Date Ref. Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "8",
+          "DATUM",
+          "Date",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "9",
+          "DIRECT",
+          "Direction",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_DIRECT",
+          "EDI_DIRECT"
+        ],
+        [
+          "10",
+          "DOCNUM",
+          "IDOC NUMBER",
+          "NUMC",
+          "16",
+          "0",
+          "EDI_DOCNUM",
+          "EDI_DOCNUM"
+        ],
+        [
+          "11",
+          "DOCREL",
+          "IDoc: SAP Release",
+          "CHAR",
+          "4",
+          "0",
+          "EDI_DOCREL",
+          "SAPRL"
+        ],
+        [
+          "12",
+          "DOCTYP",
+          "IDoc Type",
+          "CHAR",
+          "8",
+          "0",
+          "EDI_DOCTYP",
+          "EDI_DOCTYP"
+        ],
+        [
+          "13",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "14",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "15",
+          "EXPRSS",
+          "Express",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_EXPRSS",
+          "EDI_EXPRSS"
+        ],
+        [
+          "16",
+          "IDOCTP",
+          "BASIC TYPE",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_IDOCTP",
+          "EDI_IDOCTP"
+        ],
+        [
+          "17",
+          "LOGDAT",
+          "Date status error",
+          "DATS",
+          "8",
+          "0",
+          "EDI_LOGDAT",
+          "DATUM"
+        ],
+        [
+          "18",
+          "LOGTIM",
+          "Time status error",
+          "TIMS",
+          "6",
+          "0",
+          "EDI_LOGTIM",
+          "UZEIT"
+        ],
+        [
+          "19",
+          "MANAGE_IN_UTC",
+          "'X' - Manage in UTC",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "20",
+          "MAXSEGNUM",
+          "Number of data records",
+          "NUMC",
+          "6",
+          "0",
+          "ANZEDIDD",
+          "EDI_NUMBER"
+        ],
+        [
+          "21",
+          "MESCOD",
+          "Message Variant",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_MESCOD",
+          "EDI_MESCOD"
+        ],
+        [
+          "22",
+          "MESFCT",
+          "Message function",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_MESFCT",
+          "EDI_MESFCT"
+        ],
+        [
+          "23",
+          "MESSAGE",
+          "Message text",
+          "CHAR",
+          "220",
+          "0",
+          "BAPI_MSG",
+          "TEXT220"
+        ],
+        [
+          "24",
+          "MESTYP",
+          "MESSAGE TYPE",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_MESTYP",
+          "EDI_MESTYP"
+        ],
+        [
+          "25",
+          "OUTMOD",
+          "Output Mode",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_OUTMOD",
+          "EDI_OUTMOD"
+        ],
+        [
+          "26",
+          "PROCESS_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "27",
+          "RCVLAD",
+          "Logical address of recipient",
+          "CHAR",
+          "70",
+          "0",
+          "EDI_RCVLAD",
+          "EDI_LOGADR"
+        ],
+        [
+          "28",
+          "RCVPFC",
+          "Receiver Part.Functn",
+          "CHAR",
+          "2",
+          "0",
+          "EDI_RCVPFC",
+          "EDI_PARVW"
+        ],
+        [
+          "29",
+          "RCVPOR",
+          "RECEIVER PORT",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_RCVPOR",
+          "EDI_PORT"
+        ],
+        [
+          "30",
+          "RCVPRN",
+          "RECEIVER PARTNER NO.",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_RCVPRN",
+          "EDI_PARNUM"
+        ],
+        [
+          "31",
+          "RCVPRT",
+          "RECEIVER PARTNR TYPE",
+          "CHAR",
+          "2",
+          "0",
+          "EDI_RCVPRT",
+          "EDI_PARTYP"
+        ],
+        [
+          "32",
+          "RCVSAD",
+          "SADR recipient addr.",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_RCVSAD",
+          "EDI_SADNR"
+        ],
+        [
+          "33",
+          "RCVSCA",
+          "Communication Type",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_RCVSCA",
+          "EDI_SADCA"
+        ],
+        [
+          "34",
+          "RCVSDF",
+          "Default Setting",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_RCVSDF",
+          "EDI_SADDF"
+        ],
+        [
+          "35",
+          "RCVSLF",
+          "Sequential number",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_RCVSLF",
+          "EDI_SADLF"
+        ],
+        [
+          "36",
+          "RCVSMN",
+          "SADR client(rec.)",
+          "CLNT",
+          "3",
+          "0",
+          "EDI_RCVSMN",
+          "EDI_SADMDT"
+        ],
+        [
+          "37",
+          "RCVSNA",
+          "Internat.addr.",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_RCVSNA",
+          "EDI_SADNA"
+        ],
+        [
+          "38",
+          "REFGRP",
+          "Reference to Message Group",
+          "CHAR",
+          "14",
+          "0",
+          "IDOCCRFGRP",
+          "EDI_REFNUM"
+        ],
+        [
+          "39",
+          "REFINT",
+          "Interchange File Reference",
+          "CHAR",
+          "14",
+          "0",
+          "IDOCCRFINT",
+          "EDI_REFNUM"
+        ],
+        [
+          "40",
+          "REFMES",
+          "Message reference",
+          "CHAR",
+          "14",
+          "0",
+          "IDOCCRFMES",
+          "EDI_REFNUM"
+        ],
+        [
+          "41",
+          "REPID",
+          "Program Name",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_REPID",
+          "EDI_REPID"
+        ],
+        [
+          "42",
+          "ROUTID",
+          "Function module",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_ROUTID",
+          "EDI_ROUTID"
+        ],
+        [
+          "43",
+          "SEGFLD",
+          "Field name in SAP segment",
+          "CHAR",
+          "30",
+          "0",
+          "EDI_SEGFLD",
+          "EDI_SEGFLD"
+        ],
+        [
+          "44",
+          "SEGNUM",
+          "Number of SAP segment",
+          "NUMC",
+          "6",
+          "0",
+          "IDOCSSGNUM",
+          "EDI_NUMBER"
+        ],
+        [
+          "45",
+          "SERIAL",
+          "Serialization",
+          "CHAR",
+          "20",
+          "0",
+          "EDI_SERIAL",
+          "CHAR20"
+        ],
+        [
+          "46",
+          "SNDLAD",
+          "Logical address of sender",
+          "CHAR",
+          "70",
+          "0",
+          "EDI_SNDLAD",
+          "EDI_LOGADR"
+        ],
+        [
+          "47",
+          "SNDPFC",
+          "Sender partn.funct.",
+          "CHAR",
+          "2",
+          "0",
+          "EDI_SNDPFC",
+          "EDI_PARVW"
+        ],
+        [
+          "48",
+          "SNDPOR",
+          "SENDER PORT",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_SNDPOR",
+          "EDI_PORT"
+        ],
+        [
+          "49",
+          "SNDPRN",
+          "SENDER PARTNER NO.",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_SNDPRN",
+          "EDI_PARNUM"
+        ],
+        [
+          "50",
+          "SNDPRT",
+          "SENDER PARTNER TYPE",
+          "CHAR",
+          "2",
+          "0",
+          "EDI_SNDPRT",
+          "EDI_PARTYP"
+        ],
+        [
+          "51",
+          "SNDSAD",
+          "SADR sender addr.",
+          "CHAR",
+          "10",
+          "0",
+          "EDI_SNDSAD",
+          "EDI_SADNR"
+        ],
+        [
+          "52",
+          "SNDSCA",
+          "Communication Type",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_SNDSCA",
+          "EDI_SADCA"
+        ],
+        [
+          "53",
+          "SNDSDF",
+          "Default Setting",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_SNDSDF",
+          "EDI_SADDF"
+        ],
+        [
+          "54",
+          "SNDSLF",
+          "Sequential number",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_SNDSLF",
+          "EDI_SADLF"
+        ],
+        [
+          "55",
+          "SNDSMN",
+          "SADR sender client",
+          "CLNT",
+          "3",
+          "0",
+          "EDI_SNDSMN",
+          "EDI_SADMDT"
+        ],
+        [
+          "56",
+          "SNDSNA",
+          "Internat.addr.",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_SNDSNA",
+          "EDI_SADNA"
+        ],
+        [
+          "57",
+          "STACOD",
+          "Status code",
+          "CHAR",
+          "8",
+          "0",
+          "EDI_STACOD",
+          "EDI_STACOD"
+        ],
+        [
+          "58",
+          "STAMID",
+          "Status message ID",
+          "CHAR",
+          "20",
+          "0",
+          "EDI_STAMID",
+          "EDI_STAMID"
+        ],
+        [
+          "59",
+          "STAMNO",
+          "Status message number",
+          "NUMC",
+          "3",
+          "0",
+          "EDI_STAMNO",
+          "EDI_STAMNO"
+        ],
+        [
+          "60",
+          "STAMQU",
+          "Status message qualifier",
+          "CHAR",
+          "3",
+          "0",
+          "EDI_STAMQU",
+          "EDI_STAMQU"
+        ],
+        [
+          "61",
+          "STAPA1",
+          "Parameter 1",
+          "CHAR",
+          "50",
+          "0",
+          "EDI_STAPA1",
+          "EDI_PARMTR"
+        ],
+        [
+          "62",
+          "STAPA2",
+          "Parameter 2",
+          "CHAR",
+          "50",
+          "0",
+          "EDI_STAPA2",
+          "EDI_PARMTR"
+        ],
+        [
+          "63",
+          "STAPA3",
+          "Parameter 3",
+          "CHAR",
+          "50",
+          "0",
+          "EDI_STAPA3",
+          "EDI_PARMTR"
+        ],
+        [
+          "64",
+          "STAPA4",
+          "Parameter 4",
+          "CHAR",
+          "50",
+          "0",
+          "EDI_STAPA4",
+          "EDI_PARMTR"
+        ],
+        [
+          "65",
+          "STATE_COLOR",
+          "STATE COLOR",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "66",
+          "STATE_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "67",
+          "STATUS",
+          "IDOC STATUS",
+          "CHAR",
+          "2",
+          "0",
+          "EDI_STATUS",
+          "EDI_STATUS"
+        ],
+        [
+          "68",
+          "STATUS_DESC",
+          "Short text",
+          "CHAR",
+          "60",
+          "0",
+          "EDI_TEXT60",
+          "TEXT60"
+        ],
+        [
+          "69",
+          "STATXT",
+          "Text for status code",
+          "CHAR",
+          "70",
+          "0",
+          "EDI_STATX_",
+          "EDI_STATXT"
+        ],
+        [
+          "70",
+          "STATYP",
+          "Msg.type (E,I,W,A,S)",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_SYMSTY",
+          "EDI_SYMSTY"
+        ],
+        [
+          "71",
+          "STD",
+          "EDI Standard",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_STD",
+          "EDI_STD"
+        ],
+        [
+          "72",
+          "STDMES",
+          "EDI message type",
+          "CHAR",
+          "6",
+          "0",
+          "EDI_STDMES",
+          "EDI_STDMES"
+        ],
+        [
+          "73",
+          "STDVRS",
+          "EDI std version",
+          "CHAR",
+          "6",
+          "0",
+          "EDI_STDVRS",
+          "EDI_STDVRS"
+        ],
+        [
+          "74",
+          "SW_DEST",
+          "Cloud Destination",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "75",
+          "TEST",
+          "Test Flag",
+          "CHAR",
+          "1",
+          "0",
+          "EDI_TEST",
+          "EDI_TEST"
+        ],
+        [
+          "76",
+          "TID",
+          "Transaction ID",
+          "CHAR",
+          "24",
+          "0",
+          "EDI_TID",
+          "EDI_TID"
+        ],
+        [
+          "77",
+          "UNAME",
+          "User",
+          "CHAR",
+          "12",
+          "0",
+          "EDI_UNAME",
+          "UNAME"
+        ],
+        [
+          "78",
+          "UPDDAT",
+          "CHANGED ON",
+          "DATS",
+          "8",
+          "0",
+          "EDI_UPDDAT",
+          "DATUM"
+        ],
+        [
+          "79",
+          "UPDTIM",
+          "TIME CHANGED",
+          "TIMS",
+          "6",
+          "0",
+          "EDI_UPDTIM",
+          "UZEIT"
+        ],
+        [
+          "80",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: This section provides configuration guidance for ALL 80 parameters listed in the Parameters Reference Table above."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ARCKEY (EDI Archive Key):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ARCKEY directs attention to archived IDoc linkage key so monitoring can target interface records tied to a specific archive chain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Back Days):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CIMTYP (Extension):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CIMTYP restricts analysis to extension type variants, useful when custom extension processing differs from baseline IDoc flow."
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTR (Status counter):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "COUNTR narrows by status-counter sequence to isolate repeated status transitions for the same IDoc lifecycle."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CREDAT (Created On):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CREDAT applies selection on IDoc creation date and is commonly used for period-oriented operational review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CRETIM (Created at):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CRETIM refines creation-time boundaries inside the selected creation-date window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATE_REF_FLD (Date Ref. Field):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATE_REF_FLD chooses which date context should drive date-oriented logic when multiple date fields are available."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATE_REF_FLD Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        CREDAT: Use creation-date context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        UPDDAT: Use last-change-date context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Use code-defined date-reference mapping when explicitly provided."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM (Date):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM is the explicit monitoring date selector used as the primary date window when supplied."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIRECT (Direction):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIRECT applies selection on IDoc direction (inbound/outbound) so monitoring focuses on the relevant integration flow."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCNUM (IDOC NUMBER):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCNUM selects specific IDoc numbers for record-level investigation and incident follow-up."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCREL (IDoc: SAP Release):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCREL constrains records by SAP release context, useful when behavior differences are release-specific."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCTYP (IDoc Type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DOCTYP applies selection on IDoc type category for document-family-specific monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION defines the elapsed-time threshold used to prioritize aged or delayed IDoc processing."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT defines the unit used for DURATION calculations, changing whether thresholds are interpreted in minutes/hours/days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H: Hours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M: Minutes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D: Days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F: Full days for specific day filtering"
+    },
+    {
+      "kind": "paragraph",
+      "text": "EXPRSS (Express):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "EXPRSS segments express-processing flag context for urgency-sensitive interface monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDOCTP (BASIC TYPE):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDOCTP restricts to basic type, which is key when troubleshooting a specific message structure."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGDAT (Date status error):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGDAT applies selection on status-log date so analysts can focus on when status errors were recorded."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGTIM (Time status error):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOGTIM refines status-log time slicing within the selected log date."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC ('X' - Manage in UTC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC controls whether current-time comparison uses UTC normalization or local-time interpretation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X: UTC mode for distributed or multi-time-zone landscapes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        (blank): Local/system time mode for single-time-zone operation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MAXSEGNUM (Number of data records):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MAXSEGNUM segments segment-count size, helping identify unusually large or complex IDoc payloads."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESCOD (Message Variant):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESCOD applies selection on message variant and helps separate processing scenarios within one message type."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESFCT (Message function):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESFCT narrows review to message function (business operation intent) to isolate relevant interface actions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESSAGE (Message text):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESSAGE holds resolved status text and supports direct, human-readable triage of IDoc issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESTYP (MESSAGE TYPE):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MESTYP is the primary message-type filter used to segment monitoring by business integration process."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OUTMOD (Output Mode):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "OUTMOD focuses analysis on output mode so monitoring can isolate processing behavior by transmission method."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PROCESS_ICON (State Icon):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "PROCESS_ICON provides quick visual emphasis for non-green/problematic IDoc rows during triage."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVLAD (Logical address of recipient):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVLAD constrains receiver logical address, enabling target-system-specific routing analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPFC (Receiver Part.Functn):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPFC constrains receiver partner function to focus on role-specific integration relationships."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPOR (RECEIVER PORT):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPOR constrains receiver port for endpoint-specific troubleshooting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPRN (RECEIVER PARTNER NO.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPRN applies selection on receiver partner number for partner-specific incident analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPRT (RECEIVER PARTNR TYPE):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVPRT targets receiver partner type to separate business-partner categories in monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSAD (SADR recipient addr.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSAD applies selection on receiver SADR address references for address-level diagnostics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSCA (Communication Type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSCA narrows review to receiver communication type, useful when channels have different failure patterns."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSDF (Default Setting):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSDF focuses analysis on receiver default-setting indicators used in routing/address behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSLF (Sequential number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSLF focuses analysis on receiver-side sequential identifiers to isolate record-order issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSMN (SADR client(rec.)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSMN targets receiver SADR client context in cross-client/interface routing checks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSNA (Internat.addr.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RCVSNA segments receiver international address context for cross-border addressing analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFGRP (Reference to Message Group):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFGRP pins down message-group references to analyze grouped transmission behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFINT (Interchange File Reference):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFINT focuses analysis on interchange-file reference values used to trace IDocs that belong to the same interchange batch."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFMES (Message reference):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "REFMES narrows review to message-reference links to follow related IDoc message chains end-to-end."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REPID (Program Name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "REPID constrains program name that touched/generated the record, supporting source-program root-cause analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ROUTID (Function module):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "ROUTID directs attention to function module route identifier to isolate issues tied to specific processing modules."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SEGFLD (Field name in SAP segment):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SEGFLD segments segment field names for payload-content-oriented diagnostics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SEGNUM (Number of SAP segment):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SEGNUM directs attention to segment numbers to focus on specific segment positions in IDoc payload."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERIAL (Serialization):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERIAL focuses analysis on serialization context for sequence-dependent processing checks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDLAD (Logical address of sender):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDLAD pins down sender logical address for source-system routing analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPFC (Sender partn.funct.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPFC pins down sender partner function for role-specific source analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPOR (SENDER PORT):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPOR pins down sender port to isolate source endpoint behavior."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPRN (SENDER PARTNER NO.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPRN segments sender partner number for sender-specific monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPRT (SENDER PARTNER TYPE):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDPRT applies selection on sender partner type to separate sender categories in analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSAD (SADR sender addr.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSAD segments sender SADR address references for address-level source checks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSCA (Communication Type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSCA constrains sender communication type to compare channel-specific outcomes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSDF (Default Setting):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSDF narrows review to sender default-setting indicators relevant to addressing/routing."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSLF (Sequential number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSLF narrows review to sender-side sequential identifiers for sequence troubleshooting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSMN (SADR sender client):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSMN applies selection on sender SADR client context in multi-client landscapes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSNA (Internat.addr.):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDSNA directs attention to sender international address context for international routing diagnostics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STACOD (Status code):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STACOD pins down status code values used for process-state segmentation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMID (Status message ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMID identifies message class namespace used to resolve IDoc status-message semantics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMNO (Status message number):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMNO is the message number inside STAMID and pinpoints the exact message variant."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMQU (Status message qualifier):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAMQU applies selection on status-message qualifier used to interpret message context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAPA1 - STAPA4 (Status Message Parameters):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAPA1 through STAPA4 form one ordered placeholder set used to render complete status text for IDoc diagnostics."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STAPA1 - STAPA4 Connection:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interpret these fields together because final message meaning depends on combined placeholder substitution."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (STATE COLOR):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR is the severity/state selector used for quick triage via color-coded processing outcomes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R: Red (error/failed outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G: Green (successful outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y: Yellow (warning/in-process outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Standard SAP mapping is used when literals are not explicitly enumerated in code."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON (State Icon):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON is the visual state marker derived from state color for dashboard-style scanning."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS (IDOC STATUS):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS is the IDoc status filter that controls which lifecycle states are included in the result set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Use SAP IDoc status domain values configured for this system."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Code may derive status range from state color when status is not explicitly supplied."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC (Short text):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC is the resolved short description for STATUS and supports business-readable interpretation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATXT (Text for status code):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATXT is used to filter and interpret IDoc monitoring records according to its business meaning in this EI."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATYP (Msg.type (E,I,W,A,S)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATYP segments message type/severity (E/I/W/A/S) for risk-focused status review."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STD (EDI Standard):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STD applies selection on EDI standard context to segment multi-standard integrations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STDMES (EDI message type):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STDMES focuses analysis on EDI message type within the selected EDI standard."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STDVRS (EDI std version):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "STDVRS pins down EDI standard version for version-specific behavior analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST (Cloud Destination):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST selects cloud destination/rfc destination context used for remote execution path."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TEST (Test Flag):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TEST focuses analysis on test-flagged IDocs to separate non-production test traffic from operational traffic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TID (Transaction ID):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "TID targets transaction identifiers for transaction-level traceability."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UNAME (User):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "UNAME pins down user context for ownership and change-trace analysis."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPDDAT (CHANGED ON):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPDDAT narrows review to last change date and is used for recency-focused exception monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPDTIM (TIME CHANGED):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPDTIM refines last change time boundaries in the selected update-date window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationship"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Date and Time Controls:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS is fallback logic: when explicit date filters are not provided, BACKDAYS creates the initial lookback window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DATUM, CREDAT, and UPDDAT are explicit date filters; when provided, they define the date scope directly."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        CRETIM and UPDTIM refine time granularity within the selected date scope."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Duration Prioritization:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION + DURATION_UNIT form an additional age filter after date selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Simple flow: first filter by date window, then filter by elapsed duration."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Final result keeps records that satisfy both date conditions and duration conditions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Status Derivation and State Mapping:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STATUS and STATE_COLOR are linked: if STATUS is not provided and one STATE_COLOR value is selected, status range can be derived from color mapping."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STATUS_DESC, STATE_COLOR, and STATE_ICON are populated together for readable triage output."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message Diagnostics Context:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STAMID + STAMNO identify the message template."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        STAPA1 - STAPA4 provide placeholder values to render the final message text."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        LANGU - system language (SY-LANGU)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - M"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - 1 (today and yesterday)"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Recent failed outbound IDocs by type"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIRECT = 2\n MESTYP = ORDERS\n STATUS = 51\n BACKDAYS = 2\n DURATION = 30\n DURATION_UNIT = M\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Identify recently failing outbound IDocs for a specific message type and prioritize those with meaningful delay."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Update-date focused remediation queue"
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPDDAT = 20260325-20260331\n UPDTIM = 080000-235959\n STATE_COLOR = R\n DURATION = 1\n DURATION_UNIT = H\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus remediation on red-state IDocs updated in the current review period and aged beyond one hour."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Full-day delay monitoring"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM = 20260320-20260331\n STATUS = 64\n DURATION = 1\n DURATION_UNIT = F\n MANAGE_IN_UTC = X\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Monitor IDocs stuck in transfer-related status for at least one full day using UTC-consistent timing."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "ARCKEY",
+          "EDI archive key",
+          "CHAR(70)",
+          "IDOCCARKEY"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "CIMTYP",
+          "Extension",
+          "CHAR(30)",
+          "EDI_CIMTYP"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "COUNTR",
+          "IDoc status counter",
+          "NUMC(16)",
+          "EDI_COUNTR"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "CREDAT",
+          "IDoc Created On",
+          "DATS(8)",
+          "EDI_CCRDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "CRETIM",
+          "IDoc Created at",
+          "TIMS(6)",
+          "EDI_CCRTIM"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DIRECT",
+          "Direction for IDoc",
+          "CHAR(1)",
+          "EDI_DIRECT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DOCNUM",
+          "IDoc number",
+          "NUMC(16)",
+          "EDI_DOCNUM"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DOCREL",
+          "SAP Release for IDoc",
+          "CHAR(4)",
+          "EDI_DOCREL"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DOCTYP",
+          "IDoc Type",
+          "CHAR(8)",
+          "EDI_DOCTYP"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "EXPRSS",
+          "Overriding in inbound processing",
+          "CHAR(1)",
+          "EDI_EXPRSS"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "IDOCTP",
+          "Basic type",
+          "CHAR(30)",
+          "EDI_IDOCTP"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "LOGDAT",
+          "Date of status information",
+          "DATS(8)",
+          "EDI_LOGDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "LOGTIM",
+          "Time of status information",
+          "TIMS(6)",
+          "EDI_LOGTIM"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "MAXSEGNUM",
+          "Number of data records",
+          "NUMC(6)",
+          "ANZEDIDD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "MESCOD",
+          "Logical Message Variant",
+          "CHAR(3)",
+          "EDI_MESCOD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "MESFCT",
+          "Logical message function",
+          "CHAR(3)",
+          "EDI_MESFCT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "MESSAGE",
+          "Message Text",
+          "CHAR(220)",
+          "BAPI_MSG"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "MESTYP",
+          "Message Type",
+          "CHAR(30)",
+          "EDI_MESTYP"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "OUTMOD",
+          "Output Mode",
+          "CHAR(1)",
+          "EDI_OUTMOD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "PROCESS_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVLAD",
+          "Logical address of recipient",
+          "CHAR(70)",
+          "EDI_RCVLAD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVPFC",
+          "Partner Function of Receiver",
+          "CHAR(2)",
+          "EDI_RCVPFC"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVPOR",
+          "Receiver port (SAP System, EDI subsystem)",
+          "CHAR(10)",
+          "EDI_RCVPOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVPRN",
+          "Partner Number of Receiver",
+          "CHAR(10)",
+          "EDI_RCVPRN"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVPRT",
+          "Partner Type of Receiver",
+          "CHAR(2)",
+          "EDI_RCVPRT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSAD",
+          "Recipient address (SADR)",
+          "CHAR(10)",
+          "EDI_RCVSAD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSCA",
+          "Communication type (SADR) of recipient",
+          "CHAR(3)",
+          "EDI_RCVSCA"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSDF",
+          "SADR default flag for recipient address",
+          "CHAR(1)",
+          "EDI_RCVSDF"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSLF",
+          "Sequential Number of Recipient Address (SADR)",
+          "CHAR(3)",
+          "EDI_RCVSLF"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSMN",
+          "SADR client (recipient)",
+          "CLNT(3)",
+          "EDI_RCVSMN"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "RCVSNA",
+          "SADR flag for international recipient address",
+          "CHAR(1)",
+          "EDI_RCVSNA"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "REFGRP",
+          "Reference to message group",
+          "CHAR(14)",
+          "IDOCCRFGRP"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "REFINT",
+          "Reference to interchange file",
+          "CHAR(14)",
+          "IDOCCRFINT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "REFMES",
+          "Reference to message",
+          "CHAR(14)",
+          "IDOCCRFMES"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "REPID",
+          "Program Name",
+          "CHAR(30)",
+          "EDI_REPID"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "ROUTID",
+          "Name of subroutine (routine, function module)",
+          "CHAR(30)",
+          "EDI_ROUTID"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SEGFLD",
+          "Field Name in SAP Segment",
+          "CHAR(30)",
+          "EDI_SEGFLD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SEGNUM",
+          "Number of SAP segment",
+          "NUMC(6)",
+          "IDOCSSGNUM"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SERIAL",
+          "Serialization field",
+          "CHAR(20)",
+          "EDI_SERIAL"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDLAD",
+          "Logical address of sender",
+          "CHAR(70)",
+          "EDI_SNDLAD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDPFC",
+          "Partner Function of Sender",
+          "CHAR(2)",
+          "EDI_SNDPFC"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDPOR",
+          "Sender port (SAP System, EDI subsystem)",
+          "CHAR(10)",
+          "EDI_SNDPOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDPRN",
+          "Partner Number of Sender",
+          "CHAR(10)",
+          "EDI_SNDPRN"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDPRT",
+          "Partner type of sender",
+          "CHAR(2)",
+          "EDI_SNDPRT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSAD",
+          "Sender address (SADR)",
+          "CHAR(10)",
+          "EDI_SNDSAD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSCA",
+          "Communication type (SADR) of sender",
+          "CHAR(3)",
+          "EDI_SNDSCA"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSDF",
+          "SADR default flag for sender address",
+          "CHAR(1)",
+          "EDI_SNDSDF"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSLF",
+          "Sequential Number of the Sender Address (SADR)",
+          "CHAR(3)",
+          "EDI_SNDSLF"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSMN",
+          "SADR client (sender)",
+          "CLNT(3)",
+          "EDI_SNDSMN"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "SNDSNA",
+          "SADR flag for international sender address",
+          "CHAR(1)",
+          "EDI_SNDSNA"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STACOD",
+          "Status code",
+          "CHAR(8)",
+          "EDI_STACOD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAMID",
+          "Status message ID",
+          "CHAR(20)",
+          "EDI_STAMID"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAMNO",
+          "Status message number",
+          "NUMC(3)",
+          "EDI_STAMNO"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAMQU",
+          "Status message qualifier",
+          "CHAR(3)",
+          "EDI_STAMQU"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAPA1",
+          "Parameter 1",
+          "CHAR(50)",
+          "EDI_STAPA1"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAPA2",
+          "Parameter 2",
+          "CHAR(50)",
+          "EDI_STAPA2"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAPA3",
+          "Parameter 3",
+          "CHAR(50)",
+          "EDI_STAPA3"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STAPA4",
+          "Parameter 4",
+          "CHAR(50)",
+          "EDI_STAPA4"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATE_COLOR",
+          "SW: State Color",
+          "CHAR(1)",
+          "/SKN/E_SW_STATE_COLOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATE_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATUS",
+          "Status of IDoc",
+          "CHAR(2)",
+          "EDI_STATUS"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATUS_DESC",
+          "Short description of object",
+          "CHAR(60)",
+          "EDI_TEXT60"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATXT",
+          "Text for status code",
+          "CHAR(70)",
+          "EDI_STATX_"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STATYP",
+          "Type of system error message (A, W, E, S, I)",
+          "CHAR(1)",
+          "EDI_SYMSTY"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STD",
+          "EDI Standard",
+          "CHAR(1)",
+          "EDI_STD"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STDMES",
+          "EDI message type",
+          "CHAR(6)",
+          "EDI_STDMES"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "STDVRS",
+          "Version of EDI standard",
+          "CHAR(6)",
+          "EDI_STDVRS"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "TEST",
+          "Test Flag",
+          "CHAR(1)",
+          "EDI_TEST"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "TID",
+          "Transaction ID",
+          "CHAR(24)",
+          "EDI_TID"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "UNAME",
+          "User name",
+          "CHAR(12)",
+          "EDI_UNAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "UPDDAT",
+          "Date on which control record was last changed",
+          "DATS(8)",
+          "EDI_UPDDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_IDOCS",
+          "UPDTIM",
+          "Time at which control record was last changed",
+          "TIMS(6)",
+          "EDI_UPDTIM"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_IDOCS.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_IDOCS OPTIONAL\n*\"----------------------------------------------------------------------\n  DATA :   MANAGE_IN_UTC TYPE  CHAR1 ..\n  RANGES : R_MESTYP FOR EDIDC-MESTYP ,\n           R_IDOCTP FOR EDIDC-IDOCTP,\n           R_DIRECT FOR EDIDC-DIRECT,\n           R_RCVPOR FOR EDIDC-RCVPOR,\n           R_RCVPRT FOR EDIDC-RCVPRT,\n           R_RCVPRN FOR EDIDC-RCVPRN,\n           R_SNDPOR FOR EDIDC-SNDPOR,\n           R_SNDPRT FOR EDIDC-SNDPRT,\n           R_SNDPRN FOR EDIDC-SNDPRN,\n           R_CREDAT FOR EDIDC-CREDAT,\n           R_CRETIM FOR EDIDC-CRETIM,\n           R_UPDDAT FOR EDIDC-UPDDAT,\n           R_UPDTIM FOR EDIDC-UPDTIM,\n           R_STATUS   FOR EDIDC-STATUS,\n           R_STATE_COLOR FOR /SKN/S_SW_SYS_IDOCS-STATE_COLOR,\n           R_DATUM   FOR SY-DATUM .\n  DATA_SINGLE: DURATION_UNIT         /SKN/E_SW_DURATION_UNIT,\n               STATE_COLOR           /SKN/E_SW_STATE_COLOR,\n               ONLY_HEADER           CHAR1  .\n  DATA_MULTY: DURATION      /SKN/E_SW_DURATION.   \"From NOW to  Start Time point -in duration units\n  DATA :   IS_GENERAL(1) TYPE C.\n  DATA : DATE_FROM LIKE SY-DATUM ,\n         BACKDAYS  TYPE I .\n  DATA : LANGU LIKE SY-LANGU .\n  DATA : PARAM_VAL TYPE /SKN/E_SW_PARAM .\n  DATA : SY_TABIX LIKE SY-TABIX .\n  DATA : WA_EDIDS TYPE EDIDS .\n  DATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\n  DATA :   SY_DATLO LIKE SY-DATLO ,\n           SY_TIMLO LIKE SY-TIMLO .\n  DATA : TIME_DIFF TYPE I .\n  DATA: LS_EDIDC TYPE EDIDC,\n        LT_EDIDC LIKE TABLE OF LS_EDIDC.\n  DATA: LS_EDIDS TYPE EDIDS,\n        LT_EDIDS LIKE TABLE OF LS_EDIDS.\n*-- Fill Selection Option Tables\n  LV_DURATION_UNIT = 'M'.\n  SELECT_SINGLE: DURATION_UNIT,\n                 ONLY_HEADER.\n  SELECT_MULTY: DURATION.\n  \"--- Run Clood Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_02_IDOCS'\n      IMPORTING\n        IS_ALERT = IS_ALERT\n      TABLES\n        T_SELECT = T_SELECT\n        T_DATA   = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n  \"--- Run Clood Mode -----\n  LOOP AT T_SELECT WHERE FIELDNM = 'MANAGE_IN_UTC'.\n    MANAGE_IN_UTC = T_SELECT-LOW.\n    EXIT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'MESTYP'.\n    MOVE-CORRESPONDING T_SELECT TO R_MESTYP.\n    APPEND R_MESTYP.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.\n    MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.\n    APPEND R_STATE_COLOR.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'STATUS'.\n    MOVE-CORRESPONDING T_SELECT TO R_STATUS.\n    APPEND R_STATUS.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'IDOCTP'.\n    MOVE-CORRESPONDING T_SELECT TO R_IDOCTP.\n    APPEND R_IDOCTP.\n  ENDLOOP.\n*\n  LOOP AT T_SELECT WHERE FIELDNM = 'DIRECT'.\n    MOVE-CORRESPONDING T_SELECT TO R_DIRECT.\n    APPEND R_DIRECT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'RCVPOR'.\n    MOVE-CORRESPONDING T_SELECT TO R_RCVPOR.\n    APPEND R_RCVPOR.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'RCVPRT'.\n    MOVE-CORRESPONDING T_SELECT TO R_RCVPRT.\n    APPEND R_RCVPRT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'RCVPRT'.\n    MOVE-CORRESPONDING T_SELECT TO R_RCVPRT.\n    APPEND R_RCVPRT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'RCVPRN'.\n    MOVE-CORRESPONDING T_SELECT TO R_RCVPRN.\n    APPEND R_RCVPRN.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'SNDPOR'.\n    MOVE-CORRESPONDING T_SELECT TO R_SNDPOR.\n    APPEND R_SNDPOR.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'SNDPRT'.\n    MOVE-CORRESPONDING T_SELECT TO R_SNDPRT.\n    APPEND R_SNDPRT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'SNDPRN'.\n    MOVE-CORRESPONDING T_SELECT TO R_SNDPRN.\n    APPEND R_SNDPRN.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'CREDAT'.\n    MOVE-CORRESPONDING T_SELECT TO R_CREDAT.\n    APPEND R_CREDAT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'CRETIM'.\n    MOVE-CORRESPONDING T_SELECT TO R_CRETIM.\n    APPEND R_CRETIM.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'UPDDAT'.\n    MOVE-CORRESPONDING T_SELECT TO R_UPDDAT.\n    APPEND R_UPDDAT.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'UPDTIM'.\n    MOVE-CORRESPONDING T_SELECT TO R_UPDTIM.\n    APPEND R_UPDTIM.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'DATUM'.\n    MOVE-CORRESPONDING T_SELECT TO R_DATUM.\n    APPEND R_DATUM.\n  ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'IS_GENERAL'.\n    IF NOT T_SELECT-LOW IS INITIAL.\n      IS_GENERAL = 'X'.\n    ENDIF.\n    EXIT .\n  ENDLOOP.\n  IF R_DATUM[] IS INITIAL .\n    LOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.\n      R_DATUM-SIGN = 'I' .\n      R_DATUM-OPTION = 'GE' .\n      BACKDAYS = T_SELECT-LOW .\n      DATE_FROM = SY-DATUM - BACKDAYS .\n      R_DATUM-LOW = DATE_FROM .\n      APPEND R_DATUM.\n      EXIT.\n    ENDLOOP.\n    IF R_DATUM[] IS INITIAL .\n      R_DATUM-SIGN = 'I' .\n      R_DATUM-OPTION = 'GE' .\n      BACKDAYS = 1 .\n      DATE_FROM = SY-DATUM - BACKDAYS .\n      R_DATUM-LOW = DATE_FROM .\n      APPEND R_DATUM.\n    ENDIF .\n  ENDIF.\n  \"----\n  IF R_CREDAT[] IS INITIAL AND\n     R_UPDDAT[] IS INITIAL.\n    R_CREDAT[] = R_DATUM[].\n  ENDIF.\n  \"-----\n  LANGU = SY-LANGU.\n  LOOP AT T_SELECT WHERE FIELDNM = 'LANGU'.\n    LANGU = T_SELECT-LOW.\n    EXIT.\n  ENDLOOP.\n  SET_SY_TIME MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n  TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n  \"--- Complete Status\n  IF R_STATUS[] IS INITIAL.\n    IF R_STATE_COLOR[] IS NOT INITIAL.\n      READ TABLE R_STATE_COLOR INDEX 1.\n      IF SY-TFILL = 1.\n        LV_STATE_COLOR = R_STATE_COLOR-LOW.\n        CALL FUNCTION '/SKN/F_SW_01_02_IDOC_STAT_RNR'\n          EXPORTING\n            STATE_COLOR = LV_STATE_COLOR\n          TABLES\n            R_STATUS    = R_STATUS.\n      ENDIF.\n    ENDIF.\n  ENDIF.\n  \"--- Complete Status\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  SELECT *\n     FROM EDIDC\n     INTO CORRESPONDING FIELDS OF TABLE LT_EDIDC  \" t_data\n     WHERE MESTYP IN R_MESTYP\n       AND IDOCTP IN R_IDOCTP\n       AND DIRECT IN R_DIRECT\n       AND RCVPOR IN R_RCVPOR\n       AND RCVPRT IN R_RCVPRT\n       AND RCVPRN IN R_RCVPRN\n       AND SNDPOR IN R_SNDPOR\n       AND SNDPRT IN R_SNDPRT\n       AND SNDPRN IN R_SNDPRN\n       AND CREDAT IN R_CREDAT\n       AND CRETIM IN R_CRETIM\n       AND UPDDAT IN R_UPDDAT\n       AND UPDTIM IN R_UPDTIM\n       AND STATUS IN R_STATUS .\n  SORT LT_EDIDC BY DOCNUM.\n  IF LV_ONLY_HEADER IS INITIAL.\n    IF LT_EDIDC[] IS NOT INITIAL.\n      SELECT *\n         FROM EDIDS\n         INTO CORRESPONDING FIELDS OF TABLE LT_EDIDS\n         FOR ALL ENTRIES IN LT_EDIDC\n         WHERE DOCNUM = LT_EDIDC-DOCNUM\n           AND STATUS = LT_EDIDC-STATUS.\n      SORT LT_EDIDS BY DOCNUM STATUS LOGDAT DESCENDING LOGTIM DESCENDING.\n    ENDIF.\n  ENDIF.\n  LOOP AT LT_EDIDC INTO LS_EDIDC.\n    MOVE-CORRESPONDING LS_EDIDC TO T_DATA.\n    READ TABLE LT_EDIDS INTO LS_EDIDS WITH KEY DOCNUM = LS_EDIDC-DOCNUM\n                                               STATUS = LS_EDIDC-STATUS.\n    APPEND T_DATA.\n  ENDLOOP.\n*-- Fill Duration Value\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX.\n    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n      EXPORTING\n        D_FROM      = T_DATA-UPDDAT\n        T_FROM      = T_DATA-UPDTIM\n        D_TO        = SY_DATLO\n        T_TO        = SY_TIMLO\n        TIME_UNIT   = LV_DURATION_UNIT\n      IMPORTING\n        TIME_DIFF   = TIME_DIFF\n      EXCEPTIONS\n        WRONG_VALUE = 1\n        OTHERS      = 2.\n    IF SY-SUBRC = 0.\n      T_DATA-DURATION = TIME_DIFF .\n    ELSE.\n      T_DATA-DURATION = '999999'.\n    ENDIF.\n    MODIFY T_DATA INDEX SY_TABIX .\n  ENDLOOP .\n  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n    CALL FUNCTION '/SKN/F_SW_01_02_IDOC_STATUS'\n      EXPORTING\n        STATUS      = T_DATA-STATUS\n        LANGU       = LANGU\n      IMPORTING\n        STATUS_DESC = T_DATA-STATUS_DESC\n        STATE_COLOR = T_DATA-STATE_COLOR.\n    CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n      EXPORTING\n        STATE_COLOR = T_DATA-STATE_COLOR\n      IMPORTING\n        STATE_ICON  = T_DATA-STATE_ICON.\n    \"--- Set Process Icon for Red Yeloow\n    IF T_DATA-STATE_COLOR <> 'G' .\n      PROCESS_ICON = '@15@'.\n      GET_PARAMETER 'PROCESS_ICON' PARAM_VAL.\n      PROCESS_ICON = PARAM_VAL.\n      T_DATA-PROCESS_ICON = PROCESS_ICON.\n    ENDIF.\n    MODIFY T_DATA INDEX SY_TABIX.\n  ENDLOOP.\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.\n      DELETE T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-STAMID IS INITIAL.\n      CALL FUNCTION 'BAPI_MESSAGE_GETDETAIL'\n        EXPORTING\n          ID         = T_DATA-STAMID\n          NUMBER     = T_DATA-STAMNO\n          LANGUAGE   = LANGU\n          TEXTFORMAT = 'ASC'\n*         LINKPATTERN       =\n          MESSAGE_V1 = T_DATA-STAPA1\n          MESSAGE_V2 = T_DATA-STAPA2\n          MESSAGE_V3 = T_DATA-STAPA3\n          MESSAGE_V4 = T_DATA-STAPA4\n        IMPORTING\n          MESSAGE    = T_DATA-MESSAGE\n*         RETURN     =\n*       TABLES\n*         TEXT       =\n        .\n      MODIFY T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n*--- Check Alert Information\n  READ TABLE T_DATA INDEX 1.\n  CHECK NOT SY-TFILL  IS INITIAL .\n  IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

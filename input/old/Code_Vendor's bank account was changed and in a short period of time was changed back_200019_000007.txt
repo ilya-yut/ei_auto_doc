@@ -1,0 +1,509 @@
+FUNCTION /SKN/F_SW_10_06_MD_CHNG_COUNT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_MD_CHNG_COUNT
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: SW_DEST             RFCDEST,
+               MANAGE_IN_UTC       CHAR1 ,
+               LANGU               LANGU,
+               BACKDAYS            INT4,
+               DURATION_D          /SKN/E_SW_DURATION_D,
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT,
+               DATE_REF_FLD        NAME_FELD,
+               CONVERT_KEY         CHAR1,
+               HEADER_ONLY         CHAR1,
+               DETAILED            BOOLE_D.
+  DATA_MULTY:   OBJECTCLAS        CDOBJECTCL,
+                OBJECTID          CDOBJECTV,
+                USERNAME          CDUSERNAME,
+                TCODE             CDTCODE,
+                CHANGE_IND        CDCHNGINDH,
+                TABNAME           TABNAME,
+                DURATION          /SKN/E_SW_DURATION,
+                FNAME             FIELDNAME,
+                CHNGIND           CDCHNGIND,
+                UDATE             CDDATUM,
+                DATUM             SYDATUM,
+                COUNTER           I.
+  DATA: LV_SHIFT      TYPE DDLENG,
+        LV_LENG       TYPE DDLENG,
+        LV_DOMNAME    TYPE DD07V-DOMNAME,
+        LV_DOMVALUE   TYPE DD07V-DOMVALUE_L,
+        LV_DDTEXT     TYPE DD07V-DDTEXT,
+        LV_OBJECT     TYPE CDOBJECTV,
+        LV_TABNAME    TYPE TABNAME,
+        LV_FIELD      TYPE FIELDNAME,
+        LV_INDEX      TYPE I,
+        LV_OBJECTCLAS TYPE CDOBJECTCL,
+        LV_DOC        TYPE CDCHANGENR,
+        LV_COUNT_TMP  TYPE I,
+        LV_LINES      TYPE I.
+  DATA: LS_DATA LIKE LINE OF T_DATA[],
+        LS_ADDR TYPE BAPIADDR3.
+  DATA: TIME_DIFF TYPE INT4.
+  DATA: FLD(60) TYPE C.
+  DATA: REF_DATE TYPE D.
+  DATA: SY_TABIX  LIKE SY-TABIX,
+        DATE_FROM LIKE SY-DATUM .
+  DATA: LT_DATA_MD  TYPE TABLE OF /SKN/S_SW_10_06_MD_CHNG_LOG,
+        LT_DATA_TMP LIKE TABLE OF T_DATA,
+        LT_RET     TYPE TABLE OF BAPIRET2.
+  FIELD-SYMBOLS: <FS_DATA>    LIKE LINE OF T_DATA[],
+                 <FS_DATA_MD> LIKE LINE OF LT_DATA_MD,
+                          TYPE ANY.
+* Set default parameter
+  LV_BACKDAYS       = 10.
+  LV_DURATION_UNIT  = 'D'.
+  LV_DATE_REF_FLD   = 'UDATE'.
+  LV_LANGU          = SY-LANGU.
+  SELECT_MULTY:  OBJECTCLAS,
+                 OBJECTID,
+                 USERNAME,
+                 TCODE,
+                 CHANGE_IND,
+                 TABNAME,
+                 DURATION,
+                 FNAME,
+                 CHNGIND,
+                 UDATE,
+                 COUNTER,
+                 DATUM .
+  SELECT_SINGLE: SW_DEST,
+                 LANGU,
+                 MANAGE_IN_UTC,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 CONVERT_KEY,
+                 DATE_REF_FLD,
+                 DURATION_D,
+                 DURATION_UNIT,
+                 HEADER_ONLY,
+                 DETAILED.
+  CONVERT_MULTY: OBJECTID ALPHA.
+* Configuration Alert
+  CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+    IMPORTING
+      IS_ALERT = IS_ALERT
+    TABLES
+      T_SELECT = T_SELECT
+      T_DATA   = LT_DATA_MD.
+* Check if found some change in configuration log
+  CHECK IS_ALERT EQ 'X'.
+  CLEAR: IS_ALERT.
+  REFRESH: T_DATA.
+  IF R_DATUM[] IS INITIAL .  " Set default value
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF .
+  IF R_COUNTER IS INITIAL.
+    RS_COUNTER-SIGN   = 'I'.
+    RS_COUNTER-OPTION = 'GT'.
+    RS_COUNTER-LOW    =  1.
+    APPEND RS_COUNTER TO R_COUNTER.
+  ENDIF.
+  DELETE LT_DATA_MD WHERE UDATE NOT IN R_DATUM[].
+  CHECK LT_DATA_MD IS NOT INITIAL.
+  SORT LT_DATA_MD BY OBJECTCLAS OBJECTID TABNAME FNAME.
+  DESCRIBE TABLE LT_DATA_MD LINES LV_LINES.
+  LOOP AT LT_DATA_MD ASSIGNING <FS_DATA_MD>.
+    LV_INDEX = SY-TABIX.
+    IF LV_INDEX = 1.
+      LV_OBJECTCLAS = <FS_DATA_MD>-OBJECTCLAS.
+      LV_OBJECT     = <FS_DATA_MD>-OBJECTID.
+      LV_TABNAME    = <FS_DATA_MD>-TABNAME.
+      LV_FIELD      = <FS_DATA_MD>-FNAME.
+*      lv_doc        = <fs_data_md>-changenr.
+      LV_COUNT_TMP  = 1.
+      IF LV_DETAILED EQ 'X'.
+        CLEAR: LS_DATA.
+        MOVE-CORRESPONDING <FS_DATA_MD> TO LS_DATA.
+        APPEND LS_DATA TO LT_DATA_TMP.
+        CLEAR: LS_DATA.
+      ENDIF.
+    ELSE.
+      IF LV_OBJECTCLAS = <FS_DATA_MD>-OBJECTCLAS AND
+         LV_OBJECT     = <FS_DATA_MD>-OBJECTID   AND
+*         lv_doc        = <fs_data_md>-changenr   AND
+         LV_TABNAME    = <FS_DATA_MD>-TABNAME    AND
+         LV_FIELD      = <FS_DATA_MD>-FNAME.
+        LV_COUNT_TMP = LV_COUNT_TMP + 1.
+*      CLEAR: ls_data.
+*      IF lv_objectclas <> <fs_data_md>-objectclas.
+**          lv_objectclas = <fs_data_md>-objectclas.
+*      ENDIF.
+*      IF lv_object <> <fs_data_md>-objectid.
+*        lv_object = <fs_data_md>-objectid.
+*      ENDIF.
+*      IF lv_doc <> <fs_data_md>-changenr.
+*        lv_doc = <fs_data_md>-changenr.
+*      ENDIF.
+*      IF lv_field <> <fs_data_md>-fname.
+*        lv_field = <fs_data_md>-fname.
+*      ENDIF.
+        IF LV_DETAILED EQ 'X'.
+          CLEAR: LS_DATA.
+          MOVE-CORRESPONDING <FS_DATA_MD> TO LS_DATA.
+          APPEND LS_DATA TO LT_DATA_TMP.
+        ELSE.
+          IF LS_DATA IS INITIAL.
+            MOVE-CORRESPONDING <FS_DATA_MD> TO LS_DATA.
+          ENDIF.
+        ENDIF.
+* Object changed
+      ELSE.
+        IF LV_COUNT_TMP IN R_COUNTER[].
+          IF LV_DETAILED EQ 'X'.
+            LOOP AT LT_DATA_TMP ASSIGNING <FS_DATA>.
+              <FS_DATA>-RECORDS = LV_COUNT_TMP.                  " Set number of changes on the same object
+            ENDLOOP.
+            APPEND LINES OF LT_DATA_TMP TO T_DATA[].
+            CLEAR: LT_DATA_TMP.
+          ELSE.
+            LS_DATA-RECORDS = LV_COUNT_TMP.                  " Set number of changes on the same object
+            IF LV_SW_DEST IS INITIAL.
+*** Begin Yuri C.-- 19.07.19
+*              CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+*                EXPORTING
+*                  bname      = ls_data-username
+*                IMPORTING
+*                  name_first = ls_data-name_first
+*                  name_last  = ls_data-name_last
+*                  name_text  = ls_data-name_text
+*                EXCEPTIONS
+*                  no_data    = 1
+*                  OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+                EXPORTING
+                  BNAME      = LS_DATA-USERNAME
+                IMPORTING
+                  NAME_FIRST = LS_DATA-NAME_FIRST
+                  NAME_LAST  = LS_DATA-NAME_LAST
+                  NAME_TEXT  = LS_DATA-NAME_TEXT
+*                 WA_ADRP    =
+                EXCEPTIONS
+                  NO_DATA    = 1
+                  OTHERS     = 2.
+              IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+              ENDIF.
+*** End Yuri C.++ 19.07.19
+            ELSE.
+*** Begin Yuri C.-- 19.07.19
+*              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES'
+*                EXPORTING
+*                  bname      = ls_data-username
+*                  sw_dest    = lv_sw_dest
+*                IMPORTING
+*                  name_first = ls_data-name_first
+*                  name_last  = ls_data-name_last
+*                  name_text  = ls_data-name_text
+*                EXCEPTIONS
+*                  no_data    = 1
+*                  OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+                EXPORTING
+                  BNAME      = LS_DATA-USERNAME
+                  SW_DEST    = LV_SW_DEST
+                IMPORTING
+                  NAME_FIRST = LS_DATA-NAME_FIRST
+                  NAME_LAST  = LS_DATA-NAME_LAST
+                  NAME_TEXT  = LS_DATA-NAME_TEXT
+*                 WA_ADRP    =
+                EXCEPTIONS
+                  NO_DATA    = 1
+                  OTHERS     = 2.
+              IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+              ENDIF.
+*** End Yuri C.++ 19.07.19
+            ENDIF.
+            APPEND LS_DATA TO T_DATA[].
+            CLEAR: LS_DATA.
+          ENDIF.
+        ENDIF.
+* New Object
+        LV_OBJECTCLAS = <FS_DATA_MD>-OBJECTCLAS.
+        LV_OBJECT     = <FS_DATA_MD>-OBJECTID.
+        LV_TABNAME    = <FS_DATA_MD>-TABNAME.
+        LV_FIELD      = <FS_DATA_MD>-FNAME.
+        LV_COUNT_TMP  = 1.
+        IF LV_DETAILED EQ 'X'.
+          CLEAR: LS_DATA, LT_DATA_TMP.
+          MOVE-CORRESPONDING <FS_DATA_MD> TO LS_DATA.
+          APPEND LS_DATA TO LT_DATA_TMP.
+        ENDIF.
+      ENDIF.
+*      ENDIF.
+* For last row of internal table
+      IF LV_INDEX = LV_LINES.
+        IF LV_COUNT_TMP IN R_COUNTER[].
+          IF LV_DETAILED EQ 'X'.
+            LOOP AT LT_DATA_TMP ASSIGNING <FS_DATA>.
+              <FS_DATA>-RECORDS = LV_COUNT_TMP.                  " Set number of changes on the same object
+            ENDLOOP.
+            APPEND LINES OF LT_DATA_TMP TO T_DATA[].
+            CLEAR: LT_DATA_TMP.
+          ELSE.
+            LS_DATA-RECORDS = LV_COUNT_TMP.
+            IF LS_DATA IS INITIAL.
+              MOVE-CORRESPONDING <FS_DATA_MD> TO LS_DATA.
+            ENDIF.
+            IF LV_SW_DEST IS INITIAL.
+*** Begin Yuri C.-- 19.07.19
+*              CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+*                EXPORTING
+*                  bname      = ls_data-username
+*                IMPORTING
+*                  name_first = ls_data-name_first
+*                  name_last  = ls_data-name_last
+*                  name_text  = ls_data-name_text
+*                EXCEPTIONS
+*                  no_data    = 1
+*                  OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+                EXPORTING
+                  BNAME      = LS_DATA-USERNAME
+                IMPORTING
+                  NAME_FIRST = LS_DATA-NAME_FIRST
+                  NAME_LAST  = LS_DATA-NAME_LAST
+                  NAME_TEXT  = LS_DATA-NAME_TEXT
+*                 WA_ADRP    =
+                EXCEPTIONS
+                  NO_DATA    = 1
+                  OTHERS     = 2.
+              IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+              ENDIF.
+*** End Yuri C.++ 19.07.19
+            ELSE.
+*** Begin Yuri C.-- 19.07.19
+*              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES'
+*                EXPORTING
+*                  bname      = ls_data-username
+*                  sw_dest    = lv_sw_dest
+*                IMPORTING
+*                  name_first = ls_data-name_first
+*                  name_last  = ls_data-name_last
+*                  name_text  = ls_data-name_text
+*                EXCEPTIONS
+*                  no_data    = 1
+*                  OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+              CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+                EXPORTING
+                  BNAME      = LS_DATA-USERNAME
+                  SW_DEST    = LV_SW_DEST
+                IMPORTING
+                  NAME_FIRST = LS_DATA-NAME_FIRST
+                  NAME_LAST  = LS_DATA-NAME_LAST
+                  NAME_TEXT  = LS_DATA-NAME_TEXT
+*                 WA_ADRP    =
+                EXCEPTIONS
+                  NO_DATA    = 1
+                  OTHERS     = 2.
+              IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+              ENDIF.
+*** End Yuri C.++ 19.07.19
+            ENDIF.
+            APPEND LS_DATA TO T_DATA[].
+          ENDIF.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+*    IF ls_data-matkl IS NOT INITIAL.
+** Material group desc.
+*      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+*      EXPORTING
+*        matkl              = ls_data-matkl
+*      IMPORTING
+*        matkl_desc         = ls_data-wgbez
+**       MATKL_DESC_L       =
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2
+*        .
+*    ENDIF.
+**
+*    IF ls_data-bsart IS NOT INITIAL AND ls_data-bstyp IS NOT INITIAL.
+**    "-- BSART_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_BSART_DESC'
+*      EXPORTING
+*        bsart            = ls_data-bsart
+*        langu            = lv_langu
+*        bstyp            = ls_data-bstyp
+*      IMPORTING
+*        type_desc        = ls_data-batxt
+*      EXCEPTIONS
+*        wrong_code       = 1
+*        OTHERS           = 2.
+*    ENDIF.
+*
+*    IF ls_data-statu IS NOT INITIAL.
+*      "-- STATU_DESC
+*      lv_domname = 'ESTAK'.
+*      lv_domvalue = ls_data-statu.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-statu_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-bstyp IS NOT INITIAL.
+**    "-- BSTYP_DESC
+*      lv_domname = 'EBSTYP'.
+*      lv_domvalue = <fs_data>-bstyp.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-bstyp_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-lifnr IS NOT INITIAL.
+**    "--- Get  Vendor Decriptions
+*      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+*      EXPORTING
+*        lifnr              = ls_data-lifnr
+*      IMPORTING
+*        vendor_desc        = ls_data-name1
+*      EXCEPTIONS
+*        wrong_vendor       = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+*    IF ls_data-ekorg IS NOT INITIAL.
+**   "-- EKORG_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+*      EXPORTING
+*        ekorg              = ls_data-ekorg
+*      IMPORTING
+*        pur_org_desc       = ls_data-ekotx
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+**
+*    IF ls_data-ekgrp IS NOT INITIAL.
+**   "-- EKGRP_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+*      EXPORTING
+*        ekgrp              = ls_data-ekgrp
+*      IMPORTING
+*        pur_grp_desc       = ls_data-eknam
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*    ENDIF.
+*    APPEND ls_data TO t_data[].
+  ENDLOOP.
+  IF LV_DETAILED EQ 'X'.
+    LOOP AT T_DATA ASSIGNING <FS_DATA>.
+      IF LV_SW_DEST IS INITIAL.
+*** Begin Yuri C.-- 19.07.19
+*        CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+*          EXPORTING
+*            bname      = <fs_data>-username
+*          IMPORTING
+*            name_first = <fs_data>-name_first
+*            name_last  = <fs_data>-name_last
+*            name_text  = <fs_data>-name_text
+*          EXCEPTIONS
+*            no_data    = 1
+*            OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+        CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+          EXPORTING
+            BNAME      = LS_DATA-USERNAME
+          IMPORTING
+            NAME_FIRST = LS_DATA-NAME_FIRST
+            NAME_LAST  = LS_DATA-NAME_LAST
+            NAME_TEXT  = LS_DATA-NAME_TEXT
+*           WA_ADRP    =
+          EXCEPTIONS
+            NO_DATA    = 1
+            OTHERS     = 2.
+        IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+        ENDIF.
+*** End Yuri C.++ 19.07.19
+      ELSE.
+*** Begin Yuri C.-- 19.07.19
+*        CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES'
+*          EXPORTING
+*            bname      = ls_data-username
+*            sw_dest    = lv_sw_dest
+*          IMPORTING
+*            name_first = ls_data-name_first
+*            name_last  = ls_data-name_last
+*            name_text  = ls_data-name_text
+*          EXCEPTIONS
+*            no_data    = 1
+*            OTHERS     = 2.
+*** End Yuri C.-- 19.07.19
+*** Begin Yuri C.++ 19.07.19
+        CALL FUNCTION '/SKN/FC_SW_01_GET_DETAILES_BUF'
+          EXPORTING
+            BNAME      = LS_DATA-USERNAME
+            SW_DEST    = LV_SW_DEST
+          IMPORTING
+            NAME_FIRST = LS_DATA-NAME_FIRST
+            NAME_LAST  = LS_DATA-NAME_LAST
+            NAME_TEXT  = LS_DATA-NAME_TEXT
+*           WA_ADRP    =
+          EXCEPTIONS
+            NO_DATA    = 1
+            OTHERS     = 2.
+        IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+        ENDIF.
+*** End Yuri C.++ 19.07.19
+      ENDIF.
+    ENDLOOP.
+  ENDIF.
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

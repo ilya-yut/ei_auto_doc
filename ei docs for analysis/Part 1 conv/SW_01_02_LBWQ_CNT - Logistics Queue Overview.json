@@ -1,0 +1,523 @@
+{
+  "source_file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Logistics Queue Overview (SW_01_02_LBWQ_CNT)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP qRFC (Queued Remote Function Call) outbound processing to ensure reliable asynchronous data transfer and system integration. qRFC outbound queues are critical components for maintaining data consistency and enabling reliable communication between distributed SAP systems and external applications."
+    },
+    {
+      "kind": "paragraph",
+      "text": "qRFC (Queued RFC) technology extends the standard RFC mechanism by adding queue management functionality, ensuring that function calls are processed exactly once and in the correct sequence. This is essential for business-critical processes where data integrity and processing order must be guaranteed, even in cases of system failures or network interruptions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed qRFC outbound queue analysis capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Queue processing monitoring to identify stuck, failed, or accumulating qRFC entries that may impact system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration health assessment for distributed system communication and data exchange reliability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance bottleneck identification to pinpoint qRFC processing delays and system resource constraints"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data consistency verification for ensuring reliable asynchronous processing and business process continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Error pattern analysis for proactive identification of communication issues and system configuration problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes qRFC statistics from the TRFCQOUT table (outbound qRFC queue), similar to data available through the SMQ1 transaction (qRFC Monitor - Outbound Queue), and provides enhanced filtering capabilities to focus on specific destinations, queue names, user contexts, and processing states. This enables targeted analysis of qRFC performance characteristics and identification of integration-related issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP qRFC outbound processing is functioning efficiently and identifies potential queue-related issues that may impact distributed system communication, data integrity, and business process execution."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor qRFC outbound performance and queue accumulation indicate system integration and processing issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration and Communication Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Queue backlogs preventing timely data transfer to external systems and remote SAP instances"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Failed qRFC calls causing data synchronization issues and business process interruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Network connectivity problems leading to communication failures and queue accumulation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Destination configuration errors preventing successful remote function call execution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource contention from excessive queue processing workload affecting overall system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory consumption spikes from large queue backlogs impacting available system resources"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing delays causing bottlenecks in critical business workflows and automated processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database locking issues from long-running qRFC transactions affecting system responsiveness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data consistency problems due to failed or delayed qRFC processing affecting business operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations from processing delays impacting service level commitments and partner relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process interruptions from unreliable system-to-system communication and data exchange"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Potential data loss or duplication from qRFC processing failures affecting business integrity"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate queue accumulation and failed entries using SMQ1 transaction for detailed queue analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check RFC destination connectivity and configuration using SM59 transaction for connection testing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review system resource utilization during qRFC processing periods for capacity assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze error messages and processing logs for root cause identification and resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor qRFC processing performance trends and queue length patterns for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate RFC destination configuration and network connectivity for reliability optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system memory and CPU utilization during peak qRFC processing periods for performance tuning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze qRFC processing patterns by destination, user, and function module for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize qRFC processing parameters and queue management configurations for improved throughput"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement qRFC error handling and retry mechanisms for enhanced reliability and fault tolerance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive qRFC monitoring and alerting procedures for early issue detection"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on qRFC volume analysis and processing requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "CNT",
+          "Items Count",
+          "INT4",
+          "10",
+          "0",
+          "INT4",
+          "INT4"
+        ],
+        [
+          "2",
+          "DEST",
+          "RFC Destination",
+          "CHAR",
+          "32",
+          "0",
+          "RFCDEST",
+          "RFCDEST"
+        ],
+        [
+          "3",
+          "MANDT",
+          "Client",
+          "CLNT",
+          "3",
+          "0",
+          "SYMANDT",
+          "MANDT"
+        ],
+        [
+          "4",
+          "QNAME",
+          "Queue",
+          "CHAR",
+          "24",
+          "0",
+          "TRFCQNAM",
+          "TRFCQNAM"
+        ],
+        [
+          "5",
+          "QRFCFNAM",
+          "RFC FM",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "6",
+          "QRFCUSER",
+          "RFC User",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "7",
+          "QSTATE",
+          "Transactional tRFC queue statu",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 7 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CNT (Items Count)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating items count through CNT for each candidate record."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEST (RFC Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where rfc destination on DEST signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANDT (Client)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where client (MANDT) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "QNAME (Queue)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: rows removed for failing queue on QNAME never reach downstream filtering."
+    },
+    {
+      "kind": "paragraph",
+      "text": "QRFCFNAM (RFC FM)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where rfc fm on QRFCFNAM is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "QRFCUSER (RFC User)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, QRFCUSER does not restrict rfc user; when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "QSTATE (Transactional tRFC queue statu)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Limits rows to the queue or processing state values you declare, so monitoring can target only selected outcome bands."
+    },
+    {
+      "kind": "paragraph",
+      "text": "QSTATE Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Use standard SAP status values configured for the monitored object type."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Code in this EI applies QSTATE as a selector but does not enumerate fixed literals inline."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationship"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Queue Scope Controls:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        MANDT, QNAME, and DEST define which outbound queue groups are included in the base dataset."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        QSTATE, QRFCUSER, and QRFCFNAM add processing-state and ownership/function context to that dataset."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Count Filtering Logic:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        The function first groups data by queue client, name, and destination and calculates item counts."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        CNT is applied after grouping as a final threshold/range filter."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Final result keeps queue groups that satisfy both scope filters and count conditions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Volume and Prioritization:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Combining QSTATE with CNT helps prioritize states with high queue volume for remediation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Combining DEST with CNT helps identify destination-specific queue pressure."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No default values are defined for this EI."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: High-volume outbound queue review by destination"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DEST = RFC_PRD_01\n QSTATE = RUNNING\n CNT = 100 - 999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus monitoring on queue groups with high item counts for a specific destination and active processing state."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: User and function-specific queue anomaly check"
+    },
+    {
+      "kind": "paragraph",
+      "text": "QRFCUSER = BATCH_USER_01\n QRFCFNAM = Z_IF_OUTBOUND_SEND\n QNAME = OUTBOUND_QUEUE_A\n CNT = 50 - 999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Identify whether a specific user/function integration flow is generating unusually large queue backlog."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Client-level queue pressure snapshot"
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANDT = 100\n QSTATE = SYSFAIL\n DEST = RFC_EXT_02\n CNT = 10 - 999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Detect failed outbound queues with non-trivial volume in one client and destination context for faster escalation."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_QRFC_OUT_CNT",
+          "CNT",
+          "Natural Number",
+          "INT4(10)",
+          "INT4"
+        ],
+        [
+          "/SKN/S_SW_01_02_QRFC_OUT_CNT",
+          "DEST",
+          "Logical Destination (Specified in Function Call)",
+          "CHAR(32)",
+          "RFCDEST"
+        ],
+        [
+          "/SKN/S_SW_01_02_QRFC_OUT_CNT",
+          "MANDT",
+          "Client ID",
+          "CLNT(3)",
+          "SYMANDT"
+        ],
+        [
+          "/SKN/S_SW_01_02_QRFC_OUT_CNT",
+          "QNAME",
+          "Name of tRFC Queue",
+          "CHAR(24)",
+          "TRFCQNAM"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_QRFC_OUT_CNT.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_QRFC_OUT_CNT OPTIONAL\n*\"----------------------------------------------------------------------\nRANGES : R_MANDT FOR TRFCQIN-MANDT,\n         R_QNAME FOR TRFCQIN-QNAME,\n         R_DEST FOR TRFCQIN-DEST,\n         R_CNT FOR /SKN/S_SW_SYS_QRFC_OUT_CNT-CNT,\n         R_QSTATE FOR TRFCQIN-QSTATE,\n         R_QRFCUSER FOR TRFCQIN-QRFCUSER,\n         R_QRFCFNAM FOR TRFCQIN-QRFCFNAM,\n         R_QRFCDATUM FOR TRFCQIN-QRFCDATUM.\nDATA : WA TYPE /SKN/S_SW_SYS_QRFC_OUT_CNT.\nDATA : SY_TABIX LIKE SY-TABIX .\n*data : TIME_DIFF TYPE  INT4 .\nDATA : IS_OUT(1) TYPE C.\n*\n*-- Fill Selection Option Tables\n   LOOP AT T_SELECT WHERE FIELDNM = 'MANDT'.\n     MOVE-CORRESPONDING T_SELECT TO R_MANDT.\n     APPEND R_MANDT.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'QNAME'.\n     MOVE-CORRESPONDING T_SELECT TO R_QNAME.\n     APPEND R_QNAME.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'DEST'.\n     MOVE-CORRESPONDING T_SELECT TO R_DEST.\n     APPEND R_DEST.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'CNT'.\n     MOVE-CORRESPONDING T_SELECT TO R_CNT.\n     APPEND R_CNT.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'QSTATE'.\n     MOVE-CORRESPONDING T_SELECT TO R_QSTATE.\n     APPEND R_QSTATE.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'QRFCUSER'.\n     MOVE-CORRESPONDING T_SELECT TO R_QRFCUSER.\n     APPEND R_QRFCUSER.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'QRFCFNAM'.\n     MOVE-CORRESPONDING T_SELECT TO R_QRFCFNAM.\n     APPEND R_QRFCFNAM.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'QRFCDATUM'.\n     MOVE-CORRESPONDING T_SELECT TO R_QRFCDATUM.\n     APPEND R_QRFCDATUM.\n   ENDLOOP.\n   \"--- Run Cloud Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_02_QRFC_OUT_CNT'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Cloud Mode -----\n*\n*   LOOP AT T_SELECT WHERE FIELDNM = 'DURATION_M'.\n*     MOVE-CORRESPONDING T_SELECT TO R_DURATION_M.\n*     APPEND R_DURATION_M.\n*   ENDLOOP.\n*   LOOP AT T_SELECT WHERE FIELDNM = 'DURATION_H'.\n*     MOVE-CORRESPONDING T_SELECT TO R_DURATION_H.\n*     APPEND R_DURATION_H.\n*   ENDLOOP.\n*\n*\n*   LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.\n*     MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.\n*     APPEND R_STATE_COLOR.\n*   ENDLOOP.\n*   LOOP AT T_SELECT WHERE FIELDNM = 'DATUM'.\n*     MOVE-CORRESPONDING T_SELECT TO R_DATUM.\n*     APPEND R_DATUM.\n*   ENDLOOP.\n*   if R_DATUM[] is initial .\n*     LOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.\n*       R_DATUM-SIGN = 'I' .\n*        R_DATUM-OPTION = 'GE' .\n*         BACKDAYS = T_SELECT-LOW .\n*         DATE_FROM = sy-datum - BACKDAYS .\n*         R_DATUM-LOW = DATE_FROM .\n*         APPEND R_DATUM.\n*         exit.\n*     ENDLOOP.\n*     if R_DATUM[] is initial .\n*       R_DATUM-SIGN = 'I' .\n*        R_DATUM-OPTION = 'GE' .\n*         BACKDAYS = 1 .\n*         DATE_FROM = sy-datum - BACKDAYS .\n*         R_DATUM-LOW = DATE_FROM .\n*       APPEND R_DATUM.\n*     endif .\n*   endif.\n*\n*   if R_ARFCDATUM[] is initial.\n*     R_ARFCDATUM[] = R_DATUM[].\n*   endif.\n*\n*  \"-----\n*\n*\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n*\n  SELECT MANDT QNAME DEST COUNT( * )\n     FROM TRFCQOUT\n     INTO (WA-MANDT, WA-QNAME, WA-DEST, WA-CNT)\n     WHERE QNAME IN R_QNAME\n       \"and mandt in R_MANDT\n       AND QSTATE IN R_QSTATE\n       AND QRFCUSER IN R_QRFCUSER\n       AND QRFCFNAM IN R_QRFCFNAM\n       AND QRFCDATUM IN R_QRFCDATUM\n       AND DEST     IN R_DEST\n     GROUP BY MANDT QNAME DEST.\n     MOVE-CORRESPONDING WA TO T_DATA.\n     APPEND T_DATA.\n  ENDSELECT.\n*\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-CNT IN R_CNT.\n      DELETE T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -1,0 +1,200 @@
+[
+  {
+    "source": "SW_01 _02_IDOCS - IDOCs State.docx",
+    "markdown": "SW_01 _02_IDOCS - IDOCs State.md",
+    "json": "SW_01 _02_IDOCS - IDOCs State.json",
+    "markdown_bytes": 40357
+  },
+  {
+    "source": "SW_01 _02_IDOCS_CNT - IDOCs Count.docx",
+    "markdown": "SW_01 _02_IDOCS_CNT - IDOCs Count.md",
+    "json": "SW_01 _02_IDOCS_CNT - IDOCs Count.json",
+    "markdown_bytes": 18225
+  },
+  {
+    "source": "SW_01_01_DUMPS - System Dumps (Details Monitoring).docx",
+    "markdown": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md",
+    "json": "SW_01_01_DUMPS - System Dumps (Details Monitoring).json",
+    "markdown_bytes": 15494
+  },
+  {
+    "source": "SW_01_01_DUMPS_COUNT - System Dumps Count.docx",
+    "markdown": "SW_01_01_DUMPS_COUNT - System Dumps Count.md",
+    "json": "SW_01_01_DUMPS_COUNT - System Dumps Count.json",
+    "markdown_bytes": 7282
+  },
+  {
+    "source": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.docx",
+    "markdown": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md",
+    "json": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.json",
+    "markdown_bytes": 20209
+  },
+  {
+    "source": "SW_01_01_JOBS_CNT - Background Jobs Count.docx",
+    "markdown": "SW_01_01_JOBS_CNT - Background Jobs Count.md",
+    "json": "SW_01_01_JOBS_CNT - Background Jobs Count.json",
+    "markdown_bytes": 13198
+  },
+  {
+    "source": "SW_01_01_JOBS_STATE - Background Jobs Control.docx",
+    "markdown": "SW_01_01_JOBS_STATE - Background Jobs Control.md",
+    "json": "SW_01_01_JOBS_STATE - Background Jobs Control.json",
+    "markdown_bytes": 33789
+  },
+  {
+    "source": "SW_01_01_NUM_RNG - Number Range Control Monitoring.docx",
+    "markdown": "SW_01_01_NUM_RNG - Number Range Control Monitoring.md",
+    "json": "SW_01_01_NUM_RNG - Number Range Control Monitoring.json",
+    "markdown_bytes": 27780
+  },
+  {
+    "source": "SW_01_01_SM12 - Application Locks Monitoring.docx",
+    "markdown": "SW_01_01_SM12 - Application Locks Monitoring.md",
+    "json": "SW_01_01_SM12 - Application Locks Monitoring.json",
+    "markdown_bytes": 21389
+  },
+  {
+    "source": "SW_01_01_SM13 - Update Requests Monitoring.docx",
+    "markdown": "SW_01_01_SM13 - Update Requests Monitoring.md",
+    "json": "SW_01_01_SM13 - Update Requests Monitoring.json",
+    "markdown_bytes": 25501
+  },
+  {
+    "source": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.docx",
+    "markdown": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md",
+    "json": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.json",
+    "markdown_bytes": 13748
+  },
+  {
+    "source": "SW_01_01_SM50 - Work Process Monitoring.docx",
+    "markdown": "SW_01_01_SM50 - Work Process Monitoring.md",
+    "json": "SW_01_01_SM50 - Work Process Monitoring.json",
+    "markdown_bytes": 30517
+  },
+  {
+    "source": "SW_01_01_SYS_BDC - Batch Input Monitoring.docx",
+    "markdown": "SW_01_01_SYS_BDC - Batch Input Monitoring.md",
+    "json": "SW_01_01_SYS_BDC - Batch Input Monitoring.json",
+    "markdown_bytes": 29015
+  },
+  {
+    "source": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.docx",
+    "markdown": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md",
+    "json": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.json",
+    "markdown_bytes": 19656
+  },
+  {
+    "source": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.docx",
+    "markdown": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md",
+    "json": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.json",
+    "markdown_bytes": 13771
+  },
+  {
+    "source": "SW_01_02_MSG_STATUS - Message Status Monitoring.docx",
+    "markdown": "SW_01_02_MSG_STATUS - Message Status Monitoring.md",
+    "json": "SW_01_02_MSG_STATUS - Message Status Monitoring.json",
+    "markdown_bytes": 43437
+  },
+  {
+    "source": "SW_01_02_QRFC_IN_CNT - qRFC Inbound Queue Monitoring.docx",
+    "markdown": "SW_01_02_QRFC_IN_CNT - qRFC Inbound Queue Monitoring.md",
+    "json": "SW_01_02_QRFC_IN_CNT - qRFC Inbound Queue Monitoring.json",
+    "markdown_bytes": 12890
+  },
+  {
+    "source": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.docx",
+    "markdown": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md",
+    "json": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.json",
+    "markdown_bytes": 13519
+  },
+  {
+    "source": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.docx",
+    "markdown": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md",
+    "json": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.json",
+    "markdown_bytes": 17582
+  },
+  {
+    "source": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.docx",
+    "markdown": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md",
+    "json": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.json",
+    "markdown_bytes": 18671
+  },
+  {
+    "source": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.docx",
+    "markdown": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md",
+    "json": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.json",
+    "markdown_bytes": 40668
+  },
+  {
+    "source": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.docx",
+    "markdown": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md",
+    "json": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.json",
+    "markdown_bytes": 14950
+  },
+  {
+    "source": "SW_01_02_TRFC - tRFC Transactional RFC Monitoring.docx",
+    "markdown": "SW_01_02_TRFC - tRFC Transactional RFC Monitoring.md",
+    "json": "SW_01_02_TRFC - tRFC Transactional RFC Monitoring.json",
+    "markdown_bytes": 24344
+  },
+  {
+    "source": "SW_01_02_XI_MESS - XI Message Monitoring.docx",
+    "markdown": "SW_01_02_XI_MESS - XI Message Monitoring.md",
+    "json": "SW_01_02_XI_MESS - XI Message Monitoring.json",
+    "markdown_bytes": 42720
+  },
+  {
+    "source": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.docx",
+    "markdown": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md",
+    "json": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.json",
+    "markdown_bytes": 21345
+  },
+  {
+    "source": "SW_01_20_SM66 - Global Work Process Overview.docx",
+    "markdown": "SW_01_20_SM66 - Global Work Process Overview.md",
+    "json": "SW_01_20_SM66 - Global Work Process Overview.json",
+    "markdown_bytes": 29523
+  },
+  {
+    "source": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.docx",
+    "markdown": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md",
+    "json": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.json",
+    "markdown_bytes": 23071
+  },
+  {
+    "source": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.docx",
+    "markdown": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md",
+    "json": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.json",
+    "markdown_bytes": 24103
+  },
+  {
+    "source": "SW_01_20_USR_PWD - User Password State Monitoring.docx",
+    "markdown": "SW_01_20_USR_PWD - User Password State Monitoring.md",
+    "json": "SW_01_20_USR_PWD - User Password State Monitoring.json",
+    "markdown_bytes": 35447
+  },
+  {
+    "source": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.docx",
+    "markdown": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.md",
+    "json": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.json",
+    "markdown_bytes": 22605
+  },
+  {
+    "source": "SW_01_AMS_BUFF_STAT - AMS Buffer Statistics Monitoring_.docx",
+    "markdown": "SW_01_AMS_BUFF_STAT - AMS Buffer Statistics Monitoring_.md",
+    "json": "SW_01_AMS_BUFF_STAT - AMS Buffer Statistics Monitoring_.json",
+    "markdown_bytes": 15304
+  },
+  {
+    "source": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.docx",
+    "markdown": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md",
+    "json": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.json",
+    "markdown_bytes": 20373
+  },
+  {
+    "source": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.docx",
+    "markdown": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md",
+    "json": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.json",
+    "markdown_bytes": 19056
+  }
+]

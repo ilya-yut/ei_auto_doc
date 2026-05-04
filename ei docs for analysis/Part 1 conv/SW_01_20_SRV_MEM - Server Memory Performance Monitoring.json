@@ -1,0 +1,912 @@
+{
+  "source_file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Server Memory Performance Monitoring (SW_01_20_SRV_MEM)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive memory performance monitoring and analysis across SAP system landscapes to ensure optimal memory utilization and prevent memory exhaustion scenarios that could cause critical system failures. Memory monitoring is fundamental for maintaining SAP system stability, performance, and preventing out-of-memory conditions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The Server Memory Performance Monitoring solution monitors physical memory, swap space utilization, and memory paging activity across all application servers in a distributed SAP landscape, providing real-time visibility into memory consumption patterns and availability. When memory utilization exceeds critical thresholds, it can lead to excessive swapping, performance degradation, system crashes, and complete service interruption."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides advanced memory monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-server monitoring across distributed SAP landscapes with centralized visibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Comprehensive memory metrics including physical memory, swap space, and paging activity analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-time utilization analysis with current consumption and available capacity calculations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cross-platform compatibility supporting various operating systems and memory configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Enhanced error handling for network connectivity issues and collector service failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Historical tracking with timestamp recording for memory trend analysis and capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution leverages SAP's built-in memory monitoring functions and provides enhanced analytical capabilities including memory usage calculations, swap utilization processing, and comprehensive server list management for enterprise-scale memory performance monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator ensures that SAP systems maintain optimal memory performance across all critical application servers and identifies potential memory bottlenecks before they impact business operations."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High memory utilization and inadequate memory monitoring indicate critical system resource issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Stability Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System crashes and out-of-memory errors when physical memory reaches critical depletion levels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Excessive swap space utilization causing severe performance degradation and system instability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory allocation failures preventing new processes and user sessions from starting successfully"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database buffer cache inefficiency due to insufficient physical memory for optimal data caching"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance Degradation Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Severe response time slowdowns when systems rely heavily on swap space for memory operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Increased disk I/O from memory paging activities affecting overall system throughput"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work process failures and timeouts due to insufficient memory for transaction processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Application server performance issues from memory pressure and resource contention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction failures and user session terminations due to memory allocation errors"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job failures affecting critical business processes when memory resources become exhausted"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interface processing delays from memory-constrained operations affecting real-time data exchange"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Report generation failures and incomplete processing due to insufficient memory allocation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Planning Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of visibility into memory consumption patterns preventing proactive capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unpredictable memory exhaustion scenarios causing emergency system maintenance and downtime"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inadequate swap space configuration leading to system failures during peak memory demand"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor memory utilization tracking preventing optimization of system configurations and workload distribution"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate servers showing high physical memory usage (>85%) for immediate memory recovery actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check swap space utilization levels and identify excessive paging activity requiring attention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review memory-intensive processes and optimize or reschedule resource-heavy operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze memory paging rates (pages in/out per second) for system performance optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor memory utilization trends across all application servers for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate current memory allocation against business volume projections and growth patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check swap space configuration and utilization patterns for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze memory consumption by work processes and applications for efficiency improvements"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement memory optimization for SAP instances including buffer tuning and parameter adjustments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Extend physical memory capacity or optimize swap space configuration for critical systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configure automated memory monitoring with appropriate alert thresholds and escalation procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Schedule memory-intensive operations during off-peak hours to maintain optimal system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preventive Measures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular memory utilization reviews and performance baseline monitoring procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring for all critical servers with multiple memory threshold levels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create documentation and procedures for memory tuning and emergency memory management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on memory utilization analysis and business growth projections"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "FREE_MEM",
+          "Free Memory (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "2",
+          "FREE_MEM_PRC",
+          "Free Memory (%)",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "3",
+          "HOST",
+          "Host Name",
+          "CHAR",
+          "32",
+          "0",
+          "MSHOST2",
+          "MSHOST2"
+        ],
+        [
+          "4",
+          "IN_KB_SEC",
+          "Page In (KB/s)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "5",
+          "IN_PG_SEC",
+          "Pages In (Pg/S)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "6",
+          "OUT_KB_SEC",
+          "Page Out (KB/s)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "7",
+          "OUT_PG_SEC",
+          "Pages Out (Pg/S)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "8",
+          "PHYS_MEM",
+          "Physical memory (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "9",
+          "PHYS_USAGE",
+          "Physical memory Usage (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "10",
+          "SERIALNR",
+          "Serial number",
+          "INT2",
+          "5",
+          "0",
+          "COLLSERNR",
+          "INT2"
+        ],
+        [
+          "11",
+          "SERVER",
+          "Server Name",
+          "CHAR",
+          "40",
+          "0",
+          "MSNAME2",
+          "MSNAME2"
+        ],
+        [
+          "12",
+          "SUBTYPE",
+          "saposcol subtype",
+          "INT2",
+          "5",
+          "0",
+          "COLLSUBTYP",
+          "INT2"
+        ],
+        [
+          "13",
+          "SWAP_CONF",
+          "Config primary swap fixed spac",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "14",
+          "SWAP_FREE",
+          "Free space - total swap (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "15",
+          "SWAP_FREE_PRC",
+          "Free swap size (%)",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "16",
+          "SWAP_MAX",
+          "Maximum swap size by filesyste",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "17",
+          "SWAP_SIZE",
+          "Actual size of total swap (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "18",
+          "SWAP_USAGE",
+          "SWAP memory Usage (KB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "19",
+          "TYPE",
+          "saposcoltype",
+          "INT2",
+          "5",
+          "0",
+          "COLLTYPE",
+          "INT2"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 19 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM (Free Memory (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when free memory (kb) on FREE_MEM is narrowed together with client, user, or session filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM_PRC (Free Memory (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when free memory (%) on FREE_MEM_PRC correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST (Host Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when host name on HOST correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IN_KB_SEC (Page In (KB/s))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring page in (kb/s) (IN_KB_SEC) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IN_PG_SEC (Pages In (Pg/S))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter pages in (pg/s) on IN_PG_SEC surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OUT_KB_SEC (Page Out (KB/s))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so page out (kb/s) (OUT_KB_SEC) aligns with the intended triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OUT_PG_SEC (Pages Out (Pg/S))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how administrators slice operational lists: pages out (pg/s) (OUT_PG_SEC) is one lever that shapes which rows are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PHYS_MEM (Physical memory (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when physical memory (kb) on PHYS_MEM correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PHYS_USAGE (Physical memory Usage (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where physical memory usage (kb) (PHYS_USAGE) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERIALNR (Serial number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing serial number (SERIALNR) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERVER (Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing server name via SERVER before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SUBTYPE (saposcol subtype)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects saposcol subtype constraints carried by SUBTYPE."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_CONF (Config primary swap fixed spac)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening config primary swap fixed spac through SWAP_CONF alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_FREE (Free space - total swap (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, free space - total swap (kb) on SWAP_FREE isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_FREE_PRC (Free swap size (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when free swap size (%) on SWAP_FREE_PRC correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_MAX (Maximum swap size by filesyste)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when maximum swap size by filesyste on SWAP_MAX correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_SIZE (Actual size of total swap (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, actual size of total swap (kb) on SWAP_SIZE keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_USAGE (SWAP memory Usage (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets swap memory usage (kb) as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on SWAP_USAGE."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TYPE (saposcoltype)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because saposcoltype (TYPE) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The memory monitoring function provides both percentage-based and absolute value parameters to accommodate different monitoring scenarios and business requirements:"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Percentage vs. Absolute Value Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage Parameters (_PRC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM_PRC - Remaining physical memory as percentage of total physical memory"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_FREE_PRC - Remaining swap space as percentage of total swap space"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Absolute Value Parameters:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM - Absolute amount of free physical memory in KB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "PHYS_MEM - Total physical memory available in KB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_FREE - Absolute amount of free swap space in KB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_SIZE - Total swap space configured in KB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "PHYS_USAGE - Physical memory usage in MB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SWAP_USAGE - Swap space usage in MB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Both Options Exist: The dual parameter approach provides monitoring flexibility for different business contexts. Percentage-based thresholds work well for systems of varying memory sizes (e.g., alert when any server drops below 15% free memory), while absolute value thresholds are essential for memory-critical systems where specific minimum memory quantities must be maintained (e.g., always keep at least 2GB physical memory available regardless of total system memory)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No default values are defined for this EI."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Monitoring based on percentage values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Alert when free memory percentage drops below 15% for capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM_PRC = <15"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Monitoring based on absolute values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Enterprise-scale memory monitoring using absolute thresholds for critical systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MEM = <2000000"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Tight free-memory guard"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Alert when a named instance shows critically low free memory in kilobytes and percent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERVER = PRD_APP01\nHOST = prd-mem-01\nFREE_MEM_PRC = 0-8\nPHYS_MEM = 67108864-999999999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Swap pressure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Track swap consumption and free percentage on a host group."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST = %QAS%\nSWAP_FREE_PRC = 0-15\nSWAP_USAGE = 1073741824-9999999999999999\nSWAP_SIZE = 17179869184-9999999999999999\nSWAP_CONF = 17179869184-9999999999999999\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 5: Paging spike review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Combine paging rates with physical usage for a weekly stability report."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERVER = %DEV%\nIN_PG_SEC = 500-999999999\nOUT_PG_SEC = 500-999999999\nIN_KB_SEC = 1024-999999999\nOUT_KB_SEC = 1024-999999999\nPHYS_USAGE = 50000000-9999999999999999\nTYPE = 1\nSUBTYPE = 2\nSERIALNR = 0-32767\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "FREE_MEM",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "FREE_MEM_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "HOST",
+          "Name of Application Server",
+          "CHAR(32)",
+          "MSHOST2"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "IN_KB_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "IN_PG_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "OUT_KB_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "OUT_PG_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "PHYS_MEM",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "PHYS_USAGE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SERIALNR",
+          "Serial number in saposcol result structure",
+          "INT2(5)",
+          "COLLSERNR"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SERVER",
+          "Application Server Name",
+          "CHAR(40)",
+          "MSNAME2"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SUBTYPE",
+          "Subtype in saposcol result structure",
+          "INT2(5)",
+          "COLLSUBTYP"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_CONF",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_FREE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_FREE_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_MAX",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_SIZE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "SWAP_USAGE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_MEM",
+          "TYPE",
+          "Type in saposcol result structure",
+          "INT2(5)",
+          "COLLTYPE"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_SRV_MEM.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SRV_MEM OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_MULTY: DURATION /SKN/E_SW_DURATION,\n            SERVER   MSNAME2,\n            HOST     MSHOST2,\n            IN_PG_SEC  INT4_DATA,\n            OUT_PG_SEC  INT4_DATA,\n            IN_KB_SEC  INT4_DATA,\n            OUT_KB_SEC  INT4_DATA,\n            FREE_MEM  INT4_DATA,\n            PHYS_MEM  INT4_DATA,\n            SWAP_CONF  INT4_DATA,\n            SWAP_FREE  INT4_DATA,\n            SWAP_SIZE  INT4_DATA,\n            SWAP_MAX  INT4_DATA,\n            PHYS_USAGE  INT4_DATA,\n            SWAP_USAGE  INT4_DATA,\n            FREE_MEM_PRC /SKN/E_SW_PRC,\n            SWAP_FREE_PRC /SKN/E_SW_PRC.\nDATA_SINGLE: AGGR_LEVEL CHAR1.\nDATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,\n             LANGU LANGU,\n             NUMBER SY-TABIX,\n             SUBRC SY-SUBRC,\n             MANAGE_IN_UTC CHAR1.\nDATA: LS_WP_TOTAL_INFO TYPE WPTOTLINFO,\n      LT_WP_TOTAL_INFO LIKE TABLE OF LS_WP_TOTAL_INFO,\n      LS_COMMUNICATION_ERRORS TYPE WPTOTLICER,\n      LT_COMMUNICATION_ERRORS LIKE TABLE OF LS_COMMUNICATION_ERRORS,\n      IS_USED_WP TYPE WPTOTLIUWP,\n      IT_USED_WP LIKE TABLE OF IS_USED_WP.\nDATA: LS_SRV_LIST TYPE  MSXXLIST,\n      LT_SRV_LIST LIKE TABLE OF LS_SRV_LIST.\nDATA: LV_LOGICAL_DESTINATION TYPE RFCDEST.\nDATA: F_MEM_ALL_READ LIKE  DEF_PAR_FU-NO_YES,\n      ACTIVEFLAG LIKE  DEF_PAR_FU-ACTIVEFLAG,\n      INTERVAL LIKE  DEF_PAR_FU-INTERVAL,\n      DETAILSCOLL LIKE  DEF_PAR_FU-DETAILSCOL,\n      DETAILSREQI LIKE  DEF_PAR_FU-DETAILSREQ,\n      DETAILSMODE LIKE  DEF_PAR_FU-DETAILSMOD,\n      LASTCOLLWRT LIKE  DEF_PAR_FU-LASTCOLLWR,\n      LASTCOLLINT LIKE  DEF_PAR_FU-LASTCOLLIN,\n      NORMCOLLINT LIKE  DEF_PAR_FU-NORMCOLLIN.\nDATA: LS_MEM_ALL TYPE MEM_ALL,\n      LT_MEM_ALL LIKE TABLE OF LS_MEM_ALL.\nDATA: LS_DATA LIKE LINE OF T_DATA,\n      LT_DATA LIKE TABLE OF LS_DATA.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\nDATA : IS_OUT(1) TYPE C.\nDATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\nDATA: LV_NO_SERVER_LIST(1) TYPE C.\n*-- Fill Selection Option Tables\nSELECT_MULTY: DURATION,\n            SERVER,\n            HOST,\n            IN_PG_SEC,\n            OUT_PG_SEC,\n            IN_KB_SEC,\n            OUT_KB_SEC,\n            FREE_MEM,\n            PHYS_MEM,\n            SWAP_CONF,\n            SWAP_FREE,\n            SWAP_SIZE,\n            SWAP_MAX,\n            PHYS_USAGE,\n            SWAP_USAGE,\n            FREE_MEM_PRC,\n            SWAP_FREE_PRC.\n LV_DURATION_UNIT = 'M'.\n SELECT_SINGLE: DURATION_UNIT,\n                MANAGE_IN_UTC,\n                LANGU.\n SELECT_SINGLE: AGGR_LEVEL.\n SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n PROCESS_ICON = ICON_DELETE.\n\"--- Run Clood Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  REFRESH: LT_DATA.\n  CLEAR LV_NO_SERVER_LIST.\n* get a list of all running instances & name of own instance\n  CALL FUNCTION 'TH_SERVER_LIST'\n     DESTINATION LV_SW_DEST\n\"      exporting\n\"           SERVICES = 255\n       TABLES\n            LIST     = LT_SRV_LIST\n      EXCEPTIONS\n        NO_SERVER_LIST        = 1\n        SYSTEM_FAILURE        = 2\n        COMMUNICATION_FAILURE = 3\n        OTHERS                = 9.\n    IF SY-SUBRC IS NOT INITIAL .\n      CASE SY-SUBRC.\n        WHEN 1.  \" NO_SERVER_LIST\n          LV_NO_SERVER_LIST = 'X'.\n        WHEN OTHERS.\n         \" exit.\n      ENDCASE.\n    ENDIF.\n    IF LV_NO_SERVER_LIST IS NOT INITIAL. \" Add fictive Item\n      CLEAR LS_SRV_LIST.\n      \"ls_SRV_LIST-NAME = lv_SW_DEST.\n      APPEND LS_SRV_LIST TO LT_SRV_LIST.\n    ENDIF.\n    LOOP AT LT_SRV_LIST INTO LS_SRV_LIST.\n      LV_LOGICAL_DESTINATION = LS_SRV_LIST-NAME.\n      REFRESH LT_MEM_ALL.\n      CALL FUNCTION 'GET_MEM_ALL'\n        DESTINATION LV_SW_DEST\n       EXPORTING\n         LOCAL_REMOTE                         = 'INTERN'\n         LOGICAL_DESTINATION                  = LV_LOGICAL_DESTINATION\n        IMPORTING\n          F_MEM_ALL_READ                       = F_MEM_ALL_READ\n          ACTIVEFLAG                           = ACTIVEFLAG\n          INTERVAL                             = INTERVAL\n          DETAILSCOLL                          = DETAILSCOLL\n          DETAILSREQI                          = DETAILSREQI\n          DETAILSMODE                          = DETAILSMODE\n          LASTCOLLWRT                          = LASTCOLLWRT\n          LASTCOLLINT                          = LASTCOLLINT\n          NORMCOLLINT                          = NORMCOLLINT\n        TABLES\n          TF_MEM_ALL                           = LT_MEM_ALL\n        EXCEPTIONS\n          INTERNAL_ERROR_ADRESS_FAILED         = 1\n          INTERNAL_ERROR_DIFFERENT_FIELD       = 2\n          INTERNAL_ERROR_NO_NEW_LINE           = 3\n          COLLECTOR_NOT_RUNNING                = 4\n          SHARED_MEMORY_NOT_AVAILABLE          = 5\n          COLLECTOR_BUSY                       = 6\n          VERSION_CONFLICT                     = 7\n          NO_NETWORK_COLLECTOR_RUNNING         = 8\n          SYSTEM_FAILURE                       = 9\n          COMMUNICATION_FAILURE                = 10\n          OTHERS                               = 11.\n      IF SY-SUBRC <> 0.\n* Implement suitable error handling here\n      ENDIF.\n      LOOP AT LT_MEM_ALL INTO LS_MEM_ALL.\n        CLEAR: LS_DATA.\n        MOVE-CORRESPONDING LS_MEM_ALL TO LS_DATA.\n        LS_DATA-SERVER = LS_SRV_LIST-NAME.\n        LS_DATA-HOST   = LS_SRV_LIST-HOST.\n        LS_DATA-PHYS_USAGE = TRUNC( ( LS_DATA-PHYS_MEM - LS_DATA-FREE_MEM ) / 1000 ).\n        LS_DATA-SWAP_USAGE = TRUNC( ( LS_DATA-SWAP_SIZE - LS_DATA-SWAP_FREE ) / 1000 ).\n        IF LS_DATA-PHYS_MEM IS NOT INITIAL.\n          LS_DATA-FREE_MEM_PRC = LS_DATA-FREE_MEM / LS_DATA-PHYS_MEM * 100.\n        ENDIF.\n        IF LS_DATA-SWAP_MAX IS NOT INITIAL.\n          LS_DATA-SWAP_FREE_PRC = LS_DATA-SWAP_FREE / LS_DATA-SWAP_MAX * 100.\n        ENDIF.\n        APPEND LS_DATA TO LT_DATA.\n      ENDLOOP.\n    ENDLOOP.\n***  delete lt_wp_total_info where WP_TYP not in R_WP_TYP.\n***  delete lt_wp_total_info where WP_ISTATUS not in R_WP_ISTATUS.\n T_DATA[] = LT_DATA[].\n****-- Fill Duration Value\n*** sy_datlo = sy-datum.   \"--- System Date/Time\n*** sy_timlo = sy-uzeit.\n*** loop at T_DATA .\n***   sy_tabix = sy-tabix.\n***   T_DATA-DURATION_UNIT = lv_DURATION_UNIT.\n***   if t_data-STARTDATE is initial.\n***     continue.\n***   endif.\n***    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n***        EXPORTING\n***          D_FROM            = t_data-STARTDATE\n***          T_FROM            = t_data-STARTTIME\n***          D_TO              = sy_datlo\n***          T_TO              = sy_timlo\n***          TIME_UNIT         = lv_DURATION_UNIT\n***        IMPORTING\n***          TIME_DIFF         = TIME_DIFF\n***        EXCEPTIONS\n***          WRONG_VALUE       = 1\n***          OTHERS            = 2    .\n***      IF SY-SUBRC = 0.\n***        T_DATA-DURATION = TIME_DIFF .\n***      else.\n***        T_DATA-DURATION = '999999'.\n***      endif.\n***   modify T_DATA index sy_tabix .\n*** endloop .\n*** delete t_data where DURATION not in R_DURATION.\n DELETE T_DATA WHERE SERVER NOT IN R_SERVER.\n DELETE T_DATA WHERE HOST NOT IN R_HOST.\n DELETE T_DATA WHERE IN_PG_SEC NOT IN R_IN_PG_SEC.\n DELETE T_DATA WHERE OUT_PG_SEC NOT IN R_OUT_PG_SEC.\n DELETE T_DATA WHERE IN_KB_SEC NOT IN R_IN_KB_SEC.\n DELETE T_DATA WHERE OUT_KB_SEC NOT IN R_OUT_KB_SEC.\n DELETE T_DATA WHERE FREE_MEM NOT IN R_FREE_MEM.\n DELETE T_DATA WHERE PHYS_MEM NOT IN R_PHYS_MEM.\n DELETE T_DATA WHERE SWAP_CONF NOT IN R_SWAP_CONF.\n DELETE T_DATA WHERE SWAP_FREE NOT IN R_SWAP_FREE.\n DELETE T_DATA WHERE SWAP_SIZE NOT IN R_SWAP_SIZE.\n DELETE T_DATA WHERE SWAP_MAX NOT IN R_SWAP_MAX.\n DELETE T_DATA WHERE PHYS_USAGE NOT IN R_PHYS_USAGE.\n DELETE T_DATA WHERE SWAP_USAGE NOT IN R_SWAP_USAGE.\n DELETE T_DATA WHERE FREE_MEM_PRC NOT IN R_FREE_MEM_PRC.\n DELETE T_DATA WHERE SWAP_FREE_PRC NOT IN R_SWAP_FREE_PRC.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

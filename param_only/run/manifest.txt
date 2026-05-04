@@ -1,0 +1,2 @@
+output_basename=SKN_S_SW_01_AUD_SM20_TR_START
+title=Parameters: SKN_S_SW_01_AUD_SM20_TR_START

@@ -1,0 +1,907 @@
+{
+  "source_file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Server CPU Performance Monitoring (SW_01_20_SRV_CPU)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive CPU performance monitoring and analysis across SAP system landscapes to ensure optimal system performance and prevent CPU bottlenecks that could cause critical performance degradation. CPU monitoring is fundamental for maintaining SAP system responsiveness, throughput, and user experience."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The Server CPU Performance Monitoring solution monitors CPU utilization and load metrics across all application servers in a distributed SAP landscape, providing real-time visibility into CPU consumption patterns and system load characteristics. When CPU utilization exceeds optimal thresholds, it can lead to response time degradation, transaction timeouts, user session failures, and overall system performance issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides advanced CPU monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-server monitoring across distributed SAP landscapes with centralized visibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Comprehensive CPU metrics including usage percentages, load averages, and system/user time distribution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-time performance analysis with current utilization and load trend calculations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cross-platform compatibility supporting various operating systems and hardware configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Enhanced error handling for network connectivity issues and collector service failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Historical tracking with timestamp recording for performance trend analysis and capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution leverages SAP's built-in CPU monitoring functions and provides enhanced analytical capabilities including CPU usage calculations, load average processing, and comprehensive server list management for enterprise-scale CPU performance monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator ensures that SAP systems maintain optimal CPU performance across all critical application servers and identifies potential performance bottlenecks before they impact business operations."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High CPU utilization and inadequate performance monitoring indicate critical system resource issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Severe response time degradation when CPU utilization consistently exceeds 80-90% capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction timeouts and user session failures due to insufficient CPU resources for processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job delays and failures affecting critical business processes and reporting cycles"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System instability and potential crashes under sustained high CPU load conditions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "User Experience Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Slow application response times affecting user productivity and business process efficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Login failures and session timeouts during peak CPU utilization periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Dialog step timeouts causing transaction interruptions and data loss scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor system responsiveness impacting user satisfaction and operational efficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Disruption"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interface processing delays affecting real-time data exchange with external systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Background job queue congestion from CPU resource constraints impacting automation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Report generation failures and delays affecting business decision-making processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Integration failures with external systems due to processing timeouts and resource exhaustion"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Planning Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of visibility into CPU consumption patterns preventing proactive capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unpredictable performance degradation scenarios causing emergency system interventions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inadequate load balancing across application servers leading to resource inefficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor utilization tracking preventing optimization of system configurations and workload distribution"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate servers showing consistently high CPU usage (>80%) for immediate load balancing opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check CPU load averages (1, 5, 15 minute intervals) for sustained high load patterns requiring attention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review active work processes and identify resource-intensive operations for optimization or rescheduling"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze user and system CPU time distribution to identify optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor CPU utilization trends across all application servers for workload optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate current load distribution against server capacity and performance baselines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system and user CPU time ratios for process efficiency analysis and tuning opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze interrupt and context switch rates for system-level performance optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement workload balancing across application servers to distribute CPU load effectively"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize resource-intensive batch jobs and background processes for improved CPU efficiency"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configure automatic load balancing and failover mechanisms for peak load management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Schedule CPU-intensive operations during off-peak hours to maintain optimal system performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preventive Measures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular CPU utilization reviews and performance baseline monitoring procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring for all critical servers with appropriate performance thresholds"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create documentation and procedures for performance tuning and emergency load management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on utilization analysis and business growth projections"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "CPU_USAGE",
+          "CPU Utilization",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "2",
+          "CS_SEC",
+          "Context switches (sec)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "3",
+          "HOST",
+          "Host Name",
+          "CHAR",
+          "32",
+          "0",
+          "MSHOST2",
+          "MSHOST2"
+        ],
+        [
+          "4",
+          "IDLE_TOTAL",
+          "Idle (%)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "5",
+          "IDLE_TRUE",
+          "Idle True (%)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "6",
+          "INT_SEC",
+          "Interrupts (sec)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "7",
+          "LOAD15_AVG",
+          "Avg processes waiting (15 min)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "8",
+          "LOAD1_AVG",
+          "Avg processes waiting (1 min)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "9",
+          "LOAD5_AVG",
+          "Avg processes waiting (5 min)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "10",
+          "NBR_CPU",
+          "Number of CPUs",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "11",
+          "SERIALNR",
+          "Serial number",
+          "INT2",
+          "5",
+          "0",
+          "COLLSERNR",
+          "INT2"
+        ],
+        [
+          "12",
+          "SERVER",
+          "Server Name",
+          "CHAR",
+          "40",
+          "0",
+          "MSNAME2",
+          "MSNAME2"
+        ],
+        [
+          "13",
+          "SUBTYPE",
+          "saposcol subtype",
+          "INT2",
+          "5",
+          "0",
+          "COLLSUBTYP",
+          "INT2"
+        ],
+        [
+          "14",
+          "SYS_TOTAL",
+          "System Utilization (%)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "15",
+          "SYSC_SEC",
+          "System Calls (sec)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "16",
+          "TYPE",
+          "saposcoltype",
+          "INT2",
+          "5",
+          "0",
+          "COLLTYPE",
+          "INT2"
+        ],
+        [
+          "17",
+          "USR_TOTAL",
+          "User Utilization ( %)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "18",
+          "WAIT_TRUE",
+          "Wait True (%)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 18 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CPU_USAGE (CPU Utilization)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Valuable when comparing health before and after a release—hold cpu utilization on CPU_USAGE constant while varying other filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CS_SEC (Context switches (sec))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, context switches (sec) on CS_SEC often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST (Host Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when host name on HOST correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDLE_TOTAL (Idle (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, idle (%) (IDLE_TOTAL) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "IDLE_TRUE (Idle True (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because idle true (%) (IDLE_TRUE) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "INT_SEC (Interrupts (sec))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Gives auditors traceable criteria because interrupts (sec) on INT_SEC is applied consistently before any alert flag is raised."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOAD15_AVG (Avg processes waiting (15 min))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter avg processes waiting (15 min) on LOAD15_AVG surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOAD1_AVG (Avg processes waiting (1 min))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when avg processes waiting (1 min) on LOAD1_AVG correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LOAD5_AVG (Avg processes waiting (5 min))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, avg processes waiting (5 min) (LOAD5_AVG) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NBR_CPU (Number of CPUs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter number of cpus on NBR_CPU surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERIALNR (Serial number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, serial number (SERIALNR) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERVER (Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Gives auditors traceable criteria because server name on SERVER is applied consistently before any alert flag is raised."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SUBTYPE (saposcol subtype)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—saposcol subtype on SUBTYPE should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYS_TOTAL (System Utilization (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where system utilization (%) on SYS_TOTAL signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYSC_SEC (System Calls (sec))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After data is read, lines are removed unless system calls (sec) on SYSC_SEC still satisfies the active multivalued selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TYPE (saposcoltype)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when saposcoltype (TYPE) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USR_TOTAL (User Utilization ( %))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where user utilization ( %) on USR_TOTAL signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WAIT_TRUE (Wait True (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating wait true (%) through WAIT_TRUE for each candidate record."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The CPU monitoring function provides both percentage-based and absolute"
+    },
+    {
+      "kind": "paragraph",
+      "text": "value parameters to accommodate"
+    },
+    {
+      "kind": "paragraph",
+      "text": "different monitoring scenarios and business requirements:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage vs. Absolute Value Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage Parameters:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       CPU_USAGE - Current CPU utilization as percentage of total available capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       USR_TOTAL - User CPU time as percentage of total CPU time"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       SYS_TOTAL - System CPU time as percentage of total CPU time"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       IDLE_TOTAL - Idle CPU time as percentage of total CPU time"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Absolute Value Parameters:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       LOAD1_AVG - 1-minute load average for recent system load assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       LOAD5_AVG - 5-minute load average for medium-term system load assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       LOAD15_AVG - 15-minute load average for long-term system load assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       NBR_CPU - Number of CPU cores available on the server"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Note: Load average is unitless, representing the average number of processes running or waiting for resources. Load average should be interpreted relative to CPU count (e.g., load of 4.0 on a 4-core system = 100% utilization)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Both Options Exist:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The dual parameter approach provides monitoring flexibility for different business contexts. Percentage-based thresholds work well for systems of varying CPU capacities (e.g., alert when any server exceeds 85% CPU usage), while absolute value thresholds are essential for load-sensitive systems where"
+    },
+    {
+      "kind": "paragraph",
+      "text": "specific load average limits must be maintained (e.g., always keep load average below 4.0 regardless of total CPU count)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No default values are defined for this EI."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Single production instance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Watch one application server with tight CPU utilization and load-average ceilings."
+    },
+    {
+      "kind": "paragraph",
+      "text": " SERVER = PRD_ASCS01 \n HOST = prd-phx-01 \n CPU_USAGE = 85-100\n LOAD1_AVG = 8-999999\n NBR_CPU = 8\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: User versus system imbalance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Highlight hosts where user time dominates while idle time collapses."
+    },
+    {
+      "kind": "paragraph",
+      "text": " SERVER = %DEV%\n USR_TOTAL = 70-100\n IDLE_TOTAL = 0-15\n WAIT_TRUE = 5-100\n SYS_TOTAL = 10-40\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Kernel churn review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Sample several OS-level counters for a weekly stability report."
+    },
+    {
+      "kind": "paragraph",
+      "text": " HOST = %QAS%\n INT_SEC = 5000-999999999\n SYSC_SEC = 8000-999999999\n CS_SEC = 12000-999999999\n LOAD15_AVG = 4-999999\n TYPE = 1\n SUBTYPE = 2\n SERIALNR = 0-32767\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 5: Percentage based monitoring"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Alert when CPU utilization percentage exceeds 85% for performance management"
+    },
+    {
+      "kind": "paragraph",
+      "text": " CPU_USAGE = >85"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Absolute value based monitoring  "
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Enterprise-scale CPU monitoring using absolute load thresholds for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": " LOAD5_AVG = >2"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "CPU_USAGE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "CS_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "HOST",
+          "Name of Application Server",
+          "CHAR(32)",
+          "MSHOST2"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "IDLE_TOTAL",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "IDLE_TRUE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "INT_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "LOAD15_AVG",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "LOAD1_AVG",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "LOAD5_AVG",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "NBR_CPU",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "SERIALNR",
+          "Serial number in saposcol result structure",
+          "INT2(5)",
+          "COLLSERNR"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "SERVER",
+          "Application Server Name",
+          "CHAR(40)",
+          "MSNAME2"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "SUBTYPE",
+          "Subtype in saposcol result structure",
+          "INT2(5)",
+          "COLLSUBTYP"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "SYSC_SEC",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "SYS_TOTAL",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "TYPE",
+          "Type in saposcol result structure",
+          "INT2(5)",
+          "COLLTYPE"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "USR_TOTAL",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_01_SRV_CPU",
+          "WAIT_TRUE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "  FUNCTION /SKN/F_SW_01_01_SRV_CPU.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SRV_CPU OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_MULTY: DURATION /SKN/E_SW_DURATION,\n            SERVER   MSNAME2,\n            HOST     MSHOST2,\n            NBR_CPU  INT4_DATA,\n            LOAD1_AVG  INT4_DATA,\n            LOAD5_AVG  INT4_DATA,\n            LOAD15_AVG  INT4_DATA,\n            INT_SEC  INT4_DATA,\n            SYSC_SEC  INT4_DATA,\n            CS_SEC  INT4_DATA,\n            USR_TOTAL  INT4_DATA,\n            SYS_TOTAL  INT4_DATA,\n            IDLE_TOTAL  INT4_DATA,\n            IDLE_TRUE  INT4_DATA,\n            WAIT_TRUE  INT4_DATA,\n            CPU_USAGE  INT4_DATA.\n            .\nDATA_SINGLE: AGGR_LEVEL CHAR1.\nDATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,\n             LANGU LANGU,\n             NUMBER SY-TABIX,\n             SUBRC SY-SUBRC,\n             MANAGE_IN_UTC CHAR1.\nDATA: LS_SRV_LIST TYPE  MSXXLIST,\n      LT_SRV_LIST LIKE TABLE OF LS_SRV_LIST.\nDATA: LV_LOGICAL_DESTINATION TYPE RFCDEST.\nDATA: F_CPU_ALL_READ LIKE  DEF_PAR_FU-NO_YES,\n      ACTIVEFLAG LIKE  DEF_PAR_FU-ACTIVEFLAG,\n      INTERVAL LIKE  DEF_PAR_FU-INTERVAL,\n      OP_SYSTEM LIKE  DEF_PAR_FU-OPSYSTEM,\n      DETAILSCOLL LIKE  DEF_PAR_FU-DETAILSCOL,\n      DETAILSREQI LIKE  DEF_PAR_FU-DETAILSREQ,\n      DETAILSMODE LIKE  DEF_PAR_FU-DETAILSMOD,\n      LASTCOLLWRT LIKE  DEF_PAR_FU-LASTCOLLWR,\n      LASTCOLLINT LIKE  DEF_PAR_FU-LASTCOLLIN,\n      NORMCOLLINT LIKE  DEF_PAR_FU-NORMCOLLIN.\nDATA: LS_CPU_ALL TYPE CPU_ALL,\n      LT_CPU_ALL LIKE TABLE OF LS_CPU_ALL.\nDATA: LS_DATA LIKE LINE OF T_DATA,\n      LT_DATA LIKE TABLE OF LS_DATA.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\nDATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.\nDATA: LV_NO_SERVER_LIST(1) TYPE C.\n*-- Fill Selection Option Tables\nSELECT_MULTY: DURATION,\n            SERVER,\n            HOST,\n            NBR_CPU,\n            LOAD1_AVG,\n            LOAD5_AVG,\n            LOAD15_AVG,\n            INT_SEC,\n            SYSC_SEC,\n            CS_SEC,\n            USR_TOTAL,\n            SYS_TOTAL,\n            IDLE_TOTAL,\n            IDLE_TRUE,\n            WAIT_TRUE,\n            CPU_USAGE.\n LV_DURATION_UNIT = 'M'.\n SELECT_SINGLE: DURATION_UNIT,\n                MANAGE_IN_UTC,\n                LANGU.\n SELECT_SINGLE: AGGR_LEVEL.\n SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n PROCESS_ICON = ICON_DELETE.\n\"--- Run Clood Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  REFRESH: LT_DATA.\n  CLEAR LV_NO_SERVER_LIST.\n* get a list of all running instances & name of own instance\n  CALL FUNCTION 'TH_SERVER_LIST'\n     DESTINATION LV_SW_DEST\n\"      exporting\n\"           SERVICES = 255\n       TABLES\n            LIST     = LT_SRV_LIST\n      EXCEPTIONS\n        NO_SERVER_LIST        = 1\n        SYSTEM_FAILURE        = 2\n        COMMUNICATION_FAILURE = 3\n        OTHERS                = 9.\n    IF SY-SUBRC IS NOT INITIAL .\n      CASE SY-SUBRC.\n        WHEN 1.  \" NO_SERVER_LIST\n          LV_NO_SERVER_LIST = 'X'.\n        WHEN OTHERS.\n         \" exit.\n      ENDCASE.\n    ENDIF.\n    IF LV_NO_SERVER_LIST IS NOT INITIAL. \" Add fictive Item\n      CLEAR LS_SRV_LIST.\n      \"ls_SRV_LIST-NAME = lv_SW_DEST.\n      APPEND LS_SRV_LIST TO LT_SRV_LIST.\n  ENDIF.\n    LOOP AT LT_SRV_LIST INTO LS_SRV_LIST.\n      LV_LOGICAL_DESTINATION = LS_SRV_LIST-NAME.\n      REFRESH LT_CPU_ALL.\n      CALL FUNCTION 'GET_CPU_ALL'\n        DESTINATION LV_SW_DEST\n        EXPORTING\n          LOCAL_REMOTE                         = 'INTERN'\n          LOGICAL_DESTINATION                  = LV_LOGICAL_DESTINATION\n        IMPORTING\n          F_CPU_ALL_READ                       = F_CPU_ALL_READ\n          ACTIVEFLAG                           = ACTIVEFLAG\n          INTERVAL                             = INTERVAL\n          OP_SYSTEM                            = OP_SYSTEM\n          DETAILSCOLL                          = DETAILSCOLL\n          DETAILSREQI                          = DETAILSREQI\n          DETAILSMODE                          = DETAILSMODE\n          LASTCOLLWRT                          = LASTCOLLWRT\n          LASTCOLLINT                          = LASTCOLLINT\n          NORMCOLLINT                          = NORMCOLLINT\n        TABLES\n          TF_CPU_ALL                           = LT_CPU_ALL\n        EXCEPTIONS\n          INTERNAL_ERROR_ADRESS_FAILED         = 1\n          INTERNAL_ERROR_DIFFERENT_FIELD       = 2\n          INTERNAL_ERROR_NO_NEW_LINE           = 3\n          COLLECTOR_NOT_RUNNING                = 4\n          SHARED_MEMORY_NOT_AVAILABLE          = 5\n          COLLECTOR_BUSY                       = 6\n          VERSION_CONFLICT                     = 7\n          NO_NETWORK_COLLECTOR_RUNNING         = 8\n          SYSTEM_FAILURE                       = 9\n          COMMUNICATION_FAILURE                = 10\n          OTHERS                               = 11.\n      IF SY-SUBRC <> 0.\n* Implement suitable error handling here\n      ENDIF.\n      LOOP AT LT_CPU_ALL INTO LS_CPU_ALL.\n        CLEAR: LS_DATA.\n        MOVE-CORRESPONDING LS_CPU_ALL TO LS_DATA.\n        LS_DATA-SERVER = LS_SRV_LIST-NAME.\n        LS_DATA-HOST   = LS_SRV_LIST-HOST.\n        LS_DATA-CPU_USAGE = 100 - LS_DATA-IDLE_TOTAL. \"Calcing the current cpu % usage.\n        APPEND LS_DATA TO LT_DATA.\n      ENDLOOP.\n    ENDLOOP.\n***  delete lt_wp_total_info where WP_TYP not in R_WP_TYP.\n***  delete lt_wp_total_info where WP_ISTATUS not in R_WP_ISTATUS.\n T_DATA[] = LT_DATA[].\n****-- Fill Duration Value\n*** sy_datlo = sy-datum.   \"--- System Date/Time\n*** sy_timlo = sy-uzeit.\n*** loop at T_DATA .\n***   sy_tabix = sy-tabix.\n***   T_DATA-DURATION_UNIT = lv_DURATION_UNIT.\n***   if t_data-STARTDATE is initial.\n***     continue.\n***   endif.\n***    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n***        EXPORTING\n***          D_FROM            = t_data-STARTDATE\n***          T_FROM            = t_data-STARTTIME\n***          D_TO              = sy_datlo\n***          T_TO              = sy_timlo\n***          TIME_UNIT         = lv_DURATION_UNIT\n***        IMPORTING\n***          TIME_DIFF         = TIME_DIFF\n***        EXCEPTIONS\n***          WRONG_VALUE       = 1\n***          OTHERS            = 2    .\n***      IF SY-SUBRC = 0.\n***        T_DATA-DURATION = TIME_DIFF .\n***      else.\n***        T_DATA-DURATION = '999999'.\n***      endif.\n***   modify T_DATA index sy_tabix .\n*** endloop .\n DELETE T_DATA WHERE SERVER NOT IN R_SERVER.\n DELETE T_DATA WHERE HOST NOT IN R_HOST.\n DELETE T_DATA WHERE NBR_CPU NOT IN R_NBR_CPU.\n DELETE T_DATA WHERE NBR_CPU NOT IN R_NBR_CPU.\n DELETE T_DATA WHERE LOAD1_AVG NOT IN R_LOAD1_AVG.\n DELETE T_DATA WHERE LOAD5_AVG NOT IN R_LOAD5_AVG.\n DELETE T_DATA WHERE LOAD15_AVG NOT IN R_LOAD15_AVG.\n DELETE T_DATA WHERE INT_SEC NOT IN R_INT_SEC.\n DELETE T_DATA WHERE SYSC_SEC NOT IN R_SYSC_SEC.\n DELETE T_DATA WHERE CS_SEC NOT IN R_CS_SEC.\n DELETE T_DATA WHERE USR_TOTAL NOT IN R_USR_TOTAL.\n DELETE T_DATA WHERE SYS_TOTAL NOT IN R_SYS_TOTAL.\n DELETE T_DATA WHERE IDLE_TOTAL NOT IN R_IDLE_TOTAL.\n DELETE T_DATA WHERE IDLE_TRUE NOT IN R_IDLE_TRUE.\n DELETE T_DATA WHERE WAIT_TRUE NOT IN R_WAIT_TRUE.\n DELETE T_DATA WHERE CPU_USAGE NOT IN R_CPU_USAGE.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

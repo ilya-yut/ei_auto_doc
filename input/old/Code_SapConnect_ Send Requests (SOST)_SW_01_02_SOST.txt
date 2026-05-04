@@ -1,0 +1,258 @@
+FUNCTION /SKN/F_SW_01_02_SOST.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_02_SOST OPTIONAL
+*"----------------------------------------------------------------------
+DATA_MULTY: STATE_COLOR /SKN/E_SW_STATE_COLOR,
+            DATUM     SY-DATUM,
+            DURATION   /SKN/E_SW_DURATION,
+            SENDER    XUBNAME,
+            SND_DATE SO_DAT_SD,
+            SND_TIME SO_TIM_SD,
+            SNDART   SX_ADDRTYP.
+DATA_SINGLE: BACKDAYS       INT4,
+             LANGU          LANGU,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             NUMBER         SY-TABIX,
+             SUBRC          SY-SUBRC,
+             MANAGE_IN_UTC  CHAR1,
+             MAX_RECORDS    INT4.
+DATA_SINGLE: STAT_WAIT      SOST_STATUS_WAIT,
+             STAT_TRANSIT   SOST_STATUS_TRANSIT,
+             STAT_OK        SOST_STATUS_OK,
+             STAT_ERROR     SOST_STATUS_ERROR,
+             STAT_INCONS    SOST_STATUS_INCONS,
+             STAT_FUTURE    SOST_STATUS_FUTURE,
+             STAT_RETRY     SOST_STATUS_RETRY,
+             STAT_DIRECT    SOST_STATUS_DIRECT,
+             STAT_ACTIVE    SOST_STATUS_ACTIVE.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : SY_DATLO LIKE SY-DATLO ,
+       SY_TIMLO LIKE SY-TIMLO .
+DATA:  DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM.
+DATA : TIME_DIFF TYPE  INT4 .
+*data : is_out(1) type C.
+*data: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.
+*data: R_SND_DATE type SXDATRNGT,
+*      RS_SND_DATE like LINE OF R_SND_DATE.
+*
+*data: R_SND_TIME type SXTIMRNGT,
+*      RS_SND_TIME like LINE OF R_SND_TIME.
+DATA: LS_STATUS TYPE SOSTSTATUS.
+*data: R_SENDER type SXSENDERRNGT,
+*      RS_SENDER like LINE OF R_SENDER.
+DATA: LV_MAXSEL  TYPE TBMAXSEL.
+DATA: LT_SNDRECS TYPE SOXSP2TAB,
+      LS_SNDRECS LIKE LINE OF LT_SNDRECS.
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LV_DOMNAME TYPE  DDOBJNAME,
+      LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+      LS_DD07V TYPE  DD07V.
+DATA: LV_MSG_NUMBER LIKE  BAPIRET2-NUMBER.
+DEFINE SET_STATUS.
+  LS_STATUS-&1 = LV_STAT_&1.
+END-OF-DEFINITION.
+*-- Fill Selection Option Tables
+   SELECT_MULTY: STATE_COLOR,
+                 DATUM,
+                 DURATION,
+                 SENDER,
+                 SND_DATE,
+                 SND_TIME,
+                 SNDART.
+   LV_LANGU = SY-LANGU.
+   LV_DURATION_UNIT = 'M'.
+   SELECT_SINGLE: BACKDAYS,
+                  DURATION_UNIT,
+                  MANAGE_IN_UTC,
+                  LANGU,
+                  MAX_RECORDS.
+   SELECT_SINGLE: STAT_WAIT,
+                  STAT_TRANSIT,
+                  STAT_OK,
+                  STAT_ERROR,
+                  STAT_INCONS,
+                  STAT_FUTURE,
+                  STAT_RETRY,
+                  STAT_DIRECT,
+                  STAT_ACTIVE.
+ DATA_SINGLE:   SW_DEST RFCDEST.
+ SELECT_SINGLE: SW_DEST.
+ DATA: LV_FM TYPE FUNCNAME.
+ DATA_MULTY: STATUS SO_REC_STA.
+ SELECT_MULTY: STATUS.
+*** SET_SY_TIME lv_MANAGE_IN_UTC sy_datlo sy_timlo .
+*** TIME_SHIFT sy_datlo sy_timlo . " TIME_SHIFT parameter
+""_set_sys_date_time lv_sw_dest sy_datlo sy_timlo.
+_GET_CURRENT_DATE_TIME LV_MANAGE_IN_UTC LV_SW_DEST SY_DATLO SY_TIMLO.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+   IF LV_BACKDAYS IS INITIAL.
+     LV_BACKDAYS = 1.
+   ENDIF.
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+***      DATE_FROM = sy-datum - lv_BACKDAYS .
+      DATE_FROM = SY_DATLO - LV_BACKDAYS .
+      RS_DATUM-LOW = DATE_FROM .
+      APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+  IF R_SND_DATE[] IS INITIAL.
+    R_SND_DATE[] = R_DATUM[].
+   ENDIF.
+*  refresh R_SND_DATE.
+*  loop at R_DATUM into RS_DATUM.
+*    move-corresponding RS_DATUM to RS_SND_DATE.
+*    append RS_SND_DATE to R_SND_DATE.
+*  endloop.
+  "-- Set Status -----
+   "-- Set Default Status
+   SET_STATUS: WAIT,
+               TRANSIT,
+               OK,
+               ERROR,
+               INCONS,
+               FUTURE,
+               RETRY,
+               DIRECT,
+               ACTIVE.
+   IF  LS_STATUS IS INITIAL.
+     LS_STATUS-WAIT = 'X'.
+     LS_STATUS-ERROR = 'X'.
+     LS_STATUS-INCONS = 'X'.
+     LS_STATUS-TRANSIT = 'X'.
+     LS_STATUS-OK = 'X'.
+   ENDIF.
+  "-- Max Records -----
+  LV_MAXSEL = 500.
+  IF LV_MAX_RECORDS IS NOT INITIAL.
+    LV_MAXSEL = LV_MAX_RECORDS.
+  ENDIF.
+   CALL FUNCTION 'SX_SNDREC_SELECT'
+     DESTINATION LV_SW_DEST
+     EXPORTING
+*      SND_ART             =
+       SND_DATE            = R_SND_DATE
+       SND_TIME            = R_SND_TIME
+*      DEL_DATE            =
+*      DEL_TIME            =
+       STATUS              = LS_STATUS
+*      NOTIFICATIONS       =
+       SENDER              = R_SENDER
+       MAXSEL              = LV_MAXSEL
+*      ALL_WAITING         = 'X'
+     IMPORTING
+       SNDRECS             = LT_SNDRECS.
+   DELETE LT_SNDRECS WHERE: SNDART NOT IN R_SNDART.
+   DELETE LT_SNDRECS WHERE: STAT_DATE NOT IN R_SND_DATE.
+   DELETE LT_SNDRECS WHERE: STATUS NOT IN R_STATUS.
+   LOOP AT LT_SNDRECS INTO LS_SNDRECS.
+     MOVE-CORRESPONDING LS_SNDRECS TO LS_DATA.
+     IF LV_SW_DEST IS NOT INITIAL.
+       LV_FM = '/SKN/FC_SW_01_GET_ADDR_DETAILS'.
+     ELSE.
+       LV_FM = '/SKN/F_SW_01_GET_ADDR_DETAILES'.
+     ENDIF.
+     CALL FUNCTION LV_FM  " '/SKN/F_SW_01_GET_ADDR_DETAILES'
+       EXPORTING
+         ADRNR            = LS_DATA-ADRNR
+       IMPORTING
+         NAME_TEXT        = LS_DATA-RC_NAME
+       EXCEPTIONS
+         NO_DATA          = 1
+         OTHERS           = 2.
+     IF SY-SUBRC <> 0.
+     ENDIF.
+     IF LS_DATA-MSGTY IS INITIAL.
+       IF LS_DATA-STATUS IS NOT INITIAL.
+         LS_DATA-MSGTY = LS_DATA-STATUS+0(1).
+         T_DATA-MSGV1 = '672'.
+       ENDIF.
+     ENDIF.
+     CALL FUNCTION '/SKN/F_SW_01_02_SOST_STATUS'
+       EXPORTING
+         MSGTY             = LS_DATA-MSGTY
+       IMPORTING
+         STATUS_DESC       = LS_DATA-STATUS_DESC
+         STATE_COLOR       = LS_DATA-STATE_COLOR
+         STATE_ICON        = LS_DATA-STATE_ICON.
+     LV_DOMNAME = 'SX_ADDRTYP'.
+     LV_DOMVALUE = LS_DATA-SNDART.
+     CALL FUNCTION 'DDUT_DOMVALUE_TEXT_GET'
+          EXPORTING   NAME          = LV_DOMNAME
+                      VALUE         = LV_DOMVALUE
+                      LANGU         = LV_LANGU
+                      TEXTS_ONLY    = 'X'
+          IMPORTING   DD07V_WA      = LS_DD07V
+          EXCEPTIONS  OTHERS        = 1.
+      IF SY-SUBRC IS INITIAL.
+        LS_DATA-SNDART_DESC = LS_DD07V-DDTEXT.
+      ENDIF.
+     APPEND LS_DATA TO T_DATA.
+   ENDLOOP.
+  DELETE T_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-STAT_DATE
+          T_FROM            = T_DATA-STAT_TIME
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+ DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*Add Message text detail
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+    IF NOT T_DATA-MSGID IS INITIAL.
+      LV_MSG_NUMBER = T_DATA-STATUS.
+      IF LV_MSG_NUMBER IS INITIAL.
+        CONTINUE.
+      ENDIF.
+      CALL FUNCTION 'BAPI_MESSAGE_GETDETAIL'
+        DESTINATION LV_SW_DEST
+        EXPORTING
+          ID                = T_DATA-MSGID        "SOST_MSGID   "STAMID
+          NUMBER            = LV_MSG_NUMBER
+          LANGUAGE          = LV_LANGU
+          TEXTFORMAT        = 'ASC'
+*         LINKPATTERN       =
+          MESSAGE_V1        = T_DATA-MSGV1        "STAPA1
+          MESSAGE_V2        = T_DATA-MSGV2        "STAPA2
+          MESSAGE_V3        = T_DATA-MSGV3         "STAPA3
+          MESSAGE_V4        = T_DATA-MSGV4         "STAPA4
+        IMPORTING
+          MESSAGE           = T_DATA-MESSAGE
+*         RETURN            =
+*       TABLES
+*         TEXT              =
+                .
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

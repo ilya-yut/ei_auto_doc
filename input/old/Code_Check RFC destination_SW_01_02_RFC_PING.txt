@@ -1,0 +1,170 @@
+FUNCTION /SKN/F_SW_01_02_RFC_PING.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_02_RFC_PING OPTIONAL
+*"----------------------------------------------------------------------
+RANGES : R_RFCDEST FOR /SKN/T_SW_RFC-RFCDEST ,
+         R_STATE_COLOR FOR /SKN/S_SW_SYS_RFC_PING-STATE_COLOR.
+DATA :   IS_GENERAL(1) TYPE C.
+DATA : WA TYPE /SKN/T_SW_RFC.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : RFCDEST TYPE RFCDEST.
+DATA : RFC_MESS(255) TYPE C .
+DATA : IS_ERROR(1) TYPE C.
+DATA : RC TYPE  SYSUBRC,
+       ERR_MSG TYPE  /SKN/E_SW_ERROR.
+DATA: FM TYPE FUNCNAME.
+*-- Fill Selection Option Tables
+   LOOP AT T_SELECT WHERE FIELDNM = 'RFCDEST'.
+     MOVE-CORRESPONDING T_SELECT TO R_RFCDEST.
+     APPEND R_RFCDEST.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.
+     MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.
+     APPEND R_STATE_COLOR.
+   ENDLOOP.
+   IS_GENERAL = 'X'.
+   LOOP AT T_SELECT WHERE FIELDNM = 'IS_GENERAL'.
+     IF NOT T_SELECT-LOW IS INITIAL.
+       IS_GENERAL = 'X'.
+     ENDIF.
+     EXIT .
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'LIST_FROM_TABLE'.
+     IF NOT T_SELECT-LOW IS INITIAL.
+       CLEAR IS_GENERAL.
+     ENDIF.
+     EXIT .
+   ENDLOOP.
+"--- Logon Chek
+  DATA_SINGLE: LOGON_CHECK CHAR1.             .
+  SELECT_SINGLE: LOGON_CHECK.
+   FM = 'RFC_PING'.
+   IF LV_LOGON_CHECK IS NOT INITIAL.
+     FM = 'RFCPING'.
+   ENDIF.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_02_RFC_PING'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  IF IS_GENERAL IS INITIAL.
+    SELECT *
+      FROM /SKN/T_SW_RFC
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA
+      WHERE  RFCDEST IN R_RFCDEST
+        AND  IS_ACTIVE > ' '.
+   ELSE.
+     IF NOT R_RFCDEST[] IS INITIAL.
+    SELECT *
+      FROM RFCDES
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA
+      WHERE  RFCDEST IN R_RFCDEST .
+     ENDIF.
+   ENDIF.
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+    CLEAR IS_ERROR.
+    " Test RFC Destinations
+    RFCDEST = T_DATA-RFCDEST.
+    IF NOT RFCDEST IS INITIAL .
+      IF ( T_DATA-RFCTYPE = 'G' OR T_DATA-RFCTYPE =  'H' ).
+        CALL FUNCTION '/SKN/F_SW_01_CHECK_RFC_HTTP'
+          EXPORTING
+            DEST          = RFCDEST
+          IMPORTING
+            RC            = RC
+            ERR_MSG       = ERR_MSG.
+        IF RC IS NOT INITIAL.
+          IS_ERROR = 'X'.
+        ENDIF.
+        RFC_MESS = ERR_MSG.
+      ELSE.
+        CALL FUNCTION  FM   " 'RFC_PING'
+          DESTINATION  RFCDEST
+          EXCEPTIONS SYSTEM_FAILURE = 1
+                     MESSAGE RFC_MESS
+                     COMMUNICATION_FAILURE = 2
+                     MESSAGE RFC_MESS
+                     OTHERS            = 9 .
+        IF SY-SUBRC <> 0 AND SY-SUBRC < 9.
+          IS_ERROR = 'X'.
+        ENDIF.
+      ENDIF.
+      IF IS_ERROR IS NOT INITIAL.
+        T_DATA-ERR_MSG = RFC_MESS.
+        T_DATA-UDATE = SY-DATUM.
+        T_DATA-UTIME = SY-UZEIT.
+        T_DATA-STATE_COLOR = 'R'.
+        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+          EXPORTING
+            STATE_COLOR       = T_DATA-STATE_COLOR
+          IMPORTING
+            STATE_ICON        = T_DATA-STATE_ICON         .
+         MODIFY T_DATA INDEX SY_TABIX.
+      ELSE.
+        T_DATA-ERR_MSG = 'OK'.
+        T_DATA-UDATE = SY-DATUM.
+        T_DATA-UTIME = SY-UZEIT.
+        T_DATA-STATE_COLOR = 'G'.
+        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+          EXPORTING
+            STATE_COLOR       = T_DATA-STATE_COLOR
+          IMPORTING
+            STATE_ICON        = T_DATA-STATE_ICON         .
+        "--- Set Local Date-Time
+        CALL FUNCTION '/SKN/F_SW_DT_GET_SYSTEM'
+          EXPORTING
+            DEST                        = T_DATA-RFCDEST
+          IMPORTING
+            SYS_DATE                    = T_DATA-LOCAL_DATE
+            SYS_TIME                    = T_DATA-LOCAL_TIME
+          EXCEPTIONS
+            COMMUNICATION_FAILURE       = 1
+            OTHERS                      = 2.
+        IF SY-SUBRC = 0.
+          MODIFY T_DATA INDEX SY_TABIX.
+        ENDIF.
+         MODIFY T_DATA INDEX SY_TABIX.
+      ENDIF .
+     ENDIF .
+  ENDLOOP.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF T_DATA-RFCDEST_DESC IS INITIAL.
+      SELECT SINGLE RFCDOC1
+        INTO T_DATA-RFCDEST_DESC
+        FROM RFCDOC
+        WHERE RFCDEST = T_DATA-RFCDEST
+          AND RFCLANG = SY-LANGU .
+      IF SY-SUBRC IS INITIAL.
+        MODIFY T_DATA INDEX SY_TABIX.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.
+      DELETE T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

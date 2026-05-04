@@ -1,0 +1,144 @@
+FUNCTION /SKN/F_SW_01_03_TAB_REC_COUNT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_TAB_REC_COUNT OPTIONAL
+*"----------------------------------------------------------------------
+DATA: R_COND TYPE RANGE OF SO_TEXT.
+DATA: RS_COND LIKE LINE OF R_COND.
+"--- Add Parameter for Compare State & Attr Compare String
+DATA: LV_DEST TYPE RFCDEST,
+      LV_TAB  TYPE TABNAME,
+      LV_LANGU TYPE LANGU.
+"------------------------------------------
+DATA: LS_COND TYPE  RFC_DB_OPT.
+DATA: LT_COND LIKE TABLE OF LS_COND.
+"------------------------------------------
+DATA : ROWCOUNT TYPE INT4.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA: QUERY_TABLE TYPE TABNAME,
+      LS_OPTIONS  TYPE  RFC_DB_OPT,
+      LT_OPTIONS LIKE TABLE OF LS_OPTIONS. " ,
+DATA: LS_DATA LIKE LINE OF T_DATA.
+**-- Fill Selection Option Tables
+SELECT_SINGLE: DEST,
+               TAB,
+               LANGU.
+IF LV_LANGU IS INITIAL.
+  LV_LANGU = SY-LANGU.
+ENDIF.
+SELECT_MULTY: COND.
+ DATA_SINGLE:   SW_DEST RFCDEST.
+ SELECT_SINGLE: SW_DEST.
+ DATA: LV_FM TYPE FUNCNAME.
+ CLEAR IS_ALERT .
+ REFRESH T_DATA.
+ "---- Prepare Input Parameters (tables)
+ REFRESH: LT_COND.
+ "--- Fill Condition Criteria
+ REFRESH LT_COND.
+ CLEAR LS_COND.
+ LOOP AT R_COND INTO RS_COND.
+   LS_COND-TEXT = RS_COND-LOW.
+   APPEND LS_COND TO LT_COND.
+ ENDLOOP.
+*  "--- Retrieve Table data Count
+     QUERY_TABLE = LV_TAB.
+   "--- Where Condition Prepare
+   REFRESH LT_OPTIONS.
+   LOOP AT LT_COND INTO LS_COND.
+     MOVE-CORRESPONDING LS_COND TO LS_OPTIONS.
+     APPEND LS_OPTIONS TO LT_OPTIONS.
+   ENDLOOP.
+     IF LV_SW_DEST IS NOT INITIAL.
+       LV_FM = '/SKN/FC_SW_RFC_TABLE_REC_CNT'.
+       CALL FUNCTION 'FUNCTION_EXISTS'
+         EXPORTING
+           FUNCNAME                 = LV_FM
+         EXCEPTIONS
+           FUNCTION_NOT_EXIST       = 1
+           OTHERS                   = 2.
+       IF SY-SUBRC = 0.
+         CALL FUNCTION LV_FM " '/SKN/F_SW_RFC_TABLE_REC_CNT'
+           EXPORTING
+             QUERY_TABLE       = QUERY_TABLE
+             SW_DEST           = LV_SW_DEST
+           IMPORTING
+             ROWCOUNT          = ROWCOUNT
+           TABLES
+             OPTIONS           = LT_OPTIONS
+          EXCEPTIONS
+            TABLE_NOT_AVAILABLE       = 1
+            TABLE_WITHOUT_DATA        = 2
+            OPTION_NOT_VALID          = 3
+            OTHERS                    = 4.
+       ENDIF.
+     ELSE.
+       LV_FM = '/SKN/F_SW_RFC_TABLE_REC_CNT'.
+       CALL FUNCTION LV_FM " '/SKN/F_SW_RFC_TABLE_REC_CNT'
+         EXPORTING
+           QUERY_TABLE       = QUERY_TABLE
+         IMPORTING
+           ROWCOUNT          = ROWCOUNT
+         TABLES
+           OPTIONS           = LT_OPTIONS
+        EXCEPTIONS
+          TABLE_NOT_AVAILABLE       = 1
+          TABLE_WITHOUT_DATA        = 2
+          OPTION_NOT_VALID          = 3
+          OTHERS                    = 4.
+       ENDIF.
+     IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+     ENDIF.
+    "--- Fill Output Table
+    REFRESH T_DATA.
+    CLEAR LS_DATA.
+    LS_DATA-TAB = LV_TAB.
+    LS_DATA-RECORDS = ROWCOUNT.
+    LS_DATA-DEST = LV_SW_DEST.
+    CLEAR LS_DATA-TAB_DESC.
+    IF LV_SW_DEST IS NOT INITIAL.
+      LV_FM = '/SKN/FC_SW_TABLE_DESC'.
+      CALL FUNCTION 'FUNCTION_EXISTS'
+        EXPORTING
+          FUNCNAME                 = LV_FM
+        EXCEPTIONS
+          FUNCTION_NOT_EXIST       = 1
+          OTHERS                   = 2.
+      IF SY-SUBRC = 0.
+        CALL FUNCTION LV_FM  "'/SKN/F_SW_TABLE_DESC'
+          EXPORTING
+            TABNAME        = LS_DATA-TAB
+            LANGU          = LV_LANGU
+            SW_DEST           = LV_SW_DEST
+          IMPORTING
+            TAB_DESC       = LS_DATA-TAB_DESC
+          EXCEPTIONS
+            WRONG_TABLE                       = 1
+            NO_DESCRIPTION_FOR_LANGUAGE       = 2
+            OTHERS                            = 3.
+      ENDIF.
+    ELSE.
+      LV_FM = '/SKN/F_SW_TABLE_DESC'.
+    CALL FUNCTION LV_FM  "'/SKN/F_SW_TABLE_DESC'
+      EXPORTING
+        TABNAME        = LS_DATA-TAB
+        LANGU          = LV_LANGU
+      IMPORTING
+        TAB_DESC       = LS_DATA-TAB_DESC
+      EXCEPTIONS
+        WRONG_TABLE                       = 1
+       NO_DESCRIPTION_FOR_LANGUAGE       = 2
+       OTHERS                            = 3.
+    ENDIF.
+    IF SY-SUBRC = 0.
+      APPEND LS_DATA TO T_DATA.
+    ENDIF.
+ DESCRIBE TABLE T_DATA LINES SY-TFILL .
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

@@ -1,0 +1,138 @@
+  FUNCTION /SKN/F_SW_01_01_STRUST_NEW.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_STRUST_NEW OPTIONAL
+*"----------------------------------------------------------------------
+**   Logic based on report  ssf_alert_certexpire
+    DATA_MULTY:   APPLIC   SSFAPPLSSL,
+                  CONTEXT  PSECONTEXT,
+                  VALID_FROM DATUM,
+                  VALID_TO   DATUM,
+                  DURATION /SKN/E_SW_DURATION.
+    DATA_SINGLE: LANGU LANGU,
+                 FORWDAYS INT4,
+                 BACKDAYS INT4,
+                 MANAGE_IN_UTC CHAR1,
+                 DATE_VALID_TO   DATUM,
+                 SW_DEST  RFCDEST.
+    DATA : SY_TABIX LIKE SY-TABIX .
+    DATA :   SY_DATLO LIKE SY-DATLO ,
+             SY_TIMLO LIKE SY-TIMLO .
+    DATA : TIME_DIFF TYPE  INT4 .
+*-- Fill Selection Option Tables
+***    BREAK: MISHAMI.
+    SELECT_MULTY: APPLIC,
+                  CONTEXT,
+                  VALID_FROM,
+                  VALID_TO.
+    LV_LANGU = SY-LANGU.
+    SELECT_SINGLE: MANAGE_IN_UTC,
+                   FORWDAYS,
+                   BACKDAYS,
+                   LANGU,
+                   SW_DEST.
+***  set_sy_time lv_manage_in_utc sy_datlo sy_timlo .
+***  time_shift sy_datlo sy_timlo . " TIME_SHIFT parameter
+    ""_set_sys_date_time lv_sw_dest sy_datlo sy_timlo.
+    _GET_CURRENT_DATE_TIME LV_MANAGE_IN_UTC LV_SW_DEST SY_DATLO SY_TIMLO.
+*--- Retrieve data
+    IF LV_FORWDAYS IS INITIAL.
+      LV_FORWDAYS  = 5000.
+    ENDIF.
+    IF LV_BACKDAYS IS INITIAL.
+      LV_BACKDAYS  = -5000.
+    ELSE.
+      LV_BACKDAYS  = LV_BACKDAYS  * -1.
+    ENDIF.
+    _RANGE DURATION I BT LV_BACKDAYS LV_FORWDAYS.
+    CLEAR IS_ALERT .
+    REFRESH: T_DATA,
+             T_DATA_TMP.
+*** BEGIN OF RFC CALL
+    DATA:
+      LV_TABNAME LIKE DFIES-TABNAME,
+      LT_OPTION TYPE TABLE OF RFC_DB_OPT,
+      LT_DATA_RFC TYPE TABLE OF /SKN/S_SW_TAB2000,
+      LT_TABLES_LIST  TYPE  /SKN/TT_TABLES,
+      LT_JOIN_CONDITION TYPE  /SKN/TT_TABLE_JOIN,
+      LWA_JOIN_CONDITION LIKE LINE OF LT_JOIN_CONDITION[],
+      LT_SEL_FIELDS TYPE  /SKN/TT_SEL_FIELDS,
+      LT_SORT_OPTIONS TYPE TABLE OF /SKN/S_SW_RFC_JOIN_DB_SORT,
+      LT_OUTPUT_FIELDS  TYPE  /SKN/TT_RFC_DB_FLD_EXTEND,
+      LWA_OUTPUT_FIELDS LIKE LINE OF LT_OUTPUT_FIELDS,
+      LT_DFIES  TYPE TABLE OF  DFIES,
+      LT_RETURN TYPE  BAPIRET2_T,
+      LV_ROWCOUNT TYPE SOID-ACCNT,
+      LWA_TABLES_LIST LIKE LINE OF LT_TABLES_LIST[],
+      LT_IN_RANGE	TYPE TABLE OF	/SKN/S_SW_RANGE_TAB,
+      LT_OUT_WHERE_COND	TYPE TABLE OF	/SKN/S_SW_WHERE_TAB,
+      LWA_IN_RANGE LIKE LINE OF LT_IN_RANGE,
+      LWA_OUT_WHERE_COND LIKE LINE OF LT_OUT_WHERE_COND.
+    PERFORM CREATE_PSE_LIST
+          USING LV_SW_DEST
+          CHANGING GT_PSE.
+* Get all PSEs except SSL server PSE when full check
+    LOOP AT GT_PSE INTO GS_PSE.
+      CLEAR: LT_DATA.
+      CALL FUNCTION 'SSFP_GET_PSEINFO'
+        DESTINATION LV_SW_DEST
+        EXPORTING
+          CONTEXT           = GS_PSE-CONTEXT
+          APPLIC            = GS_PSE-APPLIC
+          ACCEPT_NO_CERT    = 'X'
+        IMPORTING
+          CERTIFICATE       = G_CERT
+          CERTIFICATELIST   = GT_PKLIST
+        EXCEPTIONS
+          SSF_NO_SSFLIB     = 1
+          SSF_KRN_ERROR     = 2
+          SSF_INVALID_PAR   = 3 "PSE does not exist
+          SSF_UNKNOWN_ERROR = 4
+          OTHERS            = 5.
+      G_SUBRC = SY-SUBRC.
+      IF SY-SUBRC = 0.
+        MOVE-CORRESPONDING GS_PSE TO LT_DATA.
+        PERFORM CHECK_CERT_VALIDITY_WITH_LIST
+                                    USING G_CERT
+                                          GT_PKLIST
+                                          G_CTLIST
+                                          LV_SW_DEST.
+      ENDIF.
+    ENDLOOP.
+    LOOP AT T_DATA_TMP INTO LT_DATA.
+      IF NOT LT_DATA-LIST_VALID_TO IS INITIAL.
+        LV_DATE_VALID_TO = LT_DATA-LIST_VALID_TO.
+      ELSE.
+        LV_DATE_VALID_TO = LT_DATA-VALID_TO.
+      ENDIF.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = SY_DATLO
+          T_FROM      = SY_TIMLO
+          D_TO        = LV_DATE_VALID_TO
+          T_TO        = SY_TIMLO
+          TIME_UNIT   = 'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF NOT SY-SUBRC = 0.
+        TIME_DIFF = '999999'.
+      ENDIF.
+      IF TIME_DIFF  IN R_DURATION.
+        APPEND LT_DATA TO T_DATA.
+      ENDIF.
+    ENDLOOP.
+    DELETE T_DATA WHERE APPLIC NOT IN R_APPLIC.
+    DELETE T_DATA WHERE CONTEXT NOT IN R_CONTEXT.
+    CHECK T_DATA[] IS NOT INITIAL.
+*--- Check Alert Information
+    READ TABLE T_DATA INDEX 1.
+    CHECK NOT SY-TFILL IS INITIAL .
+    IS_ALERT = 'X' .
+  ENDFUNCTION.

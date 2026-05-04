@@ -1,0 +1,316 @@
+[
+  {
+    "file": "SW_01 _02_IDOCS - IDOCs State.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [
+      "·        CREDAT: Use creation-date context.",
+      "·        UPDDAT: Use last-change-date context.",
+      "·        Use code-defined date-reference mapping when explicitly provided."
+    ],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01 _02_IDOCS_CNT - IDOCs Count.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [
+      "·        DATUM: Use generic date window context.",
+      "·        UPDDAT: Use last-change date context."
+    ],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_DUMPS_COUNT - System Dumps Count.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_JOBS_CANC_N - Canceled Background Jobs Monitoring.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [
+      "STRTDATE",
+      "ENDDATE",
+      "SDLDATE",
+      "SDLSTRTDT",
+      "LASTCHDATE",
+      "RELDATE",
+      "OTHERS"
+    ],
+    "abap_has_case_lv_date_ref": true,
+    "abap_default_strtdate": true
+  },
+  {
+    "file": "SW_01_01_JOBS_CNT - Background Jobs Count.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [
+      "·        STRTDATE — Actual job start date (default when the parameter is left initial in the delegated logic).",
+      "·        ENDDATE — Job end date.",
+      "·        SDLDATE — Schedule date for the job or step.",
+      "·        SDLSTRTDT — Planned start date for the background job.",
+      "·        LASTCHDATE — Date of the last job change.",
+      "·        RELDATE — Scheduled release date.",
+      "·        OTHERS — Treated like STRTDATE in the selection branch when an unexpected value is supplied."
+    ],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_JOBS_STATE - Background Jobs Control.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [
+      "·        STRTDATE — Actual job start date (default when the parameter is left initial in code).",
+      "·        ENDDATE — Job end date.",
+      "·        SDLDATE — Schedule date for the job or step.",
+      "·        SDLSTRTDT — Planned start date for the background job.",
+      "·        LASTCHDATE — Date of the last job change.",
+      "·        RELDATE — Scheduled release date.",
+      "·        OTHERS — Treated like STRTDATE in the selection branch when an unexpected value is supplied."
+    ],
+    "case_when_values_first_block": [
+      "STRTDATE",
+      "ENDDATE",
+      "SDLDATE",
+      "SDLSTRTDT",
+      "LASTCHDATE",
+      "RELDATE",
+      "OTHERS"
+    ],
+    "abap_has_case_lv_date_ref": true,
+    "abap_default_strtdate": true
+  },
+  {
+    "file": "SW_01_01_NUM_RNG - Number Range Control Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SM12 - Application Locks Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SM13 - Update Requests Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SM13_CNT - Update Requests Count Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SM50 - Work Process Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SYS_BDC - Batch Input Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_01_SYS_IS_OPEN - System Client Status Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_LBWQ_CNT - Logistics Queue Overview.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_MSG_STATUS - Message Status Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_QRFC_IN_CNT - qRFC Inbound Queue Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_QRFC_OUT_CN - qRFC Outbound Queue Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_RFC_PING - RFC Destination Connectivity Monitoring_.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_SOST - SAPconnect Send Requests Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_SOST_CNT - SAPconnect Send Requests Count Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_TRFC - tRFC Transactional RFC Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_02_XI_MESS - XI Message Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_20_SM66 - Global Work Process Overview.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_20_SRV_CPU - Server CPU Performance Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_20_SRV_MEM - Server Memory Performance Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_20_USR_PWD - User Password State Monitoring.md",
+    "has_date_ref_fld_mention": true,
+    "doc_option_lines": [
+      "·        PWDCHGDATE — Date of Last Password Change.",
+      "·        PWDLGNDATE — Date of Last Password Logon.",
+      "·        PWDSETDATE — Date: Password Reset by Administrator.",
+      "·        PWDLOCKDATE — Date: Password Lock."
+    ],
+    "case_when_values_first_block": [
+      "PWDCHGDATE",
+      "PWDLGNDATE",
+      "PWDSETDATE",
+      "PWDLOCKDATE",
+      "OTHERS"
+    ],
+    "abap_has_case_lv_date_ref": true,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_AMS_BUFF_STAT - AMS Buffer Statistics Monitoring_.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_01_AMS_WORKLOAD - AMS Workload Indicator.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  },
+  {
+    "file": "SW_AUD_SM20_TR_START - Transaction Start Monitoring_.md",
+    "has_date_ref_fld_mention": false,
+    "doc_option_lines": [],
+    "case_when_values_first_block": [],
+    "abap_has_case_lv_date_ref": false,
+    "abap_default_strtdate": false
+  }
+]

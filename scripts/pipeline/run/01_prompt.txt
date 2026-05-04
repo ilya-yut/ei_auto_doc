@@ -28,6 +28,7 @@ Rules:
 - Tone: professional, concise. No implementation details (no internal function names, line numbers, custom namespaces, joins, output structure names). Mention only the most important tables and central fields, and only when understanding would otherwise be lacking.
 - In the narrative, mention only SAP standard entities (e.g. tables, fields, transaction codes) when necessary. Do not mention custom objects (Z*, /SKN/*, etc.) unless essential to explain the EI's functionality.
 - Output ONLY the section: heading "## General Overview" then the four parts above. No document title, no other sections, no preamble.
+- **Single heading:** Use exactly one `## General Overview` line. Do **not** also output `### General Overview` above it (duplicate titles create two headings in Word).
 - **Optional Hint:** After the input file locations you may provide a short phrase under "Hint:". If Hint is empty or omitted, analyze and write as above. If Hint is provided, use it to guide code analysis and align the explanation with that hint (e.g. emphasize purchase-side view, vendor dimension, or a specific use case); the text must still be grounded in the code and parameters.
 
 Benchmark example (format and approach only — do not copy; infer content for the function you are given):

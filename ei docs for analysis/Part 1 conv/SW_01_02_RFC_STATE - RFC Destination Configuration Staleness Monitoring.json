@@ -1,0 +1,693 @@
+{
+  "source_file": "SW_01_02_RFC_STATE - RFC Destination Configuration Staleness Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: RFC Destination Configuration Staleness Monitoring (SW_01_02_RFC_STATE)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP RFC (Remote Function Call) destination configuration staleness to ensure proper maintenance and governance of system integration components. Unlike connectivity monitoring that tests active communication, this monitoring solution focuses on configuration lifecycle management by tracking when RFC destinations were last modified or maintained, identifying potentially outdated or abandoned integration configurations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC destinations are critical integration components that enable SAP systems to communicate with other SAP systems, external applications, and third-party systems. Over time, system landscapes evolve, integration requirements change, and RFC destinations may become obsolete or require updates for security, performance, or functional reasons. Without proper governance, organizations can accumulate large numbers of unmaintained RFC destinations that pose security risks, create confusion, and complicate system administration."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed RFC destination configuration staleness monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configuration lifecycle tracking to identify RFC destinations that haven't been maintained within specified timeframes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Governance compliance monitoring for ensuring regular review and validation of integration configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security risk assessment by identifying potentially outdated or unused RFC destinations requiring attention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Administrative efficiency by highlighting RFC destinations that may require cleanup, updates, or documentation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Change management support for tracking configuration modification patterns and maintenance schedules"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes RFC destination data from the RFCDES table (RFC destination definitions) joined with RFCATTRIB table (RFC destination attributes), focusing on modification timestamps to calculate how long each destination has remained unchanged. This enables targeted analysis of configuration staleness patterns and identification of RFC destinations requiring administrative attention."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP RFC destination configurations are being properly maintained by identifying destinations that exceed specified staleness thresholds, supporting proactive configuration governance and security management practices."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFC destination configuration staleness and poor governance practices indicate administrative and security risks causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configuration Governance Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unmaintained RFC destinations accumulating over time without proper lifecycle management or periodic review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Outdated connection parameters and credentials creating security vulnerabilities and authentication failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Obsolete integration configurations remaining active without business justification or technical validation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Missing documentation and ownership information for RFC destinations complicating troubleshooting and maintenance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Security and Compliance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stale credentials and authentication configurations creating potential security exposure points"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unused RFC destinations remaining accessible without business need, expanding attack surface area"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Non-compliant connection configurations violating security policies and governance standards"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of regular review and validation processes allowing configuration drift and security gaps"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Administrative and Operational Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Administrative overhead from managing large numbers of unmaintained RFC destinations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Troubleshooting complexity caused by confusion over active vs. obsolete integration configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System performance impacts from unnecessary RFC destination definitions consuming resources"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Audit and compliance challenges due to poor configuration documentation and tracking"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review identified stale RFC destinations using SM59 transaction to assess current usage and business need"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Validate RFC destination configurations and update credentials, parameters, or documentation as required"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Test RFC connectivity for stale destinations to determine if they are still functional and needed"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Document RFC destination ownership, purpose, and business justification for governance compliance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configuration Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish RFC destination lifecycle management processes with regular review cycles and maintenance schedules"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement RFC destination governance policies defining maximum staleness thresholds and review requirements"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create RFC destination inventory and documentation standards for ownership, purpose, and maintenance tracking"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze RFC destination usage patterns to identify truly obsolete configurations for potential decommissioning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Update RFC destination configurations with current parameters, credentials, and documentation as needed"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated RFC destination staleness monitoring and alerting procedures for proactive governance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish RFC destination cleanup procedures for safely removing obsolete or unused configurations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan regular RFC destination governance reviews and maintenance cycles based on business and security requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "BACKDAYS",
+          "Back Days",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "2",
+          "CUDATE",
+          "Created On",
+          "DATS",
+          "8",
+          "0",
+          "RDIR_CDATE",
+          "RDIR_CDATE"
+        ],
+        [
+          "3",
+          "CUNAME",
+          "Created By User Name",
+          "CHAR",
+          "12",
+          "0",
+          "CREUSRNAME",
+          "CREUSRNAME"
+        ],
+        [
+          "4",
+          "DATUM",
+          "Date",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "5",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "6",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "7",
+          "LANGU",
+          "Language",
+          "LANG",
+          "1",
+          "0",
+          "LANGU",
+          "LANGU"
+        ],
+        [
+          "8",
+          "MANAGE_IN_UTC",
+          "Manage In UTC",
+          "CHAR",
+          "1",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "9",
+          "MUDATE",
+          "Last Changed On",
+          "DATS",
+          "8",
+          "0",
+          "RDIR_UDATE",
+          "RDIR_UDATE"
+        ],
+        [
+          "10",
+          "MUNAME",
+          "Changed By User Name",
+          "CHAR",
+          "12",
+          "0",
+          "MODUSRNAME",
+          "MODUSRNAME"
+        ],
+        [
+          "11",
+          "RFCDEST",
+          "RFC Destination",
+          "CHAR",
+          "32",
+          "0",
+          "RFCDEST",
+          "RFCDEST"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 11 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Back Days)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CUDATE (Created On)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when created on on CUDATE correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CUNAME (Created By User Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where created by user name on CUNAME is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM (Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, DATUM does not restrict date; when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets duration in time units as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on DURATION."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unit for elapsed time between each session's creation date and time and the evaluation clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes (preset in code before the selection read when not overridden)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day style counting where applicable to the duration helper."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU (Language)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing language (LANGU) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC (Manage In UTC)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls whether reference timestamps for filtering and duration checks are interpreted in UTC or local time."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        X — UTC mode for the relevant timestamp comparisons."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Empty or blank — local time / framework default for the application server clock context."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MUDATE (Last Changed On)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treats last changed on as a discriminator between similar rows that would otherwise look identical in a raw extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MUNAME (Changed By User Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing changed by user name (MUNAME) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST (RFC Destination)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, rfc destination on RFCDEST indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM supplies an explicit monitoring-date range when you populate it, so the evaluation clock for duration calculations and any monitor-supplied date context is anchored to calendar bounds you choose instead of relying only on relative lookback."
+    },
+    {
+      "kind": "paragraph",
+      "text": "When DATUM is not provided, BACKDAYS is the fallback that builds the lower monitoring date from the evaluation day backward for the date axis the online monitor uses before attribute rows are aged."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION and DURATION_UNIT act as an additional filter after date-oriented selection: only destinations whose computed elapsed interval from last change timestamp to the evaluation moment still fit the configured duration band remain in the extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both the date criteria (explicit DATUM or BACKDAYS-driven window) and the DURATION / DURATION_UNIT age test are applied together—rows must satisfy the date side and the duration side before the result set is considered final for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANAGE_IN_UTC shifts whether the evaluation clock used with DATUM and duration math follows UTC semantics versus local application-server time, so calendar and duration results stay consistent with how your landscape runs the monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST ranges define which logical destinations enter the join; CUNAME, CUDATE, MUNAME, and MUDATE filters refine which attribute history rows are considered part of the same evaluation pass."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LANGU aligns description lookups and language-sensitive presentation with the monitor session when populated."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed duration value until explicit bounds are supplied on the selection interface)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - initial - treated as D by code (day-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Explicit calendar window with day-based aging"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Anchor evaluation to a fiscal-year window and flag destinations unchanged for more than thirty full days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM = 20250101 - 20251231\n DURATION = 30\n DURATION_UNIT = F\n RFCDEST = PRD_*\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Relative lookback with UTC evaluation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Use default lookback while forcing UTC-aligned clocks for a productive naming slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 7\n MANAGE_IN_UTC = X\n RFCDEST = CENTRAL*\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Changer-based slice with minute cap"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Review destinations last touched by a service account with a short inactivity cap in minutes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MUNAME = SVC_RFC*\n DURATION = 360\n DURATION_UNIT = M\n RFCDEST = EXT_*\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Full bundle for integration review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Combine destination, language, duration band, and explicit monitoring dates in one pass."
+    },
+    {
+      "kind": "paragraph",
+      "text": "RFCDEST = PARTNER_A\n LANGU = E\n DATUM = 20250401 - 20250430\n DURATION = 14\n DURATION_UNIT = D\n CUNAME = ADMIN01\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "CUCLIENT",
+          "Client ID",
+          "CLNT(3)",
+          "SYMANDT"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "CUDATE",
+          "Created on",
+          "DATS(8)",
+          "RDIR_CDATE"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "CUNAME",
+          "Created by",
+          "CHAR(12)",
+          "CREUSRNAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "CUTIME",
+          "System Time",
+          "TIMS(6)",
+          "SYUZEIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "ERR_MSG",
+          "SW: Run Error",
+          "CHAR(255)",
+          "/SKN/E_SW_ERROR"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "MUCLIENT",
+          "Client ID",
+          "CLNT(3)",
+          "SYMANDT"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "MUDATE",
+          "Changed On",
+          "DATS(8)",
+          "RDIR_UDATE"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "MUNAME",
+          "Last Changed By",
+          "CHAR(12)",
+          "MODUSRNAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "MUTIME",
+          "System Time",
+          "TIMS(6)",
+          "SYUZEIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "RFCDEST",
+          "Logical Destination (Specified in Function Call)",
+          "CHAR(32)",
+          "RFCDEST"
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "RFCDEST_DESC",
+          "",
+          "CHAR(100)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_02_RFC_ATTR",
+          "RFCVERSION",
+          "Version ID for table entry",
+          "CHAR(32)",
+          "RFCVERSION"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_RFC_ATTR .\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_RFC_ATTR OPTIONAL\n*\"----------------------------------------------------------------------\nDATA_SINGLE: MANAGE_IN_UTC       CHAR1 ,\n             LANGU               LANGU,\n             BACKDAYS            INT4,\n             DURATION_UNIT /SKN/E_SW_DURATION_UNIT.\nDATA_MULTY: RFCDEST           RFCDEST,\n            CUNAME            CREUSRNAME,\n            CUDATE            RDIR_CDATE,\n            MUNAME            MODUSRNAME,\n            MUDATE            RDIR_UDATE,\n            DURATION         /SKN/E_SW_DURATION,\n            DATUM             SYDATUM . \" Paased by SW Online Monitor\nDATA : WA TYPE /SKN/T_SW_RFC.\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA : RFCDEST TYPE RFCDEST.\nDATA : RFC_MESS(255) TYPE C .\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\n*-- Fill Selection Option Tables\n   SELECT_MULTY:\n            RFCDEST,\n            CUNAME,\n            CUDATE,\n            MUNAME,\n            MUDATE,\n            DURATION,\n            DATUM.\n   LV_LANGU = SY-LANGU.\n   LV_DURATION_UNIT = 'D'.\n   SELECT_SINGLE: BACKDAYS,\n                  DURATION_UNIT,\n                  MANAGE_IN_UTC,\n                  LANGU.\n   \"--- Run Cloud Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_02_RFC_ATTR'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Cloud Mode -----\n SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .\n TIME_SHIFT SY_DATLO SY_TIMLO . \" TIME_SHIFT parameter\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n    SELECT *\n      FROM RFCDES AS R\n        INNER JOIN RFCATTRIB AS A\n          ON R~RFCDEST = A~RFCDEST\n      INTO CORRESPONDING FIELDS OF TABLE T_DATA\n      WHERE  R~RFCDEST IN R_RFCDEST\n      AND A~CUNAME IN R_CUNAME\n      AND A~MUNAME IN R_MUNAME\n      .\n*  loop at t_data.\n*    sy_tabix = sy-tabix .\n*    \" Test RFC Destinations\n*    RFCDEST = t_data-RFCDEST.\n*    if not RFCDEST is initial .\n*      CALL FUNCTION 'RFC_PING'\n*        destination  RFCDEST\n*        EXCEPTIONS SYSTEM_FAILURE = 1\n*                   MESSAGE RFC_MESS\n*                   COMMUNICATION_FAILURE = 2\n*                   MESSAGE RFC_MESS\n*                   OTHERS            = 9 .\n*\n*      if sy-subrc <> 0 and sy-subrc < 9.\n*        t_data-ERR_MSG = RFC_MESS.\n*        t_data-UDATE = sy-datum.\n*        t_data-UTIME = sy-uzeit.\n*        t_data-STATE_COLOR = 'R'.\n*        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n*          EXPORTING\n*            STATE_COLOR       = t_data-STATE_COLOR\n*          IMPORTING\n*            STATE_ICON        = t_data-STATE_ICON         .\n*         modify t_data index sy_tabix.\n*      else.\n*        t_data-ERR_MSG = 'OK'.\n*        t_data-UDATE = sy-datum.\n*        t_data-UTIME = sy-uzeit.\n*        t_data-STATE_COLOR = 'G'.\n*        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n*          EXPORTING\n*            STATE_COLOR       = t_data-STATE_COLOR\n*          IMPORTING\n*            STATE_ICON        = t_data-STATE_ICON         .\n*         modify t_data index sy_tabix.\n*      endif .\n*     endif .\n*  endloop.\n   LOOP AT T_DATA.\n     SY_TABIX = SY-TABIX.\n      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-MUDATE\n          T_FROM            = T_DATA-MUTIME\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n      MODIFY T_DATA INDEX SY_TABIX.\n    ENDLOOP.\n  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF T_DATA-RFCDEST_DESC IS INITIAL.\n      SELECT SINGLE RFCDOC1\n        INTO T_DATA-RFCDEST_DESC\n        FROM RFCDOC\n        WHERE RFCDEST = T_DATA-RFCDEST\n          AND RFCLANG = SY-LANGU .\n      IF SY-SUBRC IS INITIAL.\n        MODIFY T_DATA INDEX SY_TABIX.\n      ENDIF.\n    ENDIF.\n  ENDLOOP.\n*  loop at t_data .\n*    sy_tabix = sy-tabix .\n*    if not t_data-STATE_COLOR in R_STATE_COLOR.\n*      delete t_data index sy_tabix.\n*    endif.\n*  endloop.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

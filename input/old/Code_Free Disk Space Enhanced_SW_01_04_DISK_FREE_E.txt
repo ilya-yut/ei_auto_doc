@@ -1,0 +1,246 @@
+FUNCTION /SKN/F_SW_01_04_DISK_FREE_N.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_04_DISK_FREE_N OPTIONAL
+*"----------------------------------------------------------------------
+RANGES : R_DRIVE   FOR /SKN/S_SW_SYS_DISK_SPACE-DRIVE ,
+         R_FREE_KB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_KB,
+         R_FREE_MB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_MB ,
+         R_FREE_GB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_GB .
+DATA : DRIVE(1) TYPE C ,
+       FREE_KB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_KB ,
+       FREE_MB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_MB ,
+       FREE_GB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_GB .
+DATA : DIRECTORY LIKE SDBAIDIR-DIRECTORY ,
+       AVAILABLE LIKE SDBAIDIR-AVAILABLE ,
+       PERCENT   LIKE SDBAIDIR-PERCENT ,
+       TOTAL     LIKE SDBAIDIR-TOTAL ,
+       USED      LIKE SDBAIDIR-USED .
+DATA : IS_SPACE(1) TYPE C .
+DATA : IFREE TYPE I .
+DATA : LV_FREE_PRC TYPE F.
+DATA: LS_DESTI TYPE RFCHOSTS,
+      LT_DESTI LIKE TABLE OF LS_DESTI.
+DATA: LS_SERVER_LIST TYPE MSXXLIST,
+      LT_SERVER_LIST LIKE TABLE OF LS_SERVER_LIST.
+DATA: LS_FSYS_SINGLE TYPE FSY_SINGLE,
+      LT_FSYS_SINGLE LIKE TABLE OF LS_FSYS_SINGLE.
+DATA: LV_LOG_DEST TYPE RFCDEST.
+DATA : SY_DATLO LIKE SY-DATLO ,
+       SY_TIMLO LIKE SY-TIMLO .
+DATA: LV_NO_SERVER_LIST(1) TYPE C.
+DATA_SINGLE: DEST RFCDEST.             .
+SELECT_SINGLE: DEST.
+DATA_SINGLE:   SW_DEST RFCDEST.
+SELECT_SINGLE: SW_DEST.
+IF LV_SW_DEST IS NOT INITIAL.
+  LV_DEST = LV_SW_DEST.
+ENDIF.
+DATA_MULTY: FREE_PRC INT1,
+            USED_PRC INT1,
+            NAME MSNAME2,
+            HOST MSHOST2,
+            SERV MSSERV.
+SELECT_MULTY: FREE_PRC,
+              USED_PRC,
+              NAME,
+              HOST,
+              SERV.
+""_set_sys_date_time lv_sw_dest sy_datlo sy_timlo
+_GET_CURRENT_DATE_TIME ' ' LV_SW_DEST SY_DATLO SY_TIMLO.  .
+   LOOP AT T_SELECT WHERE FIELDNM = 'DRIVE'.
+     MOVE-CORRESPONDING T_SELECT TO R_DRIVE.
+     APPEND R_DRIVE.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_KB'.
+     MOVE-CORRESPONDING T_SELECT TO R_FREE_KB.
+     APPEND R_FREE_KB.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_MB'.
+     MOVE-CORRESPONDING T_SELECT TO R_FREE_MB.
+     APPEND R_FREE_MB.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_GB'.
+     MOVE-CORRESPONDING T_SELECT TO R_FREE_GB.
+     APPEND R_FREE_GB.
+   ENDLOOP.
+  IF R_FREE_KB[] IS INITIAL.
+   LOOP AT R_FREE_MB.
+     IFREE = R_FREE_MB-LOW .
+     R_FREE_KB-LOW = IFREE * 1024 .
+      IFREE = R_FREE_MB-HIGH .
+      R_FREE_KB-HIGH = IFREE * 1024 .
+       R_FREE_KB-SIGN = R_FREE_MB-SIGN .
+         R_FREE_KB-OPTION = R_FREE_MB-OPTION .
+          APPEND R_FREE_KB .
+   ENDLOOP .
+  ENDIF.
+  IF R_FREE_KB[] IS INITIAL.
+   LOOP AT R_FREE_GB.
+     IFREE = R_FREE_GB-LOW .
+     R_FREE_KB-LOW = IFREE * 1024 * 1024 .
+      IFREE = R_FREE_GB-HIGH .
+      R_FREE_KB-HIGH = IFREE * 1024 * 1024.
+       R_FREE_KB-SIGN = R_FREE_GB-SIGN .
+         R_FREE_KB-OPTION = R_FREE_GB-OPTION .
+          APPEND R_FREE_KB .
+   ENDLOOP .
+  ENDIF.
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  CLEAR LV_NO_SERVER_LIST.
+  REFRESH LT_DESTI.
+  CALL FUNCTION 'TH_SERVER_LIST'
+    DESTINATION        LV_DEST
+    TABLES
+      LIST = LT_SERVER_LIST
+    EXCEPTIONS
+      NO_SERVER_LIST        = 1
+      SYSTEM_FAILURE        = 2
+      COMMUNICATION_FAILURE = 3
+      OTHERS                = 9.
+  IF SY-SUBRC IS NOT INITIAL .
+    CASE SY-SUBRC.
+      WHEN 1.  " NO_SERVER_LIST
+        LV_NO_SERVER_LIST = 'X'.
+      WHEN OTHERS.
+       " exit.
+    ENDCASE.
+  ENDIF.
+  IF LV_NO_SERVER_LIST IS NOT INITIAL. " Add fictive Item
+    CLEAR LS_SERVER_LIST.
+    "ls_SERVER_LIST-NAME = lv_SW_DEST.
+    APPEND LS_SERVER_LIST TO LT_SERVER_LIST.
+  ENDIF.
+***  LOOP AT lt_SERVER_LIST into ls_SERVER_LIST.
+***    ls_DESTI-RFCDEST = ls_SERVER_LIST-NAME.
+***
+***    if lv_DEST is not initial.  "--- Cloud Mode
+***      ls_DESTI-RFCDEST = lv_DEST.
+***    endif.
+***
+***    APPEND ls_DESTI to lt_DESTI.
+***  ENDLOOP.
+  LOOP AT LT_SERVER_LIST INTO LS_SERVER_LIST.
+    IF LV_NO_SERVER_LIST IS INITIAL.
+      LV_LOG_DEST = LS_SERVER_LIST-NAME.
+    ENDIF.
+    CALL FUNCTION 'GET_FSYS_SINGLE'
+      DESTINATION        LV_DEST
+      EXPORTING
+        LOCAL_REMOTE                         = 'INTERN'
+        LOGICAL_DESTINATION                  = LV_LOG_DEST
+*     IMPORTING
+*       F_FSYS_SINGLE_READ                   =
+*       ACTIVEFLAG                           =
+*       INTERVAL                             =
+*       DETAILSCOLL                          =
+*       DETAILSREQI                          =
+*       DETAILSMODE                          =
+*       LASTCOLLWRT                          =
+*       LASTCOLLINT                          =
+*       NORMCOLLINT                          =
+      TABLES
+        TF_FSYS_SINGLE                       = LT_FSYS_SINGLE
+      EXCEPTIONS
+        INTERNAL_ERROR_ADRESS_FAILED         = 1
+        INTERNAL_ERROR_DIFFERENT_FIELD       = 2
+        INTERNAL_ERROR_NO_NEW_LINE           = 3
+        COLLECTOR_NOT_RUNNING                = 4
+        SHARED_MEMORY_NOT_AVAILABLE          = 5
+        COLLECTOR_BUSY                       = 6
+        VERSION_CONFLICT                     = 7
+        NO_NETWORK_COLLECTOR_RUNNING         = 8
+        SYSTEM_FAILURE                       = 9
+        COMMUNICATION_FAILURE                = 10
+        OTHERS                               = 11.
+    IF SY-SUBRC = 0.
+      LOOP AT LT_FSYS_SINGLE INTO LS_FSYS_SINGLE.
+        CLEAR T_DATA.
+        MOVE-CORRESPONDING LS_SERVER_LIST TO T_DATA.
+        MOVE-CORRESPONDING LS_FSYS_SINGLE TO T_DATA.
+"        if strlen( ls_fsys_single-FSYSNAME ) <= 2.
+          T_DATA-FREE_MB = T_DATA-FREE.
+          T_DATA-FREE_GB = T_DATA-FREE_MB / 1024.
+          TRY.
+            T_DATA-FREE_KB = T_DATA-FREE * 1024.
+            CATCH CX_SY_ARITHMETIC_OVERFLOW. " INTO myref.
+            CLEAR T_DATA-FREE_KB.
+          ENDTRY.
+          IF T_DATA-CAPACITY <> 0.
+            LV_FREE_PRC = T_DATA-FREE / T_DATA-CAPACITY * 100.
+            IF LV_FREE_PRC >= 0 AND LV_FREE_PRC <= 100.
+              T_DATA-FREE_PRC = LV_FREE_PRC.
+            ENDIF.
+            T_DATA-USED_PRC = 100 - T_DATA-FREE_PRC.
+          ENDIF.
+          T_DATA-DRIVE = LS_FSYS_SINGLE-FSYSNAME+0(1).
+          T_DATA-UDATE = SY_DATLO.
+          T_DATA-UTIME = SY_TIMLO.
+          APPEND T_DATA.
+ "       endif.
+      ENDLOOP.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DRIVE NOT IN R_DRIVE.
+  DELETE T_DATA WHERE FREE_PRC NOT IN R_FREE_PRC.
+  DELETE T_DATA WHERE USED_PRC NOT IN R_USED_PRC.
+  DELETE T_DATA WHERE NAME NOT IN R_NAME.
+  DELETE T_DATA WHERE HOST NOT IN R_HOST.
+  DELETE T_DATA WHERE SERV NOT IN R_SERV.
+  DELETE T_DATA WHERE FREE_KB NOT IN R_FREE_KB.
+  DELETE T_DATA WHERE FREE_MB NOT IN R_FREE_MB.
+  DELETE T_DATA WHERE FREE_GB NOT IN R_FREE_GB.
+*** loop at R_DRIVE .
+***  DRIVE = R_DRIVE-LOW .
+***  if not DRIVE is initial .
+***    concatenate DRIVE ':' into DIRECTORY .
+***    clear is_space .
+***    CALL FUNCTION 'SHOW_DIRECTORY_FILL_STATUS'
+***      DESTINATION        lv_DEST
+***      EXPORTING
+***        directory   = DIRECTORY
+***      IMPORTING
+***       AVAILABLE    = AVAILABLE
+***       PERCENT      = PERCENT
+***       TOTAL        = TOTAL
+***       USED         = USED
+***     EXCEPTIONS
+***       PROBLEMS        = 1
+***       OTHERS          = 2 .
+***    IF sy-subrc = 0.
+***      is_space = 'X' .
+***      if AVAILABLE <= '9999999999'.
+***        FREE_KB = AVAILABLE .
+***        ifree = FREE_KB .
+***         ifree = ifree / 1024 .
+***         FREE_MB = ifree .
+***          ifree = ifree / 1024 .
+***          FREE_GB = ifree .
+***       else.
+***         FREE_KB = 999999999.
+***          ifree = AVAILABLE / 1024 .
+***          FREE_MB = ifree .
+***           ifree = ifree / 1024 .
+***           FREE_GB = ifree .
+***       endif.
+***    ENDIF.
+***    if not is_space is initial .
+***      if  FREE_KB in R_FREE_KB .
+***        IS_ALERT = 'X' .
+***         T_DATA-DRIVE = DRIVE .
+***          T_DATA-FREE_KB = FREE_KB .
+***           T_DATA-FREE_MB = FREE_MB .
+***            T_DATA-FREE_GB = FREE_GB .
+***             T_DATA-UDATE = sy-datum.
+***              T_DATA-UTIME = sy-uzeit.
+***         append T_DATA .
+***      endif .
+***    endif .
+***  endif .
+*** endloop .
+ENDFUNCTION.

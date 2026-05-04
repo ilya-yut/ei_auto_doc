@@ -1,0 +1,107 @@
+FUNCTION /SKN/F_SW_01_03_MSS_LAST_CHECK.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_MSS_LAST_CHECK
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+DATA: SY_UZEIT LIKE SY-UZEIT,
+      SY_DATUM LIKE SY-DATUM.
+DATA: TIME_DIFF TYPE  INT4.
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU  LANGU,
+             DEST RFCDEST,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+  DATA_MULTY: DURATION   /SKN/E_SW_DURATION_D.
+   LV_LANGU = SY-LANGU.
+   LV_DURATION_UNIT = 'H'.
+   SELECT_SINGLE: LANGU,
+                  MANAGE_IN_UTC,
+                  DEST,
+                  DURATION_UNIT.
+   SELECT_MULTY: DURATION.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    LV_DEST = LV_SW_DEST.
+  ENDIF.
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: SY_TABIX LIKE SY-TABIX .
+DATA: LV_DT TYPE  MSSLKGDBCCDT,
+      LV_TM TYPE  MSSLKGDBCCTM,
+      LV_MESSAGE TYPE  BAPIRET2-MESSAGE,
+      LS_CONN TYPE  MSSCONNDATA.
+DATA: LV_FM LIKE  RS38L-NAME.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  LV_FM = '/SKN/F_SW_GET_LAST_DBCC_CHECKD'.
+  CALL FUNCTION 'FUNCTION_EXISTS'
+    DESTINATION LV_DEST
+    EXPORTING
+      FUNCNAME                 = LV_FM
+*   IMPORTING
+*     GROUP                    =
+*     INCLUDE                  =
+*     NAMESPACE                =
+*     STR_AREA                 =
+    EXCEPTIONS
+      FUNCTION_NOT_EXIST       = 1
+      OTHERS                   = 2.
+  IF SY-SUBRC <> 0.
+      CONCATENATE 'Function Module : ' LV_FM  ' does not exist at the client side.' INTO  LV_MESSAGE .
+     LS_DATA-MESSAGE = LV_MESSAGE.
+     APPEND LS_DATA TO T_DATA.
+     EXIT.
+  ENDIF.
+   CALL FUNCTION '/SKN/F_SW_GET_LAST_DBCC_CHECKD'
+     DESTINATION LV_DEST
+     IMPORTING
+       DT            = LV_DT
+       TM            = LV_TM
+       MESSAGE       = LV_MESSAGE
+       CONN          = LS_CONN.
+   IF SY-SUBRC = 0.
+     MOVE-CORRESPONDING LS_CONN TO LS_DATA.
+     LS_DATA-DT = LV_DT.
+     LS_DATA-TM = LV_TM.
+     LS_DATA-MESSAGE = LV_MESSAGE.
+     APPEND LS_DATA TO T_DATA.
+   ENDIF.
+  SY_UZEIT = SY-UZEIT.
+  SY_DATUM = SY-DATUM.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = T_DATA-DT
+          T_FROM      = T_DATA-TM
+          D_TO        = SY_DATUM
+          T_TO        = SY_UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

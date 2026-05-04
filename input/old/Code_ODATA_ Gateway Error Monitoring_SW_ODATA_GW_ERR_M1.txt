@@ -1,0 +1,242 @@
+FUNCTION /SKN/F_SW_ODATA_GW_ERR_MNTR.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_ODATA_GW_ERR_MNTR OPTIONAL
+*"----------------------------------------------------------------------
+* ----------------------------------------------------------------------
+* Local Type definition
+* ----------------------------------------------------------------------
+* ----------------------------------------------------------------------
+* Local Data definition
+* ----------------------------------------------------------------------
+* - single DATA
+  DATA_SINGLE:
+    LANGU                LANGU,                    " Language (not in use)
+    DATUM                SY-DATUM                  " System Date
+    .
+*
+* - range DATA
+  DATA_MULTY:
+    TIMESTAMP            TIMESTAMP                 " Timestamp
+    .
+*
+* ----------------------------------------------------------------------
+* Parameters Definition
+* ----------------------------------------------------------------------
+* Define Special Parameters
+* - single DATA
+  DATA_SINGLE:
+    "sw_dest              rfcdest,                  " RFC destination
+    BACKDAYS             INT4                     " BACKDAYS
+    .
+* - range DATA
+  DATA_MULTY:
+      SAPCLIENT         CHAR3,
+      USERNAME          CHAR12,
+      ERROR_COUNT       INT4,
+      T100_MSGID        SYMSGID,
+      T100_MSGNO        SYMSGNO,
+      T100_MSGV1        SYMSGV,
+      T100_MSGV2        SYMSGV,
+      T100_MSGV3        SYMSGV,
+      T100_MSGV4        SYMSGV,
+      LOCATION          CHAR1,
+      CHANNEL           CHAR1,
+      ERROR_TEXT        CHAR128,
+      ERROR_COMPONENT   CHAR24,
+      ERROR_PACKAGE     CHAR30,
+      SOURCE_PROGRAM    CHAR40,
+      SOURCE_INCLUDE    CHAR40,
+      SOURCE_LINE       INT4,
+      NAMESPACE         NAMESPACE,
+      SERVICE_NAME      CHAR40,
+      TRANSACTION_ID    CHAR32,
+      ROOT_CONTEXT_ID   CHAR32,
+      CONNECTION_ID     CHAR32,
+      CONNECTION_CNT    INT4,
+      TERMINAL_ID       CHAR32,
+      REMOTE_ADDRESS    CHAR45,
+      DESTINATION       CHAR32,
+      REQUEST_URI       CHAR255,
+      BALOGNO           CHAR20,
+      CONTEXT_SIZE      INT4,
+      CALLSTACK_SIZE    INT4,
+      REQUEST_SIZE      INT4,
+      RESPONSE_SIZE     INT4,
+      HTML_PAGE         CHAR1024,
+      ICF_NODE          CHAR8,
+      REQUEST_ID        CHAR100,       "   request_id,
+      SERVICE_VERSION   NUMC4,
+      LOG_LEVEL         CHAR1
+ "     service_repo      char10,
+ "     http_status       numc3
+    .
+  DATA: DATE_FROM      LIKE SY-DATUM,
+        TIMESTAMP_FROM TYPE TIMESTAMPL,
+        LT_DATA2       TYPE TABLE OF /SKN/S_SW_ODATA_GW_ERR_MNTR,
+        LS_DATA2       TYPE /SKN/S_SW_ODATA_GW_ERR_MNTR,
+        LV_TZONE       TYPE SY-ZONLO
+        .
+* ----------------------------------------------------------------------
+* Extracting parameters’ value and populating variables
+* ----------------------------------------------------------------------
+* Set initial value
+  LV_LANGU               = 'E'.     " English
+  LV_BACKDAYS            =  1.
+*
+* Extract Special Parameters
+* - single value
+  SELECT_SINGLE:
+    "sw_dest,                        " RFC destination
+    BACKDAYS                       " BACKDAYS
+    .
+* - range value
+  SELECT_MULTY:
+      SAPCLIENT,
+      USERNAME,
+      ERROR_COUNT,
+      T100_MSGID,
+      T100_MSGNO,
+      T100_MSGV1,
+      T100_MSGV2,
+      T100_MSGV3,
+      T100_MSGV4,
+      LOCATION,
+      CHANNEL,
+      ERROR_TEXT,
+      ERROR_COMPONENT,
+      ERROR_PACKAGE,
+      SOURCE_PROGRAM,
+      SOURCE_INCLUDE,
+      SOURCE_LINE,
+      NAMESPACE,
+      SERVICE_NAME,
+      TRANSACTION_ID,
+      ROOT_CONTEXT_ID,
+      CONNECTION_ID,
+      CONNECTION_CNT,
+      TERMINAL_ID,
+      REMOTE_ADDRESS,
+      DESTINATION,
+      REQUEST_URI,
+      BALOGNO,
+      CONTEXT_SIZE,
+      CALLSTACK_SIZE,
+      REQUEST_SIZE,
+      RESPONSE_SIZE,
+      HTML_PAGE,
+      ICF_NODE,
+      REQUEST_ID,
+      SERVICE_VERSION,
+      LOG_LEVEL
+      "service_repo,
+      "http_status
+    .
+*
+* ----------------------------------------------------------------------
+* Initiating
+* ----------------------------------------------------------------------
+  CLEAR:
+    IS_ALERT
+    .
+  REFRESH
+    T_DATA
+    .
+*
+* ----------------------------------------------------------------------
+* Retrieving alert data
+* ----------------------------------------------------------------------
+  IF R_TIMESTAMP[] IS INITIAL .
+   RS_TIMESTAMP-SIGN   = 'I' .
+   RS_TIMESTAMP-OPTION = 'GE' .
+   DATE_FROM           = SY-DATUM - LV_BACKDAYS .
+   CONVERT DATE DATE_FROM INTO TIME STAMP TIMESTAMP_FROM TIME ZONE SY-ZONLO.
+   RS_TIMESTAMP-LOW    = TIMESTAMP_FROM .
+   APPEND RS_TIMESTAMP TO R_TIMESTAMP.
+  ENDIF.
+*  --- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_ODATA_GW_ERR_MNTR'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*  --- Run Cloud Mode -----
+* Extract data to t_data table.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE LT_DATA2
+    FROM /IWFND/SU_ERRLOG AS A
+     WHERE A~SAPCLIENT       IN R_SAPCLIENT
+     AND   A~USERNAME        IN R_USERNAME
+     AND   A~ERROR_COUNT     IN R_ERROR_COUNT
+     AND   A~T100_MSGID      IN R_T100_MSGID
+     AND   A~T100_MSGNO      IN R_T100_MSGNO
+     AND   A~T100_MSGV1      IN R_T100_MSGV1
+     AND   A~T100_MSGV2      IN R_T100_MSGV2
+     AND   A~T100_MSGV3      IN R_T100_MSGV3
+     AND   A~T100_MSGV4      IN R_T100_MSGV4
+     AND   A~LOCATION        IN R_LOCATION
+     AND   A~CHANNEL         IN R_CHANNEL
+     AND   A~ERROR_TEXT      IN R_ERROR_TEXT
+     AND   A~ERROR_COMPONENT IN R_ERROR_COMPONENT
+     AND   A~ERROR_PACKAGE   IN R_ERROR_PACKAGE
+     AND   A~SOURCE_PROGRAM  IN R_SOURCE_PROGRAM
+     AND   A~SOURCE_INCLUDE  IN R_SOURCE_INCLUDE
+     AND   A~SOURCE_LINE     IN R_SOURCE_LINE
+     AND   A~NAMESPACE       IN R_NAMESPACE
+     AND   A~SERVICE_NAME    IN R_SERVICE_NAME
+     AND   A~TRANSACTION_ID  IN R_TRANSACTION_ID
+     AND   A~ROOT_CONTEXT_ID IN R_ROOT_CONTEXT_ID
+     AND   A~CONNECTION_ID   IN R_CONNECTION_CNT
+     AND   A~TERMINAL_ID     IN R_TERMINAL_ID
+     AND   A~REMOTE_ADDRESS  IN R_REMOTE_ADDRESS
+     AND   A~DESTINATION     IN R_DESTINATION
+     AND   A~REQUEST_URI     IN R_REQUEST_URI
+     AND   A~BALOGNO         IN R_BALOGNO
+     AND   A~CONTEXT_SIZE    IN R_CONTEXT_SIZE
+     AND   A~CALLSTACK_SIZE  IN R_CALLSTACK_SIZE
+     AND   A~REQUEST_SIZE    IN R_REQUEST_SIZE
+     AND   A~RESPONSE_SIZE   IN R_RESPONSE_SIZE
+     "AND   a~html_page       IN r_html_page
+     AND   A~ICF_NODE        IN R_ICF_NODE
+     AND   A~REQUEST_ID      IN R_REQUEST_ID
+     AND   A~SERVICE_VERSION IN R_SERVICE_VERSION
+     AND   A~LOG_LEVEL       IN R_LOG_LEVEL
+     "AND   a~service_repo    IN r_service_repo
+     "AND   a~http_status     IN r_http_status
+     AND   A~TIMESTAMP       IN R_TIMESTAMP
+     .
+*
+*
+* ----------------------------------------------------------------------
+* Post retrieving manipulations
+* ----------------------------------------------------------------------
+* Fill Date & Time fields based on Timestamp
+   CHECK NOT LT_DATA2[]  IS INITIAL .
+   LOOP AT LT_DATA2 INTO LS_DATA2.
+     CONVERT TIME STAMP LS_DATA2-TIMESTAMP TIME ZONE LV_TZONE
+        INTO DATE LS_DATA2-DATE TIME LS_DATA2-TIME.
+     APPEND LS_DATA2 TO T_DATA.
+   ENDLOOP.
+* ----------------------------------------------------------------------
+* Post retrieving filtering
+* ----------------------------------------------------------------------
+* no action
+*
+* ----------------------------------------------------------------------
+* Finishing
+* ----------------------------------------------------------------------
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

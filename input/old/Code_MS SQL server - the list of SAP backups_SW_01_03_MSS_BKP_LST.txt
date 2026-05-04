@@ -1,0 +1,147 @@
+FUNCTION /SKN/F_SW_01_03_MSS_BKP_LIST.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_03_MSS_BKP_LIST
+*"----------------------------------------------------------------------
+DATA : LS_TASKLIST TYPE MSQBACKMED,
+       LT_TASKLIST LIKE TABLE OF LS_TASKLIST.
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU  LANGU,
+             DEST RFCDEST.
+DATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+DATA_MULTY: DBNAME     MSSDB,
+            SERVERNAM  MSSSERVER1,
+            MACHINENAM MSQHOSTNA,
+            TYPE MSQBKTYPE,
+            BACKUPTYPE MSSBKTYPES,
+            BACKUP_DURATION /SKN/E_SW_DURATION,
+            DURATION   /SKN/E_SW_DURATION.
+*-- Fill Selection Option Tables
+  SELECT_MULTY: DBNAME,
+                SERVERNAM,
+                MACHINENAM,
+                TYPE,
+                BACKUPTYPE,
+                BACKUP_DURATION,
+                DURATION.
+   LV_LANGU = SY-LANGU.
+   SELECT_SINGLE: LANGU,
+                  MANAGE_IN_UTC,
+                  DEST.
+   LV_DURATION_UNIT = 'M'.
+   SELECT_SINGLE: DURATION_UNIT.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    LV_DEST = LV_SW_DEST.
+  ENDIF.
+DATA: LS_INFO TYPE MSSDBSIZEINFO.
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : IS_OUT(1) TYPE C.
+DATA :NTMP(15) TYPE N,
+      ITMP TYPE TSIZE1.
+DATA: TIME_DIFF TYPE  INT4,
+      SY_UZEIT LIKE SY-UZEIT,
+      SY_DATUM LIKE SY-DATUM.
+DEFINE SET_DT_TM.
+  LS_DATA-&1_DT+0(4) = LS_DATA-&1_DATE+0(4).
+   LS_DATA-&1_DT+4(2) = LS_DATA-&1_DATE+5(2).
+    LS_DATA-&1_DT+6(2) = LS_DATA-&1_DATE+8(2).
+  LS_DATA-&1_TM+0(2) = LS_DATA-&1_DATE+11(2).
+   LS_DATA-&1_TM+2(2) = LS_DATA-&1_DATE+14(2).
+    LS_DATA-&1_TM+4(2) = LS_DATA-&1_DATE+17(2).
+END-OF-DEFINITION.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+   CALL FUNCTION 'GET_BACKUP_LIST_MSQ'
+     DESTINATION  LV_DEST
+     EXPORTING
+       NUM_OF_DAYS                = 30
+*      CON_NAME                   = 'DEFAULT'
+*      SCHEMA                     = ''
+     TABLES
+       TASKLIST                   = LT_TASKLIST
+     EXCEPTIONS
+       DB_ERROR                   = 1
+       INTERNAL_ERROR             = 2
+       CONNECT_ERROR              = 3
+       NOT_RUNNING_ON_MSSQL       = 4
+       OTHERS                     = 5.
+   IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+   ENDIF.
+   SY_UZEIT = SY-UZEIT.
+   SY_DATUM = SY-DATUM.
+   _SET_SYS_DATE_TIME LV_DEST SY_DATUM SY_UZEIT.
+   LOOP AT LT_TASKLIST INTO LS_TASKLIST.
+     MOVE-CORRESPONDING LS_TASKLIST TO LS_DATA.
+***     ls_DATA-START_DT+0(4) = ls_DATA-START_DATE+0(4).
+***      ls_DATA-START_DT+4(2) = ls_DATA-START_DATE+5(2).
+***       ls_DATA-START_DT+6(2) = ls_DATA-START_DATE+8(2).
+***     ls_DATA-START_TM+0(2) = ls_DATA-START_DATE+11(2).
+***      ls_DATA-START_TM+2(2) = ls_DATA-START_DATE+14(2).
+***       ls_DATA-START_TM+4(2) = ls_DATA-START_DATE+17(2).
+     SET_DT_TM START.
+     SET_DT_TM END.
+     LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+     CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = LS_DATA-START_DT
+          T_FROM      = LS_DATA-START_TM
+          D_TO        = LS_DATA-END_DT
+          T_TO        = LS_DATA-END_TM
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          LS_DATA-BACKUP_DURATION = TIME_DIFF .
+        ELSE.
+          LS_DATA-BACKUP_DURATION = '999999'.
+        ENDIF.
+      ENDIF.
+     CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = LS_DATA-START_DT
+          T_FROM      = LS_DATA-START_TM
+          D_TO        = SY_DATUM
+          T_TO        = SY_UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          LS_DATA-DURATION = TIME_DIFF .
+        ELSE.
+          LS_DATA-DURATION = '999999'.
+        ENDIF.
+      ENDIF.
+     APPEND LS_DATA TO T_DATA.
+   ENDLOOP.
+  DELETE T_DATA WHERE DBNAME NOT IN R_DBNAME.
+  DELETE T_DATA WHERE SERVERNAM NOT IN R_SERVERNAM.
+  DELETE T_DATA WHERE MACHINENAM NOT IN R_MACHINENAM.
+  DELETE T_DATA WHERE TYPE NOT IN R_TYPE.
+  DELETE T_DATA WHERE BACKUPTYPE NOT IN R_BACKUPTYPE.
+  DELETE T_DATA WHERE BACKUP_DURATION NOT IN R_BACKUP_DURATION.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

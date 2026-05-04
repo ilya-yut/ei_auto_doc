@@ -1,0 +1,32 @@
+FUNCTION /SKN/F_SW_01_01_JOBS_N_CNT.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_JOBS_N_CNT OPTIONAL
+*"----------------------------------------------------------------------
+DATA : LV_ALERT TYPE  CHAR1.
+DATA : LS_DATA TYPE /SKN/S_SW_01_01_JOBS,
+       LT_DATA LIKE TABLE OF LS_DATA.
+DATA : LV_CNT TYPE I.
+DATA_MULTY: JOBS_CNT /SKN/E_SW_CNT.
+SELECT_MULTY: JOBS_CNT.
+   REFRESH T_DATA.
+   CALL FUNCTION '/SKN/F_SW_01_01_JOBS_N'
+    IMPORTING
+       IS_ALERT       = LV_ALERT
+     TABLES
+       T_SELECT       = T_SELECT
+       T_DATA         = LT_DATA.
+    IS_ALERT = LV_ALERT.
+    DESCRIBE TABLE LT_DATA LINES LV_CNT.
+    IF LV_CNT IN R_JOBS_CNT.
+      T_DATA-JOBS_CNT = LV_CNT.
+      APPEND T_DATA.
+      IS_ALERT = LV_ALERT.
+    ELSE.
+      CLEAR IS_ALERT.
+    ENDIF.
+ENDFUNCTION.

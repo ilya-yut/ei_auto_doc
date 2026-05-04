@@ -1,0 +1,244 @@
+FUNCTION /SKN/F_SW_01_01_TRANSP_DETAILS.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_TRANSP_DETAILS OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE:
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT ,
+               BACKDAYS       INT4.
+  DATA_MULTY: DURATION     /SKN/E_SW_DURATION,
+              DOMNAM       TMSDOMNAM,
+              SYSNAM       TMSSYSNAM,            " System Name(For)
+              TRKORR       TRKORR,               " Request/task
+              STRKORR      STRKORR,              " High level request
+              MAXRC        TRRETCODE,
+              INT_MAXRC    INT1,
+              TARCLI       TRTARCLI,             " Target Clnt
+"              TRFUNC       TRFUNCTION,
+*              OWNER        TMSOWNER,
+              COMSYS       TMSSYSNAM,            " System Name(from)
+              SRCCLI       TRCLIENT,             " Source client
+              TRSTATUS      TRSTATUS,
+              TRFUNCTION    TRFUNCTION,
+              AS4USER       TR_AS4USER,
+              PGMID         PGMID,
+              OBJECT        TROBJTYPE,           " Object Type
+              OBJ_NAME      TROBJ_NAME,          " Object Name
+*              objfunc       objfunc,
+*              lockflag      lockflag,
+*              gennum        trgennum,
+              STATE_COLOR   /SKN/E_SW_STATE_COLOR,
+*              status        btcstatus,
+              DATUM         SY-DATUM .
+  DATA: R_TAB_COND TYPE RANGE OF SO_TEXT,
+        RS_TAB_COND LIKE LINE OF R_TAB_COND.
+  DATA: LS_DATA LIKE LINE OF T_DATA,
+        LT_DATA LIKE TABLE OF LS_DATA.
+  DATA: BEGIN OF LS_MAIN_REQ,
+          TRKORR TYPE TRKORR,
+         END OF LS_MAIN_REQ.
+  DATA: LT_MAIN_REQ LIKE TABLE OF LS_MAIN_REQ.
+  DATA: LS_QUEUE TYPE TMSBUFFER,
+        LT_QUEUE LIKE TABLE OF LS_QUEUE.
+  DATA: LV_TRKORR TYPE TRKORR.
+  LV_DURATION_UNIT = 'H'.
+  LV_BACKDAYS = 1.
+  SELECT_SINGLE: BACKDAYS,
+                 DURATION_UNIT.
+  "--- Run Clood Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_TRANSP_DETAIL'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Clood Mode -----
+  SELECT_MULTY: DURATION,
+                DOMNAM,
+                SYSNAM,    " System Name(For)
+                TRKORR,
+                STRKORR,
+                MAXRC,
+                INT_MAXRC,
+                TARCLI,
+*                TRFUNC,
+*                OWNER,
+                COMSYS,    " System Name(from)
+                SRCCLI,
+                TRSTATUS,
+                TRFUNCTION,
+                AS4USER,
+                PGMID,
+                OBJECT,
+                OBJ_NAME,
+*                objfunc       ,
+*               lockflag      ,
+*                gennum        ,
+                STATE_COLOR,
+*                status,
+                DATUM.
+*  DATA: t_fields TYPE TABLE OF  rfc_db_fld,
+*        t_cond TYPE TABLE OF  rfc_db_opt ,
+*        ls_cond TYPE rfc_db_opt.
+  DATA : IS_GENERAL(1) TYPE C.
+  DATA : DATE_FROM LIKE SY-DATUM ,
+         BACKDAYS  TYPE I .
+  DATA : SY_TABIX LIKE SY-TABIX,
+         FROM_TABIX LIKE SY-TABIX.
+  DATA :  ENDDATE LIKE SY-DATUM,
+          ENDTIME LIKE SY-UZEIT.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : MAX_RC TYPE TRRETCODE,
+         MAX_RC_N(4) TYPE N.
+  DATA :   SY_DATLO LIKE SY-DATLO ,
+           SY_TIMLO LIKE SY-TIMLO .
+*?????????
+*    "TIME_DELAY_TO_CHECK time_delay_for_check .
+* SET_SY_TIME MANAGE_IN_UTC sy_datlo sy_timlo .
+* TIME_SHIFT sy_datlo sy_timlo . " TIME_SHIFT parameter
+  SY_DATLO = SY-DATUM .        " Appl Server's Date
+  SY_TIMLO = SY-UZEIT.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+*  "--- Fill Condition Criteria
+*  REFRESH t_cond.
+*  CLEAR ls_cond.
+*  LOOP AT r_tab_cond INTO rs_tab_cond.
+*    ls_cond-text = rs_tab_cond-low.
+*    APPEND ls_cond TO t_cond.
+*  ENDLOOP.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH: T_DATA, LT_DATA .
+  SELECT *
+    FROM E070 AS E
+*        LEFT JOIN TMSBUFFER as T1 on ( E~TRKORR = T1~TRKORR )
+*        LEFT JOIN TMSBUFFER as T2 on ( E~STRKORR = T2~TRKORR )
+    INNER JOIN E071 AS D ON ( E~TRKORR = D~TRKORR )
+    INTO CORRESPONDING FIELDS OF TABLE LT_DATA
+    WHERE E~AS4DATE    IN R_DATUM       " Date of Last Change
+    AND   E~TRKORR     IN R_TRKORR      " Request/Task
+    AND   E~TRSTATUS   IN R_TRSTATUS    " Status:Modifiable, Released
+    AND   E~TRFUNCTION IN R_TRFUNCTION  " Type of request/task:Workbench, Customizing
+    AND   E~AS4USER    IN R_AS4USER     " Request/task owner
+    AND   D~PGMID      IN R_PGMID       " Program ID
+    AND   D~OBJECT     IN R_OBJECT
+    AND   D~OBJ_NAME   IN R_OBJ_NAME
+*       AND  D~OBJFUNC in R_OBJFUNC
+*       AND  D~LOCKFLAG in R_LOCKFLAG
+*       AND  D~GENNUM in R_GENNUM
+           .
+  REFRESH LT_MAIN_REQ.
+  LOOP AT LT_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    IF LS_DATA-STRKORR IS INITIAL.
+      LS_DATA-STRKORR = LS_DATA-TRKORR.
+      MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX.
+    ENDIF.
+    LS_MAIN_REQ-TRKORR = LS_DATA-STRKORR.
+    APPEND LS_MAIN_REQ TO LT_MAIN_REQ.
+  ENDLOOP.
+  SORT LT_MAIN_REQ.
+  DELETE ADJACENT DUPLICATES FROM LT_MAIN_REQ.
+  REFRESH LT_QUEUE.
+  IF LT_MAIN_REQ[] IS NOT INITIAL.
+    SELECT *
+      FROM TMSBUFFER
+      INTO CORRESPONDING FIELDS OF TABLE LT_QUEUE
+      FOR ALL ENTRIES IN LT_MAIN_REQ
+      WHERE TRKORR EQ LT_MAIN_REQ-TRKORR.
+    SORT LT_QUEUE BY TRKORR.
+  ENDIF.
+  LOOP AT LT_DATA INTO LS_DATA.
+    READ TABLE LT_QUEUE INTO LS_QUEUE WITH KEY TRKORR = LS_DATA-STRKORR
+                                      BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      FROM_TABIX = SY-TABIX.
+      LOOP AT LT_QUEUE INTO LS_QUEUE FROM FROM_TABIX.
+        IF LS_QUEUE-TRKORR <> LS_DATA-STRKORR.
+          EXIT.
+        ENDIF.
+        LV_TRKORR = LS_DATA-TRKORR.
+        MOVE-CORRESPONDING LS_QUEUE TO LS_DATA.
+        LS_DATA-TRKORR = LV_TRKORR.
+        APPEND LS_DATA TO T_DATA.
+      ENDLOOP.
+    ELSE.
+      APPEND LS_DATA TO T_DATA.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE: DOMNAM NOT IN R_DOMNAM,
+                       SYSNAM NOT IN R_SYSNAM,   " System Name(For)
+                       MAXRC  NOT IN R_MAXRC,
+                       TARCLI NOT IN R_TARCLI,   " Target client
+*                       TRFUNC not in R_TRFUNC,
+*                       OWNER  not in R_OWNER,
+                       COMSYS NOT IN R_COMSYS,   " System Name(from)
+                       SRCCLI NOT IN R_SRCCLI,   " Source client
+                       STRKORR NOT IN R_STRKORR. " High level request
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+    MAX_RC = T_DATA-MAXRC.
+    CASE T_DATA-MAXRC. " MAX_RC.
+      WHEN   '0008' .
+        T_DATA-STATE_COLOR = 'R'.
+        T_DATA-STATE_ICON = STATE_ICON_RED .
+      WHEN  '0012'.
+        T_DATA-STATE_COLOR = 'R'.
+        T_DATA-STATE_ICON = '@AG@'. "ICON_ALERT
+      WHEN   '0000'.
+        T_DATA-STATE_COLOR ='G'.
+        T_DATA-STATE_ICON = STATE_ICON_GREEN.
+      WHEN   '0004'.
+        T_DATA-STATE_COLOR ='Y'.
+        T_DATA-STATE_ICON = STATE_ICON_YELLOW.
+      WHEN ''.
+        T_DATA-STATE_ICON = '@BZ@'.  "ICON_LED_INACTIVE "'@HM@'. "ICON_PS_MILESTONE
+    ENDCASE.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE T_DATA WHERE STATE_COLOR NOT IN R_STATE_COLOR.
+*-- Fill Duration Value
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX.
+    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = T_DATA-AS4DATE
+        T_FROM      = T_DATA-AS4TIME
+        D_TO        = SY_DATLO
+        T_TO        = SY_TIMLO
+        TIME_UNIT   = LV_DURATION_UNIT
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-DURATION = TIME_DIFF .
+    ELSE.
+      T_DATA-DURATION = '999999'.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX .
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

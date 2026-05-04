@@ -1,0 +1,783 @@
+{
+  "source_file": "SW_01_04_DISK_FREE_E - Enhanced Free Disk Space Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Enhanced Free Disk Space Monitoring (SW_01_04_DISK_FREE_E)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive disk space monitoring and analysis across SAP system landscapes to ensure system availability and prevent disk space exhaustion scenarios that could cause critical system failures. Disk space monitoring is fundamental for maintaining SAP system stability, performance, and business continuity."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The Enhanced Free Disk Space Monitoring solution monitors file system utilization across all application servers in a distributed SAP landscape, providing real-time visibility into disk space consumption patterns and available capacity. When disk space drops below critical thresholds, it can lead to system crashes, database corruption, failed transactions, and complete business process interruption."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides advanced disk space monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-server monitoring across distributed SAP landscapes with centralized visibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Flexible threshold management supporting absolute values (KB, MB, GB) and percentage-based alerts"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-time capacity analysis with current utilization and available space calculations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Cross-platform compatibility supporting various operating systems and file system types"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Enhanced error handling for network connectivity issues and system failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Historical tracking with timestamp recording for trend analysis and capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution leverages SAP's built-in file system monitoring functions and provides enhanced analytical capabilities including percentage calculations, multi-unit conversions, and comprehensive server list processing for enterprise-scale disk space management."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator ensures that SAP systems maintain adequate disk space across all critical file systems and identifies potential space exhaustion scenarios before they impact business operations."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Disk space exhaustion and inadequate monitoring indicate critical infrastructure issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Availability Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Complete system crashes when critical file systems (database, application, temp) reach 100% capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database corruption and transaction log failures due to insufficient space for write operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Application server failures preventing user logons and business transaction processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Backup failures due to inadequate space for backup files and archive logs"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance Degradation Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Severe performance slowdowns when file systems exceed 80-90% utilization capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database performance issues from insufficient space for temporary operations and sorting"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Memory swapping problems when virtual memory file systems become constrained"
+    },
+    {
+      "kind": "paragraph",
+      "text": "I/O bottlenecks from fragmented file systems operating near capacity limits"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction failures and data loss from incomplete write operations during space exhaustion"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job failures affecting critical business processes like payroll, billing, and reporting"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interface failures preventing data exchange with external systems and business partners"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance violations from inability to generate required reports and audit trails"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data Integrity Concerns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Database consistency issues from interrupted transactions due to space constraints"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Log file truncation leading to incomplete audit trails and recovery complications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Temporary file cleanup failures causing data processing errors and system instability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Archive management problems affecting long-term data retention and compliance requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate servers showing high disk utilization (>85%) for immediate space recovery actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check critical file systems (/usr/sap, database directories, temp spaces) for emergency cleanup opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review system logs for disk space-related errors and transaction failures requiring immediate attention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze temporary file accumulation and archive log retention policies for quick space recovery"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor disk space trends across all application servers for proactive capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate current space allocation against business volume projections and growth patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check file system fragmentation levels and optimization opportunities for improved space utilization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze backup and archive storage requirements against available disk capacity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated cleanup procedures for temporary files, old logs, and obsolete data"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Extend file system capacity or add additional storage volumes for critical systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize database space management including table reorganization and index optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configure automated space monitoring with appropriate alert thresholds and escalation procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preventive Measures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular disk space utilization reviews and capacity planning procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring for all critical file systems with multiple threshold levels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create documentation and procedures for emergency disk space recovery and system recovery"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "CAPACITY",
+          "Total Space (MB)",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "2",
+          "DRIVE",
+          "Drive Letter",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_SYS_DRIVE",
+          ""
+        ],
+        [
+          "3",
+          "FREE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4",
+          "10",
+          "0",
+          "INT4_DATA",
+          "SYST_LONG"
+        ],
+        [
+          "4",
+          "FREE_GB",
+          "Free Space (GB)",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_SYS_DRIVE_FREE_G",
+          ""
+        ],
+        [
+          "5",
+          "FREE_KB",
+          "Free Space (KB)",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_SYS_DRIVE_FREE_K",
+          ""
+        ],
+        [
+          "6",
+          "FREE_MB",
+          "Free Space (MB)",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_SYS_DRIVE_FREE_M",
+          ""
+        ],
+        [
+          "7",
+          "FREE_PRC",
+          "Free Space (%)",
+          "INT1",
+          "3",
+          "0",
+          "INT1",
+          "INT1"
+        ],
+        [
+          "8",
+          "FSYSNAME",
+          "File System Name",
+          "CHAR",
+          "36",
+          "0",
+          "FSYSNAME",
+          "TEXT36"
+        ],
+        [
+          "9",
+          "HOST",
+          "Host Name",
+          "CHAR",
+          "32",
+          "0",
+          "MSHOST2",
+          "MSHOST2"
+        ],
+        [
+          "10",
+          "NAME",
+          "Server Name",
+          "CHAR",
+          "40",
+          "0",
+          "MSNAME2",
+          "MSNAME2"
+        ],
+        [
+          "11",
+          "SERV",
+          "Service",
+          "CHAR",
+          "20",
+          "0",
+          "MSSERV",
+          "MSSERV"
+        ],
+        [
+          "12",
+          "UDATE",
+          "",
+          "DATS",
+          "8",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "13",
+          "USED_PRC",
+          "Used Space (%)",
+          "INT1",
+          "3",
+          "0",
+          "INT1",
+          "INT1"
+        ],
+        [
+          "14",
+          "UTIME",
+          "",
+          "TIMS",
+          "6",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 14 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "CAPACITY (Total Space (MB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, CAPACITY does not restrict total space (mb); when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DRIVE (Drive Letter)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when drive letter on DRIVE correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE (Data for tables to call \"SAPOSCOL\")"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After data is read, lines are removed unless data for tables to call \"saposcol\" on FREE still satisfies the active multivalued selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_GB (Free Space (GB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when free space (gb) (FREE_GB) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_KB (Free Space (KB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where free space (kb) on FREE_KB is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_MB (Free Space (MB))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, free space (mb) on FREE_MB isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_PRC (Free Space (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, FREE_PRC does not restrict free space (%); when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FSYSNAME (File System Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, file system name on FSYSNAME keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST (Host Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses host name from the source context so only records with HOST inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NAME (Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Documents expected operator behavior—server name on NAME should be set when that dimension is part of the control objective."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SERV (Service)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where service on SERV signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UDATE (UDATE)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating udate through UDATE for each candidate record."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USED_PRC (Used Space (%))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, used space (%) on USED_PRC often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UTIME (UTIME)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when utime on UTIME correlates with counters or status fields."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The disk space monitoring function provides both percentage-based and absolute value parameters to accommodate different monitoring scenarios and"
+    },
+    {
+      "kind": "paragraph",
+      "text": "business requirements:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage vs. Absolute Value Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage Parameters (_PRC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       FREE_PRC - Remaining capacity as percentage of total file system size"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       USED_PRC - Utilized capacity as percentage of total file system size"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Absolute Value Parameters:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       FREE_KB - Total space available in kilobytes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       FREE_MB - Absolute count of remaining space in megabytes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·       FREE_GB - Absolute count of remaining space in gigabytes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Both Options Exist"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The dual parameter approach provides monitoring flexibility for different business contexts. Percentage-based thresholds work well for file systems of varying sizes (e.g., alert when any file system drops below 15% free capacity), while absolute value thresholds are essential for business-critical systems where specific minimum space quantities must be maintained (e.g., always keep at least 5GB available for database operations regardless of total file system size)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "No default values are defined for this EI."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Critical low free percentage"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Alert when any monitored drive on a named host drops below ten percent free while still bounding absolute space."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST = SAPPRD01\n FREE_PRC = 0-10\n FREE_GB = 0-5\n DRIVE = C\n SERV = disp+work\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Database server slice"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Track large data volumes on a specific instance with both MB and percent windows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NAME = prddb00\n HOST = prddb00\n FREE_MB = 50000-999999999\n USED_PRC = 85-100\n FSYSNAME = /db/data01\n CAPACITY = 1048576\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Multi-drive review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Sample several dimensions for a weekly capacity report."
+    },
+    {
+      "kind": "paragraph",
+      "text": "HOST = %PRD%\n DRIVE = D\n FREE_KB = 104857600-999999999999999\n UDATE = 20260101-20260131\n UTIME = 000000-235959\n FREE = 1\n SW_DEST = NONE\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Percentage utilization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Utilization percentage exceeds 80% for capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "USED_PRC"
+    },
+    {
+      "kind": "paragraph",
+      "text": "= >80"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 5: Utilization in absolute values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Volume Enterprise-scale disk space monitoring using absolute thresholds for database systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "FREE_GB"
+    },
+    {
+      "kind": "paragraph",
+      "text": "= <10"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "CAPACITY",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "DRIVE",
+          "SW:  Disk Drive Letter",
+          "CHAR(1)",
+          "/SKN/E_SW_SYS_DRIVE"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FREE",
+          "Data for tables to call \"SAPOSCOL\"",
+          "INT4(10)",
+          "INT4_DATA"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FREE_GB",
+          "",
+          "INT4(10)",
+          "/SKN/E_SW_SYS_DRIVE_FREE_G"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FREE_KB",
+          "",
+          "INT4(10)",
+          "/SKN/E_SW_SYS_DRIVE_FREE_K"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FREE_MB",
+          "",
+          "INT4(10)",
+          "/SKN/E_SW_SYS_DRIVE_FREE_M"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FREE_PRC",
+          "Dummy for B20 int1 (Local Everywhere)",
+          "INT1(3)",
+          "INT1"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "FSYSNAME",
+          "Name of a File System (for \"SAPOSCOL\")",
+          "CHAR(36)",
+          "FSYSNAME"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "HOST",
+          "Name of Application Server",
+          "CHAR(32)",
+          "MSHOST2"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "NAME",
+          "Application Server Name",
+          "CHAR(40)",
+          "MSNAME2"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "SERV",
+          "Service",
+          "CHAR(20)",
+          "MSSERV"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "UDATE",
+          "",
+          "DATS(8)",
+          ""
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "USED_PRC",
+          "Dummy for B20 int1 (Local Everywhere)",
+          "INT1(3)",
+          "INT1"
+        ],
+        [
+          "/SKN/S_SW_01_04_DISK_FREE_N",
+          "UTIME",
+          "",
+          "TIMS(6)",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_04_DISK_FREE_N.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_04_DISK_FREE_N OPTIONAL\n*\"----------------------------------------------------------------------\nRANGES : R_DRIVE   FOR /SKN/S_SW_SYS_DISK_SPACE-DRIVE ,\n         R_FREE_KB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_KB,\n         R_FREE_MB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_MB ,\n         R_FREE_GB   FOR /SKN/S_SW_SYS_DISK_SPACE-FREE_GB .\nDATA : DRIVE(1) TYPE C ,\n       FREE_KB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_KB ,\n       FREE_MB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_MB ,\n       FREE_GB LIKE /SKN/S_SW_SYS_DISK_SPACE-FREE_GB .\nDATA : DIRECTORY LIKE SDBAIDIR-DIRECTORY ,\n       AVAILABLE LIKE SDBAIDIR-AVAILABLE ,\n       PERCENT   LIKE SDBAIDIR-PERCENT ,\n       TOTAL     LIKE SDBAIDIR-TOTAL ,\n       USED      LIKE SDBAIDIR-USED .\nDATA : IS_SPACE(1) TYPE C .\nDATA : IFREE TYPE I .\nDATA : LV_FREE_PRC TYPE F.\nDATA: LS_DESTI TYPE RFCHOSTS,\n      LT_DESTI LIKE TABLE OF LS_DESTI.\nDATA: LS_SERVER_LIST TYPE MSXXLIST,\n      LT_SERVER_LIST LIKE TABLE OF LS_SERVER_LIST.\nDATA: LS_FSYS_SINGLE TYPE FSY_SINGLE,\n      LT_FSYS_SINGLE LIKE TABLE OF LS_FSYS_SINGLE.\nDATA: LV_LOG_DEST TYPE RFCDEST.\nDATA : SY_DATLO LIKE SY-DATLO ,\n       SY_TIMLO LIKE SY-TIMLO .\nDATA: LV_NO_SERVER_LIST(1) TYPE C.\nDATA_SINGLE: DEST RFCDEST.             .\nSELECT_SINGLE: DEST.\nDATA_SINGLE:   SW_DEST RFCDEST.\nSELECT_SINGLE: SW_DEST.\nIF LV_SW_DEST IS NOT INITIAL.\n  LV_DEST = LV_SW_DEST.\nENDIF.\nDATA_MULTY: FREE_PRC INT1,\n            USED_PRC INT1,\n            NAME MSNAME2,\n            HOST MSHOST2,\n            SERV MSSERV.\nSELECT_MULTY: FREE_PRC,\n              USED_PRC,\n              NAME,\n              HOST,\n              SERV.\n\"\"_set_sys_date_time lv_sw_dest sy_datlo sy_timlo\n_GET_CURRENT_DATE_TIME ' ' LV_SW_DEST SY_DATLO SY_TIMLO.  .\n   LOOP AT T_SELECT WHERE FIELDNM = 'DRIVE'.\n     MOVE-CORRESPONDING T_SELECT TO R_DRIVE.\n     APPEND R_DRIVE.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_KB'.\n     MOVE-CORRESPONDING T_SELECT TO R_FREE_KB.\n     APPEND R_FREE_KB.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_MB'.\n     MOVE-CORRESPONDING T_SELECT TO R_FREE_MB.\n     APPEND R_FREE_MB.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'FREE_GB'.\n     MOVE-CORRESPONDING T_SELECT TO R_FREE_GB.\n     APPEND R_FREE_GB.\n   ENDLOOP.\n  IF R_FREE_KB[] IS INITIAL.\n   LOOP AT R_FREE_MB.\n     IFREE = R_FREE_MB-LOW .\n     R_FREE_KB-LOW = IFREE * 1024 .\n      IFREE = R_FREE_MB-HIGH .\n      R_FREE_KB-HIGH = IFREE * 1024 .\n       R_FREE_KB-SIGN = R_FREE_MB-SIGN .\n         R_FREE_KB-OPTION = R_FREE_MB-OPTION .\n          APPEND R_FREE_KB .\n   ENDLOOP .\n  ENDIF.\n  IF R_FREE_KB[] IS INITIAL.\n   LOOP AT R_FREE_GB.\n     IFREE = R_FREE_GB-LOW .\n     R_FREE_KB-LOW = IFREE * 1024 * 1024 .\n      IFREE = R_FREE_GB-HIGH .\n      R_FREE_KB-HIGH = IFREE * 1024 * 1024.\n       R_FREE_KB-SIGN = R_FREE_GB-SIGN .\n         R_FREE_KB-OPTION = R_FREE_GB-OPTION .\n          APPEND R_FREE_KB .\n   ENDLOOP .\n  ENDIF.\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n  CLEAR LV_NO_SERVER_LIST.\n  REFRESH LT_DESTI.\n  CALL FUNCTION 'TH_SERVER_LIST'\n    DESTINATION        LV_DEST\n    TABLES\n      LIST = LT_SERVER_LIST\n    EXCEPTIONS\n      NO_SERVER_LIST        = 1\n      SYSTEM_FAILURE        = 2\n      COMMUNICATION_FAILURE = 3\n      OTHERS                = 9.\n  IF SY-SUBRC IS NOT INITIAL .\n    CASE SY-SUBRC.\n      WHEN 1.  \" NO_SERVER_LIST\n        LV_NO_SERVER_LIST = 'X'.\n      WHEN OTHERS.\n       \" exit.\n    ENDCASE.\n  ENDIF.\n  IF LV_NO_SERVER_LIST IS NOT INITIAL. \" Add fictive Item\n    CLEAR LS_SERVER_LIST.\n    \"ls_SERVER_LIST-NAME = lv_SW_DEST.\n    APPEND LS_SERVER_LIST TO LT_SERVER_LIST.\n  ENDIF.\n***  LOOP AT lt_SERVER_LIST into ls_SERVER_LIST.\n***    ls_DESTI-RFCDEST = ls_SERVER_LIST-NAME.\n***\n***    if lv_DEST is not initial.  \"--- Cloud Mode\n***      ls_DESTI-RFCDEST = lv_DEST.\n***    endif.\n***\n***    APPEND ls_DESTI to lt_DESTI.\n***  ENDLOOP.\n  LOOP AT LT_SERVER_LIST INTO LS_SERVER_LIST.\n    IF LV_NO_SERVER_LIST IS INITIAL.\n      LV_LOG_DEST = LS_SERVER_LIST-NAME.\n    ENDIF.\n    CALL FUNCTION 'GET_FSYS_SINGLE'\n      DESTINATION        LV_DEST\n      EXPORTING\n        LOCAL_REMOTE                         = 'INTERN'\n        LOGICAL_DESTINATION                  = LV_LOG_DEST\n*     IMPORTING\n*       F_FSYS_SINGLE_READ                   =\n*       ACTIVEFLAG                           =\n*       INTERVAL                             =\n*       DETAILSCOLL                          =\n*       DETAILSREQI                          =\n*       DETAILSMODE                          =\n*       LASTCOLLWRT                          =\n*       LASTCOLLINT                          =\n*       NORMCOLLINT                          =\n      TABLES\n        TF_FSYS_SINGLE                       = LT_FSYS_SINGLE\n      EXCEPTIONS\n        INTERNAL_ERROR_ADRESS_FAILED         = 1\n        INTERNAL_ERROR_DIFFERENT_FIELD       = 2\n        INTERNAL_ERROR_NO_NEW_LINE           = 3\n        COLLECTOR_NOT_RUNNING                = 4\n        SHARED_MEMORY_NOT_AVAILABLE          = 5\n        COLLECTOR_BUSY                       = 6\n        VERSION_CONFLICT                     = 7\n        NO_NETWORK_COLLECTOR_RUNNING         = 8\n        SYSTEM_FAILURE                       = 9\n        COMMUNICATION_FAILURE                = 10\n        OTHERS                               = 11.\n    IF SY-SUBRC = 0.\n      LOOP AT LT_FSYS_SINGLE INTO LS_FSYS_SINGLE.\n        CLEAR T_DATA.\n        MOVE-CORRESPONDING LS_SERVER_LIST TO T_DATA.\n        MOVE-CORRESPONDING LS_FSYS_SINGLE TO T_DATA.\n\"        if strlen( ls_fsys_single-FSYSNAME ) <= 2.\n          T_DATA-FREE_MB = T_DATA-FREE.\n          T_DATA-FREE_GB = T_DATA-FREE_MB / 1024.\n          TRY.\n            T_DATA-FREE_KB = T_DATA-FREE * 1024.\n            CATCH CX_SY_ARITHMETIC_OVERFLOW. \" INTO myref.\n            CLEAR T_DATA-FREE_KB.\n          ENDTRY.\n          IF T_DATA-CAPACITY <> 0.\n            LV_FREE_PRC = T_DATA-FREE / T_DATA-CAPACITY * 100.\n            IF LV_FREE_PRC >= 0 AND LV_FREE_PRC <= 100.\n              T_DATA-FREE_PRC = LV_FREE_PRC.\n            ENDIF.\n            T_DATA-USED_PRC = 100 - T_DATA-FREE_PRC.\n          ENDIF.\n          T_DATA-DRIVE = LS_FSYS_SINGLE-FSYSNAME+0(1).\n          T_DATA-UDATE = SY_DATLO.\n          T_DATA-UTIME = SY_TIMLO.\n          APPEND T_DATA.\n \"       endif.\n      ENDLOOP.\n    ENDIF.\n  ENDLOOP.\n  DELETE T_DATA WHERE DRIVE NOT IN R_DRIVE.\n  DELETE T_DATA WHERE FREE_PRC NOT IN R_FREE_PRC.\n  DELETE T_DATA WHERE USED_PRC NOT IN R_USED_PRC.\n  DELETE T_DATA WHERE NAME NOT IN R_NAME.\n  DELETE T_DATA WHERE HOST NOT IN R_HOST.\n  DELETE T_DATA WHERE SERV NOT IN R_SERV.\n  DELETE T_DATA WHERE FREE_KB NOT IN R_FREE_KB.\n  DELETE T_DATA WHERE FREE_MB NOT IN R_FREE_MB.\n  DELETE T_DATA WHERE FREE_GB NOT IN R_FREE_GB.\n*** loop at R_DRIVE .\n***  DRIVE = R_DRIVE-LOW .\n***  if not DRIVE is initial .\n***    concatenate DRIVE ':' into DIRECTORY .\n***    clear is_space .\n***    CALL FUNCTION 'SHOW_DIRECTORY_FILL_STATUS'\n***      DESTINATION        lv_DEST\n***      EXPORTING\n***        directory   = DIRECTORY\n***      IMPORTING\n***       AVAILABLE    = AVAILABLE\n***       PERCENT      = PERCENT\n***       TOTAL        = TOTAL\n***       USED         = USED\n***     EXCEPTIONS\n***       PROBLEMS        = 1\n***       OTHERS          = 2 .\n***    IF sy-subrc = 0.\n***      is_space = 'X' .\n***      if AVAILABLE <= '9999999999'.\n***        FREE_KB = AVAILABLE .\n***        ifree = FREE_KB .\n***         ifree = ifree / 1024 .\n***         FREE_MB = ifree .\n***          ifree = ifree / 1024 .\n***          FREE_GB = ifree .\n***       else.\n***         FREE_KB = 999999999.\n***          ifree = AVAILABLE / 1024 .\n***          FREE_MB = ifree .\n***           ifree = ifree / 1024 .\n***           FREE_GB = ifree .\n***       endif.\n***    ENDIF.\n***    if not is_space is initial .\n***      if  FREE_KB in R_FREE_KB .\n***        IS_ALERT = 'X' .\n***         T_DATA-DRIVE = DRIVE .\n***          T_DATA-FREE_KB = FREE_KB .\n***           T_DATA-FREE_MB = FREE_MB .\n***            T_DATA-FREE_GB = FREE_GB .\n***             T_DATA-UDATE = sy-datum.\n***              T_DATA-UTIME = sy-uzeit.\n***         append T_DATA .\n***      endif .\n***    endif .\n***  endif .\n*** endloop .\nENDFUNCTION.\n"
+    }
+  ]
+}

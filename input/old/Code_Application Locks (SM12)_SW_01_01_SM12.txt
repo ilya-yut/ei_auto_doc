@@ -1,0 +1,162 @@
+FUNCTION /SKN/F_SW_01_01_SM12.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM12 OPTIONAL
+*"----------------------------------------------------------------------
+DATA_MULTY: DURATION   /SKN/E_SW_DURATION,   "From NOW to Job Start Time point -in duration units
+            GCLIENT EQECLIENT,
+            GUNAME  EQEUNAME,
+            GMODE   EQEGRAMODE,
+            GTARG   EQEGTARG,
+            GTCODE  EQETCODE,
+            GUSR    EQEUSR,
+            GNAME   EQEGRANAME,
+            GARG    EQEGRAARG,
+            GTHOST  EQEHOST.
+DATA_SINGLE: LANGU LANGU,
+             NUMBER SY-TABIX,
+             SUBRC SY-SUBRC,
+             MANAGE_IN_UTC CHAR1,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             DEST RFCDEST.
+DATA : LS_ENQ TYPE SEQG3,
+       LT_ENQ LIKE TABLE OF LS_ENQ.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : IS_OUT(1) TYPE C.
+DATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.
+*-- Fill Selection Option Tables
+   SELECT_MULTY: DURATION,
+                 GCLIENT,
+                 GUNAME,
+                 GMODE,
+                 GTARG,
+                 GTCODE,
+                 GUSR,
+                 GNAME,
+                 GARG ,
+                 GTHOST.
+  LV_DURATION_UNIT = 'M'.
+  SELECT_SINGLE: DURATION_UNIT,
+                 MANAGE_IN_UTC,
+                 DEST.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_SM12'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+ SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+ TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+ PROCESS_ICON = ICON_DELETE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  REFRESH LT_ENQ.
+  CALL FUNCTION 'ENQUEUE_READ'
+    DESTINATION        LV_DEST
+    EXPORTING
+      GCLIENT                     = ' '  " SY-MANDT
+*     GNAME                       = ' '
+*     GARG                        = ' '
+      GUNAME                      = ' '  " SY-UNAME
+*     LOCAL                       = ' '
+*     FAST                        = ' '
+*     GARGNOWC                    = ' '
+    IMPORTING
+      NUMBER                      = LV_NUMBER
+      SUBRC                       = LV_SUBRC
+    TABLES
+      ENQ                         = LT_ENQ
+   EXCEPTIONS
+     COMMUNICATION_FAILURE       = 1
+     SYSTEM_FAILURE              = 2
+     OTHERS                      = 3.
+  IF SY-SUBRC <> 0.
+    EXIT.
+  ENDIF.
+  DELETE LT_ENQ WHERE GCLIENT NOT IN R_GCLIENT.
+  DELETE LT_ENQ WHERE GUNAME NOT IN R_GUNAME.
+  DELETE LT_ENQ WHERE GMODE NOT IN R_GMODE.
+  DELETE LT_ENQ WHERE GTARG NOT IN R_GTARG.
+  DELETE LT_ENQ WHERE GTCODE NOT IN R_GTCODE.
+  DELETE LT_ENQ WHERE GTHOST NOT IN R_GTHOST.
+  DELETE LT_ENQ WHERE GUSR NOT IN R_GUSR.
+  DELETE LT_ENQ WHERE GNAME NOT IN R_GNAME.
+  DELETE LT_ENQ WHERE GARG NOT IN R_GARG.
+  LOOP AT LT_ENQ INTO LS_ENQ.
+    CLEAR T_DATA.
+    MOVE-CORRESPONDING LS_ENQ TO T_DATA.
+    T_DATA-DEST = LV_DEST.
+    APPEND T_DATA.
+  ENDLOOP.
+*   loop at t_data.
+*     sy_tabix = sy-tabix.
+*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*        EXPORTING
+*          D_FROM            = t_data-GTDATE
+*          T_FROM            = t_data-GTTIME
+*          D_TO              = sy_datlo
+*          T_TO              = sy_timlo
+*          TIME_UNIT         = 'M'
+*        IMPORTING
+*          TIME_DIFF         = TIME_DIFF
+*        EXCEPTIONS
+*          WRONG_VALUE       = 1
+*          OTHERS            = 2    .
+*      IF SY-SUBRC = 0.
+*        if TIME_DIFF < '999999'.
+*          t_data-DURATION_M = TIME_DIFF .
+*        else.
+*          t_data-DURATION_M = '999999'.
+*        endif.
+*        t_data-DURATION_H = t_data-DURATION_M / 60.
+*        t_data-PROCESS_ICON = PROCESS_ICON.
+*        modify t_data index sy_tabix.
+*      ENDIF.
+*    endloop.
+*
+*  delete t_data where DURATION_M not in R_DURATION_M.
+*  delete t_data where DURATION_H not in R_DURATION_H.
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-GTDATE
+          T_FROM            = T_DATA-GTTIME
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+ DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

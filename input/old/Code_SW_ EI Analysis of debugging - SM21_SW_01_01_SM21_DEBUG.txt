@@ -1,0 +1,193 @@
+  FUNCTION /SKN/F_SW_01_01_SM21_DEBUGGER.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_SM21 OPTIONAL
+*"----------------------------------------------------------------------
+    DATA_MULTY: DURATION     /SKN/E_SW_DURATION,   "From NOW to Job Start Time point -in duration units
+                DATUM        DATUM,
+                INSTANCENAME MSNAME2,
+                SLGUSER      RSLGUSER,
+                SLGTC        TCODE,
+                SLGREPNA     PROGRAM_ID,
+                SLGMODE      SAPMODE,
+                STATE_COLOR  /SKN/E_SW_STATE_COLOR,
+                SLGDATE      DATUM,
+                SLGTIME      UZEIT,
+                WP_TYPE      CHAR4,
+                DEVCLASS     DEVCLASS,
+                USTYP        XUUSTYP,        " 04/24++
+                TABE         RSLGNO.
+    DATA_SINGLE: LANGU          LANGU,
+                 SUBRC          SY-SUBRC,
+                 MANAGE_IN_UTC  CHAR1,
+                 DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+                 BACKDAYS       INT4,
+                 DEST           RFCDEST.
+    DATA: LV_POS                  TYPE I,
+          LV_FM                   TYPE RS38L-NAME,
+          LV_ERROR                TYPE BOOLE_D,
+          LV_MESSAGE              TYPE BAPIRET2-MESSAGE,
+          LV_WRAPCOUNT            TYPE I,
+          LV_FILTER_DATETIME_FROM TYPE RSLGTIME,
+          LV_FILTER_DATETIME_TO   TYPE RSLGTIME,
+          LV_INSTANCENAME         TYPE MSNAME2.
+    DATA: LS_RETURN TYPE BAPIRET2.
+    DATA: LS_SYSLOG TYPE RSLGENTR_NEW,
+          LT_SYSLOG LIKE TABLE OF LS_SYSLOG.
+    DATA: LS_SERVER_LIST TYPE MSXXLIST,
+          LT_SERVER_LIST LIKE TABLE OF LS_SERVER_LIST.
+    DATA: LS_DATA     TYPE /SKN/S_SW_SYSLOG,
+          LS_DATA_OUT TYPE /SKN/S_SW_01_01_SM21.
+    DATA: LT_DATA     TYPE TABLE OF /SKN/S_SW_SYSLOG,
+          LT_DATA_OUT TYPE TABLE OF /SKN/S_SW_01_01_SM21.
+    DATA: SY_TABIX LIKE SY-TABIX.
+    DATA: SY_DATLO LIKE SY-DATLO,
+          SY_TIMLO LIKE SY-TIMLO.
+    DATA: TIME_DIFF      TYPE INT4 .
+    DATA: LV_SLGPROC     TYPE RSLGPID.
+    DATA: LV_AREA        LIKE TSL1D-AREA,
+          LV_SUBID       LIKE TSL1D-SUBID,
+          LV_CACHE_ENTRY TYPE RSLGTCACHE,
+          LV_TERMINAL    TYPE CHAR20. "   RSLG_TERMINAL.
+    DATA: LV_DATE_FROM   LIKE SY-DATUM,
+          LV_DATE_TO     LIKE SY-DATUM,
+          LV_TIME_FROM   LIKE SY-UZEIT.
+    DATA: LV_NO_SERVER_LIST(1) TYPE C.
+***
+****-- Fill Selection Option Tables
+***
+    SELECT_MULTY: DURATION,
+                  DATUM,
+                  INSTANCENAME,
+*                  slgltrm,
+                  SLGUSER,
+                  SLGTC,
+                  SLGREPNA,
+*                  slgmand,
+                  SLGMODE,
+                  STATE_COLOR,
+                  SLGDATE,
+                  SLGTIME,
+                  WP_TYPE,
+                  DEVCLASS,
+                  USTYP,             " 04/24++
+                  TABE.
+    LV_DURATION_UNIT = 'M'.
+    LV_BACKDAYS      = 0.
+    SELECT_SINGLE: DURATION_UNIT,
+                   BACKDAYS,
+                   MANAGE_IN_UTC,
+                   DEST.
+    DATA_SINGLE: SW_DEST RFCDEST.             .
+    SELECT_SINGLE: SW_DEST.
+* Check if add-on exist on the client side
+    LV_FM = '/SKN/F_SW_SM21_SYSLOG_GET'.
+    CALL FUNCTION 'FUNCTION_EXISTS'
+      DESTINATION LV_SW_DEST
+      EXPORTING
+        FUNCNAME           = LV_FM
+      EXCEPTIONS
+        FUNCTION_NOT_EXIST = 1
+        OTHERS             = 2.
+    IF SY-SUBRC IS NOT INITIAL.
+      CONCATENATE 'Function Module : ' LV_FM  ' does not exist at the client side.' INTO LV_MESSAGE .
+      T_DATA-MESSAGE = LV_MESSAGE.
+      APPEND T_DATA.
+      EXIT.
+    ENDIF.
+    SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+    TIME_SHIFT SY_DATLO SY_TIMLO.
+    READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+    IF SY-SUBRC IS INITIAL.
+      LV_DATE_FROM = RS_DATUM-LOW.
+      LV_DATE_TO   = RS_DATUM-HIGH.
+    ELSE.
+      LV_DATE_FROM = SY_DATLO - LV_BACKDAYS.
+    ENDIF.
+*--- Retrieve data
+    CLEAR: IS_ALERT, LT_DATA.
+    REFRESH: T_DATA.
+**** 10/24--
+* Adding manually message ID parameter table, due to
+* following parameters are excluded from SM21 log
+*    rs_tabe-sign   = 'I'.
+*    rs_tabe-option = 'NE'.
+*    rs_tabe-low    = 'E0A'.
+*
+*    APPEND rs_tabe TO r_tabe.
+**** 10/24--
+    CALL FUNCTION '/SKN/F_SW_SM21_SYSLOG_GET'
+      DESTINATION LV_SW_DEST
+      EXPORTING
+        DATE_FR              = LV_DATE_FROM
+*       time_fr              =
+        DATE_TO              = LV_DATE_TO
+*       TIME_TO              =
+      IMPORTING
+        EV_ERROR             = LV_ERROR
+        ES_SYSLOG_RETURN     = LS_RETURN
+      TABLES
+        IT_DATE_PARAM        = R_SLGDATE[]
+        IT_TIME_PARAM        = R_SLGTIME[]
+        IT_SERVER_NAME_PARAM = R_INSTANCENAME[]
+        IT_MESSAGE_ID_PARAM  = R_TABE[]
+        IT_USER_PARAM        = R_SLGUSER[]
+        IT_TCODE_PARAM       = R_SLGTC[]
+        IT_PROGRAM_PARAM     = R_SLGREPNA[]
+        IT_WORK_PROC_PARAM   = R_WP_TYPE[]
+        IT_DEVCLASS_PARAM    = R_DEVCLASS[]
+        IT_USTYP_PARAM       = R_USTYP[]            " 04/24++
+        T_SYSLOG             = LT_DATA.
+    IF LV_ERROR IS NOT INITIAL.
+      T_DATA-MESSAGE = LS_RETURN-MESSAGE.
+      APPEND T_DATA.
+      EXIT.
+    ENDIF.
+    LOOP AT LT_DATA INTO LS_DATA.
+      MOVE-CORRESPONDING LS_DATA TO LS_DATA_OUT.
+      LS_DATA_OUT-STATE_COLOR = LS_DATA-MONBEW(1).
+      CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+        EXPORTING
+          STATE_COLOR = LS_DATA_OUT-STATE_COLOR
+        IMPORTING
+          STATE_ICON  = LS_DATA_OUT-STATE_ICON.
+      APPEND LS_DATA_OUT TO LT_DATA_OUT.
+      CLEAR: LS_DATA_OUT.
+    ENDLOOP.
+    DELETE LT_DATA_OUT WHERE STATE_COLOR  NOT IN R_STATE_COLOR.
+    SY_DATLO = SY-DATUM.
+    SY_TIMLO = SY-UZEIT.
+*-- Fill Duration Value
+    LOOP AT LT_DATA_OUT INTO LS_DATA_OUT.
+      SY_TABIX = SY-TABIX.
+      LS_DATA_OUT-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = LS_DATA_OUT-SLGDATE
+          T_FROM      = LS_DATA_OUT-SLGTIME
+          D_TO        = SY_DATLO
+          T_TO        = SY_TIMLO
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        LS_DATA_OUT-DURATION = TIME_DIFF .
+      ELSE.
+        LS_DATA_OUT-DURATION = '999999'.
+      ENDIF.
+      MODIFY LT_DATA_OUT FROM LS_DATA_OUT INDEX SY_TABIX.
+    ENDLOOP .
+    DELETE LT_DATA_OUT WHERE DURATION NOT IN R_DURATION.
+    T_DATA[] = LT_DATA_OUT[].
+*--- Check Alert Information
+    READ TABLE T_DATA INDEX 1.
+    CHECK NOT SY-TFILL  IS INITIAL .
+    IS_ALERT = 'X' .
+  ENDFUNCTION.

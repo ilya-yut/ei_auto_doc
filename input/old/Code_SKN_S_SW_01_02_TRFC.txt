@@ -1,0 +1,260 @@
+FUNCTION /SKN/F_SW_01_02_TRFC.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_02_TRFC OPTIONAL
+*"----------------------------------------------------------------------
+RANGES : R_ARFCSTATE FOR ARFCSSTATE-ARFCSTATE,
+         R_ARFCUSER  FOR ARFCSSTATE-ARFCUSER,
+         R_ARFCDEST  FOR ARFCSSTATE-ARFCDEST,
+         R_ARFCFNAM  FOR ARFCSSTATE-ARFCFNAM,
+         R_ARFCDATUM FOR ARFCSSTATE-ARFCDATUM,
+         R_ARFCUZEIT FOR ARFCSSTATE-ARFCUZEIT.
+RANGES : R_STATE_COLOR FOR /SKN/S_SW_SYS_RFC_PING-STATE_COLOR,
+         R_DATUM   FOR SY-DATUM .
+DATA : DATE_FROM LIKE SY-DATUM ,
+       BACKDAYS  TYPE I .
+DATA : LANGU LIKE SY-LANGU .
+DATA_MULTY: DURATION   /SKN/E_SW_DURATION.
+DATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+*
+* define all known statuses
+*
+DATA :
+       RECORDED LIKE ARFCSSTATE-ARFCSTATE VALUE 'RECORDED',
+       CPICERR  LIKE ARFCSSTATE-ARFCSTATE VALUE 'CPICERR',
+       SYSFAIL  LIKE ARFCSSTATE-ARFCSTATE VALUE 'SYSFAIL',
+       CONFAIL  LIKE ARFCSSTATE-ARFCSTATE VALUE 'NO_CONF',
+       EXECUTED LIKE ARFCSSTATE-ARFCSTATE VALUE 'EXECUTED',
+       MAILED   LIKE ARFCSSTATE-ARFCSTATE VALUE 'MAILED',
+       READ     LIKE ARFCSSTATE-ARFCSTATE VALUE 'READ',
+       VBRECORD LIKE ARFCSSTATE-ARFCSTATE VALUE 'VBRECORD',
+       SENDED   LIKE ARFCSSTATE-ARFCSTATE VALUE 'SENDED',
+       DEBUG    LIKE ARFCSSTATE-ARFCSTATE VALUE 'DEBUG',
+       VXRECORD LIKE ARFCSSTATE-ARFCSTATE VALUE 'VXRECORD',
+       CONFAIL1 LIKE ARFCSSTATE-ARFCSTATE VALUE 'CONFAIL'.
+DATA: BEGIN OF %_RESERV,               "Rel. Adr.
+        CPROG        LIKE SY-CPROG,                          "40       0
+        MANDT        LIKE SY-MANDT,                          "3       40
+        BATCHPLA     TYPE C,                                 "1       43
+        QRFCFLAG     TYPE C,                                 "1       44
+        QNAME        LIKE TRFCQIN-QNAME,                     "24      45
+        QCOUNT       LIKE TRFCQIN-QCOUNT,                    "24      69
+        QRCVTID      LIKE ARFCTID,                           "24      93
+        ARFCMSG2(23) TYPE C,                                 "23     117
+        CHNGTRFC     TYPE C,                                 "1      140
+        ORGHOST(20)  TYPE C,                                 "20     141
+        ASGROUP(20)  TYPE C,                                 "20     161
+        QTRACE       TYPE C,                                 "1      181
+        QACTION      TYPE C,                                 "1      182
+        QDATE        LIKE SY-DATUM,                          "8      183
+        QTIME        LIKE SY-UZEIT,                          "6      191
+        QLOG         TYPE C,                                 "1      197
+        PACTION      TYPE C,                                 "1      198
+        QNOEXEC      TYPE C,                                 "1      199
+        USEQLIST     TYPE C,                                 "1      200
+        QRCVNEW      TYPE C,                                 "1      201
+        QNOSEND      TYPE C,                                 "1      202
+        NRDATA(8)    TYPE N,                                 "8      203
+        VBERRKEY(32) TYPE C,                                 "32     211
+        LANGU        LIKE SY-LANGU.                          "1      243
+                                                             "       244
+                                     " hier kצnnnen bis max. 255 insges.
+DATA: END OF %_RESERV.               " weitere Eintrהge abgesp. werden
+DATA: STATUS_DESC TYPE  EDI_TEXT60.
+DATA : WA TYPE ARFCSSTATE.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : IS_OUT(1) TYPE C.
+*-- Fill Selection Option Tables
+  SELECT_MULTY: DURATION.
+  LV_DURATION_UNIT = 'M'.
+  SELECT_SINGLE: DURATION_UNIT.
+  SY_DATLO = SY-DATUM .        " Appl Server's Date
+  SY_TIMLO = SY-UZEIT.
+"--- Run Clood Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_02_TRFC'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Clood Mode -----
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCDEST'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCDEST.
+     APPEND R_ARFCDEST.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCSTATE'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCSTATE.
+     APPEND R_ARFCSTATE.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCUSER'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCUSER.
+     APPEND R_ARFCUSER.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCFNAM'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCFNAM.
+     APPEND R_ARFCFNAM.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCDATUM'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCDATUM.
+     APPEND R_ARFCDATUM.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'ARFCUZEIT'.
+     MOVE-CORRESPONDING T_SELECT TO R_ARFCUZEIT.
+     APPEND R_ARFCUZEIT.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.
+     MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.
+     APPEND R_STATE_COLOR.
+   ENDLOOP.
+   LOOP AT T_SELECT WHERE FIELDNM = 'DATUM'.
+     MOVE-CORRESPONDING T_SELECT TO R_DATUM.
+     APPEND R_DATUM.
+   ENDLOOP.
+   IF R_DATUM[] IS INITIAL .
+     LOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.
+       R_DATUM-SIGN = 'I' .
+        R_DATUM-OPTION = 'GE' .
+         BACKDAYS = T_SELECT-LOW .
+         DATE_FROM = SY-DATUM - BACKDAYS .
+         R_DATUM-LOW = DATE_FROM .
+         APPEND R_DATUM.
+         EXIT.
+     ENDLOOP.
+     IF R_DATUM[] IS INITIAL .
+       R_DATUM-SIGN = 'I' .
+        R_DATUM-OPTION = 'GE' .
+         BACKDAYS = 1 .
+         DATE_FROM = SY-DATUM - BACKDAYS .
+         R_DATUM-LOW = DATE_FROM .
+       APPEND R_DATUM.
+     ENDIF .
+   ENDIF.
+   IF R_ARFCDATUM[] IS INITIAL.
+     R_ARFCDATUM[] = R_DATUM[].
+   ENDIF.
+  "-----
+  LANGU = SY-LANGU.
+  LOOP AT T_SELECT WHERE FIELDNM = 'LANGU'.
+    LANGU = T_SELECT-LOW.
+    EXIT.
+  ENDLOOP.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+SELECT * FROM ARFCSSTATE
+   INTO WA
+   WHERE ARFCSTATE  IN R_ARFCSTATE
+     "and  ARFCSTATE IN (CONFAIL1, SYSFAIL, CPICERR , RECORDED)
+     AND ARFCUSER   IN R_ARFCUSER
+     AND ARFCDEST   IN R_ARFCDEST
+     AND ARFCFNAM   IN R_ARFCFNAM
+     AND ARFCDATUM  IN R_ARFCDATUM
+     AND ARFCUZEIT  IN R_ARFCUZEIT
+     AND ARFCRETURN  = SPACE.
+  %_RESERV = WA-ARFCRESERV.
+  IF %_RESERV-QRFCFLAG <> SPACE.
+    "qRFC-LUWs exclude
+  ELSE.
+    MOVE-CORRESPONDING WA TO T_DATA.
+    APPEND T_DATA.
+  ENDIF.
+ENDSELECT.
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+     CALL FUNCTION '/SKN/F_SW_01_02_TRFC_STATUS'
+       EXPORTING
+         STATUS            = T_DATA-ARFCSTATE
+         LANGU             = LANGU
+       IMPORTING
+         STATUS_DESC       = STATUS_DESC
+         STATE_COLOR       = T_DATA-STATE_COLOR.
+     CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+       EXPORTING
+         STATE_COLOR       = T_DATA-STATE_COLOR
+       IMPORTING
+         STATE_ICON        = T_DATA-STATE_ICON         .
+     IF T_DATA-ARFCMSG IS INITIAL.
+       T_DATA-ARFCMSG = STATUS_DESC.
+     ENDIF.
+     MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.
+      DELETE T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*  loop at t_data .
+*    sy_tabix = sy-tabix .
+*    clear is_out.
+*    if not t_data-ARFCDATUM is initial.
+*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*        EXPORTING
+*          D_FROM            = t_data-ARFCDATUM
+*          T_FROM            = t_data-ARFCUZEIT
+*          D_TO              = sy-datum
+*          T_TO              = sy-uzeit
+*          TIME_UNIT         = 'M'
+*        IMPORTING
+*          TIME_DIFF         = TIME_DIFF
+*        EXCEPTIONS
+*          WRONG_VALUE       = 1
+*          OTHERS            = 2    .
+*      IF SY-SUBRC = 0.
+*        t_data-DURATION_M = TIME_DIFF .
+*        t_data-DURATION_H = t_data-DURATION_M / 60.
+*        if not t_data-DURATION_H in R_DURATION_H .
+*          is_out = 'X'.
+*        endif.
+*        if not t_data-DURATION_M in R_DURATION_M .
+*          is_out = 'X'.
+*        endif.
+*       if not is_out is initial.
+*         delete t_data index sy_tabix .
+*       else.
+*         modify t_data index sy_tabix.
+*       endif.
+*      ENDIF.
+*    endif.
+*  endloop.
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-ARFCDATUM
+          T_FROM            = T_DATA-ARFCUZEIT
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+ DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

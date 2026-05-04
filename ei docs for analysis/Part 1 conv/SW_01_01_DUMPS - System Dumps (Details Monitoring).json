@@ -1,0 +1,678 @@
+{
+  "source_file": "SW_01_01_DUMPS - System Dumps (Details Monitoring).docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: System Dumps (Details Monitoring) - SW_01_01_DUMPS"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides detailed information about system dumps (ABAP runtime errors) that occur within a specified time period and filtering criteria. Short dumps occur when the SAP system encounters an error during runtime, resulting in the termination of the affected process. As part of daily monitoring, it is the responsibility of the basis administrator to analyze the dumps and take necessary actions to avoid future issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This EI acts as a comprehensive system health indicator that provides detailed dump information for:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unusual spikes in error rates that may signal underlying technical problems, code defects, or infrastructure issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Specific dump analysis for validation that systems are running cleanly and identification of root causes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Detailed dump information where administrators need comprehensive data for troubleshooting"
+    },
+    {
+      "kind": "paragraph",
+      "text": "A few examples of ABAP dumps are timeout problems, database space issues, spool overflow issues etc. This EI provides detailed dump analysis rather than simple counting, using the same data sources as ST22 (ABAP Dump Analysis) but with enhanced filtering and monitoring capabilities."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "High dump counts indicate system instability causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Performance Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Resource exhaustion and memory shortages"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Code defects causing runtime failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Infrastructure problems affecting servers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process Disruptions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job failures preventing automated processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction failures blocking critical operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance degradation during peak usage"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Continuity"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Data inconsistency during update processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SLA violations due to system unavailability"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Customer-facing errors damaging reputation"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate dump root causes using ST22 transaction"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system resource levels and restart servers if needed"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review system logs for infrastructure errors"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor CPU, memory, and database performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check system processes and communication channels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze resource consumption patterns"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Apply code fixes and system parameter adjustments"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize resource-intensive operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive monitoring and quality controls"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control data retrieval and processing."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "BACKDAYS",
+          "Back Days",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "2",
+          "DATUM",
+          "Date",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "3",
+          "DUMPID",
+          "Runtime Error",
+          "CHAR",
+          "30",
+          "0",
+          "DUMPID",
+          "CHAR30"
+        ],
+        [
+          "4",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "5",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "6",
+          "INCLUDENAME",
+          "Include Name",
+          "CHAR",
+          "40",
+          "0",
+          "PROGNAME",
+          "PROGNAME"
+        ],
+        [
+          "7",
+          "LINENUMBER",
+          "Source Code Line of ABAP Program",
+          "CHAR",
+          "5",
+          "0",
+          "ABP_SLINE",
+          "SYCHAR05"
+        ],
+        [
+          "8",
+          "PROGRAMNAME",
+          "Program Name",
+          "CHAR",
+          "40",
+          "0",
+          "PROGNAME",
+          "PROGNAME"
+        ],
+        [
+          "9",
+          "SW_DEST",
+          "Cloud Destination",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "10",
+          "SYDATE",
+          "Date",
+          "DATS",
+          "8",
+          "0",
+          "SYDATUM",
+          "SYDATS"
+        ],
+        [
+          "11",
+          "SYHOST",
+          "Host",
+          "CHAR",
+          "32",
+          "0",
+          "SYHOST",
+          "HOST_ID"
+        ],
+        [
+          "12",
+          "SYTIME",
+          "Time",
+          "TIMS",
+          "6",
+          "0",
+          "SYUZEIT",
+          "SYTIME"
+        ],
+        [
+          "13",
+          "SYUSER",
+          "User",
+          "CHAR",
+          "12",
+          "0",
+          "SYUNAME",
+          "SYCHAR12"
+        ],
+        [
+          "14",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: This section provides configuration guidance for ALL 14 parameters listed in the Parameters Reference Table above."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Back Days):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM (Date):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM is the explicit date selector for dump retrieval window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DUMPID (Runtime Error):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DUMPID restricts analysis to specific runtime error identifiers."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION sets elapsed-time threshold used after dump timestamp comparison with current time."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M)):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT defines the measurement unit for DURATION calculations."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H: Hours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M: Minutes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D: Days"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F: Full days for specific day filtering"
+    },
+    {
+      "kind": "paragraph",
+      "text": "INCLUDENAME (Include Name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "INCLUDENAME narrows monitoring to includes related to problematic call stacks."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LINENUMBER (Source Code Line of ABAP Program):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "LINENUMBER pinpoints source-code location context for technical root-cause correlation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PROGRAMNAME (Program Name):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "PROGRAMNAME targets ABAP program context to isolate unstable components."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST (Cloud Destination):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SW_DEST controls optional cloud-destination execution path for this monitoring logic."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYDATE (Date):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYDATE explicitly selects dump event dates used for retrieval."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYHOST (Host):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYHOST segments dump events by application host to detect node-specific instability."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYTIME (Time):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYTIME refines intraday time slicing inside selected dump dates."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYUSER (User):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYUSER narrows events by user context to support ownership-based investigation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationship"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Date and Time Controls:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DATUM and SYDATE define explicit dump-date scope when provided."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS is fallback logic when explicit date ranges are not supplied."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        SYTIME refines time boundaries inside the selected date window."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Duration Prioritization:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION + DURATION_UNIT are an additional (second) filter after date selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Simple flow: first retrieve by date window, then keep dumps matching duration threshold."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Final result depends on both date conditions and duration conditions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Technical Ownership Segmentation:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        SYHOST, SYUSER, PROGRAMNAME, INCLUDENAME, and DUMPID work together to isolate recurring technical root-cause patterns."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - H"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - 1 (today and yesterday)"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Recent critical dump triage"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 1\n DURATION = 1\n DURATION_UNIT = H\n DUMPID = TSV_TNEW_PAGE_ALLOC_FAILED\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus on dumps from the last day that remain recent/high-priority in memory-allocation failure scenarios."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Host-specific stability investigation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYDATE = 20260330-20260331\n SYHOST = APP01\n PROGRAMNAME = Z_BATCH_IMPORT\n DURATION = 30\n DURATION_UNIT = M\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Identify dump concentration on one host and one program during the selected period."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: User and include deep-dive"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SYUSER = BATCH_USER_02\n INCLUDENAME = ZFI_POSTING_INCLUDE\n DATUM = 20260331-20260331\n SYTIME = 080000-180000\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Investigate user-owned daytime dump activity linked to a specific include source."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "DUMPID",
+          "Name of Runtime Error",
+          "CHAR(30)",
+          "DUMPID"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "INCLUDENAME",
+          "ABAP Program Name",
+          "CHAR(40)",
+          "PROGNAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "LINENUMBER",
+          "Source code line of an ABAP/4 program",
+          "CHAR(5)",
+          "ABP_SLINE"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "PROGRAMNAME",
+          "ABAP Program Name",
+          "CHAR(40)",
+          "PROGNAME"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "SYDATE",
+          "System Date",
+          "DATS(8)",
+          "SYDATUM"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "SYHOST",
+          "Application Server",
+          "CHAR(32)",
+          "SYHOST"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "SYTIME",
+          "System Time",
+          "TIMS(6)",
+          "SYUZEIT"
+        ],
+        [
+          "/SKN/S_SW_01_01_DUMPS",
+          "SYUSER",
+          "User Name",
+          "CHAR(12)",
+          "SYUNAME"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_DUMPS.\n *\"----------------------------------------------------------------------\n *\"*\"Local Interface:\n *\"  EXPORTING\n *\" \tVALUE(IS_ALERT) TYPE  CHAR1\n *\"  TABLES\n *\"  \tT_SELECT STRUCTURE  RSSELECT OPTIONAL\n *\"  \tT_DATA STRUCTURE  /SKN/S_SW_01_01_DUMPS OPTIONAL\n *\"----------------------------------------------------------------------\n * Changed by Zoe on 29.12.10 to allow selection by msg parameters (msgv1 & msgv2)\n * Zoe on 3.1.10 for Ortal - complete matnr & plant numbers for CIF messages\n *\"----------------------------------------------------------------------\n   RANGES : R_SYDATE FOR RSDUMPINFO-SYDATE ,\n        \tR_SYTIME FOR RSDUMPINFO-SYTIME,\n        \tR_SYHOST FOR RSDUMPINFO-SYHOST,\n        \tR_SYUSER FOR RSDUMPINFO-SYUSER,\n            R_DUMPID FOR RSDUMPINFO-DUMPID,\n        \tR_PROGRAMNAME FOR RSDUMPINFO-PROGRAMNAME,\n        \tR_INCLUDENAME FOR RSDUMPINFO-INCLUDENAME,\n        \tR_DATUM   FOR SY-DATUM .\n   DATA : DATE_FROM LIKE SY-DATUM ,\n      \tDATE_TO LIKE SY-DATUM ,\n  \t    BACKDAYS  TYPE I .\n   DATA : SY_TABIX LIKE SY-TABIX .\n   DATA : DDATE LIKE SY-DATUM.\n   DATA : T_DUMP TYPE RSDUMPTAB,\n      \tL_DUMP LIKE LINE OF T_DUMP.\n   DATA :   SY_DATLO LIKE SY-DATLO ,\n        \tSY_TIMLO LIKE SY-TIMLO .\n   DATA : TIME_DIFF TYPE  INT4 .\n   DATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.\n   DATA_MULTY:  DURATION       /SKN/E_SW_DURATION.   \"From NOW to Job Start Time point -in duration units\n   SY_DATLO = SY-DATUM .    \t\" Appl Server's Date\n   SY_TIMLO = SY-UZEIT.\n *-- Fill Selection Option Tables\n   LV_DURATION_UNIT = 'H'.\n   SELECT_SINGLE: DURATION_UNIT.\n    SELECT_MULTY: DURATION.\n \"--- Run Clood Mode -----\n   DATA_SINGLE: SW_DEST RFCDEST.         \t.\n   SELECT_SINGLE: SW_DEST.\n   IF LV_SW_DEST IS NOT INITIAL.\n \tCALL FUNCTION '/SKN/FC_SW_01_01_DUMPS'\n   \tIMPORTING\n     \tIS_ALERT   \t= IS_ALERT\n   \tTABLES\n     \tT_SELECT   \t= T_SELECT\n     \tT_DATA     \t= T_DATA.\n   ENDIF.\n   CHECK LV_SW_DEST IS INITIAL.\n \"--- Run Clood Mode -----\n   LOOP AT T_SELECT WHERE FIELDNM = 'SYDATE'.\n \tMOVE-CORRESPONDING T_SELECT TO R_SYDATE.\n \tAPPEND R_SYDATE.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'SYTIME'.\n \tMOVE-CORRESPONDING T_SELECT TO R_SYTIME.\n \tAPPEND R_SYTIME.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'SYHOST'.\n \tMOVE-CORRESPONDING T_SELECT TO R_SYHOST.\n \tAPPEND R_SYHOST.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'SYUSER'.\n \tMOVE-CORRESPONDING T_SELECT TO R_SYUSER.\n \tAPPEND R_SYUSER.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'DUMPID'.\n \tMOVE-CORRESPONDING T_SELECT TO R_DUMPID.\n \tAPPEND R_DUMPID.\n   ENDLOOP.\n *\n   LOOP AT T_SELECT WHERE FIELDNM = 'PROGRAMNAME'.\n \tMOVE-CORRESPONDING T_SELECT TO R_PROGRAMNAME.\n \tAPPEND R_PROGRAMNAME.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'INCLUDENAME'.\n \tMOVE-CORRESPONDING T_SELECT TO R_INCLUDENAME.\n \tAPPEND R_INCLUDENAME.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'DATUM'.\n \tMOVE-CORRESPONDING T_SELECT TO R_DATUM.\n \tAPPEND R_DATUM.\n   ENDLOOP.\n   IF R_DATUM[] IS INITIAL .\n \tR_DATUM[] = R_SYDATE[].\n   ENDIF.\n   IF R_DATUM[] IS INITIAL .\n \tLOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.\n   \tR_DATUM-SIGN = 'I' .\n   \tR_DATUM-OPTION = 'GE' .\n   \tBACKDAYS = T_SELECT-LOW .\n   \tDATE_FROM = SY-DATUM - BACKDAYS .\n   \tDATE_TO = SY-DATUM.\n   \tR_DATUM-LOW = DATE_FROM .\n   \tAPPEND R_DATUM.\n   \tEXIT.\n \tENDLOOP.\n \tIF R_DATUM[] IS INITIAL .\n   \tR_DATUM-SIGN = 'I' .\n   \tR_DATUM-OPTION = 'GE' .\n   \tBACKDAYS = 1 .\n   \tDATE_FROM = SY-DATUM - BACKDAYS .\n   \tDATE_TO = SY-DATUM.\n   \tR_DATUM-LOW = DATE_FROM .\n   \tAPPEND R_DATUM.\n \tENDIF .\n   ENDIF.\n   \"--------------\n   READ TABLE R_DATUM INDEX 1.\n   DATE_FROM = R_DATUM-LOW.\n   IF R_DATUM-HIGH IS NOT INITIAL.\n \tDATE_TO = R_DATUM-HIGH.\n   ENDIF.\n   LOOP AT R_DATUM .\n \tIF DATE_FROM > R_DATUM-LOW.\n   \tDATE_FROM = R_DATUM-LOW.\n \tENDIF.\n \tIF DATE_TO < R_DATUM-HIGH.\n   \tDATE_TO = R_DATUM-HIGH.\n \tENDIF.\n   ENDLOOP.\n   IF DATE_TO IS INITIAL.\n \tDATE_TO = DATE_FROM.\n   ENDIF.\n   \"--------------\n *--- Retrieve data\n   CLEAR IS_ALERT .\n   REFRESH T_DATA .\n   DDATE = DATE_FROM.\n   WHILE DDATE <= DATE_TO.\n \tREFRESH: T_DUMP.\n \tCALL FUNCTION 'RS_ST22_GET_DUMPS'\n   \tEXPORTING\n     \tP_DAY   \t= DDATE\n   \tIMPORTING\n     \tP_INFOTAB   = T_DUMP .\n \tLOOP AT T_DUMP INTO L_DUMP.\n   \tMOVE-CORRESPONDING L_DUMP TO T_DATA.\n   \tAPPEND T_DATA.\n \tENDLOOP.\n  \tADD 1 TO DDATE.\n   ENDWHILE.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-SYDATE IN R_SYDATE.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-SYTIME IN R_SYTIME.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-SYHOST IN R_SYHOST.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-SYUSER IN R_SYUSER.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-DUMPID IN R_DUMPID.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-PROGRAMNAME IN R_PROGRAMNAME.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n   LOOP AT T_DATA .\n \tSY_TABIX = SY-TABIX .\n \tIF NOT T_DATA-INCLUDENAME IN R_INCLUDENAME.\n   \tDELETE T_DATA INDEX SY_TABIX.\n \tENDIF.\n   ENDLOOP.\n *-- Fill Duration Value\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX.\n    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n \tCALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n     \tEXPORTING\n       \tD_FROM \t       = T_DATA-SYDATE\n       \tT_FROM        \t= T_DATA-SYTIME\n       \tD_TO          \t= SY_DATLO\n       \tT_TO          \t= SY_TIMLO\n       \tTIME_UNIT     \t= LV_DURATION_UNIT\n     \tIMPORTING\n       \tTIME_DIFF     \t= TIME_DIFF\n   \t  EXCEPTIONS\n       \tWRONG_VALUE   \t= 1\n       \tOTHERS        \t= 2\t.\n   \tIF SY-SUBRC = 0.\n     \tT_DATA-DURATION = TIME_DIFF .\n   \tELSE.\n     \tT_DATA-DURATION = '999999'.\n   \tENDIF.\n    MODIFY T_DATA INDEX SY_TABIX .\n  ENDLOOP .\n  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n *--- Check Alert Information\n   READ TABLE T_DATA INDEX 1.\n   CHECK NOT SY-TFILL  IS INITIAL .\n   IS_ALERT = 'X' .\n ENDFUNCTION.\n"
+    }
+  ]
+}

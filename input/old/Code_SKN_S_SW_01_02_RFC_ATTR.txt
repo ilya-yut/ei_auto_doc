@@ -1,0 +1,154 @@
+FUNCTION /SKN/F_SW_01_02_RFC_ATTR .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_02_RFC_ATTR OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC       CHAR1 ,
+             LANGU               LANGU,
+             BACKDAYS            INT4,
+             DURATION_UNIT /SKN/E_SW_DURATION_UNIT.
+DATA_MULTY: RFCDEST           RFCDEST,
+            CUNAME            CREUSRNAME,
+            CUDATE            RDIR_CDATE,
+            MUNAME            MODUSRNAME,
+            MUDATE            RDIR_UDATE,
+            DURATION         /SKN/E_SW_DURATION,
+            DATUM             SYDATUM . " Paased by SW Online Monitor
+DATA : WA TYPE /SKN/T_SW_RFC.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : RFCDEST TYPE RFCDEST.
+DATA : RFC_MESS(255) TYPE C .
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+DATA : TIME_DIFF TYPE  INT4 .
+*-- Fill Selection Option Tables
+   SELECT_MULTY:
+            RFCDEST,
+            CUNAME,
+            CUDATE,
+            MUNAME,
+            MUDATE,
+            DURATION,
+            DATUM.
+   LV_LANGU = SY-LANGU.
+   LV_DURATION_UNIT = 'D'.
+   SELECT_SINGLE: BACKDAYS,
+                  DURATION_UNIT,
+                  MANAGE_IN_UTC,
+                  LANGU.
+   "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_02_RFC_ATTR'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+ SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+ TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+    SELECT *
+      FROM RFCDES AS R
+        INNER JOIN RFCATTRIB AS A
+          ON R~RFCDEST = A~RFCDEST
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA
+      WHERE  R~RFCDEST IN R_RFCDEST
+      AND A~CUNAME IN R_CUNAME
+      AND A~MUNAME IN R_MUNAME
+      .
+*  loop at t_data.
+*    sy_tabix = sy-tabix .
+*    " Test RFC Destinations
+*    RFCDEST = t_data-RFCDEST.
+*    if not RFCDEST is initial .
+*      CALL FUNCTION 'RFC_PING'
+*        destination  RFCDEST
+*        EXCEPTIONS SYSTEM_FAILURE = 1
+*                   MESSAGE RFC_MESS
+*                   COMMUNICATION_FAILURE = 2
+*                   MESSAGE RFC_MESS
+*                   OTHERS            = 9 .
+*
+*      if sy-subrc <> 0 and sy-subrc < 9.
+*        t_data-ERR_MSG = RFC_MESS.
+*        t_data-UDATE = sy-datum.
+*        t_data-UTIME = sy-uzeit.
+*        t_data-STATE_COLOR = 'R'.
+*        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+*          EXPORTING
+*            STATE_COLOR       = t_data-STATE_COLOR
+*          IMPORTING
+*            STATE_ICON        = t_data-STATE_ICON         .
+*         modify t_data index sy_tabix.
+*      else.
+*        t_data-ERR_MSG = 'OK'.
+*        t_data-UDATE = sy-datum.
+*        t_data-UTIME = sy-uzeit.
+*        t_data-STATE_COLOR = 'G'.
+*        CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'
+*          EXPORTING
+*            STATE_COLOR       = t_data-STATE_COLOR
+*          IMPORTING
+*            STATE_ICON        = t_data-STATE_ICON         .
+*         modify t_data index sy_tabix.
+*      endif .
+*     endif .
+*  endloop.
+   LOOP AT T_DATA.
+     SY_TABIX = SY-TABIX.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-MUDATE
+          T_FROM            = T_DATA-MUTIME
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF T_DATA-RFCDEST_DESC IS INITIAL.
+      SELECT SINGLE RFCDOC1
+        INTO T_DATA-RFCDEST_DESC
+        FROM RFCDOC
+        WHERE RFCDEST = T_DATA-RFCDEST
+          AND RFCLANG = SY-LANGU .
+      IF SY-SUBRC IS INITIAL.
+        MODIFY T_DATA INDEX SY_TABIX.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+*  loop at t_data .
+*    sy_tabix = sy-tabix .
+*    if not t_data-STATE_COLOR in R_STATE_COLOR.
+*      delete t_data index sy_tabix.
+*    endif.
+*  endloop.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

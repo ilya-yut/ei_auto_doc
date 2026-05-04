@@ -1,0 +1,248 @@
+FUNCTION /SKN/F_SW_01_01_AL08.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_AL08 OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_MULTY: DURATION     /SKN/E_SW_DURATION,
+              TID          UTID,
+              MANDT        MANDT,
+              BNAME        UBNAME,
+              TCODE        UTCODE,
+              TERM         UTERM,
+              ZEIT         UDTIME,
+              MASTER       UMASTER,
+              HOSTADR      MSHOSTADR,
+              IP_ADDRESS   XUTERMINAL,   " 09/23++
+              TYPE         INT4,
+              STAT         INT4,
+              PROTOCOL     INT4,
+              GUIVERSION   CHAR10,
+              RFC_TYPE     CHAR1,
+              TOTAL_MEM_MB INT4.
+  DATA_SINGLE: LANGU          LANGU,
+               NUMBER         SY-TABIX,
+               SUBRC          SY-SUBRC,
+               MANAGE_IN_UTC  CHAR1,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               DEST           RFCDEST.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA : IS_OUT(1) TYPE C.
+  DATA: PROCESS_ICON TYPE  /SKN/E_SW_STATE_ICON.
+**** Begin 09/23++
+  DATA: LV_USERNAME TYPE XUBNAME.
+**** End 09/23++
+  DATA: LS_DESTI TYPE RFCHOSTS,
+        LT_DESTI LIKE TABLE OF LS_DESTI.
+  DATA: LS_SERVER_LIST TYPE MSXXLIST,
+        LT_SERVER_LIST LIKE TABLE OF LS_SERVER_LIST.
+  DATA: LS_USR_LISTE TYPE UINFO,
+        LT_USR_LISTE LIKE TABLE OF LS_USR_LISTE.
+  DATA: LV_DATUM TYPE D,
+        LV_ZEIT TYPE T.
+  DATA: LS_LIST_MEMO TYPE /SKN/S_SW_01_MEMO_INFO,
+        LT_LIST_MEMO LIKE TABLE OF LS_LIST_MEMO.
+  DATA: LV_NO_SERVER_LIST(1) TYPE C.
+*-- Fill Selection Option Tables
+  SELECT_MULTY: DURATION,
+                TID,
+                MANDT,
+                BNAME,
+                TCODE,
+                TERM,
+                ZEIT,
+                MASTER,
+                HOSTADR,
+                IP_ADDRESS,    " 09/23++
+                TYPE,
+                STAT,
+                PROTOCOL,
+                GUIVERSION,
+                RFC_TYPE,
+                TOTAL_MEM_MB.
+  LV_DURATION_UNIT = 'M'.
+  SELECT_SINGLE: DURATION_UNIT,
+                 MANAGE_IN_UTC,
+                 LANGU,
+                 DEST.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_AL08'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+  TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  REFRESH LT_DESTI.
+  CALL FUNCTION 'TH_SERVER_LIST'
+    DESTINATION LV_DEST
+    TABLES
+      LIST           = LT_SERVER_LIST
+    EXCEPTIONS
+      NO_SERVER_LIST = 1
+      OTHERS         = 2.
+  IF SY-SUBRC <> 0.
+    CASE SY-SUBRC.
+      WHEN 1.  " NO_SERVER_LIST
+        LV_NO_SERVER_LIST = 'X'.
+      WHEN OTHERS.
+        EXIT.
+    ENDCASE.
+  ENDIF.
+  IF LV_NO_SERVER_LIST IS NOT INITIAL. " Add fictive Item
+    LS_SERVER_LIST-NAME = LV_DEST.
+    APPEND LS_SERVER_LIST TO LT_SERVER_LIST.
+  ENDIF.
+  LOOP AT LT_SERVER_LIST INTO LS_SERVER_LIST.
+    LS_DESTI-RFCDEST = LS_SERVER_LIST-NAME.
+    IF LV_DEST IS NOT INITIAL.  "--- Cloud Mode
+      LS_DESTI-RFCDEST = LV_DEST.
+    ENDIF.
+    APPEND LS_DESTI TO LT_DESTI.
+  ENDLOOP.
+  LOOP AT LT_DESTI INTO LS_DESTI.
+    REFRESH LT_USR_LISTE.
+    CLEAR LS_USR_LISTE.
+    CALL FUNCTION 'THUSRINFO'
+      DESTINATION LS_DESTI
+      TABLES
+        USR_TABL              = LT_USR_LISTE
+      EXCEPTIONS
+        COMMUNICATION_FAILURE = 17
+        SYSTEM_FAILURE        = 17.
+    IF SY-SUBRC = '17'.
+      "ERROR = 'X'.
+    ENDIF.
+    LOOP AT LT_USR_LISTE INTO LS_USR_LISTE.
+      CLEAR T_DATA.
+      MOVE-CORRESPONDING LS_DESTI TO T_DATA.
+      MOVE-CORRESPONDING LS_USR_LISTE TO T_DATA.
+      CASE LS_USR_LISTE-TYPE.                "EA 14.09.99
+        WHEN 4.
+          T_DATA-US_GUI = 'X'.
+        WHEN 32.
+          T_DATA-US_RFC = 'X'.
+        WHEN 202.
+          T_DATA-US_PLUGIN = 'X'.
+        WHEN OTHERS.
+      ENDCASE.
+**** Begin 09/23++
+      IF LS_USR_LISTE-HOSTADR IS NOT INITIAL AND
+         LS_USR_LISTE-HOSTADR NE '00000000'.
+        LV_USERNAME = LS_USR_LISTE-BNAME.
+* Convert User's host address to IP address
+        CALL FUNCTION '/SKN/F_SW_CONVERT_HOST_2_IP'
+          EXPORTING
+            IF_USERNAME   = LV_USERNAME
+            IF_HOSTADR    = LS_USR_LISTE-HOSTADR
+            DEST          = LV_DEST
+          IMPORTING
+            EF_IP_ADDRESS = T_DATA-IP_ADDRESS
+          EXCEPTIONS
+            OTHERS        = 1.
+      ENDIF.
+**** End 09/23++
+      APPEND T_DATA.
+    ENDLOOP.
+    "----Build Memory List
+    IF LV_DEST IS INITIAL.  "--- Non Cloud Mode
+      CALL FUNCTION '/SKN/F_SW_01_MEMO_INFO'
+        DESTINATION LS_DESTI
+        TABLES
+          LIST_MEMO = LT_LIST_MEMO.
+      LOOP AT T_DATA.
+        SY_TABIX = SY-TABIX.
+        READ TABLE LT_LIST_MEMO INTO LS_LIST_MEMO
+                                WITH KEY TID = T_DATA-TID.
+        IF SY-SUBRC IS INITIAL.
+          MOVE-CORRESPONDING LS_LIST_MEMO TO T_DATA.
+          MODIFY T_DATA INDEX SY_TABIX.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+    "----Build Memory List
+  ENDLOOP.
+*-- Fill Duration Value
+  SY_DATLO = SY-DATUM.   " System Date/Time
+  SY_TIMLO = SY-UZEIT.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX.
+    LV_DATUM = SY_DATLO.
+    LV_ZEIT = T_DATA-ZEIT.
+    IF LV_ZEIT > SY_TIMLO.
+      LV_DATUM = LV_DATUM - 1.
+    ENDIF.
+    T_DATA-DATE = LV_DATUM.
+    T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = LV_DATUM
+        T_FROM      = LV_ZEIT
+        D_TO        = SY_DATLO
+        T_TO        = SY_TIMLO
+        TIME_UNIT   = LV_DURATION_UNIT
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-DURATION = TIME_DIFF .
+    ELSE.
+      T_DATA-DURATION = '999999'.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX .
+  ENDLOOP .
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+  DELETE T_DATA WHERE TID          NOT IN R_TID.
+  DELETE T_DATA WHERE MANDT        NOT IN R_MANDT.
+  DELETE T_DATA WHERE BNAME        NOT IN R_BNAME.
+  DELETE T_DATA WHERE TCODE        NOT IN R_TCODE.
+  DELETE T_DATA WHERE TERM         NOT IN R_TERM.
+  DELETE T_DATA WHERE ZEIT         NOT IN R_ZEIT.
+  DELETE T_DATA WHERE MASTER       NOT IN R_MASTER.
+  DELETE T_DATA WHERE HOSTADR      NOT IN R_HOSTADR.
+  DELETE T_DATA WHERE IP_ADDRESS   NOT IN R_IP_ADDRESS.     " 09/23++
+  DELETE T_DATA WHERE TYPE         NOT IN R_TYPE.
+  DELETE T_DATA WHERE STAT         NOT IN R_STAT.
+  DELETE T_DATA WHERE PROTOCOL     NOT IN R_PROTOCOL.
+  DELETE T_DATA WHERE GUIVERSION   NOT IN R_GUIVERSION.
+  DELETE T_DATA WHERE RFC_TYPE     NOT IN R_RFC_TYPE.
+  DELETE T_DATA WHERE TOTAL_MEM_MB NOT IN R_TOTAL_MEM_MB.
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX.
+    CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+      EXPORTING
+        BNAME      = T_DATA-BNAME
+      IMPORTING
+        NAME_FIRST = T_DATA-NAME_FIRST
+        NAME_LAST  = T_DATA-NAME_LAST
+        NAME_TEXT  = T_DATA-NAME_TEXT
+      EXCEPTIONS
+        NO_DATA    = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

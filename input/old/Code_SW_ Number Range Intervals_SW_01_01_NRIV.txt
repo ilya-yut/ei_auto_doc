@@ -1,0 +1,139 @@
+FUNCTION /SKN/F_SW_01_01_NRIV.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_01_01_NRIV OPTIONAL
+*"----------------------------------------------------------------------
+  " variables definition
+  DATA_MULTY:   OBJECT        NROBJ,
+                SUBOBJECT     NRSOBJ,
+                NRRANGENR     NRNR,
+                NRLEVEL       NRLEVEL,
+                TOYEAR        NRYEAR,
+                FREENUMABS    NRFROM,
+                FREENUMPERC   INT1,
+                THRESHOLDABS  NRFROM,
+                THRESHOLDPERC INT1,
+                BNAME         XUBNAME,
+                CLASS         XUCLASS,
+                TONUMBER      NRTO,
+                FROMNUMBER    NRLEVEL,
+                EXTERNIND     NRIND.
+  DATA_SINGLE:  LANGU         LANGU,
+                MANAGE_IN_UTC CHAR1,
+                SW_DEST       RFCDEST.
+  DATA :        SY_TABIX      LIKE SY-TABIX,
+                SY_DATLO      LIKE SY-DATLO,
+                SY_TIMLO      LIKE SY-TIMLO,
+                DOMVALUE      LIKE DD07V-DOMVALUE_L,
+                DDTEXT        LIKE DD07V-DDTEXT.
+  FIELD-SYMBOLS: <T_DATA_WA_FS> LIKE LINE OF T_DATA.
+DATA: LV_FREENUMABS(20) TYPE N,
+      LV_THRESHOLDABS(20) TYPE N,
+      LV_NORMALIZEDNRLEV(20) TYPE N,
+      LV_AVAILNUMRANGE(20) TYPE N,
+      LV_THRESHOLDPERC TYPE I.
+  " variables population
+  SELECT_MULTY: OBJECT,
+                SUBOBJECT,
+                NRRANGENR,
+                NRLEVEL,
+                TOYEAR,
+                FREENUMABS,
+                FREENUMPERC,
+                THRESHOLDABS,
+                THRESHOLDPERC,
+                TONUMBER,
+                FROMNUMBER,
+                EXTERNIND.
+ CONVERT_MULTY: NRLEVEL     ALPHA,
+                FREENUMABS   ALPHA,
+                THRESHOLDABS ALPHA,
+                TONUMBER     ALPHA,
+                FROMNUMBER   ALPHA.
+  LV_LANGU = SY-LANGU.
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 SW_DEST.
+  " if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_01_01_NRIV'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  " time filling and shifting
+  SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO.
+  TIME_SHIFT SY_DATLO SY_TIMLO.
+  CLEAR IS_ALERT.
+  REFRESH T_DATA.
+  " retrieve the data
+  SELECT *
+    FROM NRIV
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE OBJECT        IN R_OBJECT
+      AND SUBOBJECT     IN R_SUBOBJECT
+      AND NRRANGENR     IN R_NRRANGENR
+      AND TOYEAR        IN R_TOYEAR
+      AND TONUMBER      IN R_TONUMBER
+      AND NRLEVEL       IN R_NRLEVEL
+      AND FROMNUMBER    IN R_FROMNUMBER
+      AND EXTERNIND     IN R_EXTERNIND.
+  DATA: TONUMBER_STR      TYPE STRING,
+        FROMNUMBER_STR    TYPE STRING,
+        NRLEVEL_STR       TYPE STRING,
+        NORMALIZEDNRLEV   TYPE NRTO.
+  " data post processing
+  LOOP AT T_DATA ASSIGNING <T_DATA_WA_FS>.
+    " check if it's number, cause there is also garbage values, e.g. *, -, letters etc.
+    TONUMBER_STR    = <T_DATA_WA_FS>-TONUMBER.
+    FROMNUMBER_STR  = <T_DATA_WA_FS>-FROMNUMBER.
+    NRLEVEL_STR     = <T_DATA_WA_FS>-NRLEVEL.
+    IF ( TONUMBER_STR NA SY-ABCDE AND
+         FROMNUMBER_STR NA SY-ABCDE AND
+         NRLEVEL_STR NA SY-ABCDE ).
+      IF ( TONUMBER_STR NA '~!@#$%^&*()_-=+' AND
+           FROMNUMBER_STR NA '~!@#$%^&*()_-=+' AND
+           NRLEVEL_STR NA '~!@#$%^&*()_-=+' ).
+        LV_AVAILNUMRANGE = <T_DATA_WA_FS>-TONUMBER - <T_DATA_WA_FS>-FROMNUMBER.
+        <T_DATA_WA_FS>-AVAILNUMRANGE = LV_AVAILNUMRANGE.
+        " since the number ranges can begin not only from 0, but from any place,
+        " perform normalization before percentage calculation
+        IF <T_DATA_WA_FS>-NRLEVEL > 0.
+          LV_NORMALIZEDNRLEV = <T_DATA_WA_FS>-NRLEVEL - <T_DATA_WA_FS>-FROMNUMBER.
+        ELSE.
+          LV_NORMALIZEDNRLEV = 0.
+        ENDIF.
+        NORMALIZEDNRLEV = LV_NORMALIZEDNRLEV.
+        IF NORMALIZEDNRLEV NA '~!@#$%^&*()_-=+'.
+          LV_FREENUMABS  = <T_DATA_WA_FS>-TONUMBER - <T_DATA_WA_FS>-NRLEVEL.
+          <T_DATA_WA_FS>-FREENUMABS = LV_FREENUMABS.
+          <T_DATA_WA_FS>-FREENUMPERC = 100 - ( LV_NORMALIZEDNRLEV / <T_DATA_WA_FS>-AVAILNUMRANGE * 100 ).
+          IF <T_DATA_WA_FS>-NRLEVEL > 0.
+            LV_THRESHOLDABS  = <T_DATA_WA_FS>-NRLEVEL - <T_DATA_WA_FS>-FROMNUMBER.
+          ELSE.
+            LV_THRESHOLDABS  = 0.
+          ENDIF.
+          <T_DATA_WA_FS>-THRESHOLDABS = LV_THRESHOLDABS.
+          LV_THRESHOLDPERC = ( LV_NORMALIZEDNRLEV / <T_DATA_WA_FS>-AVAILNUMRANGE * 100 ).
+          <T_DATA_WA_FS>-THRESHOLDPERC = LV_THRESHOLDPERC.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  " clean-up the data
+  DELETE T_DATA WHERE FREENUMABS    NOT IN R_FREENUMABS.
+  DELETE T_DATA WHERE FREENUMPERC   NOT IN R_FREENUMPERC.
+  DELETE T_DATA WHERE THRESHOLDABS  NOT IN R_THRESHOLDABS.
+  DELETE T_DATA WHERE THRESHOLDPERC NOT IN R_THRESHOLDPERC.
+  " check alert information
+  READ TABLE T_DATA   INDEX 1.
+  CHECK NOT  SY-TFILL IS INITIAL.
+  IS_ALERT = 'X'.
+ENDFUNCTION.

@@ -1,0 +1,2541 @@
+{
+  "source_file": "SW_01_02_MSG_STATUS - Message Status Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: Message Status Monitoring (SW_01_02_MSG_STATUS)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive monitoring and analysis of SAP message status records to ensure reliable output processing, document generation, and communication delivery through the SAP Message Control framework. Message status monitoring is essential for maintaining business process continuity and ensuring that critical business documents, reports, and communications are processed and delivered successfully to intended recipients."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message Status Monitoring extends the standard SAP Output Management framework by providing detailed message processing lifecycle tracking and delivery status analysis. The technology enables proactive monitoring of message processing events including failed outputs, stuck processing, delivery confirmations, and communication channel performance, crucial for maintaining robust business communication workflows and preventing document delivery failures."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides detailed message status monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Output processing tracking to monitor the status and performance of business document generation and delivery"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message delivery analysis for understanding communication success patterns and identifying processing failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Processing bottleneck detection to identify stuck or delayed message processing that may impact business operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication channel monitoring to track delivery performance across different output types and channels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business process continuity for ensuring critical business communications reach their intended destinations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution analyzes message status data from the NAST table (Message Status), similar to data available through VN01/VN02 transactions (Output Control), and provides enhanced filtering capabilities to focus on specific applications, output types, processing statuses, and time periods. This enables targeted analysis of message processing characteristics and identification of output-related business continuity issues."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator checks whether SAP message processing is functioning reliably and identifies potential issues that may impact business document delivery, communication workflows, and operational continuity."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor message processing performance and delivery failures indicate output management system issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication and Document Delivery Problems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Failed message processing preventing critical business document delivery and communication workflows"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stuck output processing causing document generation delays and recipient notification failures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message delivery errors leading to incomplete business process execution and communication gaps"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Output channel failures disrupting automated business document distribution and operational workflows"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Document processing bottlenecks affecting business operation timelines and customer communication"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Message delivery failures impacting compliance requirements and business process completion"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Output generation delays causing customer service issues and operational inefficiencies"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Communication workflow interruptions affecting business relationship management and process automation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business continuity disruptions due to failed or delayed message delivery affecting operational effectiveness"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Compliance violations from missing or undelivered business documents impacting regulatory adherence"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Customer satisfaction issues from communication delivery failures affecting business relationships and service quality"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process automation failures from unreliable message processing compromising operational efficiency and productivity"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate failed and stuck message processing using VN01/VN02 transactions for detailed output analysis and resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check message processing queues and delivery channels for bottleneck identification and immediate remediation"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review output management system performance and resource utilization for capacity assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze message delivery patterns and identify frequently failing output types for targeted troubleshooting"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor message processing performance trends and delivery success rates for optimization opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate output management system capacity and resource allocation for workload optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check communication channel configuration and delivery mechanism reliability for performance enhancement"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze message processing patterns by application, output type, and delivery channel for system tuning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize message processing parameters and output management configurations for improved reliability and performance"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement message delivery error handling and retry mechanisms for enhanced fault tolerance and recovery"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish proactive message status monitoring and alerting procedures for early issue detection and prevention"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades and process improvements based on message volume analysis and delivery requirements"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "ACALL",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "2",
+          "ADRNR",
+          "Address Number",
+          "CHAR",
+          "10",
+          "0",
+          "AD_ADDRNUM",
+          "AD_ADDRNUM"
+        ],
+        [
+          "3",
+          "AENDE",
+          "Change message",
+          "CHAR",
+          "1",
+          "0",
+          "NA_AENDE",
+          "NA_AENDE"
+        ],
+        [
+          "4",
+          "AKTIV",
+          "Activity flag",
+          "CHAR",
+          "1",
+          "0",
+          "NA_AKTIV",
+          "CHAR1"
+        ],
+        [
+          "5",
+          "ANZAL",
+          "Number of messages",
+          "DEC",
+          "2",
+          "0",
+          "NA_ANZAL",
+          "DEC2"
+        ],
+        [
+          "6",
+          "BACKDAYS",
+          "Back Days",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "7",
+          "CMFPNR",
+          "Number",
+          "NUMC",
+          "12",
+          "0",
+          "NA_CMF_NR",
+          "NUMC12"
+        ],
+        [
+          "8",
+          "DATRE",
+          "Response date",
+          "DATS",
+          "8",
+          "0",
+          "NA_DATRE",
+          "DATUM"
+        ],
+        [
+          "9",
+          "DATUM",
+          "Date",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "10",
+          "DATVR",
+          "Processing date",
+          "DATS",
+          "8",
+          "0",
+          "NA_DATVR",
+          "DATUM"
+        ],
+        [
+          "11",
+          "DELET",
+          "Release after output",
+          "CHAR",
+          "1",
+          "0",
+          "TDDELETE",
+          "TDBOOL"
+        ],
+        [
+          "12",
+          "DIMME",
+          "Print immediately",
+          "CHAR",
+          "1",
+          "0",
+          "TDIMMED",
+          "TDBOOL"
+        ],
+        [
+          "13",
+          "DSNAM",
+          "Spool request name",
+          "CHAR",
+          "6",
+          "0",
+          "RSPO0NAME",
+          "CHAR6"
+        ],
+        [
+          "14",
+          "DSUF1",
+          "Suffix 1",
+          "CHAR",
+          "4",
+          "0",
+          "RSPO1NAME",
+          "CHAR4"
+        ],
+        [
+          "15",
+          "DSUF2",
+          "Suffix 2",
+          "CHAR",
+          "12",
+          "0",
+          "RSPO2NAME",
+          "CHAR12"
+        ],
+        [
+          "16",
+          "DURATION",
+          "Duration In Time Units",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "17",
+          "DURATION_UNIT",
+          "Duration Unit(D/H/M)",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_DURATION_UNIT",
+          "/SKN/D_SW_DURATION_UNIT"
+        ],
+        [
+          "18",
+          "EDIKEY",
+          "Not used",
+          "CHAR",
+          "8",
+          "0",
+          "NA_OBS008",
+          "CHAR8"
+        ],
+        [
+          "19",
+          "EDITRANS",
+          "Not used",
+          "CHAR",
+          "6",
+          "0",
+          "NA_OBS006",
+          "CHAR6"
+        ],
+        [
+          "20",
+          "ERDAT",
+          "Created Date",
+          "DATS",
+          "8",
+          "0",
+          "NA_ERDAT",
+          "DATUM"
+        ],
+        [
+          "21",
+          "ERUHR",
+          "Created Time",
+          "TIMS",
+          "6",
+          "0",
+          "NA_ERUHR",
+          "UZEIT"
+        ],
+        [
+          "22",
+          "EVENT",
+          "Event",
+          "CHAR",
+          "32",
+          "0",
+          "SWO_EVENT",
+          "SWC_ELEM"
+        ],
+        [
+          "23",
+          "FORFB",
+          "Requested Status",
+          "CHAR",
+          "1",
+          "0",
+          "BCS_RQST",
+          "BCS_RQST"
+        ],
+        [
+          "24",
+          "KAPPL",
+          "Application",
+          "CHAR",
+          "2",
+          "0",
+          "SNA_KAPPL",
+          "CHAR2"
+        ],
+        [
+          "25",
+          "KSCHL",
+          "Mess Type",
+          "CHAR",
+          "4",
+          "0",
+          "SNA_KSCHL",
+          "CHAR4"
+        ],
+        [
+          "26",
+          "LDEST",
+          "Spool: Output device",
+          "CHAR",
+          "4",
+          "0",
+          "RSPOPNAME",
+          "RSPOPNAME"
+        ],
+        [
+          "27",
+          "MANUE",
+          "Message manually",
+          "CHAR",
+          "1",
+          "0",
+          "NA_MANUE",
+          "NA_MANUE"
+        ],
+        [
+          "28",
+          "NACHA",
+          "Message transmission medium",
+          "CHAR",
+          "1",
+          "0",
+          "NA_NACHA",
+          "NA_NACHA"
+        ],
+        [
+          "29",
+          "NAUTO",
+          "Automatic",
+          "CHAR",
+          "1",
+          "0",
+          "NA_NAUTO",
+          "XFELD"
+        ],
+        [
+          "30",
+          "OBJAC",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "31",
+          "OBJCP",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "32",
+          "OBJKY",
+          "Object Key",
+          "CHAR",
+          "30",
+          "0",
+          "NA_OBJKEY",
+          "NA_OBJKEY"
+        ],
+        [
+          "33",
+          "OBJPRI",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "34",
+          "OBJRN",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "35",
+          "OBJRR",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "36",
+          "OBJSNS",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "37",
+          "OBJTYPE",
+          "Object type",
+          "CHAR",
+          "10",
+          "0",
+          "OJ_NAME",
+          "OJ_NAME"
+        ],
+        [
+          "38",
+          "OPTARCNR",
+          "Archive number",
+          "NUMC",
+          "10",
+          "0",
+          "NA_OPTAR",
+          "NA_OPTAR"
+        ],
+        [
+          "39",
+          "OUTFL",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "40",
+          "PARNR",
+          "Mess Partner",
+          "CHAR",
+          "10",
+          "0",
+          "NA_PARNR",
+          "NA_PARNR"
+        ],
+        [
+          "41",
+          "PARVW",
+          "Partner Role",
+          "CHAR",
+          "2",
+          "0",
+          "SNA_PARVW",
+          "CHAR2"
+        ],
+        [
+          "42",
+          "PFLD1",
+          "Not used",
+          "CHAR",
+          "30",
+          "0",
+          "NA_OBS030",
+          "CHAR30"
+        ],
+        [
+          "43",
+          "PFLD2",
+          "Not used",
+          "CHAR",
+          "30",
+          "0",
+          "NA_OBS030",
+          "CHAR30"
+        ],
+        [
+          "44",
+          "PFLD3",
+          "Not used",
+          "CHAR",
+          "30",
+          "0",
+          "NA_OBS030",
+          "CHAR30"
+        ],
+        [
+          "45",
+          "PFLD4",
+          "SAPscript Form",
+          "CHAR",
+          "30",
+          "0",
+          "NA_TDFORM",
+          "CHAR30"
+        ],
+        [
+          "46",
+          "PFLD5",
+          "Layout module for print formatting",
+          "CHAR",
+          "30",
+          "0",
+          "NA_LABEL",
+          "FUNCNAME"
+        ],
+        [
+          "47",
+          "PMID1",
+          "Not used",
+          "CHAR",
+          "3",
+          "0",
+          "NA_OBS003",
+          "CHAR03"
+        ],
+        [
+          "48",
+          "PMID2",
+          "Not used",
+          "CHAR",
+          "3",
+          "0",
+          "NA_OBS003",
+          "CHAR03"
+        ],
+        [
+          "49",
+          "PMID3",
+          "Not used",
+          "CHAR",
+          "3",
+          "0",
+          "NA_OBS003",
+          "CHAR03"
+        ],
+        [
+          "50",
+          "PMID4",
+          "Not used",
+          "CHAR",
+          "3",
+          "0",
+          "NA_OBS003",
+          "CHAR03"
+        ],
+        [
+          "51",
+          "PMID5",
+          "Not used",
+          "CHAR",
+          "3",
+          "0",
+          "NA_OBS003",
+          "CHAR03"
+        ],
+        [
+          "52",
+          "PRIFB",
+          "Report Status by Mail",
+          "CHAR",
+          "1",
+          "0",
+          "BCS_STML",
+          "BCS_STML"
+        ],
+        [
+          "53",
+          "REPET",
+          "Repeatability",
+          "CHAR",
+          "1",
+          "0",
+          "NA_REPET",
+          "NA_REPET"
+        ],
+        [
+          "54",
+          "REPID",
+          "Not used",
+          "CHAR",
+          "8",
+          "0",
+          "NA_OBS008",
+          "CHAR8"
+        ],
+        [
+          "55",
+          "SNDBC",
+          "Address Type",
+          "CHAR",
+          "1",
+          "0",
+          "AD_ADRTYPE",
+          "AD_ADRTYPE"
+        ],
+        [
+          "56",
+          "SNDCP",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "57",
+          "SNDDR",
+          "Send as disregard",
+          "CHAR",
+          "1",
+          "0",
+          "SO_SND_DR",
+          "SO_FLAG"
+        ],
+        [
+          "58",
+          "SNDEX",
+          "Not used",
+          "CHAR",
+          "1",
+          "0",
+          "NA_OBS001",
+          "CHAR1"
+        ],
+        [
+          "59",
+          "SORT1",
+          "Sort criterion",
+          "CHAR",
+          "20",
+          "0",
+          "NAST_SORTK",
+          "CHAR20"
+        ],
+        [
+          "60",
+          "SORT2",
+          "Sort criterion",
+          "CHAR",
+          "20",
+          "0",
+          "NAST_SORTK",
+          "CHAR20"
+        ],
+        [
+          "61",
+          "SORT3",
+          "Sort criterion",
+          "CHAR",
+          "20",
+          "0",
+          "NAST_SORTK",
+          "CHAR20"
+        ],
+        [
+          "62",
+          "SPRAS",
+          "Language",
+          "LANG",
+          "1",
+          "0",
+          "NA_SPRAS",
+          "SPRAS"
+        ],
+        [
+          "63",
+          "STATE_COLOR",
+          "State Color",
+          "CHAR",
+          "1",
+          "0",
+          "/SKN/E_SW_STATE_COLOR",
+          "/SKN/D_SW_STATE_COLOR"
+        ],
+        [
+          "64",
+          "STATE_ICON",
+          "State Icon",
+          "CHAR",
+          "4",
+          "0",
+          "/SKN/E_SW_STATE_ICON",
+          "ICON"
+        ],
+        [
+          "65",
+          "STATUS_DESC",
+          "Short text",
+          "CHAR",
+          "60",
+          "0",
+          "EDI_TEXT60",
+          "TEXT60"
+        ],
+        [
+          "66",
+          "TCODE",
+          "Communication strategy",
+          "CHAR",
+          "4",
+          "0",
+          "CSTRATEGY",
+          "CSTRATEGY"
+        ],
+        [
+          "67",
+          "TDARMOD",
+          "Storage Mode",
+          "CHAR",
+          "1",
+          "0",
+          "SYARMOD",
+          "SYARMOD"
+        ],
+        [
+          "68",
+          "TDAUTORITY",
+          "Authorization",
+          "CHAR",
+          "12",
+          "0",
+          "SYPRBER",
+          "SYCHAR12"
+        ],
+        [
+          "69",
+          "TDCOVTITLE",
+          "Cover Page Text",
+          "CHAR",
+          "68",
+          "0",
+          "SYPRTXT",
+          "SYCHAR68K"
+        ],
+        [
+          "70",
+          "TDDIVISION",
+          "Department on Cover Page",
+          "CHAR",
+          "12",
+          "0",
+          "SYPRABT",
+          "SYCHAR12K"
+        ],
+        [
+          "71",
+          "TDID",
+          "Text ID",
+          "CHAR",
+          "4",
+          "0",
+          "TDID",
+          "TDID"
+        ],
+        [
+          "72",
+          "TDNAME",
+          "Object key",
+          "CHAR",
+          "70",
+          "0",
+          "NA_OBJKY_L",
+          "NA_OBJKY_L"
+        ],
+        [
+          "73",
+          "TDOCOVER",
+          "SAP cover page",
+          "CHAR",
+          "1",
+          "0",
+          "SYPRSAP",
+          "SYPRSAP"
+        ],
+        [
+          "74",
+          "TDRECEIVER",
+          "Recipient",
+          "CHAR",
+          "12",
+          "0",
+          "SYPRREC",
+          "SYCHAR12"
+        ],
+        [
+          "75",
+          "TDSCHEDULE",
+          "Send time",
+          "CHAR",
+          "3",
+          "0",
+          "SKSCHEDULE",
+          "SKSCHEDULE"
+        ],
+        [
+          "76",
+          "TDSPRAS",
+          "Language Key",
+          "LANG",
+          "1",
+          "0",
+          "SPRAS",
+          "SPRAS"
+        ],
+        [
+          "77",
+          "TELFX",
+          "Fax number",
+          "CHAR",
+          "31",
+          "0",
+          "NA_TELFX",
+          "TEXT31"
+        ],
+        [
+          "78",
+          "TELTX",
+          "Teletex number",
+          "CHAR",
+          "30",
+          "0",
+          "TELTX",
+          "TEXT30"
+        ],
+        [
+          "79",
+          "TELX1",
+          "Telex number",
+          "CHAR",
+          "30",
+          "0",
+          "TELX1",
+          "TEXT30"
+        ],
+        [
+          "80",
+          "TLAND",
+          "Country Key",
+          "CHAR",
+          "3",
+          "0",
+          "LAND1",
+          "LAND1"
+        ],
+        [
+          "81",
+          "UHRVR",
+          "Processing time",
+          "TIMS",
+          "6",
+          "0",
+          "NA_UHRVR",
+          "UZEIT"
+        ],
+        [
+          "82",
+          "USER_FLD",
+          "Dynamic Recipient User Field",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "83",
+          "USNAM",
+          "User name",
+          "CHAR",
+          "12",
+          "0",
+          "USNAM",
+          "XUBNAME"
+        ],
+        [
+          "84",
+          "USRNAM",
+          "Company Address",
+          "CHAR",
+          "12",
+          "0",
+          "NA_PERS_12",
+          "CHAR12"
+        ],
+        [
+          "85",
+          "VSDAT",
+          "Send date",
+          "DATS",
+          "8",
+          "0",
+          "NA_VSDAT",
+          "DATUM"
+        ],
+        [
+          "86",
+          "VSTAT",
+          "Processing status of message",
+          "CHAR",
+          "1",
+          "0",
+          "NA_VSTAT",
+          "NA_VSTAT"
+        ],
+        [
+          "87",
+          "VSURA",
+          "Dispatch time from",
+          "TIMS",
+          "6",
+          "0",
+          "NA_VSURA",
+          "UZEIT"
+        ],
+        [
+          "88",
+          "VSURB",
+          "Send time to",
+          "TIMS",
+          "6",
+          "0",
+          "NA_VSURB",
+          "UZEIT"
+        ],
+        [
+          "89",
+          "VSZTP",
+          "Dispatch time",
+          "CHAR",
+          "1",
+          "0",
+          "NA_VSZTP",
+          "NA_VSZTP"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 89 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ACALL (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, not used on ACALL often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ADRNR (Address Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter address number on ADRNR surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AENDE (Change message)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening change message through AENDE alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AKTIV (Activity flag)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where activity flag on AKTIV is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ANZAL (Number of messages)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so number of messages (ANZAL) aligns with the intended triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS (Back Days)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Backdays is based on ERDAT"
+    },
+    {
+      "kind": "paragraph",
+      "text": "CMFPNR (Number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing number via CMFPNR before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATRE (Response date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when response date on DATRE is narrowed together with client, user, or session filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM (Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when date on DATUM is narrowed together with client, user, or session filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATVR (Processing date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, processing date on DATVR indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DELET (Release after output)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Works downstream of the initial read so release after output on DELET still participates in row-level deletion rules."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIMME (Print immediately)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, print immediately on DIMME often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DSNAM (Spool request name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because spool request name (DSNAM) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DSUF1 - DSUF2 (Suffix 1 / Suffix 2)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Together, DSUF1 and DSUF2 narrow spool-related naming suffix dimensions so monitoring stays aligned with how operators identify related output requests in the same run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION (Duration In Time Units)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring duration in time units (DURATION) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT (Duration Unit(D/H/M))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unit for elapsed time between each session's creation date and time and the evaluation clock."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION_UNIT Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        H — Hours."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        M — Minutes (preset in code before the selection read when not overridden)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        D — Days."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        F — Full-day style counting where applicable to the duration helper."
+    },
+    {
+      "kind": "paragraph",
+      "text": "EDIKEY (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where not used on EDIKEY is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "EDITRANS (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, not used on EDITRANS isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ERDAT (Created Date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, created date on ERDAT indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "ERUHR (Created Time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter created time on ERUHR surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "EVENT (Event)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where event (EVENT) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "FORFB (Requested Status)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects requested status constraints carried by FORFB."
+    },
+    {
+      "kind": "paragraph",
+      "text": "KAPPL (Application)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses application from the source context so only records with KAPPL inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "KSCHL (Mess Type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening mess type through KSCHL alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "LDEST (Spool: Output device)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing spool: output device (LDEST) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "MANUE (Message manually)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, message manually (MANUE) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NACHA (Message transmission medium)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Gives auditors traceable criteria because message transmission medium on NACHA is applied consistently before any alert flag is raised."
+    },
+    {
+      "kind": "paragraph",
+      "text": "NAUTO (Automatic)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, automatic on NAUTO indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJAC (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because not used (OBJAC) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJCP (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where not used (OBJCP) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJKY (Object Key)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, OBJKY does not restrict object key; when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJPRI (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening not used through OBJPRI alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJRN (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, OBJRN does not restrict not used; when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJRR (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, not used on OBJRR keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJSNS (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, not used on OBJSNS indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OBJTYPE (Object type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interprets object type as part of the selection contract: open ranges follow framework defaults; restricted ranges apply strict matching on OBJTYPE."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OPTARCNR (Archive number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports escalation where archive number on OPTARCNR signals ownership for follow-up between Basis and functional teams."
+    },
+    {
+      "kind": "paragraph",
+      "text": "OUTFL (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when not used on OUTFL correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PARNR (Mess Partner)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter mess partner on PARNR surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PARVW (Partner Role)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, partner role on PARVW often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PFLD1 - PFLD5 (Not used / SAPscript Form / Layout module for print formatting)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treat PFLD1 through PFLD5 as the print-form and layout parameter family: configure the slots that matter for your scenario so SAPscript form and layout selections stay consistent with the message lines you expect in the extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PMID1 - PMID5 (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configure PMID1 through PMID5 as reserved message-parameter slots: leave them open when your scenario does not use them, or populate the subset your installation maps so the monitor’s selection contract matches how output determination fills those positions."
+    },
+    {
+      "kind": "paragraph",
+      "text": "PRIFB (Report Status by Mail)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, report status by mail on PRIFB often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REPET (Repeatability)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing repeatability (REPET) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "REPID (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, not used on REPID indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDBC (Address Type)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because address type (SNDBC) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDCP (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen SNDCP for not used, then tighten thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDDR (Send as disregard)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When combined with destination discipline, send as disregard on SNDDR keeps both breadth and depth of the extract intentional."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SNDEX (Not used)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating not used through SNDEX for each candidate record."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SORT1 - SORT3 (Sort criterion)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "SORT1, SORT2, and SORT3 define multi-level sort keys for the outbound list so reviewers see message rows in a stable business order (for example by partner, object, and time) before duration and state-style trimming."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SPRAS (Language)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reduces false positives during peak windows by tightening language through SPRAS alongside state filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR (State Color)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Filters lines by the derived color bucket used for severity-style triage in the monitor framework."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        R — Red (error or failed-style outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        G — Green (successful outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Y — Yellow (warning or in-process outcomes)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        Additional literals may exist where the framework extends the palette for neutral states."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_ICON (State Icon)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When left open per framework rules, STATE_ICON does not restrict state icon; when set, only matching rows remain."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATUS_DESC (Short text)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing short text via STATUS_DESC before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TCODE (Communication strategy)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For operations, communication strategy on TCODE indicates whether a row belongs in the current monitoring pass versus historical noise."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDARMOD (Storage Mode)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing storage mode via TDARMOD before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDAUTORITY (Authorization)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Aligns exception volume with the chosen scope by testing authorization via TDAUTORITY before alert evaluation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDCOVTITLE (Cover Page Text)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Valuable when comparing health before and after a release—hold cover page text on TDCOVTITLE constant while varying other filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDDIVISION (Department on Cover Page)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Explains why two monitoring passes differ: only the pass with stricter department on cover page on TDDIVISION surfaces the disputed rows."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDID (Text ID)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing text id (TDID) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDNAME (Object key)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects object key constraints carried by TDNAME."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDOCOVER (SAP cover page)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "After data is read, lines are removed unless sap cover page on TDOCOVER still satisfies the active multivalued selection."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDRECEIVER (Recipient)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Supports operational control by evaluating recipient through TDRECEIVER for each candidate record."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDSCHEDULE (Send time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where send time (TDSCHEDULE) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TDSPRAS (Language Key)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how administrators slice operational lists: language key (TDSPRAS) is one lever that shapes which rows are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TELFX (Fax number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, fax number (TELFX) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TELTX (Teletex number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because teletex number (TELTX) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TELX1 (Telex number)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Connects to alert semantics: rows removed for failing telex number on TELX1 never reach downstream filtering."
+    },
+    {
+      "kind": "paragraph",
+      "text": "TLAND (Country Key)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, country key on TLAND often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UHRVR (Processing time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects processing time constraints carried by UHRVR."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USER_FLD (Dynamic Recipient User Field)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The USER_FLD parameter serves a dual purpose in work process monitoring: filtering results and enabling dynamic notification routing through the Dynamic Recipient List (DRL) mechanism. Instead of notifying pre-assigned users, the DRL mechanism provides a flexible, role-based notification system that automatically determines the appropriate recipients based on the monitoring results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "How DRL Works:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When USER_FLD is specified, the system extracts values from that field in the monitoring result set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "These extracted values are then used as recipient addresses for alert notifications"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This creates a dynamic, role-based notification mechanism that adapts based on the actual data being monitored"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The mechanism is much more flexible than defining and constantly updating lists of specific pre-assigned users"
+    },
+    {
+      "kind": "paragraph",
+      "text": "USNAM (User name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When harmonized with related filters, user name on USNAM isolates the highest-risk record families."
+    },
+    {
+      "kind": "paragraph",
+      "text": "USRNAM (Company Address)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when company address on USRNAM correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VSDAT (Send date)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Guards against oversized extracts when send date on VSDAT is narrowed together with client, user, or session filters."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VSTAT (Processing status of message)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when processing status of message on VSTAT correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VSURA (Dispatch time from)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, dispatch time from on VSURA often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VSURB (Send time to)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when send time to on VSURB correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "VSZTP (Dispatch time)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring dispatch time (VSZTP) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "How parameter combinations work together"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM supplies an explicit monitoring-date range when you populate it, so the population of message rows is anchored to calendar bounds you choose instead of a relative lookback alone."
+    },
+    {
+      "kind": "paragraph",
+      "text": "When DATUM is not provided, BACKDAYS is the fallback that builds the lower monitoring date from the evaluation day backward, and that same window is then aligned with creation-date style selection on the message side unless you override the explicit creation-date filters separately."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION and DURATION_UNIT act as an additional filter after date-oriented selection: only rows whose elapsed time from the reference creation timestamp to the evaluation moment still fit the configured duration band remain in the extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Both the date criteria (explicit DATUM or BACKDAYS-driven window, together with creation-date filters when you set them) and the DURATION / DURATION_UNIT age test are applied together—rows must satisfy the date side and the duration side before downstream presentation and alerting logic runs."
+    },
+    {
+      "kind": "paragraph",
+      "text": "Application and object keys such as KAPPL, OBJKY, and KSCHL define which message families enter the dataset; narrowing them reduces cross-topic noise before time and aging filters run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR and related presentation attributes should be read together with queue or status-style fields so operators interpret severity-style buckets alongside the underlying processing state."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        BACKDAYS - initial - treated as 1 by code (SY-DATUM minus one day as the lower bound for the monitoring date range when neither explicit monitoring dates nor a populated back-day interval fill the range tables)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION - initial - treated as unconstrained by code (empty multivalued interval keeps every computed age value until explicit bounds are supplied on the selection interface)."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        DURATION_UNIT - initial - treated as M by code (minute-based duration math runs before the single-value unit read completes unless the caller overrides the unit afterward)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Practical Example of Parameter Configuration"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Explicit calendar window and aging cap"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Anchor monitoring to a fixed fiscal-year window for message rows and cap how old they may be in minutes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DATUM = 20250101 - 20251231\n DURATION = 240\n DURATION_UNIT = M\n KAPPL = V1\n KSCHL = BA00\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Relative lookback when explicit dates are not set"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Use default lookback behavior while still scoping to one output application and object key pattern."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BACKDAYS = 14\n KAPPL = V2\n OBJKY = 00*\n SPRAS = E\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: State presentation with output type slice"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Focus on error-style presentation while limiting to one output type and partner view."
+    },
+    {
+      "kind": "paragraph",
+      "text": "STATE_COLOR = R\n KSCHL = ZINV\n PARVW = WE\n SPRAS = E\n\n"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 4: Duration in full-day units for batch-style review"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Purpose: Flag rows older than several full days for a known condition type after date selection has already applied."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DURATION = 5\n DURATION_UNIT = F\n KSCHL = BA00\n SPRAS = E\n KAPPL = V1\n\n"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "ACALL",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "ADRNR",
+          "Address number",
+          "CHAR(10)",
+          "AD_ADDRNUM"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "AENDE",
+          "Change message flag",
+          "CHAR(1)",
+          "NA_AENDE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "AKTIV",
+          "Active",
+          "CHAR(1)",
+          "NA_AKTIV"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "ANZAL",
+          "Number of messages (original + copies)",
+          "DEC(2)",
+          "NA_ANZAL"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "CMFPNR",
+          "Error management number",
+          "NUMC(12)",
+          "NA_CMF_NR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DATRE",
+          "Date of the expected response to a message",
+          "DATS(8)",
+          "NA_DATRE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DATVR",
+          "Processing date",
+          "DATS(8)",
+          "NA_DATVR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DELET",
+          "Release after output",
+          "CHAR(1)",
+          "TDDELETE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DIMME",
+          "Print immediately",
+          "CHAR(1)",
+          "TDIMMED"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DSNAM",
+          "Spool request: Name",
+          "CHAR(6)",
+          "RSPO0NAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DSUF1",
+          "Spool request: Suffix 1",
+          "CHAR(4)",
+          "RSPO1NAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DSUF2",
+          "Spool request: Suffix 2",
+          "CHAR(12)",
+          "RSPO2NAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "DURATION_UNIT",
+          "SW: Duration Unit",
+          "CHAR(1)",
+          "/SKN/E_SW_DURATION_UNIT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "EDIKEY",
+          "Unused field",
+          "CHAR(8)",
+          "NA_OBS008"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "EDITRANS",
+          "Unused field",
+          "CHAR(6)",
+          "NA_OBS006"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "ERDAT",
+          "Date on which status record was created",
+          "DATS(8)",
+          "NA_ERDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "ERUHR",
+          "Time at which status record was created",
+          "TIMS(6)",
+          "NA_ERUHR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "EVENT",
+          "Event",
+          "CHAR(32)",
+          "SWO_EVENT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "FORFB",
+          "Requested Status",
+          "CHAR(1)",
+          "BCS_RQST"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "KAPPL",
+          "Application for message conditions",
+          "CHAR(2)",
+          "SNA_KAPPL"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "KSCHL",
+          "Message type",
+          "CHAR(4)",
+          "SNA_KSCHL"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "LDEST",
+          "Spool: Output device",
+          "CHAR(4)",
+          "RSPOPNAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "MANUE",
+          "Message processed manually",
+          "CHAR(1)",
+          "NA_MANUE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "NACHA",
+          "Message transmission medium",
+          "CHAR(1)",
+          "NA_NACHA"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "NAUTO",
+          "Message determined via conditions",
+          "CHAR(1)",
+          "NA_NAUTO"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJAC",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJCP",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJKY",
+          "Object key",
+          "CHAR(30)",
+          "NA_OBJKEY"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJPRI",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJRN",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJRR",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJSNS",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OBJTYPE",
+          "Object type",
+          "CHAR(10)",
+          "OJ_NAME"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OPTARCNR",
+          "Archive number for optical archives",
+          "NUMC(10)",
+          "NA_OPTAR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "OUTFL",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PARNR",
+          "Message partner",
+          "CHAR(10)",
+          "NA_PARNR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PARVW",
+          "Partner function (for example SH for ship-to party)",
+          "CHAR(2)",
+          "SNA_PARVW"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PFLD1",
+          "Unused field",
+          "CHAR(30)",
+          "NA_OBS030"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PFLD2",
+          "Unused field",
+          "CHAR(30)",
+          "NA_OBS030"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PFLD3",
+          "Unused field",
+          "CHAR(30)",
+          "NA_OBS030"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PFLD4",
+          "WFMC: SAPscript form in 30-character field",
+          "CHAR(30)",
+          "NA_TDFORM"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PFLD5",
+          "WFMC: Function module for print formatting",
+          "CHAR(30)",
+          "NA_LABEL"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PMID1",
+          "Unused field",
+          "CHAR(3)",
+          "NA_OBS003"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PMID2",
+          "Unused field",
+          "CHAR(3)",
+          "NA_OBS003"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PMID3",
+          "Unused field",
+          "CHAR(3)",
+          "NA_OBS003"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PMID4",
+          "Unused field",
+          "CHAR(3)",
+          "NA_OBS003"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PMID5",
+          "Unused field",
+          "CHAR(3)",
+          "NA_OBS003"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "PRIFB",
+          "Setting for Which Statuses Are Reported by Mail",
+          "CHAR(1)",
+          "BCS_STML"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "REPET",
+          "Repeatability of message",
+          "CHAR(1)",
+          "NA_REPET"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "REPID",
+          "Unused field",
+          "CHAR(8)",
+          "NA_OBS008"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SNDBC",
+          "Address type (1=Organization, 2=Person, 3=Contact person)",
+          "CHAR(1)",
+          "AD_ADRTYPE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SNDCP",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SNDDR",
+          "Send: As disregard",
+          "CHAR(1)",
+          "SO_SND_DR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SNDEX",
+          "Unused field",
+          "CHAR(1)",
+          "NA_OBS001"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SORT1",
+          "Sort criteria for message status records",
+          "CHAR(20)",
+          "NAST_SORTK"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SORT2",
+          "Sort criteria for message status records",
+          "CHAR(20)",
+          "NAST_SORTK"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SORT3",
+          "Sort criteria for message status records",
+          "CHAR(20)",
+          "NAST_SORTK"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "SPRAS",
+          "Message language",
+          "LANG(1)",
+          "NA_SPRAS"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "STATE_COLOR",
+          "SW: State Color",
+          "CHAR(1)",
+          "/SKN/E_SW_STATE_COLOR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "STATE_ICON",
+          "SW: State Icon",
+          "CHAR(4)",
+          "/SKN/E_SW_STATE_ICON"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "STATUS_DESC",
+          "Short description of object",
+          "CHAR(60)",
+          "EDI_TEXT60"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TCODE",
+          "Communication strategy",
+          "CHAR(4)",
+          "CSTRATEGY"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDARMOD",
+          "Print: Archiving mode",
+          "CHAR(1)",
+          "SYARMOD"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDAUTORITY",
+          "Print: Authorization",
+          "CHAR(12)",
+          "SYPRBER"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDCOVTITLE",
+          "Spool Description",
+          "CHAR(68)",
+          "SYPRTXT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDDIVISION",
+          "Spool Department Name",
+          "CHAR(12)",
+          "SYPRABT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDID",
+          "Text ID",
+          "CHAR(4)",
+          "TDID"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDNAME",
+          "Object key (long)",
+          "CHAR(70)",
+          "NA_OBJKY_L"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDOCOVER",
+          "Print: SAP cover page",
+          "CHAR(1)",
+          "SYPRSAP"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDRECEIVER",
+          "Spool Recipient Name",
+          "CHAR(12)",
+          "SYPRREC"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDSCHEDULE",
+          "Send time request",
+          "CHAR(3)",
+          "SKSCHEDULE"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TDSPRAS",
+          "Language Key",
+          "LANG(1)",
+          "SPRAS"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TELFX",
+          "Fax number",
+          "CHAR(31)",
+          "NA_TELFX"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TELTX",
+          "Teletex number",
+          "CHAR(30)",
+          "TELTX"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TELX1",
+          "Telex number",
+          "CHAR(30)",
+          "TELX1"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "TLAND",
+          "Country Key",
+          "CHAR(3)",
+          "LAND1"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "UHRVR",
+          "Processing time",
+          "TIMS(6)",
+          "NA_UHRVR"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "USNAM",
+          "User name",
+          "CHAR(12)",
+          "USNAM"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "USRNAM",
+          "WFMC: Address number, 12 characters",
+          "CHAR(12)",
+          "NA_PERS_12"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "VSDAT",
+          "Requested date for sending message",
+          "DATS(8)",
+          "NA_VSDAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "VSTAT",
+          "Processing status of message",
+          "CHAR(1)",
+          "NA_VSTAT"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "VSURA",
+          "Requested time for sending message (from)",
+          "TIMS(6)",
+          "NA_VSURA"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "VSURB",
+          "Requested time for sending message (to)",
+          "TIMS(6)",
+          "NA_VSURB"
+        ],
+        [
+          "/SKN/S_SW_01_02_MSG_STATUS",
+          "VSZTP",
+          "Dispatch time",
+          "CHAR(1)",
+          "NA_VSZTP"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_02_MSG_STATUS.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_02_MSG_STATUS OPTIONAL\n*\"----------------------------------------------------------------------\nRANGES : R_KAPPL FOR NAST-KAPPL ,\n         R_STATE_COLOR FOR /SKN/S_SW_SYS_JOB-STATE_COLOR,\n         R_OBJKY FOR NAST-OBJKY,\n         R_KSCHL FOR NAST-KSCHL,\n         R_SPRAS FOR NAST-SPRAS,\n         R_PARNR FOR NAST-PARNR,\n         R_PARVW FOR NAST-PARVW,\n         R_ERDAT FOR NAST-ERDAT,\n         R_ERUHR FOR NAST-ERUHR,\n         R_VSTAT FOR NAST-VSTAT,\n         R_NACHA FOR NAST-NACHA,\n         R_VSZTP FOR NAST-VSZTP,\n         R_USNAM FOR NAST-USNAM,\n         R_TCODE FOR NAST-TCODE,\n         R_LDEST FOR NAST-LDEST,\n         R_TDID  FOR NAST-TDID,\n         R_OBJTYPE FOR NAST-OBJTYPE,\n         R_DATUM   FOR SY-DATUM .\nDATA :   IS_GENERAL(1) TYPE C.\nDATA : DATE_FROM LIKE SY-DATUM ,\n       BACKDAYS  TYPE I .\nDATA : SY_TABIX LIKE SY-TABIX .\nDATA : LANGU TYPE LANGU .\nDATA_MULTY: DURATION   /SKN/E_SW_DURATION.\nDATA_SINGLE: DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.\nDATA :   SY_DATLO LIKE SY-DATLO ,\n         SY_TIMLO LIKE SY-TIMLO .\nDATA : TIME_DIFF TYPE  INT4 .\n*-- Fill Selection Option Tables\n   LOOP AT T_SELECT WHERE FIELDNM = 'OBJKY'.\n     MOVE-CORRESPONDING T_SELECT TO R_OBJKY.\n     APPEND R_OBJKY.\n   ENDLOOP.\n  LOOP AT T_SELECT WHERE FIELDNM = 'KAPPL'.\n    MOVE-CORRESPONDING T_SELECT TO R_KAPPL.\n    APPEND R_KAPPL.\n  ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'STATE_COLOR'.\n     MOVE-CORRESPONDING T_SELECT TO R_STATE_COLOR.\n     APPEND R_STATE_COLOR.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'KSCHL'.\n     MOVE-CORRESPONDING T_SELECT TO R_KSCHL.\n     APPEND R_KSCHL.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'SPRAS'.\n     MOVE-CORRESPONDING T_SELECT TO R_SPRAS.\n     APPEND R_SPRAS.\n   ENDLOOP.\n*\n   LOOP AT T_SELECT WHERE FIELDNM = 'PARNR'.\n     MOVE-CORRESPONDING T_SELECT TO R_PARNR.\n     APPEND R_PARNR.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'PARVW'.\n     MOVE-CORRESPONDING T_SELECT TO R_PARVW.\n     APPEND R_PARVW.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'ERDAT'.\n     MOVE-CORRESPONDING T_SELECT TO R_ERDAT.\n     APPEND R_ERDAT.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'ERUHR'.\n     MOVE-CORRESPONDING T_SELECT TO R_ERUHR.\n     APPEND R_ERUHR.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'VSTAT'.\n     MOVE-CORRESPONDING T_SELECT TO R_VSTAT.\n     APPEND R_VSTAT.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'NACHA'.\n     MOVE-CORRESPONDING T_SELECT TO R_NACHA.\n     APPEND R_NACHA.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'VSZTP'.\n     MOVE-CORRESPONDING T_SELECT TO R_VSZTP.\n     APPEND R_VSZTP.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'USNAM'.\n     MOVE-CORRESPONDING T_SELECT TO R_USNAM.\n     APPEND R_USNAM.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'TCODE'.\n     MOVE-CORRESPONDING T_SELECT TO R_TCODE.\n     APPEND R_TCODE.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'LDEST'.\n     MOVE-CORRESPONDING T_SELECT TO R_LDEST.\n     APPEND R_LDEST.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'TDID'.\n     MOVE-CORRESPONDING T_SELECT TO R_TDID.\n     APPEND R_TDID.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'OBJTYPE'.\n     MOVE-CORRESPONDING T_SELECT TO R_OBJTYPE.\n     APPEND R_OBJTYPE.\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'IS_GENERAL'.\n     IF NOT T_SELECT-LOW IS INITIAL.\n       IS_GENERAL = 'X'.\n     ENDIF.\n     EXIT .\n   ENDLOOP.\n   LOOP AT T_SELECT WHERE FIELDNM = 'DATUM'.\n     MOVE-CORRESPONDING T_SELECT TO R_DATUM.\n     APPEND R_DATUM.\n   ENDLOOP.\n   IF R_DATUM[] IS INITIAL .\n     LOOP AT T_SELECT WHERE FIELDNM = 'BACKDAYS'.\n       R_DATUM-SIGN = 'I' .\n        R_DATUM-OPTION = 'GE' .\n         BACKDAYS = T_SELECT-LOW .\n         DATE_FROM = SY-DATUM - BACKDAYS .\n         R_DATUM-LOW = DATE_FROM .\n         APPEND R_DATUM.\n         EXIT.\n     ENDLOOP.\n     IF R_DATUM[] IS INITIAL .\n       R_DATUM-SIGN = 'I' .\n        R_DATUM-OPTION = 'GE' .\n         BACKDAYS = 1 .\n         DATE_FROM = SY-DATUM - BACKDAYS .\n         R_DATUM-LOW = DATE_FROM .\n       APPEND R_DATUM.\n     ENDIF .\n   ENDIF.\n  IF R_ERDAT[] IS INITIAL.\n    R_ERDAT[] = R_DATUM[] .\n  ENDIF.\n  \"-----\n  LANGU = SY-LANGU.\n  READ TABLE R_SPRAS INDEX 1.\n  IF SY-SUBRC IS INITIAL.\n    LANGU = R_SPRAS-LOW.\n  ENDIF.\n  SELECT_MULTY: DURATION.\n  LV_DURATION_UNIT = 'M'.\n  SELECT_SINGLE: DURATION_UNIT.\n  \"--- Run Cloud Mode -----\n  DATA_SINGLE: SW_DEST RFCDEST.             .\n  SELECT_SINGLE: SW_DEST.\n  IF LV_SW_DEST IS NOT INITIAL.\n    CALL FUNCTION '/SKN/FC_SW_01_02_MSG_STATUS'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = T_DATA.\n  ENDIF.\n  CHECK LV_SW_DEST IS INITIAL.\n\"--- Run Cloud Mode -----\n  SY_DATLO = SY-DATUM .        \" Appl Server's Date\n  SY_TIMLO = SY-UZEIT.\n*--- Retrieve data\n  CLEAR IS_ALERT .\n  REFRESH T_DATA .\n   SELECT *\n      FROM NAST\n      INTO CORRESPONDING FIELDS OF TABLE T_DATA\n      WHERE KAPPL IN R_KAPPL\n        AND OBJKY IN R_OBJKY\n        AND KSCHL IN R_KSCHL\n        AND SPRAS IN R_SPRAS\n        AND PARNR IN R_PARNR\n        AND PARVW IN R_PARVW\n        AND ERDAT IN R_ERDAT\n        AND ERUHR IN R_ERUHR\n        AND VSTAT IN R_VSTAT\n        AND NACHA IN R_NACHA\n        AND VSZTP IN R_VSZTP\n        AND USNAM IN R_USNAM\n        AND TCODE IN R_TCODE\n        AND LDEST IN R_LDEST\n        AND TDID IN R_TDID\n        AND OBJTYPE IN R_OBJTYPE.\n  LOOP AT T_DATA.\n    SY_TABIX = SY-TABIX .\n     CALL FUNCTION '/SKN/F_SW_01_02_MSG_VSTAT'\n       EXPORTING\n         VSTAT             = T_DATA-VSTAT\n         LANGU             = LANGU\n       IMPORTING\n         STATUS_DESC       = T_DATA-STATUS_DESC\n         STATE_COLOR       = T_DATA-STATE_COLOR .\n*\n     CALL FUNCTION '/SKN/F_SW_GET_STATE_ICON'\n       EXPORTING\n         STATE_COLOR       = T_DATA-STATE_COLOR\n       IMPORTING\n         STATE_ICON        = T_DATA-STATE_ICON         .\n     MODIFY T_DATA INDEX SY_TABIX.\n  ENDLOOP.\n  LOOP AT T_DATA .\n    SY_TABIX = SY-TABIX .\n    IF NOT T_DATA-STATE_COLOR IN R_STATE_COLOR.\n      DELETE T_DATA INDEX SY_TABIX.\n    ENDIF.\n  ENDLOOP.\n*-- Fill Duration Value\n LOOP AT T_DATA .\n   SY_TABIX = SY-TABIX.\n   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.\n    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'\n        EXPORTING\n          D_FROM            = T_DATA-ERDAT\n          T_FROM            = T_DATA-ERUHR\n          D_TO              = SY_DATLO\n          T_TO              = SY_TIMLO\n          TIME_UNIT         = LV_DURATION_UNIT\n        IMPORTING\n          TIME_DIFF         = TIME_DIFF\n        EXCEPTIONS\n          WRONG_VALUE       = 1\n          OTHERS            = 2    .\n      IF SY-SUBRC = 0.\n        T_DATA-DURATION = TIME_DIFF .\n      ELSE.\n        T_DATA-DURATION = '999999'.\n      ENDIF.\n   MODIFY T_DATA INDEX SY_TABIX .\n ENDLOOP .\n DELETE T_DATA WHERE DURATION NOT IN R_DURATION.\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}

@@ -1,0 +1,985 @@
+{
+  "source_file": "SW_01_20_WP_TOT - System Work Processes Count Monitoring.docx",
+  "converter": "docx_to_analysis_bundle.py v1",
+  "blocks": [
+    {
+      "kind": "heading",
+      "level": 1,
+      "text": "Exception Indicator: System Work Processes Count Monitoring (SW_01_20_WP_TOT)"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "General Overview"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator (EI) provides comprehensive work process monitoring and analysis across SAP system landscapes to ensure optimal work process utilization and prevent resource bottlenecks that could cause critical performance issues. Work process monitoring is fundamental for maintaining SAP system responsiveness, user session management, and background job processing efficiency."
+    },
+    {
+      "kind": "paragraph",
+      "text": "The System Work Processes Count Monitoring solution monitors work process allocation, utilization, and availability across all application servers in a distributed SAP landscape, providing real-time visibility into work process consumption patterns and resource availability. When work processes become fully utilized or unavailable, it can lead to user login failures, transaction queuing, batch job delays, and complete system unresponsiveness."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator provides advanced work process monitoring capabilities that enable:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Multi-server monitoring across distributed SAP landscapes with centralized visibility"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Comprehensive work process metrics including dialog, batch, update, and spool process tracking"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Real-time utilization analysis with current usage and availability calculations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Process type differentiation supporting DIA, BTC, UPD, UP2, and SPO work process monitoring"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Enhanced duration tracking for long-running processes and performance optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Historical tracking with timestamp recording for work process trend analysis and capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The monitoring solution leverages SAP's built-in work process monitoring functions and provides enhanced analytical capabilities including work process usage calculations, duration tracking, and comprehensive server list management for enterprise-scale work process performance monitoring."
+    },
+    {
+      "kind": "paragraph",
+      "text": "This Exception Indicator ensures that SAP systems maintain optimal work process availability across all critical application servers and identifies potential resource bottlenecks before they impact business operations."
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Problem Description"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Work process exhaustion and inadequate monitoring indicate critical system resource issues causing:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System Availability Risks"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Complete user login failures when dialog work processes become fully utilized"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch job queue stagnation when background work processes are exhausted"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Update process bottlenecks causing transaction commit delays and data consistency issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Spool process unavailability preventing report generation and printing operations"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Performance Degradation Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Severe response time increases when work processes reach capacity limits"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Transaction queuing and user wait times during peak work process utilization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Background job processing delays affecting critical business processes and reporting cycles"
+    },
+    {
+      "kind": "paragraph",
+      "text": "System lock-ups from work process resource contention and deadlock scenarios"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Business Process Impact"
+    },
+    {
+      "kind": "paragraph",
+      "text": "User productivity loss from session timeouts and login failures during peak usage"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Batch processing delays affecting payroll, billing, and financial closing procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Report generation failures impacting business decision-making and compliance requirements"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Interface processing delays affecting real-time data exchange with external systems"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Planning Issues"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Lack of visibility into work process consumption patterns preventing proactive capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Unpredictable resource exhaustion scenarios causing emergency system interventions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Inadequate work process allocation leading to frequent resource shortages and user complaints"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Poor utilization tracking preventing optimization of work process configurations and load distribution"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Suggested Resolution"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Immediate Response"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Investigate servers showing high work process utilization (>90%) for immediate load balancing opportunities"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check dialog work process availability and redistribute user load across available application servers"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Review background work process queues and reschedule non-critical batch jobs to off-peak hours"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze long-running processes and identify optimization opportunities or termination candidates"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Capacity Assessment"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Monitor work process utilization trends across all application servers for capacity planning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Evaluate current work process allocation against user load and business volume projections"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Check work process duration patterns for performance optimization and configuration tuning"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Analyze work process distribution by type and server for load balancing optimization"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Corrective Actions"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Increase work process allocation for dialog and background processing based on utilization analysis"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Configure dynamic work process management to automatically adjust allocation during peak periods"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement work process monitoring with appropriate alert thresholds and escalation procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Optimize long-running processes and implement background job scheduling improvements"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Preventive Measures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Establish regular work process utilization reviews and capacity planning procedures"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Implement automated monitoring for all critical servers with multiple work process threshold levels"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Create documentation and procedures for work process tuning and emergency resource management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Plan system capacity upgrades based on work process utilization analysis and business growth projections"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "Parameters"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameters Reference Table"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all configurable input parameters. Users set values for these parameters to filter and control the EI's data selection and processing logic."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "#",
+          "Field",
+          "Description",
+          "Type",
+          "Length",
+          "Decimal",
+          "Data Element",
+          "Domain"
+        ],
+        [
+          "1",
+          "AGGR_LEVEL",
+          "Aggr. Level (T-total/S-server)",
+          "",
+          "0",
+          "0",
+          "",
+          ""
+        ],
+        [
+          "2",
+          "BTC_CNT",
+          "Total Background WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "3",
+          "BTC_DURATION",
+          "Backgroung WP Duration In Min.",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "4",
+          "BTC_FREE_CNT",
+          "Free Background WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "5",
+          "BTC_FREE_PRC",
+          "% of Free Background WPs",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "6",
+          "BTC_INUSE_CNT",
+          "Used Background WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "7",
+          "BTC_INUSE_PRC",
+          "% of In Use Background WPs",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "8",
+          "DIA_CNT",
+          "Total Dialog WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "9",
+          "DIA_DURATION",
+          "Dialog WP Duration In Min.",
+          "INT4",
+          "10",
+          "0",
+          "/SKN/E_SW_DURATION",
+          ""
+        ],
+        [
+          "10",
+          "DIA_FREE_CNT",
+          "Free Dialog WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "11",
+          "DIA_FREE_PRC",
+          "% of Free Dialog WPs",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "12",
+          "DIA_INUSE_CNT",
+          "Used Dialog WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "13",
+          "DIA_INUSE_PRC",
+          "% of In Use Dialog WPs",
+          "DEC",
+          "5",
+          "2",
+          "/SKN/E_SW_PRC",
+          "/SKN/D_SW_PRC"
+        ],
+        [
+          "14",
+          "SPO_CNT",
+          "Total Spool WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "15",
+          "SPO_FREE_CNT",
+          "Free Spool WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "16",
+          "SPO_INUSE_CNT",
+          "Used Spool WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "17",
+          "UP2_CNT",
+          "Total Update-2 WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "18",
+          "UP2_FREE_CNT",
+          "Free Update-2 WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "19",
+          "UP2_INUSE_CNT",
+          "Used Update-2 WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "20",
+          "UPD_CNT",
+          "Total Update WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "21",
+          "UPD_FREE_CNT",
+          "Free Update WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "22",
+          "UPD_INUSE_CNT",
+          "Used Update WPs",
+          "INT2",
+          "5",
+          "0",
+          "INT2",
+          "INT2"
+        ],
+        [
+          "23",
+          "WP_SERVER",
+          "Server Name",
+          "CHAR",
+          "20",
+          "0",
+          "MSNAME",
+          "MSNAME"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Configuration Guidelines"
+    },
+    {
+      "kind": "paragraph",
+      "text": "IMPORTANT: Configure ALL 23 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AGGR_LEVEL (Aggr. Level (T-total/S-server))"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Controls aggregation granularity for work process totals versus server-specific breakdown."
+    },
+    {
+      "kind": "paragraph",
+      "text": "AGGR_LEVEL Options:"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        T — Total aggregation across all servers."
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        S — Server-level aggregation."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_CNT (Total Background WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing total background wps (BTC_CNT) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_DURATION (Backgroung WP Duration In Min.)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When populated, keeps the extract focused so backgroung wp duration in min. (BTC_DURATION) aligns with the intended triage slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_FREE_CNT (Free Background WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "When tightened, free background wps (BTC_FREE_CNT) removes rows that would otherwise dilute attention from failing or stuck cases."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_FREE_PRC (% of Free Background WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "For distributed landscapes, % of free background wps on BTC_FREE_PRC often anchors which application server or destination appears in results."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_INUSE_CNT (Used Background WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Captures edge cases where used background wps (BTC_INUSE_CNT) must be non-default to reproduce a customer-specific monitoring scenario."
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_INUSE_PRC (% of In Use Background WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Ensures reporting respects % of in use background wps constraints carried by BTC_INUSE_PRC."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_CNT (Total Dialog WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Reflects real administration where total dialog wps on DIA_CNT is routinely restricted to a single productive client or object family."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_DURATION (Dialog WP Duration In Min.)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Uses dialog wp duration in min. from the source context so only records with DIA_DURATION inside declared values proceed."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_FREE_CNT (Free Dialog WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Stabilizes week-over-week metrics by fixing free dialog wps (DIA_FREE_CNT) while allowing duration thresholds to move."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_FREE_PRC (% of Free Dialog WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps monitoring stay readable by requiring % of free dialog wps (DIA_FREE_PRC) to match organizational or technical selectors when set."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_INUSE_CNT (Used Dialog WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Helps distinguish technical versus business attributes when used dialog wps on DIA_INUSE_CNT correlates with counters or status fields."
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_INUSE_PRC (% of In Use Dialog WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Treats % of in use dialog wps as a discriminator between similar rows that would otherwise look identical in a raw extract."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SPO_CNT (Total Spool WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where total spool wps (SPO_CNT) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SPO_FREE_CNT (Free Spool WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when free spool wps on SPO_FREE_CNT correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "SPO_INUSE_CNT (Used Spool WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because used spool wps (SPO_INUSE_CNT) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UP2_CNT (Total Update-2 WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Prevents accidental global scans when total update-2 wps (UP2_CNT) is meant to stay within a controlled application slice."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UP2_FREE_CNT (Free Update-2 WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Allows phased rollout: first widen UP2_FREE_CNT for free update-2 wps, then tighten thresholds once baseline noise is understood."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UP2_INUSE_CNT (Used Update-2 WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Mirrors how administrators slice operational lists: used update-2 wps (UP2_INUSE_CNT) is one lever that shapes which rows are comparable run over run."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_CNT (Total Update WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Separates cross-client noise from in-scope work when total update wps on UPD_CNT correlates with client or user attributes."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_FREE_CNT (Free Update WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Narrows retrieved rows where free update wps (UPD_FREE_CNT) must match the configured selection for this monitor."
+    },
+    {
+      "kind": "paragraph",
+      "text": "UPD_INUSE_CNT (Used Update WPs)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Improves readability of exported lists because used update wps (UPD_INUSE_CNT) columns stay aligned with the configured filter intent."
+    },
+    {
+      "kind": "paragraph",
+      "text": "WP_SERVER (Server Name)"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Pairs with duration logic: once WP_SERVER passes list selection, elapsed time from the reference timestamp still must fit configured duration windows."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Parameter Relationships"
+    },
+    {
+      "kind": "paragraph",
+      "text": "The work process monitoring function provides both percentage-based and absolute value parameters to accommodate different monitoring scenarios and business requirements:"
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Percentage vs. Absolute Value Parameters"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Percentage Parameters (_PRC):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_FREE_PRC - Available dialog work processes as percentage of total dialog processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_FREE_PRC - Available batch work processes as percentage of total batch processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_INUSE_PRC - Utilized dialog work processes as percentage of total dialog processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_INUSE_PRC - Utilized batch work processes as percentage of total batch processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Absolute Value Parameters (_CNT):"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_CNT - Total count of dialog work processes configured"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_CNT - Total count of batch work processes configured"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_FREE_CNT - Absolute count of available dialog work processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_FREE_CNT - Absolute count of available batch work processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_INUSE_CNT - Absolute count of utilized dialog work processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_INUSE_CNT - Absolute count of utilized batch work processes"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Why Both Options Exist: The dual parameter approach provides monitoring flexibility for different business contexts. Percentage-based thresholds work well for systems of varying work process configurations (e.g., alert when any server drops below 20% free dialog processes), while absolute value thresholds are essential for business-critical systems where specific minimum work process quantities must be maintained (e.g., always keep at least 5 dialog work processes available regardless of total configuration)."
+    },
+    {
+      "kind": "heading",
+      "level": 3,
+      "text": "Default Values"
+    },
+    {
+      "kind": "paragraph",
+      "text": "·        AGGR_LEVEL - T"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 1: Alert when dialog work process utilization exceeds 85% for user session management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_INUSE_PRC = >85"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 2: Enterprise-scale batch monitoring using absolute thresholds for critical processing"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_FREE_CNT = <3"
+    },
+    {
+      "kind": "paragraph",
+      "text": "Use Case 3: Combined dialog and batch monitoring for comprehensive work process capacity management"
+    },
+    {
+      "kind": "paragraph",
+      "text": "DIA_FREE_PRC = <15"
+    },
+    {
+      "kind": "paragraph",
+      "text": "BTC_INUSE_PRC = >80"
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "EI Function Structure"
+    },
+    {
+      "kind": "paragraph",
+      "text": "This table lists all output fields returned by the EI. These fields contain the results of the EI's data retrieval and calculations."
+    },
+    {
+      "kind": "table",
+      "rows": [
+        [
+          "Structure Name",
+          "Field Name",
+          "Description",
+          "Data Type",
+          "Component Type"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_FREE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_FREE_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_INUSE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "BTC_INUSE_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_DURATION",
+          "SW: Duration In Time Units (defined separatly)",
+          "INT4(10)",
+          "/SKN/E_SW_DURATION"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_FREE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_FREE_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_INUSE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "DIA_INUSE_PRC",
+          "SW : Percent",
+          "DEC(5,2)",
+          "/SKN/E_SW_PRC"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "SPO_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "SPO_FREE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "SPO_INUSE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UP2_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UP2_FREE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UP2_INUSE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UPD_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UPD_FREE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "UPD_INUSE_CNT",
+          "2 byte integer (signed)",
+          "INT2(5)",
+          "INT2"
+        ],
+        [
+          "/SKN/S_SW_01_01_WP_TOT",
+          "WP_SERVER",
+          "Server Name",
+          "CHAR(20)",
+          "MSNAME"
+        ]
+      ]
+    },
+    {
+      "kind": "heading",
+      "level": 2,
+      "text": "ABAP Code"
+    },
+    {
+      "kind": "abap",
+      "text": "FUNCTION /SKN/F_SW_01_01_WP_TOT.\n*\"----------------------------------------------------------------------\n*\"*\"Local Interface:\n*\"  EXPORTING\n*\"     VALUE(IS_ALERT) TYPE  CHAR1\n*\"  TABLES\n*\"      T_SELECT STRUCTURE  RSSELECT OPTIONAL\n*\"      T_DATA STRUCTURE  /SKN/S_SW_01_01_WP_TOT OPTIONAL\n*\"----------------------------------------------------------------------\nDATA: LS_WP TYPE /SKN/S_SW_01_01_SM66,\n      LT_WP LIKE TABLE OF LS_WP.\nDATA: LS_DATA LIKE LINE OF T_DATA,\n      LT_DATA LIKE TABLE OF LS_DATA.\nDATA: BEGIN OF LS_DURATION,\n        WP_SERVER TYPE MSNAME,\n        WP_TYP TYPE WPTYP,\n        DURATION TYPE /SKN/E_SW_DURATION,\n***        DIA_DURATION type /SKN/E_SW_DURATION,\n***        BTC_DURATION type /SKN/E_SW_DURATION,\n      END OF LS_DURATION,\n      LT_DURATION LIKE TABLE OF LS_DURATION.\nDATA: FLD(30) TYPE C.\nFIELD-SYMBOLS: <FS_CNT> TYPE INT2,\n               <FS_FREE> TYPE INT2,\n               <FS_INUSE> TYPE INT2.\nDATA: LV_WP_TYP(3) TYPE C.\nDATA: SY_TABIX LIKE SY-TABIX.\nDATA_MULTY: WP_SERVER  MSNAME.\nDATA_MULTY: DIA_CNT INT2,\n            BTC_CNT INT2,\n            UPD_CNT INT2,\n            UP2_CNT INT2,\n            SPO_CNT INT2,\n            DIA_FREE_CNT INT2,\n            BTC_FREE_CNT INT2,\n            UPD_FREE_CNT INT2,\n            UP2_FREE_CNT INT2,\n            SPO_FREE_CNT INT2,\n            DIA_INUSE_CNT INT2,\n            BTC_INUSE_CNT INT2,\n            UPD_INUSE_CNT INT2,\n            UP2_INUSE_CNT INT2,\n            SPO_INUSE_CNT INT2,\n            DIA_FREE_PRC /SKN/E_SW_PRC,\n            BTC_FREE_PRC /SKN/E_SW_PRC,\n            DIA_INUSE_PRC /SKN/E_SW_PRC,\n            BTC_INUSE_PRC /SKN/E_SW_PRC,\n            DIA_DURATION   /SKN/E_SW_DURATION,\n            BTC_DURATION   /SKN/E_SW_DURATION.\n.\nDATA_SINGLE: AGGR_LEVEL CHAR1.\n*-- Fill Selection Option Tables\nSELECT_MULTY: WP_SERVER.\nSELECT_MULTY: DIA_CNT,\n              BTC_CNT,\n              UPD_CNT,\n              UP2_CNT,\n              SPO_CNT,\n              DIA_FREE_CNT,\n              BTC_FREE_CNT,\n              UPD_FREE_CNT,\n              UP2_FREE_CNT,\n              SPO_FREE_CNT,\n              DIA_INUSE_CNT,\n              BTC_INUSE_CNT,\n              UPD_INUSE_CNT,\n              UP2_INUSE_CNT,\n              SPO_INUSE_CNT,\n              DIA_FREE_PRC,\n              BTC_FREE_PRC,\n              DIA_INUSE_PRC,\n              BTC_INUSE_PRC,\n              DIA_DURATION,\n              BTC_DURATION.\n LV_AGGR_LEVEL = 'T'.\n SELECT_SINGLE: AGGR_LEVEL.\n    CALL FUNCTION '/SKN/F_SW_01_01_SM66'\n      IMPORTING\n        IS_ALERT       = IS_ALERT\n      TABLES\n        T_SELECT       = T_SELECT\n        T_DATA         = LT_WP.\n     SORT LT_WP BY WP_SERVER WP_TYP.\n     LOOP AT LT_WP INTO LS_WP.\n       CLEAR LS_DATA.\n       IF LV_AGGR_LEVEL <> 'S'.\n         CLEAR LS_DATA-WP_SERVER.\n       ELSE.\n         LS_DATA-WP_SERVER = LS_WP-WP_SERVER.\n       ENDIF.\n       LV_WP_TYP = LS_WP-WP_TYP.\n       IF LV_WP_TYP = 'BGD'.\n         LV_WP_TYP = 'BTC'.\n       ENDIF.\n       CONCATENATE LV_WP_TYP '_CNT' INTO FLD.\n        ASSIGN COMPONENT FLD OF STRUCTURE LS_DATA TO <FS_CNT>.\n        IF <FS_CNT> IS ASSIGNED.\n          ADD 1 TO <FS_CNT>.\n        ENDIF.\n       CONCATENATE LV_WP_TYP '_FREE_CNT' INTO FLD.\n        ASSIGN COMPONENT FLD OF STRUCTURE LS_DATA TO <FS_FREE>.\n        IF <FS_FREE> IS ASSIGNED.\n          IF LS_WP-WP_ISTATUS = '2'.  \" Waiting\n            ADD 1 TO <FS_FREE>.\n          ENDIF.\n        ENDIF.\n       CONCATENATE LV_WP_TYP '_INUSE_CNT' INTO FLD.\n        ASSIGN COMPONENT FLD OF STRUCTURE LS_DATA TO <FS_INUSE>.\n        IF <FS_INUSE> IS ASSIGNED.\n          IF LS_WP-WP_ISTATUS <> '2'.\n            ADD 1 TO <FS_INUSE>.\n          ENDIF.\n        ENDIF.\n        COLLECT LS_DATA INTO LT_DATA.\n        MOVE-CORRESPONDING LS_WP TO LS_DURATION.\n        LS_DURATION-WP_SERVER = LS_DATA-WP_SERVER.\n        IF LS_WP-DURATION > 0.\n          APPEND LS_DURATION TO LT_DURATION.\n        ENDIF.\n     ENDLOOP.\n     SORT LT_DURATION BY WP_SERVER WP_TYP DURATION.\n     LOOP AT LT_DATA INTO LS_DATA.\n       SY_TABIX = SY-TABIX.\n       IF LS_DATA-DIA_CNT <> 0.\n         LS_DATA-DIA_FREE_PRC = LS_DATA-DIA_FREE_CNT / LS_DATA-DIA_CNT * 100.\n         LS_DATA-DIA_INUSE_PRC = LS_DATA-DIA_INUSE_CNT / LS_DATA-DIA_CNT * 100.\n       ENDIF.\n       IF LS_DATA-BTC_CNT IS NOT INITIAL.\n         LS_DATA-BTC_FREE_PRC = LS_DATA-BTC_FREE_CNT / LS_DATA-BTC_CNT * 100.\n         LS_DATA-BTC_INUSE_PRC = LS_DATA-BTC_INUSE_CNT / LS_DATA-BTC_CNT * 100.\n       ENDIF.\n       READ TABLE LT_DURATION INTO LS_DURATION\n                              WITH KEY WP_SERVER = LS_DATA-WP_SERVER\n                                       WP_TYP = 'BTC'.\n       IF SY-SUBRC IS INITIAL.\n         LS_DATA-BTC_DURATION = LS_DURATION-DURATION.\n       ENDIF.\n       \"---\n       READ TABLE LT_DURATION INTO LS_DURATION\n                              WITH KEY WP_SERVER = LS_DATA-WP_SERVER\n                                       WP_TYP = 'DIA'.\n       IF SY-SUBRC IS INITIAL.\n         LS_DATA-DIA_DURATION = LS_DURATION-DURATION.\n       ENDIF.\n       MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX.\n     ENDLOOP.\n  DELETE LT_DATA WHERE: DIA_CNT NOT IN R_DIA_CNT,\n                        BTC_CNT NOT IN R_BTC_CNT,\n                        UPD_CNT NOT IN R_UPD_CNT,\n                        UP2_CNT NOT IN R_UP2_CNT,\n                        SPO_CNT NOT IN R_SPO_CNT,\n                        DIA_FREE_CNT NOT IN R_DIA_FREE_CNT,\n                        BTC_FREE_CNT NOT IN R_BTC_FREE_CNT,\n                        UPD_FREE_CNT NOT IN R_UPD_FREE_CNT,\n                        UP2_FREE_CNT NOT IN R_UP2_FREE_CNT,\n                        SPO_FREE_CNT NOT IN R_SPO_FREE_CNT,\n                        DIA_INUSE_CNT NOT IN R_DIA_INUSE_CNT,\n                        BTC_INUSE_CNT NOT IN R_BTC_INUSE_CNT,\n                        UPD_INUSE_CNT NOT IN R_UPD_INUSE_CNT,\n                        UP2_INUSE_CNT NOT IN R_UP2_INUSE_CNT,\n                        SPO_INUSE_CNT NOT IN R_SPO_INUSE_CNT,\n                        DIA_FREE_PRC NOT IN R_DIA_FREE_PRC,\n                        BTC_FREE_PRC NOT IN R_BTC_FREE_PRC,\n                        DIA_INUSE_PRC NOT IN R_DIA_INUSE_PRC,\n                        BTC_INUSE_PRC NOT IN R_BTC_INUSE_PRC,\n                        DIA_DURATION  NOT IN R_DIA_DURATION,\n                        BTC_DURATION  NOT IN R_BTC_DURATION.\n  T_DATA[] = LT_DATA[].\n*--- Check Alert Information\n READ TABLE T_DATA INDEX 1.\n CHECK NOT SY-TFILL  IS INITIAL .\n IS_ALERT = 'X' .\nENDFUNCTION.\n"
+    }
+  ]
+}
