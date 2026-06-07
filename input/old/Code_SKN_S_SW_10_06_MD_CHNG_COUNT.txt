@@ -1,0 +1,349 @@
+FUNCTION /SKN/F_SW_10_06_MD_CHNG_VENDOR .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_MD_CHNG_COUNT
+*"----------------------------------------------------------------------
+  INCLUDE /SKN/PC_SQL_DATA.
+  TYPES: BEGIN OF TY_LFA1,
+           LIFNR TYPE LFA1-LIFNR,
+           LAND1 TYPE LFA1-LAND1,
+           KTOKK TYPE LFA1-KTOKK,
+           XCPDK TYPE LFA1-XCPDK,
+           VBUND TYPE LFA1-VBUND,
+           STKZN TYPE LFA1-STKZN,
+         END OF TY_LFA1,
+         TT_LFA1 TYPE TABLE OF TY_LFA1.
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: SW_DEST             RFCDEST,
+               MANAGE_IN_UTC       CHAR1 ,
+               LANGU               LANGU,
+               BACKDAYS            INT4,
+               DURATION_D          /SKN/E_SW_DURATION_D,
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT,
+               DATE_REF_FLD        NAME_FELD,
+               CONVERT_KEY         CHAR1,
+               HEADER_ONLY         CHAR1.
+  DATA_MULTY:   LIFNR             LIFNR,
+                LAND1             LAND1_GP,
+                XCPDK             XCPDK,
+                VBUND             RASSC,
+                KTOKK             KTOKK,
+                STKZN             STKZN,
+                OBJECTCLAS        CDOBJECTCL,
+                OBJECTID          CDOBJECTV,
+                USERNAME          CDUSERNAME,
+                TCODE             CDTCODE,
+                CHANGE_IND        CDCHNGINDH,
+                TABNAME           TABNAME,
+                DURATION          /SKN/E_SW_DURATION,
+                FNAME             FIELDNAME,
+                CHNGIND           CDCHNGIND,
+                UDATE             CDDATUM,
+                DATUM             SYDATUM,
+                COUNTER           I.
+  CONSTANTS: C_LFA1 TYPE TABNAME VALUE 'LFA1'.
+  DATA: SY_DATLO LIKE SY-DATLO ,
+        SY_TIMLO LIKE SY-TIMLO .
+  DATA: TIME_DIFF TYPE INT4.
+  DATA: FLD(60) TYPE C.
+  DATA: REF_DATE TYPE D.
+  DATA: SY_TABIX  LIKE SY-TABIX,
+        DATE_FROM LIKE SY-DATUM .
+  DATA: LV_SHIFT      TYPE DDLENG,
+        LV_LENG       TYPE DDLENG,
+        LV_DOMNAME    TYPE DD07V-DOMNAME,
+        LV_DOMVALUE   TYPE DD07V-DOMVALUE_L,
+        LV_DDTEXT     TYPE DD07V-DDTEXT,
+        LV_OBJECT     TYPE CDOBJECTV,
+        LV_LIFNR      TYPE LIFNR,
+        LV_STRUCTURE  TYPE DDOBJNAME,
+        LV_INDEX      TYPE I,
+        LV_OBJECTCLAS TYPE CDOBJECTCL,
+        LV_DOC        TYPE CDCHANGENR,
+        LV_COUNT_TMP  TYPE I,
+        LV_LINES      TYPE I.
+  DATA: LS_DATA    LIKE LINE OF T_DATA[],
+        LS_ADDR    TYPE BAPIADDR3,
+        LS_DATA_MD TYPE /SKN/S_SW_10_06_MD_CHNG_LOG,
+        LS_LFA1    TYPE TY_LFA1.
+  DATA: LT_DATA_MD  TYPE TABLE OF /SKN/S_SW_10_06_MD_CHNG_LOG,
+        LT_DATA_TMP LIKE TABLE OF T_DATA,
+        LT_RET     TYPE TABLE OF BAPIRET2,
+        LT_LFA1    TYPE TT_LFA1.
+  FIELD-SYMBOLS: <FS_DATA>    LIKE LINE OF T_DATA[],
+                 <FS_DATA_MD> LIKE LINE OF LT_DATA_MD,
+                          TYPE ANY.
+* Set default parameter
+  LV_BACKDAYS       = 10.
+  LV_DURATION_UNIT  = 'D'.
+  LV_DATE_REF_FLD   = 'ERDAT'.
+  LV_LANGU          = 'E'.
+  SELECT_MULTY:  LIFNR,
+                 LAND1,
+                 XCPDK,
+                 VBUND,
+                 KTOKK,
+                 STKZN,
+                 OBJECTCLAS,
+                 OBJECTID,
+                 USERNAME,
+                 TCODE,
+                 CHANGE_IND,
+                 TABNAME,
+                 DURATION,
+                 FNAME,
+                 CHNGIND,
+                 UDATE,
+                 COUNTER,
+                 DATUM .
+  SELECT_SINGLE: SW_DEST,
+                 LANGU,
+                 MANAGE_IN_UTC,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 CONVERT_KEY,
+                 DATE_REF_FLD,
+                 DURATION_D,
+                 DURATION_UNIT,
+                 HEADER_ONLY.
+* Configuration Alert
+  CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+    IMPORTING
+      IS_ALERT = IS_ALERT
+    TABLES
+      T_SELECT = T_SELECT
+      T_DATA   = LT_DATA_MD.
+* Check if found some change in configuration log
+  CHECK IS_ALERT EQ 'X'.
+  CLEAR: IS_ALERT.
+  REFRESH: T_DATA.
+* Select parameters for Select from LFA1
+  SELECT_MULTY:  LIFNR,
+                 LAND1,
+                 XCPDK,
+                 VBUND,
+                 KTOKK,
+                 STKZN.
+  CONVERT_MULTY: LIFNR ALPHA.
+  _SET_SYS_DATE_TIME LV_SW_DEST SY_DATLO SY_TIMLO.
+  IF R_DATUM[] IS INITIAL .  " Set default value
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF .
+  DELETE LT_DATA_MD WHERE UDATE NOT IN R_DATUM[].
+  CHECK LT_DATA_MD IS NOT INITIAL.
+  SORT LT_DATA_MD BY OBJECTCLAS OBJECTID TABNAME FNAME.
+  IF LV_SW_DEST IS INITIAL.
+    SELECT LIFNR LAND1 KTOKK XCPDK VBUND STKZN
+      FROM LFA1
+      INTO TABLE LT_LFA1
+      WHERE LIFNR IN R_LIFNR
+      AND   LAND1 IN R_LAND1
+      AND   KTOKK IN R_KTOKK
+      AND   XCPDK IN R_XCPDK
+      AND   VBUND IN R_VBUND
+      AND   STKZN IN R_STKZN.
+  ENDIF.
+  LOOP AT LT_DATA_MD INTO LS_DATA WHERE TABNAME EQ C_LFA1 .
+    CLEAR: LV_LIFNR.
+    LV_LIFNR = LS_DATA-OBJECTID.
+    READ TABLE LT_LFA1 INTO LS_LFA1 WITH KEY LIFNR = LV_LIFNR
+                                    BINARY SEARCH.
+    IF SY-SUBRC = 0.
+      CALL FUNCTION '/SKN/F_SW_01_GET_DETAILES'
+        EXPORTING
+          BNAME      = LS_DATA-USERNAME
+        IMPORTING
+          NAME_FIRST = LS_DATA-NAME_FIRST
+          NAME_LAST  = LS_DATA-NAME_LAST
+          NAME_TEXT  = LS_DATA-NAME_TEXT
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+      IF LS_LFA1-LIFNR IS NOT INITIAL.
+**    "--- Get  Vendor Decriptions
+        CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+          EXPORTING
+            LIFNR        = LS_LFA1-LIFNR
+          IMPORTING
+            VENDOR_DESC  = LS_DATA-OBJECT_DESC
+          EXCEPTIONS
+            WRONG_VENDOR = 1
+            OTHERS       = 2.
+*
+      ENDIF.
+      APPEND LS_DATA TO T_DATA.
+    ENDIF.
+  ENDLOOP.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY_TIMLO
+          D_TO        = SY_DATLO
+          T_TO        = SY_TIMLO
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+*    IF ls_data-matkl IS NOT INITIAL.
+** Material group desc.
+*      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+*      EXPORTING
+*        matkl              = ls_data-matkl
+*      IMPORTING
+*        matkl_desc         = ls_data-wgbez
+**       MATKL_DESC_L       =
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2
+*        .
+*    ENDIF.
+**
+*    IF ls_data-bsart IS NOT INITIAL AND ls_data-bstyp IS NOT INITIAL.
+**    "-- BSART_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_BSART_DESC'
+*      EXPORTING
+*        bsart            = ls_data-bsart
+*        langu            = lv_langu
+*        bstyp            = ls_data-bstyp
+*      IMPORTING
+*        type_desc        = ls_data-batxt
+*      EXCEPTIONS
+*        wrong_code       = 1
+*        OTHERS           = 2.
+*    ENDIF.
+*
+*    IF ls_data-statu IS NOT INITIAL.
+*      "-- STATU_DESC
+*      lv_domname = 'ESTAK'.
+*      lv_domvalue = ls_data-statu.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-statu_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-bstyp IS NOT INITIAL.
+**    "-- BSTYP_DESC
+*      lv_domname = 'EBSTYP'.
+*      lv_domvalue = <fs_data>-bstyp.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-bstyp_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-lifnr IS NOT INITIAL.
+**    "--- Get  Vendor Decriptions
+*      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+*      EXPORTING
+*        lifnr              = ls_data-lifnr
+*      IMPORTING
+*        vendor_desc        = ls_data-name1
+*      EXCEPTIONS
+*        wrong_vendor       = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+*    IF ls_data-ekorg IS NOT INITIAL.
+**   "-- EKORG_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+*      EXPORTING
+*        ekorg              = ls_data-ekorg
+*      IMPORTING
+*        pur_org_desc       = ls_data-ekotx
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+**
+*    IF ls_data-ekgrp IS NOT INITIAL.
+**   "-- EKGRP_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+*      EXPORTING
+*        ekgrp              = ls_data-ekgrp
+*      IMPORTING
+*        pur_grp_desc       = ls_data-eknam
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*    ENDIF.
+*    APPEND ls_data TO t_data[].
+*  LOOP AT t_data ASSIGNING <fs_data>.
+*
+*    CLEAR: lt_ret, ls_addr.
+*    CALL FUNCTION 'BAPI_USER_GET_DETAIL'
+*      EXPORTING
+*        username = <fs_data>-username
+*      IMPORTING
+*        address  = ls_addr
+*      TABLES
+*        return   = lt_ret.
+*
+*    IF sy-subrc = 0.
+*      <fs_data>-name_first = ls_addr-firstname.
+*      <fs_data>-name_last  = ls_addr-lastname.
+*    ENDIF.
+*
+*  ENDLOOP.
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

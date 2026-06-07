@@ -27,7 +27,8 @@ You are verifying and fixing the **Practical Configuration Examples** part of `0
 - **At least one use case:** **3–5** (or more) parameter lines in its code block.
 - **Parameter scope:** Only parameters that appear in the Parameters (Name (Description)) file for this EI. If you do not have that file, add parameters that are plausible for the EI (e.g. BACKDAYS, DURATION, DURATION_UNIT, company code, purchasing org, plant, vendor, date ranges).
 - **Format:** Preserve the structure: **Use Case N: [Title]**, **one blank line**, then **Purpose:** paragraph on the next line, then the code block (one parameter per line). Pipeline verify requires that blank line between title and **Purpose:**. Do not remove or reorder use cases except when adding one.
-- **DURATION_UNIT = F:** If the original prompt required at least one example with DURATION_UNIT = F and single-value DURATION, keep that in the corrected output if it was present; otherwise do not add it unless the Parameters file contains DURATION_UNIT and DURATION.
+- **No ranges on time/duration parameters:** In every use-case code block, these parameters must not use a range: `BACKDAYS`, `FORWDAYS`, `DURATION`, `DURATION_UNIT`, `DURATION_D`, `DURATION_H`, `DURATION_M`. Rewrite to single values (e.g. `DURATION = 7` not `DURATION = 0 - 7`).
+- **DURATION_UNIT = F:** When the Parameters file contains `DURATION_UNIT` and `DURATION`, at least one use case must have `DURATION_UNIT = F` with single-value `DURATION`. The **Purpose:** for that use case must state the scope is **exactly** &lt;N&gt; **full days ago** (N = the DURATION integer). Fix Purpose text if it says “at least” or omits “exactly”.
 
 ---
 

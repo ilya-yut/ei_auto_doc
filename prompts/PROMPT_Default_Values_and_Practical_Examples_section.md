@@ -15,7 +15,7 @@ You are documenting **Default Values** and **Practical Configuration Examples** 
 
 **Your task:** Produce **two** subsections in order:
 
-1. **Default Values** – **You must always check the ABAP code for default values** before producing this subsection. List (a) every parameter with an **explicit** default in code (assignment before read or when initial), and (b) **initial-runtime parameters** (see below) whenever they appear in the Parameters file—even if the code never assigns a literal before read. Only parameters that appear in the Parameters (Name (Description)) file belong here. If **no** explicit defaults exist **and** none of the initial-runtime parameters appear in the Parameters file, output the subsection with a **short generic sentence** (e.g. "No default values are defined for this EI; all parameters are used as supplied or as initial when not supplied."). If the file contains any initial-runtime parameter, you **cannot** use only that generic sentence—you must document those parameters. **Do not skip the check:** never assume there are no defaults without scanning the code.
+1. **Default Values** – **You must always check the ABAP code for default values** before producing this subsection. List (a) every **active** parameter with an **explicit** default in code (assignment before read or when initial), and (b) **initial-runtime parameters** (see below) whenever they appear in the Parameters file and are **not** marked unused in the pipeline block below—even if the code never assigns a literal before read. **Do not** document parameters marked unused (section 04 **`Not in use`**). Only active parameters from the Parameters (Name (Description)) file belong here. If **no** explicit defaults exist **and** none of the initial-runtime parameters appear among **active** parameters, output the subsection with a **short generic sentence** (e.g. "No default values are defined for this EI; all parameters are used as supplied or as initial when not supplied."). If the file contains any active initial-runtime parameter, you **cannot** use only that generic sentence—you must document those parameters. **Do not skip the check:** never assume there are no defaults without scanning the code.
 
 2. **Practical Configuration Examples** – **Mandatory.** Produce 1–5 use cases (see rules below) as code blocks with a business-meaning title and a **Purpose:** paragraph per use case (**one blank line** between the title line and **Purpose:**). Each use case must reflect real business scenarios. When the Parameters file contains date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), use **a subset** per use case so that business logic stays clear and easily understandable for SAP business/technical professionals; do not use all date-related parameters in a single use case.
 
@@ -75,17 +75,27 @@ You are documenting **Default Values** and **Practical Configuration Examples** 
 
 4. **Date-related parameters:** When the Parameters file contains multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS, BACKMONTHS, COMPMONTHS), **do not use them all in one use case**. Use **a subset** per use case so that business logic stays clear and easily understandable for professionals in the respective SAP business/technical domain. Spread date-related parameters across use cases; in each use case include only those that fit the scenario. Do not invent parameters that are not in the Parameters file.
 
-5. **DURATION_UNIT = F:** If **DURATION_UNIT** exists among the function’s parameters (Parameters file), **at least one** practical configuration example must include **DURATION_UNIT = F** (full days for specific day filtering) among its parameters. In that example, **DURATION** must be a **single value** (e.g. `DURATION = 30`), not a range (e.g. not `DURATION = 0–30` or `DURATION = 30–999999`).
+5. **No ranges for time/duration selection parameters (mandatory):** In practical use-case code blocks, the following parameters must **always** use a **single value** only—never a range (`low - high`, `low–high`, or similar):
 
-6. **Business meaning:** For each use case, choose a **clear business scenario** (e.g. "Monthly High-Value Sales Monitoring", "Weekly Customer Sales Pattern Analysis"). The **Purpose:** paragraph must explain what the configuration achieves in business terms and when it is useful, on its own line after a blank line following the use case title.
+   `BACKDAYS`, `FORWDAYS`, `DURATION`, `DURATION_UNIT`, `DURATION_D`, `DURATION_H`, `DURATION_M`
 
-7. **Parameter scope:** Use **only** parameters that appear in the Parameters (Name (Description)) file for this EI. Do not reference parameters not in that file.
+   Examples: `BACKDAYS = 7`, `FORWDAYS = 1`, `DURATION = 14`, `DURATION_UNIT = D`.  
+   **Not allowed:** `DURATION = 0 - 7`, `BACKDAYS = 1 - 30`, `DURATION_UNIT = D - F`.
 
-8. **Format per use case:**
+6. **DURATION_UNIT = F (full days):** If **DURATION_UNIT** exists among the function’s parameters (Parameters file):
+   - **At least one** practical configuration example must include **DURATION_UNIT = F** (full-day counting).
+   - In that example, **DURATION** must be a **single positive integer** (e.g. `DURATION = 7`), never a range.
+   - The **Purpose:** paragraph for that use case must state clearly that the scope is **exactly** that many **full days ago** (e.g. “flags rows whose reference date is exactly 7 full days ago”). Do not describe it as a band or “at least N days” unless the ABAP logic truly implements that.
+
+7. **Business meaning:** For each use case, choose a **clear business scenario** (e.g. "Monthly High-Value Sales Monitoring", "Weekly Customer Sales Pattern Analysis"). The **Purpose:** paragraph must explain what the configuration achieves in business terms and when it is useful, on its own line after a blank line following the use case title.
+
+8. **Parameter scope:** Use **only** **active** parameters that appear in the Parameters (Name (Description)) file for this EI. Do **not** reference unused parameters (pipeline block below or **`Not in use`** in section 04).
+
+9. **Format per use case:**
    - **Use Case N: [Business-meaning title]** (end the line after the closing `**`; do not continue on the same line.)
    - One **blank line** (empty line).
    - **Purpose:** One or two sentences on the **next** line describing the business scenario and what the configuration achieves (**before** the code block). Do **not** put `**Purpose:**` on the same line as the use case title.
-   - Code block with one parameter per line: `PARAM = value` or `PARAM = low - high` for ranges. For range parameters (e.g. low–high), use a hyphen: **`PARAM = low - high`** (e.g. `SMRATIO = 0 - 0.5`), not `PARAM = low high`. Optionally a short inline comment.
+   - Code block with one parameter per line: `PARAM = value`. For parameters **other than** the no-range list in rule 5, ranges are allowed: **`PARAM = low - high`** (e.g. `SMRATIO = 0 - 0.5`), not `PARAM = low high`. Optionally a short inline comment.
 
 ---
 
@@ -131,9 +141,10 @@ PARAM2 = value
 - **BACKDAYS vs section 04:** Section **04** must contain the **verbatim** BACKDAYS monitoring-window sentence from the Parameter Configuration Guidelines prompt, and an anchor line **only** when that prompt allows it (see Parameter Configuration Guidelines). **Default Values** only has the `- **BACKDAYS** - …` bullet; do not paste the section 04 verbatim lines into section 06.
 - **Practical Examples:** This subsection is **mandatory.** Output at least one use case; 1–5 use cases depending on parameter count and complexity (see above). **Each example must include at least 2 parameters**; do not produce an example with only one parameter. **At least one use case (and preferably more) must include 3–5 parameters** in its code block; do not produce only 2-parameter examples for every use case. Every use case must have a business-meaning title, then **one blank line**, then **Purpose:** on its own line, then the fenced parameter block (pipeline verify requires the blank line before **Purpose:**).
 - **Date parameters:** When the Parameters file has multiple date-related parameters (e.g. BACKDAYS, DURATION, DURATION_UNIT, DURATION_D, AEDAT, BUDAT, DATE_REF_FLD, UPDDAT, REPET_BACKDAYS), do not use them all in one use case. Use a subset per use case so business logic stays clear and easily understandable for SAP business/technical professionals.
-- **DURATION_UNIT = F:** If **DURATION_UNIT** exists in the Parameters file, **at least one** practical configuration example must have **DURATION_UNIT = F** among its parameters (full days for specific day filtering). In that example, **DURATION** must be a single value (e.g. `DURATION = 30`), not a range.
-- **Parameter scope:** Mention **only** parameters that appear in the Parameters (Name (Description)) file for this EI.
-- **Range format:** For parameters that accept a range (low–high), write **`PARAM = low - high`** (e.g. `SMRATIO = 0 - 0.5`), not `PARAM = low high`.
+- **No ranges on time/duration parameters:** In use-case code blocks, never use ranges for `BACKDAYS`, `FORWDAYS`, `DURATION`, `DURATION_UNIT`, `DURATION_D`, `DURATION_H`, or `DURATION_M` (single values only).
+- **DURATION_UNIT = F:** If **DURATION_UNIT** exists in the Parameters file, **at least one** use case must have **DURATION_UNIT = F** with single-value **DURATION**; **Purpose:** must say the scope is **exactly N full days ago** (N = the DURATION value).
+- **Parameter scope:** Mention **only** **active** parameters from the Parameters file. **Exclude** unused parameters (pipeline block below / **`Not in use`** in section 04).
+- **Range format:** For parameters **not** listed under no-range rules, write **`PARAM = low - high`** (e.g. `SMRATIO = 0 - 0.5`), not `PARAM = low high`.
 - **Tone:** Professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
 - **Non-standard entities:** Avoid mentioning non-standard entities (e.g. Z*, Y*, /SKN/*) unless necessary.
 - **Output scope:** Only the two subsections (Default Values: explicit defaults plus mandatory `initial - treated as … by code` bullets for BACKDAYS/DURATION/DURATION_UNIT/AGGLEVEL when in Parameters, or one short "no default values" sentence when none apply; **### Practical Example of Parameter Configuration** always). No other sections, no document title, no preamble.
@@ -151,6 +162,8 @@ Use the **Default Values** and **Practical Configuration Examples** subsections 
 - **Practical Examples:** **Use Case N: [Title]**, blank line, **Purpose:** paragraph, then code block (PARAM = value per line). Subsection heading in pipeline output: **### Practical Example of Parameter Configuration**.
 
 ---
+
+[UNUSED_PARAMS_PIPELINE_BLOCK]
 
 ## Inputs (provide below)
 

@@ -21,6 +21,8 @@ OUTPUT FORMAT:
 
 Rules:
 - Search _Parameters.docx: For every parameter in the Parameters (Name (Description)) file, search _Parameters.docx for that parameter. Where it describes how parameters work together or connections, use that to identify and describe relationship groups. Adjust wording to match this EI.
+- Time logic (when BACKDAYS, DURATION/DURATION_UNIT, and explicit dates exist): explain fallback vs explicit dates and duration as additional filter inside the time group bullets only—not in a separate closing block.
+- No global summary block: Do not add **Combined effect:** or a similar closing paragraph that restates all groups.
 - Only include parameters that have a verified relationship in code, in _Parameters.docx, or clear business logic. Do not list every parameter.
 - Parameter scope: mention ONLY parameters from the Parameters (Name (Description)) file for this EI.
 - Verification: If you end up with 0 relationship groups, re-check the code for time and aggregation usage before omitting. If you end up with relationship groups covering most of the parameter list, re-check and reduce to only parameters with clear, code-visible relationships (~20–30% max typical).

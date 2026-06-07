@@ -25,9 +25,9 @@ Inputs:
    - **`input/params_dictionary.xlsx`** (sheet **`dictionary`**, columns **`parameter`** and **`suggested/corrected explanation`**) holds curated explanations keyed by **parameter Field name** (same spelling as the Parameters sheet / Reference Table, e.g. `BACKDAYS`, `SHKZG`).  
    - **`input/checked params.txt`** (optional): one parameter name per line (same spelling as Field). Lines starting with `#` after optional whitespace are comments. **If this file is missing or contains no non-blank lines, ignore the yellow-highlight rule below** (dictionary text still applies when present).  
    - **For each parameter, apply in order:**  
-     1. **In `params_dictionary.xlsx` AND listed in `checked params.txt`:** use the dictionary explanation as the **main explanation paragraph** **verbatim** (no paraphrase). **Do not** wrap it in `<mark>`.  
-     2. **In `params_dictionary.xlsx` but NOT in `checked params.txt`** (and `checked params.txt` is active as above): use the dictionary explanation **verbatim**, wrapped as **`<mark>…</mark>`** around the **entire** dictionary paragraph only (so Word export can render yellow highlight; see pipeline `md_to_docx`). Escape any `<` / `>` inside the explanation as HTML entities if needed.  
-     3. **Not in `params_dictionary.xlsx`:** write a concise, SAP-style explanation yourself (data element / domain meaning, typical usage in monitoring selection), still following all other rules below (same as previous “no dictionary row” behavior).  
+     1. **In `params_dictionary.xlsx` AND listed in `checked params.txt`:** use the dictionary explanation as the **main explanation paragraph** **verbatim** (no paraphrase). **Do not** wrap it in `<mark>` (`python scripts/pipeline/pipeline.py verify` fails if you do). **Do not** append or prepend EI-specific clauses (no extra table/field names, no “on **KNVV**”, no “filters via …” suffixes)—put EI-specific behavior in **Parameter Relationships** or code-derived **Options** only.
+     2. **In `params_dictionary.xlsx` but NOT in `checked params.txt`** (and `checked params.txt` is active as above): use the dictionary explanation **verbatim** (same “no extra sentences” rule as bullet **1**), wrapped as **`<mark>…</mark>`** around the **entire** dictionary paragraph only (so Word export can render yellow highlight; see pipeline `md_to_docx`). Escape any `<` / `>` inside the explanation as HTML entities if needed.
+     3. **Not in `params_dictionary.xlsx`:** write a concise, SAP-style explanation yourself (data element / domain meaning, typical usage in monitoring selection), still following all other rules below (same as previous “no dictionary row” behavior).
    - **Exceptions (dictionary does not override mandatory boilerplate):**  
      - **`BACKDAYS`:** keep the **mandatory verbatim window sentence** (and anchor line rules) from **§3a** exactly as specified; you may place the dictionary paragraph **immediately before** that mandatory sentence if the dictionary adds canonical context, or rely on the dictionary only if it already contains the same mandatory sentence. Apply the `<mark>` rule only to the dictionary paragraph lines, not to the mandatory BACKDAYS sentence.  
      - **`USER_FLD` / `USR_FLD`:** keep the **mandatory DRL narrative** from **§3b** verbatim first; if the dictionary contains an extra explanation for the same parameter, append it **after** the DRL block (and after any code-derived literal list), not instead of it; apply `<mark>` to that appended dictionary paragraph when rule **0** bullet **2** applies.  
@@ -37,6 +37,12 @@ Inputs:
    - Follow the **Parameters Reference Table** order: fields **alphabetically A–Z by Field name** (case-insensitive), same as a sorted Parameters sheet.
    - Cover every parameter.
    - Group only true serial ranges (for example `KEY1 - KEY10`, `MSGV1 - MSGV4`) when business meaning is shared.
+
+1b. **Unused parameters (`**Not in use**`)**
+   - When the pipeline marks a parameter as unused (declared in the interface but not on the output structure sheet and not used in ABAP to affect results), its block must include a separate line **`Not in use`** immediately **after** the main description paragraph(s) and **before** any `**… Options:**` subsection.
+   - Do **not** remove or paraphrase **`Not in use`** when `prepare --generate-037` inserted it.
+   - Unused parameters must **not** appear in **Parameter Relationships** (section 05) or **Default Values / Practical Examples** (section 06).
+   - The IMPORTANT intro line explains that parameters marked **`Not in use`** do not change results for this EI.
 
 2. **No generic/template text** (does not apply where you are pasting **dictionary** text verbatim per rule **0**)
    - Do NOT use fill-in templates such as:
@@ -63,13 +69,35 @@ When **BACKDAYS** is listed in the Parameters file, the **BACKDAYS** block must 
 
 `Backdays is based on DATE_REF_FLD field.`
 
-- If **DATE_REF_FLD** does **not** exist: read the ABAP. Add a **second line** **only** when the source clearly shows which SAP **date field** the BACKDAYS lookback applies to (e.g. a `FIELD IN R_DATUM` / `FIELD IN R_CREDATE` pattern or an equivalent explicit selection). Use this exact pattern (replace only `FIELD` with that technical name, same casing as SAP):
+- If **DATE_REF_FLD** does **not** exist: read the ABAP. Add a **second line** **only** when the source clearly shows which SAP **date field** the BACKDAYS lookback applies to (e.g. `TABLE~FIELD IN R_DATUM`, `FIELD IN R_CREDATE`, `TABLE~FIELD IN R_ERDAT`, or an equivalent explicit selection). Use this exact pattern (replace only `FIELD` with that technical name, same casing as SAP):
 
 `Backdays is based on FIELD`
 
 - If you **cannot** determine that field from the available ABAP, **do not** add any `Backdays is based on …` line—**do not** guess or default to a field name (e.g. do not assume ERDAT).
 
 Do **not** paraphrase, merge, bold, or append extra clauses to these mandatory lines when they are present. Do **not** use internal ABAP range variable names elsewhere in the BACKDAYS block (no `R_DATUM`, `SY-DATUM`, `DATE_FROM`, etc.).
+
+3c. **FORWDAYS (mandatory forward window sentence when FORWDAYS appears in the Parameters sheet)**
+
+When **FORWDAYS** is listed in the Parameters file, the **FORWDAYS** block must always include the forward monitoring-window sentence below **verbatim** (copy **character-for-character**; you may use either Unicode en-dash `–` (U+2013) or hyphen-minus `-` for the two dashes in that sentence only):
+
+**First sentence (exact):**
+
+`FORWDAYS defines the historical monitoring window by specifying how many days forward from today to retrieve records. 0 – today, 1 – today + tomorrow etc.`
+
+**Second line (anchor — only when it can be stated from evidence):**
+
+- If **DATE_REF_FLD** exists in the Parameters sheet for this function, add **exactly**:
+
+`Forwdays is based on DATE_REF_FLD field.`
+
+- If **DATE_REF_FLD** does **not** exist: read the ABAP. Add a **second line** **only** when the source clearly shows which SAP **date field** the forward (or FORWDAYS-adjusted) lookback applies to (same evidence as for BACKDAYS: e.g. `TABLE~FIELD IN R_ERDAT`, `FIELD IN R_BEDAT`, or when `LV_BACKDAYS = LV_FORWDAYS` precedes the same range copy as BACKDAYS). Use this exact pattern (replace only `FIELD` with that technical name, same casing as SAP):
+
+`Forwdays is based on FIELD`
+
+- If you **cannot** determine that field from the available ABAP, **do not** add any `Forwdays is based on …` line—**do not** guess.
+
+Do **not** paraphrase, merge, bold, or append extra clauses to these mandatory lines when they are present. Do **not** use internal ABAP range variable names elsewhere in the FORWDAYS block (no `R_DATUM`, `SY-DATUM`, `DATE_FROM`, etc.).
 
 3b. **`USER_FLD` / `USR_FLD` (mandatory DRL narrative; optional ABAP literals only)**
 
@@ -147,7 +175,7 @@ Always include `**[PARAM] Options:**` when applicable:
   - `STAT_WAIT`, `STAT_TRANSIT`, `STAT_OK`, `STAT_ERROR`, `STAT_INCONS`, `STAT_FUTURE`, `STAT_RETRY`, `STAT_DIRECT`, `STAT_ACTIVE`
 - `USER_FLD` / `USR_FLD`: follow **3b** (not the generic `**… Options:**` rule below).
 
-**DURATION_UNIT exact options text:**
+**DURATION_UNIT exact options text (mandatory verbatim):** Auto-generation and verify use `scripts/pipeline/pipeline.py` (`_DURATION_UNIT_OPTION_LINES`). Copy these four lines exactly under `**DURATION_UNIT Options:**` — do not paraphrase, bold the codes, or use em-dash bullets.
 - H: Hours
 - M: Minutes
 - D: Days

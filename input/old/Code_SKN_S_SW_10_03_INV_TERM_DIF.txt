@@ -1,0 +1,375 @@
+FUNCTION /SKN/F_SW_10_03_INV_TERM_DIF .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_INV_TERM_DIF OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: LANGU  LANGU,
+               BACKDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               ADV_VS_DELAYED CHAR1. ""A-adv-before, D-delayed - after
+  LV_BACKDAYS = 10.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU.
+  LV_DATE_REF_FLD = 'CPUDT'. "Entered on
+  SELECT_SINGLE: LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 DURATION_UNIT,
+                 ADV_VS_DELAYED.
+  DATA_MULTY: FRGRL        FRGRL,
+              EBELN        EBELN,
+              BUKRS        BUKRS,
+              BSTYP        EBSTYP,
+              BSART        ESART,
+              EKORG        EKORG,
+              EKGRP        BKGRP,
+              FRGGR        FRGGR,
+              FRGSX        FRGSX,
+              FRGCO        FRGCO,
+              FRGKE        FRGKE,
+              LIFNR        ELIFN,
+              RESWK        RESWK,
+              ZTERM        DZTERM,
+              USNAM        USNAM,
+              BLDAT        BLDAT,
+              BUDAT        BUDAT,
+              WAERS        WAERS,
+              PROCSTAT    MEPROCSTATE,
+              DATUM        SY-DATUM,
+              CPUDT        CPUDT,
+              BLART        BLART,
+              BELNR     RE_BELNR,
+              NETDT_DIFF   INT4,
+              DURATION    /SKN/E_SW_DURATION.
+  SELECT_MULTY:
+              FRGRL,
+              EBELN,
+              BUKRS,
+              BSTYP,
+              BSART,
+              EKORG,
+              EKGRP,
+              FRGGR,
+              FRGSX,
+              FRGCO,
+              FRGKE,
+              LIFNR,
+              RESWK,
+              ZTERM,
+              USNAM,
+              BLDAT,
+              BUDAT,
+              WAERS,
+              PROCSTAT,
+              DATUM,
+              CPUDT,
+              BLART,
+              BELNR,
+              NETDT_DIFF,
+              DURATION.
+  CONVERT_MULTY: EBELN ALPHA,
+                 LIFNR ALPHA.
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+           R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA :   FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+        LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+        LV_DDTEXT LIKE  DD07V-DDTEXT.
+  DATA: LV_FRGCO  TYPE FRGCO.
+  DATA: LS_T169F TYPE T169F,
+        LT_T169F LIKE TABLE OF LS_T169F.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+  DATA : E_FAEDE TYPE FAEDE,
+         I_FAEDE TYPE FAEDE.
+  DATA:  LV_ZFBDT TYPE DZFBDT,
+         LV_ZBD1T TYPE DZBD1T.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_03_INV_TERM_DIF'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'CPUDT'.
+      R_CPUDT[] = R_DATUM[]. "Entered on
+    WHEN 'BLDAT'.
+      R_BLDAT[] = R_DATUM[]. "PO Date
+    WHEN 'BUDAT'.
+      R_BUDAT[] = R_DATUM[]. "PO Date
+    WHEN OTHERS.
+      R_CPUDT[] = R_DATUM[]. "Billing date
+  ENDCASE.
+  "--- Prepare BLART
+  SELECT *
+    FROM T169F
+    INTO CORRESPONDING FIELDS OF TABLE LT_T169F
+    WHERE TCODE EQ 'MIRO'
+    AND   BLART IN R_BLART.
+  REFRESH R_BLART.
+  LOOP AT LT_T169F INTO LS_T169F.
+    RS_BLART-SIGN = 'I'.
+    RS_BLART-OPTION = 'EQ'.
+    RS_BLART-LOW = LS_T169F-BLART.
+    APPEND RS_BLART TO R_BLART.
+  ENDLOOP.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT R~LIFNR R~ZBD3T R~ZFBDT R~BLDAT R~BUDAT R~CPUDT R~USNAM R~BUKRS R~RMWWR R~WAERS R~ZTERM
+         R~USNAM R~BELNR R~BLART R~ZFBDT R~ZBD1T
+*         l~zterm AS lfb1_zterm           " 20.06.21--
+         L~EKORG                          " 20.06.21++
+         L~ZTERM AS LFM1_ZTERM            " 20.06.21++
+    FROM RBKP AS R
+*    INNER JOIN lfb1 AS l    " 20.06.21--
+*** 20.06.21++
+    INNER JOIN RSEG AS RS ON  R~BELNR  EQ RS~BELNR
+                          AND R~GJAHR  EQ RS~GJAHR
+    INNER JOIN EKKO AS E  ON  RS~EBELN EQ E~EBELN
+    INNER JOIN LFM1 AS L  ON  R~LIFNR  EQ L~LIFNR
+                          AND E~EKORG  EQ L~EKORG
+*** 20.06.21++
+*    AND r~bukrs EQ l~bukrs  " 20.06.21--
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE R~BLART  IN R_BLART
+      AND R~BUKRS  IN R_BUKRS
+      AND R~CPUDT  IN R_CPUDT
+      AND R~LIFNR  IN R_LIFNR
+      AND R~BELNR  IN R_BELNR
+      AND R~BLDAT  IN R_BLDAT
+      AND R~BUDAT  IN R_BUDAT
+      AND R~USNAM  IN R_USNAM
+      AND R~RBSTAT IN ( '5',' ' ) "  (posted invoice)
+      AND R~STBLG  EQ ' '         "  (uncanceled invoice)
+      AND R~ZTERM  NE L~ZTERM.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+********************************************************************************
+  "--- Set Descriptions
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    "--- Get  Vendor Decriptions
+    CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+      EXPORTING
+        LIFNR        = T_DATA-LIFNR
+      IMPORTING
+        VENDOR_DESC  = T_DATA-VENDOR_DESC
+      EXCEPTIONS
+        WRONG_VENDOR = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    CLEAR I_FAEDE.
+    I_FAEDE-SHKZG = 'H'.
+    I_FAEDE-KOART = 'K'.
+    I_FAEDE-ZFBDT = T_DATA-ZFBDT.
+    I_FAEDE-ZBD1T = T_DATA-ZBD1T.
+    CALL FUNCTION 'DETERMINE_DUE_DATE'
+      EXPORTING
+        I_FAEDE                    = I_FAEDE
+*       I_GL_FAEDE                 =
+      IMPORTING
+        E_FAEDE                    = E_FAEDE
+      EXCEPTIONS
+        ACCOUNT_TYPE_NOT_SUPPORTED = 1
+        OTHERS                     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-NETDT = E_FAEDE-NETDT.
+    ENDIF.
+    "====
+    CALL FUNCTION 'FI_TERMS_OF_PAYMENT_PROPOSE'
+      EXPORTING
+        I_BLDAT         = T_DATA-BLDAT
+        I_BUDAT         = T_DATA-BUDAT
+        I_CPUDT         = T_DATA-CPUDT
+*       I_ZFBDT         =
+*       i_zterm         = t_data-lfb1_zterm     " 20.06.21--
+        I_ZTERM         = T_DATA-LFM1_ZTERM     " 20.06.21++
+*       I_REINDAT       =
+*       I_LIFNR         =
+*       I_BUKRS         =
+      IMPORTING
+        E_ZBD1T         = LV_ZBD1T
+*       E_ZBD1P         =
+*       E_ZBD2T         =
+*       E_ZBD2P         =
+*       E_ZBD3T         =
+        E_ZFBDT         = LV_ZFBDT
+*       E_SPLIT         =
+*       E_ZSCHF         =
+*       E_ZLSCH         =
+*       E_T052          =
+      EXCEPTIONS
+        TERMS_NOT_FOUND = 1
+        OTHERS          = 2.
+    IF SY-SUBRC <> 0.
+      CLEAR : LV_ZBD1T,
+              LV_ZFBDT.
+    ENDIF.
+    "===
+    CLEAR I_FAEDE.
+    I_FAEDE-SHKZG = 'H'.
+    I_FAEDE-KOART = 'K'.
+    I_FAEDE-ZFBDT = LV_ZFBDT.
+    I_FAEDE-ZBD1T = LV_ZBD1T.
+    CALL FUNCTION 'DETERMINE_DUE_DATE'
+      EXPORTING
+        I_FAEDE                    = I_FAEDE
+*       I_GL_FAEDE                 =
+      IMPORTING
+        E_FAEDE                    = E_FAEDE
+      EXCEPTIONS
+        ACCOUNT_TYPE_NOT_SUPPORTED = 1
+        OTHERS                     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-NETDT_VEND = E_FAEDE-NETDT.
+    ENDIF.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = T_DATA-NETDT
+        T_FROM      = SY-UZEIT
+        D_TO        = T_DATA-NETDT_VEND
+        T_TO        = SY-UZEIT
+        TIME_UNIT   = 'D'
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-NETDT_DIFF = TIME_DIFF.
+      IF TIME_DIFF > 0.
+        T_DATA-ADV_VS_DELAYED = 'A'.
+      ELSEIF TIME_DIFF < 0.
+        T_DATA-ADV_VS_DELAYED = 'D'.
+      ELSE.
+        T_DATA-ADV_VS_DELAYED = ''.
+      ENDIF.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE T_DATA WHERE NETDT_DIFF NOT IN R_NETDT_DIFF.
+  """28.1.19
+  IF LV_ADV_VS_DELAYED = 'D'.
+    DELETE T_DATA WHERE NETDT_DIFF >= 0.
+  ELSEIF LV_ADV_VS_DELAYED = 'A'.
+    DELETE T_DATA WHERE NETDT_DIFF =< 0.
+  ELSE.
+  ENDIF.
+  """"""""
+  "--- Set Descriptions
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    "--- Get  Vendor Decriptions
+    CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+      EXPORTING
+        LIFNR        = T_DATA-LIFNR
+      IMPORTING
+        VENDOR_DESC  = T_DATA-VENDOR_DESC
+      EXCEPTIONS
+        WRONG_VENDOR = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+*** 20.06.21++
+    CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+      EXPORTING
+        EKORG        = T_DATA-EKORG
+*        langu        = sy-langu
+      IMPORTING
+        PUR_ORG_DESC = T_DATA-EKORG_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+    ENDIF.
+*** 20.06.21++
+    CALL FUNCTION '/SKN/F_SW_10_BLART_DESC'
+      EXPORTING
+        BLART      = T_DATA-BLART
+*       LANGU      = SY-LANGU
+      IMPORTING
+        TYPE_DESC  = T_DATA-BLART_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

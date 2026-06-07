@@ -1,0 +1,154 @@
+FUNCTION /SKN/F_SW_10_07_FI_TCURR.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_07_FI_TCURR
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC       CHAR1 ,
+             LANGU               LANGU,
+             BACKDAYS            INT4.
+DATA_MULTY:   KURST             KURST_CURR,
+              FCURR             FCURR_CURR,
+              TCURR             TCURR_CURR,
+              UKURS             UKURS_CURR,
+              DURATION_D       /SKN/E_SW_DURATION_D,
+              DATUM            SYDATUM . " Paased by SW Online Monitor
+  SELECT_MULTY: KURST,
+                FCURR,
+                TCURR,
+                UKURS,
+                DURATION_D,
+                DATUM.
+   LV_LANGU = SY-LANGU.
+   SELECT_SINGLE: MANAGE_IN_UTC,
+                  LANGU,
+                  BACKDAYS.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_07_FI_TCURR'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+  "-----------------------------------------------
+  " Additional Definition                        "
+  "-----------------------------------------------
+  DATA : DATE_FROM TYPE D,
+         BACKDAYS  TYPE I.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : LS_DATA LIKE LINE OF T_DATA.
+  DATA : LT_DATA LIKE TABLE OF LS_DATA.
+  DATA : TIME_DIFF TYPE I .
+  DATA : SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+  DATA : DOMVALUE LIKE  DD07V-DOMVALUE_L,
+         DDTEXT LIKE  DD07V-DDTEXT.
+DATA_MULTY: GDATU  GDATU_INV.
+  "-----------------------------------------------
+  " 2. Extracting & Populating Parameters        "
+  "-----------------------------------------------
+    IF R_DATUM[] IS INITIAL .  " Set default value
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+      DATE_FROM = SY-DATUM - LV_BACKDAYS .
+      RS_DATUM-LOW = DATE_FROM .
+      APPEND RS_DATUM TO R_DATUM.
+    ENDIF .
+    "--- Fill GDATU
+    DATE_2_INVERTED_RANGE DATUM GDATU.
+*    refresh R_GDATU.
+*    loop at R_DATUM into RS_DATUM.
+*      move-corresponding RS_DATUM to RS_GDATU.
+*      date_2_inverted RS_DATUM-LOW RS_GDATU-LOW.
+*      if RS_DATUM-HIGH is not initial.
+*        date_2_inverted RS_DATUM-HIGH RS_GDATU-HIGH.
+*      endif.
+*      append RS_GDATU to R_GDATU.
+*    endloop.
+   SET_SY_TIME LV_MANAGE_IN_UTC SY_DATLO SY_TIMLO .
+   TIME_SHIFT SY_DATLO SY_TIMLO . " TIME_SHIFT parameter
+  "-----------------------------------------------
+  " 3. Initiating Output Table(Mandatory!!!)     "
+  "-----------------------------------------------
+  CLEAR IS_ALERT .
+  REFRESH T_DATA .
+  REFRESH LT_DATA .
+  "-----------------------------------------------
+  " 4. Retrieving/preparing Alert Data           "
+  "-----------------------------------------------
+  "--- Check that Object Class is not empty
+  SELECT *
+     FROM TCURR
+     INTO CORRESPONDING FIELDS OF TABLE T_DATA
+     WHERE KURST IN R_KURST
+       AND FCURR IN   R_FCURR
+       AND TCURR IN   R_TCURR
+       AND GDATU IN   R_GDATU
+       AND UKURS IN   R_UKURS.
+  "-----------------------------------------------
+  " 5. Post retrieving manipulations             "
+  "-----------------------------------------------
+  "-----------------------------------------------
+  " 6. Post retrieving filtering                 "
+  "-----------------------------------------------
+  LOOP AT T_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    DATE_2_INVERTED  LS_DATA-GDATU LS_DATA-ACT_DATE.
+         CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+            EXPORTING
+              D_FROM          = LS_DATA-ACT_DATE
+              T_FROM          = SY-UZEIT
+              D_TO            = SY_DATLO
+              T_TO            = SY_TIMLO
+              TIME_UNIT        = 'D'
+            IMPORTING
+              TIME_DIFF        = TIME_DIFF
+            EXCEPTIONS
+              WRONG_VALUE      = 1
+              OTHERS           = 2 .
+         IF SY-SUBRC = 0.
+           LS_DATA-DURATION_D = TIME_DIFF .
+         ELSE.
+           LS_DATA-DURATION_D = '999999' .
+         ENDIF.
+    MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*
+ DELETE T_DATA WHERE DURATION_D NOT IN R_DURATION_D.
+ "
+ LOOP AT T_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+  CALL FUNCTION '/SKN/F_SW_10_EXCHRATE_TYP_DESC'
+    EXPORTING
+      KURST                   = LS_DATA-KURST
+      LANGU                   = SY-LANGU
+  IMPORTING
+      EXCHRATE_TYP_DESC       = LS_DATA-EXCHRATE_TYP_DESC
+  EXCEPTIONS
+      WRONG_CODE              = 1
+  OTHERS                  = 2
+          .
+ IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+ ENDIF.
+    MODIFY T_DATA FROM LS_DATA INDEX SY_TABIX.
+ ENDLOOP.
+  "-----------------------------------------------
+  " 7. Finishing (Set IS_ALERT parameter)        "
+  "-----------------------------------------------
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

@@ -1,0 +1,427 @@
+FUNCTION /SKN/F_SW_10_08_EMP_EVENT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_08_EMP_EVENT OPTIONAL
+*"----------------------------------------------------------------------
+DATA : DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM .
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : SPRAS_T TYPE SPRAS .
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LS_PA0000 TYPE PA0000,
+      LT_PA0000 LIKE TABLE OF LS_PA0000 WITH HEADER LINE,
+      LT_PA0000_PREV LIKE TABLE OF LS_PA0000 WITH HEADER LINE,
+      LS_PA0000_PREV TYPE PA0000,
+      LT_PA0000_ADD LIKE TABLE OF LS_PA0000 WITH HEADER LINE.      .
+DATA: LS_PA0002 TYPE PA0002,
+      LT_PA0002 LIKE TABLE OF LS_PA0002.
+DATA: LS_PA0001 TYPE PA0001,
+      LT_PA0001 LIKE TABLE OF LS_PA0001.
+DATA_SINGLE: BACKDAYS INT4,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             LANGU  LANGU,
+             SAME_PREV_EVENT CHAR1, "The same type of event
+             ANY_PREV_EVENT CHAR1,
+             PREV_EVENT_NUM INT1.
+DATA: LV_PERNR_CURR TYPE PERSNO,
+      LV_BEGDA TYPE BEGDA,
+      LV_PERNR_CNT TYPE I.
+*
+*
+*
+ LV_BACKDAYS = 1.
+ LV_LANGU = 'E'.
+ LV_DURATION_UNIT = 'D'.
+ LV_PREV_EVENT_NUM = 1.
+*
+ SELECT_SINGLE: BACKDAYS,
+                DURATION_UNIT,
+                LANGU,
+                SAME_PREV_EVENT,
+                ANY_PREV_EVENT,
+                PREV_EVENT_NUM.
+*
+*
+DATA_MULTY: PERNR       PERSNO,
+            MASSN       MASSN,
+            BUKRS       BUKRS,
+            WERKS       PERSA,
+            PERSG       PERSG,
+            PERSK       PERSK,
+            BTRTL       BTRTL,
+            PLANS       PLANS,
+            STAT1       STAT1,
+            STAT2       STAT2,
+            STAT3       STAT3,
+            ORGEH       ORGEH,
+            STELL       STELL,
+            DURATION   /SKN/E_SW_DURATION,
+            DATUM        SY-DATUM.
+SELECT_MULTY:
+            PERNR,
+            MASSN,
+            BUKRS,
+            WERKS,
+            PERSG,
+            PERSK,
+            BTRTL,
+            PLANS,
+            STAT1,
+            STAT2,
+            STAT3,
+            ORGEH,
+            STELL,
+            DURATION,
+            DATUM .
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_08_EMP_EVENT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+*"convert and check langu
+CONVERT_SINGLE: LANGU ISOLA.
+SELECT SINGLE SPRAS INTO SPRAS_T
+  FROM T002
+  WHERE SPRAS = LV_LANGU.
+  IF SY-SUBRC <> 0.
+    LV_LANGU = 'E'.
+  ENDIF.
+************************************
+    SY_DATLO = SY-DATUM .        " Appl Server's Date
+    SY_TIMLO = SY-UZEIT.
+*
+********************************************************
+    DATE_FROM = SY-DATUM.
+    DATE_TO = SY-DATUM.
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+      DATE_FROM = SY-DATUM - LV_BACKDAYS .
+      DATE_TO = SY-DATUM.
+      RS_DATUM-LOW = DATE_FROM .
+      APPEND RS_DATUM TO R_DATUM.
+   ELSE.
+     READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+     IF SY-SUBRC IS INITIAL.
+       DATE_FROM = RS_DATUM-LOW.
+       DATE_TO = RS_DATUM-HIGH.
+       IF DATE_TO < DATE_FROM.
+         DATE_TO = DATE_FROM.
+       ENDIF.
+     ENDIF.
+   ENDIF.
+*********************************************************
+**  if lv_NO_DATE_RESTRICTION is not initial.
+**    refresh R_DATUM.
+**  endif.
+*
+**--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+*
+   SELECT *
+     FROM PA0000
+     INTO CORRESPONDING FIELDS OF TABLE LT_PA0000
+     WHERE   PERNR IN R_PERNR
+       AND    MASSN IN R_MASSN
+       AND STAT1 IN R_STAT1
+       AND STAT2 IN R_STAT2
+       AND STAT3 IN R_STAT3
+       AND BEGDA IN R_DATUM.
+   "--- Get the  Prev Event ----
+      IF LV_ANY_PREV_EVENT IS NOT INITIAL.
+        CLEAR LV_SAME_PREV_EVENT.
+      ENDIF.
+   "--- Get the SAME Prev Event ----
+   REFRESH LT_PA0000_PREV.
+   IF LV_SAME_PREV_EVENT IS NOT INITIAL.
+     IF LT_PA0000[] IS NOT INITIAL.
+       SELECT *
+       FROM PA0000
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0000_PREV
+       FOR ALL ENTRIES IN LT_PA0000
+       WHERE  PERNR = LT_PA0000-PERNR
+         AND  SUBTY = LT_PA0000-SUBTY
+         AND  OBJPS = LT_PA0000-OBJPS
+         AND  SPRPS = LT_PA0000-SPRPS
+         AND  MASSN = LT_PA0000-MASSN
+         AND  ENDDA < LT_PA0000-BEGDA.
+     ENDIF.
+   ENDIF.
+   IF LV_ANY_PREV_EVENT IS NOT INITIAL.
+     IF LT_PA0000[] IS NOT INITIAL.
+       SELECT *
+       FROM PA0000
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0000_PREV
+       FOR ALL ENTRIES IN LT_PA0000
+       WHERE  PERNR = LT_PA0000-PERNR
+         AND  SUBTY = LT_PA0000-SUBTY
+         AND  OBJPS = LT_PA0000-OBJPS
+         AND  SPRPS = LT_PA0000-SPRPS
+"         and  MASSN = lt_PA0000-MASSN
+         AND  ENDDA < LT_PA0000-BEGDA.
+     ENDIF.
+   ENDIF.
+   SORT LT_PA0000_PREV BY PERNR BEGDA DESCENDING.
+   CLEAR: LV_PERNR_CURR.
+   LV_PERNR_CNT = 1.
+   REFRESH LT_PA0000_ADD.
+   LOOP AT LT_PA0000 INTO LS_PA0000.
+     CLEAR LV_PERNR_CNT.
+     LOOP AT LT_PA0000_PREV INTO LS_PA0000_PREV WHERE PERNR = LS_PA0000-PERNR.
+       IF LS_PA0000_PREV-ENDDA < LS_PA0000-BEGDA.
+         ADD 1 TO LV_PERNR_CNT.
+         IF LV_PERNR_CNT <= LV_PREV_EVENT_NUM.
+           APPEND LS_PA0000_PREV TO LT_PA0000_ADD.
+         ENDIF.
+       ENDIF.
+     ENDLOOP.
+   ENDLOOP.
+   LOOP AT LT_PA0000_ADD INTO LS_PA0000.
+     APPEND LS_PA0000 TO LT_PA0000.
+   ENDLOOP.
+*   loop at lt_PA0000_PREV into ls_PA0000.
+*     if lv_PERNR_curr = ls_PA0000-PERNR.
+*       add 1 to lv_PERNR_cnt.
+*     else.
+*       lv_PERNR_cnt = 1.
+*       lv_PERNR_curr = ls_PA0000-PERNR.
+*     endif.
+*     if lv_PERNR_cnt <= lv_PREV_EVENT_NUM.
+*       append ls_PA0000 to lt_PA0000.
+*     endif.
+*   endloop.
+   SORT LT_PA0000 BY PERNR BEGDA.
+   "--- Get the  Prev Event ----
+   IF LT_PA0000[] IS NOT INITIAL.
+     SELECT *
+       FROM PA0001
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0001
+       FOR ALL ENTRIES IN LT_PA0000
+       WHERE  PERNR = LT_PA0000-PERNR
+          AND BUKRS IN R_BUKRS
+          AND WERKS IN R_WERKS
+          AND PERSG IN R_PERSG
+          AND PERSK IN R_PERSK
+          AND BTRTL IN R_BTRTL
+          AND PLANS IN R_PLANS
+          AND ORGEH IN R_ORGEH
+          AND STELL IN R_STELL
+          "and ENDDA   = '99991231'.
+          AND BEGDA   <= LT_PA0000-BEGDA
+          AND ENDDA   >= LT_PA0000-BEGDA.
+     SELECT *
+       FROM PA0002
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0002
+       FOR ALL ENTRIES IN LT_PA0000
+       WHERE  PERNR = LT_PA0000-PERNR
+          "and ENDDA   = '99991231'.
+          AND BEGDA   <= LT_PA0000-BEGDA
+          AND ENDDA   >= LT_PA0000-BEGDA.
+   ENDIF.
+  REFRESH T_DATA.
+  LOOP AT LT_PA0000 INTO LS_PA0000.
+    LOOP AT LT_PA0001 INTO LS_PA0001 WHERE PERNR = LS_PA0000-PERNR
+                                       AND BEGDA <= LS_PA0000-BEGDA
+                                       AND ENDDA >= LS_PA0000-BEGDA.
+      LOOP AT LT_PA0002 INTO LS_PA0002 WHERE PERNR = LS_PA0000-PERNR
+                                       AND BEGDA <= LS_PA0000-BEGDA
+                                       AND ENDDA >= LS_PA0000-BEGDA.
+        MOVE-CORRESPONDING LS_PA0001 TO LS_DATA.
+        MOVE-CORRESPONDING LS_PA0002 TO LS_DATA.
+        MOVE-CORRESPONDING LS_PA0000 TO LS_DATA.
+        APPEND LS_DATA TO T_DATA.
+      ENDLOOP.
+    ENDLOOP.
+  ENDLOOP.
+*********************
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = T_DATA-BEGDA
+          T_FROM            = SY_TIMLO
+          D_TO              = SY_DATLO
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+ LOOP AT T_DATA.
+   SY_TABIX = SY-TABIX.
+   CALL FUNCTION '/SKN/F_SW_10_USRID_BY_PERNR'
+     EXPORTING
+       PERNR         = T_DATA-PERNR
+    IMPORTING
+      USRID         = T_DATA-USRID
+    EXCEPTIONS
+      WRONG_CODE       = 1
+*      OTHERS           = 2
+             .
+*****Act. type-**********
+   CALL FUNCTION '/SKN/F_SW_10_ACTION_TYP_DESC'
+     EXPORTING
+       MASSN                 = T_DATA-MASSN
+      LANGU                 = LV_LANGU
+    IMPORTING
+     ACTION_TYP_DESC       = T_DATA-MNTXT
+    EXCEPTIONS
+      WRONG_CODE            = 1
+*      OTHERS                = 2
+             .
+   IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+   ENDIF.
+*****-REASON-********
+   CALL FUNCTION '/SKN/F_SW_10_ACT_REASON_DESC'
+     EXPORTING
+       MASSN                    = T_DATA-MASSN
+       MASSG                    = T_DATA-MASSG
+      LANGU                    = LV_LANGU
+    IMPORTING
+      ACTION_REASON_DESC       = T_DATA-MGTXT
+    EXCEPTIONS
+      WRONG_CODE               = 1
+*      OTHERS                   = 2
+             .
+   IF SY-SUBRC <> 0.
+   ENDIF.
+*****-Employee Group-***********
+   CALL FUNCTION '/SKN/F_SW_10_EMP_GROUP_DESC'
+     EXPORTING
+       PERSG                = T_DATA-PERSG
+      LANGU                = LV_LANGU
+    IMPORTING
+      EMP_GROUP_DESC       = T_DATA-PGTXT
+    EXCEPTIONS
+      WRONG_CODE           = 1
+*      OTHERS               = 2
+             .
+   IF SY-SUBRC <> 0.
+   ENDIF.
+*****-Emp. Subgroup -******************
+  CALL FUNCTION '/SKN/F_SW_10_EMP_SUBGROUP_DESC'
+    EXPORTING
+      PERSK                   = T_DATA-PERSK
+     LANGU                   = LV_LANGU
+   IMPORTING
+     EMP_SUBGROUP_DESC       = T_DATA-PKTXT
+   EXCEPTIONS
+     WRONG_CODE              = 1
+*     OTHERS                  = 2
+            .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+             .
+******- Job  -**************
+  CALL FUNCTION '/SKN/F_SW_10_EMP_JOB_DESC'
+    EXPORTING
+     STELL              = T_DATA-STELL
+     LANGU              = LV_LANGU
+   IMPORTING
+     EMP_JOB_DESC       = T_DATA-STLTX
+   EXCEPTIONS
+     WRONG_CODE         = 1
+*   OTHERS             = 2
+          .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+*****-ORG UNIT  -**************
+  CALL FUNCTION '/SKN/F_SW_10_ORG_UNIT_DESC'
+    EXPORTING
+      ORGEH               = T_DATA-ORGEH
+      LANGU                = LV_LANGU
+   IMPORTING
+      ORG_UNIT_DESC       = T_DATA-ORGTX
+   EXCEPTIONS
+     WRONG_CODE          = 1
+*   OTHERS              = 2
+          .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+********Pers. Area-*************
+  CALL FUNCTION '/SKN/F_SW_10_PERS_AREA_DESC'
+    EXPORTING
+      PERSA                = T_DATA-WERKS
+   IMPORTING
+     PERS_AREA_DESC       = T_DATA-PBTXT
+   EXCEPTIONS
+     WRONG_CODE           = 1
+*    OTHERS               = 2
+          .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+******-Pers. SUBarea-**********
+  CALL FUNCTION '/SKN/F_SW_10_PERS_SUBAREA_DESC'
+    EXPORTING
+      PERSA                   = T_DATA-WERKS
+      BTRTL                   = T_DATA-BTRTL
+   IMPORTING
+     PERS_SUBAREA_DESC       = T_DATA-BTRTX
+   EXCEPTIONS
+     WRONG_CODE              = 1
+*     OTHERS                  = 2
+            .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+*****-Position-*********
+  CALL FUNCTION '/SKN/F_SW_10_EMP_POSITION_DESC'
+    EXPORTING
+      PLANS               = T_DATA-PLANS
+      OTYPE               = 'S'
+     LANGU               = LV_LANGU
+   IMPORTING
+     POSITION_DESC       = T_DATA-PLSTX
+   EXCEPTIONS
+     WRONG_CODE          = 1
+*     OTHERS              = 2
+            .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+*****- Comp. Code-*********
+  CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+    EXPORTING
+      BUKRS                = T_DATA-BUKRS
+   IMPORTING
+     COMP_CODE_DESC       = T_DATA-BUTXT
+   EXCEPTIONS
+     WRONG_CODE           = 1
+*     OTHERS               = 2
+            .
+  IF SY-SUBRC <> 0.
+  ENDIF.
+********************************
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP.
+**--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

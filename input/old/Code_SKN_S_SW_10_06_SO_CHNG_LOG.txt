@@ -1,0 +1,124 @@
+FUNCTION /SKN/F_SW_10_06_SO_CHNG_LOG .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_06_SO_CHNG_LOG
+*"----------------------------------------------------------------------
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: BACKDAYS         INT4,
+               SW_DEST          RFCDEST
+               .
+  DATA_MULTY: OBJECTID  IB_RECNO,
+              VBELN     VBELN_VA,
+              VBTYP     VBTYP,
+              AUART     AUART,
+              VKORG     VKORG,
+              VTWEG     VTWEG,
+              VKGRP     VKGRP,
+              VKBUR     VKBUR,
+              GSBER     GSBER,
+              MATNR     MATNR,
+              KUNNR     KUNAG,
+              ABGRU     ABGRU_VA,
+              USERNAME  CDUSERNAME.
+  DATA: LV_FIELDNAME TYPE FIELDNAME,
+        LV_SHIFT     TYPE DDLENG,
+        LV_LENG      TYPE DDLENG.
+  DATA: LV_TABKEY_LEN TYPE I VALUE '70',    "!!!
+        LV_ILEN       TYPE I.
+  DATA: LS_DATA LIKE LINE OF T_DATA[].
+  FIELD-SYMBOLS: <FS_OLD> TYPE ANY,
+                 <FS_NEW> TYPE ANY.
+  DATA : FLD TYPE FIELDNAME,
+         IFLD TYPE I,
+         CTMP(2) TYPE C.
+  DATA: LT_DATA TYPE TABLE OF /SKN/S_SW_10_06_MD_CHNG_LOG.
+  DATA: LS_DATA_MD LIKE LINE OF LT_DATA.
+  FIELD-SYMBOLS: <FS_DATA> LIKE LINE OF T_DATA[].
+  SELECT_SINGLE: BACKDAYS,
+                 SW_DEST.
+  SELECT_MULTY: OBJECTID,
+                USERNAME.
+  CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+* Configuration Alert
+  CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+    IMPORTING
+      IS_ALERT = IS_ALERT
+    TABLES
+      T_SELECT = T_SELECT
+      T_DATA   = LT_DATA.
+* Check if found some change in configuration log
+  CHECK IS_ALERT EQ 'X'.
+  SELECT_MULTY: VBELN,
+                VBTYP,
+                AUART,
+                VKORG,
+                VTWEG,
+                VKGRP,
+                VKBUR,
+                GSBER,
+                MATNR,
+                KUNNR,
+                ABGRU.
+* Move data change's log to main tab.
+  LOOP AT LT_DATA INTO LS_DATA_MD.
+    MOVE-CORRESPONDING LS_DATA_MD TO LS_DATA.
+    APPEND LS_DATA TO T_DATA[].
+  ENDLOOP.
+* if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_06_SO_CHNG_LOG'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    FROM IBIN INNER JOIN VBAP ON  IBIN~INSTANCE EQ VBAP~CUOBJ
+              INNER JOIN VBAK ON  VBAP~VBELN    EQ VBAK~VBELN
+              INNER JOIN VBEP ON  VBAP~VBELN    EQ VBEP~VBELN
+                              AND VBAP~POSNR    EQ VBEP~POSNR
+              LEFT OUTER JOIN AFPO ON  VBEP~VBELN EQ AFPO~KDAUF
+                                   AND VBEP~POSNR EQ AFPO~KDPOS
+                                   AND VBEP~ETENR EQ AFPO~KDEIN
+    FOR ALL ENTRIES IN T_DATA
+    WHERE IN_RECNO   EQ T_DATA-OBJECTID+0(22)
+    AND   VBAP~VBELN IN R_VBELN
+    AND   VBAP~MATNR IN R_MATNR
+    AND   VBAP~ABGRU IN R_ABGRU
+    AND   VBAK~VBTYP IN R_VBTYP
+    AND   VBAK~AUART IN R_AUART
+    AND   VBAK~VKORG IN R_VKORG
+    AND   VBAK~VTWEG IN R_VTWEG
+    AND   VBAK~VKGRP IN R_VKGRP
+    AND   VBAK~VKBUR IN R_VKBUR
+    AND   VBAK~GSBER IN R_GSBER
+    AND   VBAK~KUNNR IN R_KUNNR.
+* Customer Description Name
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+    IF <FS_DATA>-KUNNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR          = <FS_DATA>-KUNNR
+        IMPORTING
+          CUST_DESC      = <FS_DATA>-NAME1
+        EXCEPTIONS
+          WRONG_CUSTOMER = 1
+          OTHERS         = 2.
+    ENDIF.
+  ENDLOOP.
+  IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+  ENDIF.
+  READ TABLE T_DATA INTO LS_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

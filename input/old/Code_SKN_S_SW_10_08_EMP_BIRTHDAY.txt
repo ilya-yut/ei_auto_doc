@@ -1,0 +1,282 @@
+FUNCTION /SKN/F_SW_10_08_EMP_BIRTHDAY .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_08_EMP_BIRTHDAY OPTIONAL
+*"----------------------------------------------------------------------
+TYPES : T_MONTDAY(4) TYPE N.
+DATA : DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM .
+DATA : MONTH_FROM TYPE GBMON,
+       MONTH_TO TYPE GBMON.
+DATA : MONTDAY_FROM TYPE T_MONTDAY,
+       MONTDAY_TO TYPE T_MONTDAY.
+DATA : LV_MONTDAY TYPE T_MONTDAY,
+       LV_DAY TYPE GBTAG,
+       LV_MONTH TYPE GBMON,
+       LV_DATE LIKE SY-DATUM,
+       LV_YEAR TYPE GBJHR.
+DATA_MULTY : MONTDAY T_MONTDAY,
+              MONTH GBMON,
+              DAY GBTAG.
+DATA: LV_OBJID TYPE  REALO,
+      LV_LEADER_ID TYPE  REALO.
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LS_PA0000 TYPE PA0000,
+      LT_PA0000 LIKE TABLE OF LS_PA0000 WITH HEADER LINE.
+DATA: WA_PA0002  TYPE  PA0002.
+DATA: LS_PA0002 TYPE PA0002,
+      LT_PA0002 LIKE TABLE OF LS_PA0002.
+DATA: WA_PA0001  TYPE  PA0001.
+DATA: LS_PA0001 TYPE PA0001,
+      LT_PA0001 LIKE TABLE OF LS_PA0001.
+DATA_SINGLE: BACKDAYS        INT4,
+             FORWDAYS        INT4,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             PLVAR          PLVAR,
+             OTYPE          OTYPE.
+*
+ LV_BACKDAYS = 0.
+ LV_FORWDAYS = 1.
+ LV_DURATION_UNIT = 'D'.
+ LV_PLVAR = '01'.
+ LV_OTYPE = 'S'.
+*
+ SELECT_SINGLE: BACKDAYS,
+                FORWDAYS,
+                DURATION_UNIT,
+                PLVAR,
+                OTYPE.
+*
+*
+DATA_MULTY: PERNR       PERSNO,
+            BUKRS       BUKRS,
+            WERKS       PERSA,
+            PERSG       PERSG,
+            PERSK       PERSK,
+            BTRTL       BTRTL,
+            PLANS       PLANS,
+            DURATION   /SKN/E_SW_DURATION,
+            DATUM        SY-DATUM,
+            STAT1       STAT1,
+            STAT2       STAT2,
+            STAT3       STAT3.
+SELECT_MULTY:
+            PERNR,
+            BUKRS,
+            WERKS,
+            PERSG,
+            PERSK,
+            BTRTL,
+            PLANS,
+            DURATION,
+            DATUM ,
+            STAT1,
+            STAT2,
+            STAT3.
+*
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_08_EMP_BIRTHDAY'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+DATA :   SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+    SY_DATLO = SY-DATUM .        " Appl Server's Date
+    SY_TIMLO = SY-UZEIT.
+********************************************************
+    DATE_FROM = SY-DATUM.
+    DATE_TO = SY-DATUM.
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'BT' .
+      DATE_FROM = SY-DATUM - LV_BACKDAYS .
+      DATE_TO = SY-DATUM + LV_FORWDAYS.
+      RS_DATUM-LOW = DATE_FROM .
+      RS_DATUM-HIGH = DATE_TO .
+      APPEND RS_DATUM TO R_DATUM.
+   ELSE.
+     READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+     IF SY-SUBRC IS INITIAL.
+       DATE_FROM = RS_DATUM-LOW.
+       DATE_TO = RS_DATUM-HIGH.
+       IF DATE_TO < DATE_FROM.
+         DATE_TO = DATE_FROM.
+       ENDIF.
+     ENDIF.
+   ENDIF.
+   MONTH_FROM = DATE_FROM+4(2).
+   MONTH_TO = DATE_TO+4(2).
+   MONTDAY_FROM = DATE_FROM+4(4).
+   MONTDAY_TO = DATE_TO+4(4).
+   REFRESH R_MONTDAY.
+   LV_MONTDAY = MONTDAY_FROM.
+***   lv_date = sy-datum.
+***   if MONTH_FROM > MONTH_TO.
+***     lv_date+4(4) = '0101' . lv_date = lv_date - 1. "Prev Year
+***     lv_date+4(4) = lv_MONTDAY.
+***   else.
+***      lv_date+4(4) = lv_MONTDAY.
+***   endif.
+  LV_DATE = DATE_FROM.
+    DO.
+      RS_MONTDAY-SIGN = 'I'.
+       RS_MONTDAY-OPTION = 'EQ'.
+        RS_MONTDAY-LOW = LV_MONTDAY.
+      APPEND RS_MONTDAY TO R_MONTDAY.
+      "--- Increment
+      ADD 1 TO LV_DATE.
+      IF LV_DATE > DATE_TO.
+        EXIT.
+      ENDIF.
+      LV_MONTDAY = LV_DATE+4(4).
+    ENDDO.
+    REFRESH: R_MONTH,
+             R_DAY.
+    LOOP AT R_MONTDAY INTO RS_MONTDAY.
+      MOVE-CORRESPONDING RS_MONTDAY TO RS_MONTH.
+       RS_MONTH-LOW = RS_MONTDAY-LOW+0(2).
+      APPEND RS_MONTH TO R_MONTH.
+      MOVE-CORRESPONDING RS_MONTDAY TO RS_DAY.
+       RS_DAY-LOW = RS_MONTDAY-LOW+2(2).
+      APPEND RS_DAY TO R_DAY.
+    ENDLOOP.
+    SORT R_MONTH.
+    DELETE ADJACENT DUPLICATES FROM R_MONTH.
+    SORT R_DAY.
+    DELETE ADJACENT DUPLICATES FROM  R_DAY.
+*********************************************************
+**--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+*
+  SELECT *
+     FROM PA0002
+     INTO CORRESPONDING FIELDS OF TABLE LT_PA0002
+     WHERE PERNR IN R_PERNR
+       AND BEGDA = SY-DATUM
+       AND GBMON IN R_MONTH
+       AND GBTAG IN R_DAY.
+   "--- Restrict for the required Birth Days
+    LOOP AT LT_PA0002 INTO LS_PA0002.
+      SY_TABIX = SY-TABIX .
+     LV_MONTDAY = LS_PA0002-GBDAT+4(4).
+     IF LV_MONTDAY NOT IN R_MONTDAY.
+       DELETE LT_PA0002 INDEX SY_TABIX.
+     ENDIF.
+    ENDLOOP.
+   IF LT_PA0002[] IS NOT INITIAL.
+     SELECT *
+       FROM PA0001
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0001
+       FOR ALL ENTRIES IN LT_PA0002
+       WHERE  PERNR = LT_PA0002-PERNR
+          AND BUKRS IN R_BUKRS
+          AND WERKS IN R_WERKS
+          AND PERSG IN R_PERSG
+          AND PERSK IN R_PERSK
+          AND BTRTL IN R_BTRTL
+          AND PLANS IN R_PLANS
+          AND BEGDA   = SY-DATUM.
+     SELECT *
+       FROM PA0000
+       INTO CORRESPONDING FIELDS OF TABLE LT_PA0000
+       FOR ALL ENTRIES IN LT_PA0002
+       WHERE  PERNR = LT_PA0002-PERNR
+          AND STAT1 IN R_STAT1
+          AND STAT2 IN R_STAT2
+          AND STAT3 IN R_STAT3
+          AND BEGDA   = SY-DATUM.
+   ENDIF.
+  REFRESH T_DATA.
+  LOOP AT LT_PA0002 INTO LS_PA0002.
+    LOOP AT LT_PA0001 INTO LS_PA0001 WHERE PERNR = LS_PA0002-PERNR
+                                       AND BEGDA = SY-DATUM.
+      LOOP AT LT_PA0000 INTO LS_PA0000 WHERE PERNR = LS_PA0002-PERNR
+                                       AND BEGDA = SY-DATUM.
+        MOVE-CORRESPONDING LS_PA0000 TO LS_DATA.
+        MOVE-CORRESPONDING LS_PA0001 TO LS_DATA.
+        MOVE-CORRESPONDING LS_PA0002 TO LS_DATA.
+        APPEND LS_DATA TO T_DATA.
+      ENDLOOP.
+    ENDLOOP.
+  ENDLOOP.
+*********************
+*-- Fill Duration Value
+ LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+   LV_DATE = SY-DATUM.
+   LV_DATE+4(4) = T_DATA-GBDAT+4(4).
+   IF LV_DATE > DATE_TO.
+     LV_YEAR = LV_DATE+0(4).  LV_YEAR = LV_YEAR - 1. LV_DATE+0(4) = LV_YEAR.
+   ENDIF.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = SY_DATLO
+          T_FROM            = SY_TIMLO
+          D_TO              = LV_DATE
+          T_TO              = SY_TIMLO
+          TIME_UNIT         = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        T_DATA-DURATION = TIME_DIFF .
+      ELSE.
+        T_DATA-DURATION = '999999'.
+      ENDIF.
+   MODIFY T_DATA INDEX SY_TABIX .
+ ENDLOOP .
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+*************
+LOOP AT T_DATA .
+   SY_TABIX = SY-TABIX.
+   LV_OBJID = T_DATA-PLANS.
+   CLEAR LV_LEADER_ID.
+   CALL FUNCTION 'RH_GET_LEADER'
+     EXPORTING
+       PLVAR                           = LV_PLVAR
+       KEYDATE                         = SY-DATUM
+       OTYPE                           = LV_OTYPE
+       OBJID                           = LV_OBJID "T_DATA-PLANS
+      GET_LEADER_TAB                  = 'X'
+*      CONSIDER_VAC_POS                = ' '
+    IMPORTING
+*      LEADER_TYPE                     =
+      LEADER_ID                       = LV_LEADER_ID
+*      MULTIPLE                        =
+*    TABLES
+*      LEADER_TAB                      =
+    EXCEPTIONS
+      NO_LEADER_FOUND                 = 1
+      NO_LEADING_POSITION_FOUND       = 2
+      OTHERS                          = 3
+             .
+   IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+   ENDIF.
+   T_DATA-LEADER_ID = LV_LEADER_ID .
+   T_DATA-EXEC_YEAR = SY-DATUM+0(4).
+   MODIFY T_DATA INDEX SY_TABIX .
+ENDLOOP.
+**--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

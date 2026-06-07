@@ -24,11 +24,11 @@ You are documenting the **Parameter Relationships** subsection for an SAP Except
 
 2. **Time-related parameters:** Always check all time-related parameters from the Parameters (Name (Description)) file against the ABAP code. In most cases some time parameters will have visible relations (e.g. BACKDAYS + date reference field, DURATION + DURATION_UNIT, date field parameters). Verify usage in the code before including.
    - **BACKDAYS alignment:** Section 04 must already use the **verbatim** BACKDAYS monitoring-window sentence from the Parameter Configuration Guidelines prompt, plus an anchor line **only** when that prompt allows one (DATE_REF_FLD branch, or a code-evidenced `Backdays is based on FIELD`). When no anchor is used in 04, do not invent one here. When you mention BACKDAYS, do not contradict section 04.
-   - **Clarity rule (mandatory):** Explain time logic in simple words. If `BACKDAYS`, `DURATION`, and explicit date parameters (for example `DATUM`/`SND_DATE`) exist, clearly state:
+   - **Clarity rule (mandatory):** Explain time logic in simple words **inside the time-related group bullets** (not in a separate closing block). If `BACKDAYS`, `DURATION`, and explicit date parameters (for example `DATUM`/`SND_DATE`) exist, clearly state:
      1) `BACKDAYS` is fallback when explicit dates are not provided,
      2) explicit dates override fallback,
      3) `DURATION` + `DURATION_UNIT` is an additional age filter after date selection,
-     4) final result requires both date and duration conditions.
+     4) how date-window and duration filters combine in the final selection (e.g. both must be satisfied), still within that group's bullets.
 
 3. **Aggregation-related parameters:** Always check aggregation-related parameters against the code. Aggregation may connect to other fields or parameters (e.g. AGGR_PERIOD, AGGR_FIELDS, grouping keys). Verify how they interact in the code.
 
@@ -55,7 +55,9 @@ You are documenting the **Parameter Relationships** subsection for an SAP Except
 - **Search _Parameters.docx:** For every parameter in the Parameters (Name (Description)) file, search the Selected parameters file (_Parameters.docx) for that parameter. Where the file describes how parameters work together, connections, or "Work together / Connection", use that to identify and describe relationship groups. Adjust wording (table/field/domain terms) to match this EI; do not copy verbatim if the function differs.
 - **Only parameters with verified relationships:** Include in this subsection **only** parameters that have a relationship visible in the code, in _Parameters.docx, or clear business logic. Do not list every parameter from the Parameters file.
 - **Simple wording:** For date/time relationships, avoid abstract phrasing. Use plain wording such as "first filter by date window, then filter by duration/age."
+- **No global summary block:** Do **not** add a closing **Combined effect:** (or similar) paragraph that restates all groups. End the subsection after the last relationship group; do not add a separate "everything applies together" block.
 - **Parameter scope:** Mention **only** parameters that appear in the Parameters (Name (Description)) file for this EI.
+- **Unused parameters:** Do **not** mention parameters listed as unused in the pipeline block below (or marked **`Not in use`** in section 04). They have no runtime effect and must be omitted from this subsection entirely.
 - **Verification:** If you end up with **0** relationship groups, re-check the code for time and aggregation usage before omitting. If you end up with relationship groups covering **most** of the parameter list, re-check and reduce to only parameters with clear, code-visible relationships (~20–30% max typical).
 - **Serial-number series:** When relevant for a group, describe as a group unless business meaning differs strongly by index.
 - **Tone:** Professional. No implementation details (no line numbers, internal function names). Standard SAP names allowed.
@@ -79,6 +81,8 @@ Use the **Parameter Relationships** subsection in the benchmark for structure an
 - Only a subset of the full parameter list appears in this subsection (time, aggregation, partner, threshold groups — not every parameter).
 
 ---
+
+[UNUSED_PARAMS_PIPELINE_BLOCK]
 
 ## Inputs (provide below)
 

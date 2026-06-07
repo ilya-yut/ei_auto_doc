@@ -1,0 +1,94 @@
+FUNCTION /SKN/F_SW_10_02_PO_AGREE_VALID.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_02_PO_AGREE_VALID OPTIONAL
+*"----------------------------------------------------------------------
+  CONSTANTS: C_BSART TYPE BSART VALUE ''.
+  TYPES: BEGIN OF TY_EKKO,
+           EBELN TYPE EKKO-EBELN,
+           AEDAT TYPE EKKO-AEDAT,
+           BEDAT TYPE EKKO-BEDAT,
+         END OF TY_EKKO,
+         TT_EKKO TYPE STANDARD TABLE OF TY_EKKO.
+  DATA_SINGLE: SW_DEST    RFCDEST,
+               BACKDAYS   INT4,
+               PERIOD     INT4    .
+  DATA_MULTY: EBELN    EBELN,
+              BEDAT    EBDAT,
+              DATUM    SY-DATUM.
+  SELECT_MULTY: EBELN,
+                BEDAT.
+  SELECT_SINGLE: SW_DEST,
+                 BACKDAYS.
+  CONVERT_MULTY: EBELN ALPHA.
+  DATA: SY_TABIX LIKE SY-TABIX,
+        SY_DATLO LIKE SY-DATLO,
+        SY_TIMLO LIKE SY-TIMLO.
+  DATA: LT_EKKO TYPE TT_EKKO,
+        LS_EKKO TYPE TY_EKKO,
+        LS_DATA LIKE LINE OF T_DATA[].
+  DATA: BACKDAYS  TYPE I,
+        DATE_FROM LIKE SY-DATUM,
+        DATE_TO   LIKE SY-DATUM,
+        REF_DATE  TYPE D.
+  DATA: TIME_DIFF TYPE  INT4 .
+  DATA: FLD(60) TYPE C.
+  FIELD-SYMBOLS:  TYPE ANY.
+  REFRESH T_DATA[].
+*  IF NOT lv_forwdays  IS INITIAL.
+*    lv_backdays = lv_forwdays * ( -1 ).
+*  ENDIF.
+  IF R_BEDAT[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS.
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+    R_BEDAT = R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  DATE_FROM = SY-DATUM.
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    DATE_FROM = RS_DATUM-LOW.
+    DATE_TO   = RS_DATUM-HIGH.
+    IF DATE_TO < DATE_FROM.
+      DATE_TO = DATE_FROM.
+    ENDIF.
+  ENDIF.
+* if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_02_PO_AGRE_VALID'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*"--- Run Cloud Mode -----
+*--- Retrieve data
+  CLEAR: IS_ALERT, LT_EKKO.
+  REFRESH T_DATA.
+  SELECT EBELN BSART BEDAT KDATB KDATE
+    FROM EKKO
+    INTO TABLE LT_EKKO
+    WHERE EBELN IN R_EBELN
+    AND   BEDAT IN R_BEDAT.
+  LOOP AT LT_EKKO INTO LS_EKKO.
+    CLEAR LS_DATA.
+    IF ( LS_EKKO-AEDAT - LS_EKKO-BEDAT ) > LV_PERIOD.
+      LS_DATA-EBELN = LS_EKKO-EBELN.
+      LS_DATA-AEDAT = LS_EKKO-AEDAT.
+      LS_DATA-BEDAT = LS_EKKO-BEDAT.
+      APPEND LS_DATA TO T_DATA[].
+    ENDIF.
+  ENDLOOP.
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

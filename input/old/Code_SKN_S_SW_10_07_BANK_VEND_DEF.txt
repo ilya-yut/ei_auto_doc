@@ -1,0 +1,567 @@
+FUNCTION /SKN/F_SW_10_07_BANK_VEND_DEF .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_07_ONE_TIME_VEND
+*"----------------------------------------------------------------------
+  INCLUDE /SKN/PC_SQL_DATA.
+  TYPES: BEGIN OF TY_DATA,
+           LAUFD         TYPE REGUH-LAUFD,
+           LAUFI         TYPE REGUH-LAUFI,
+           XVORL         TYPE REGUH-XVORL,
+           ZBUKR         TYPE REGUH-ZBUKR,
+           LIFNR         TYPE REGUH-LIFNR,
+           KUNNR         TYPE REGUH-KUNNR,
+           EMPFG         TYPE REGUH-EMPFG,
+           VBLNR         TYPE REGUH-VBLNR,
+           ZBNKS         TYPE REGUH-ZBNKS,
+           ZBNKN         TYPE REGUH-ZBNKN,
+           ZBNKL         TYPE REGUH-ZBNKL,
+           PAYEE         TYPE LFA1-LIFNR,
+           LAND1         TYPE LFA1-LAND1,
+           LANDX         TYPE T005T-LANDX,
+           ERDAT         TYPE LFA1-ERDAT,
+           LNRZA         TYPE LFA1-LNRZA,
+           LOEVM         TYPE LFA1-LOEVM,
+           KTOKK         TYPE LFA1-KTOKK,
+           XCPDK         TYPE LFA1-XCPDK,    " One time vendor
+           VBUND         TYPE LFA1-VBUND,
+           STKZN         TYPE LFA1-STKZN,
+           SPRAS         TYPE T005T-SPRAS,
+           DURATION      TYPE /SKN/E_SW_DURATION,
+           DURATION_UNIT TYPE /SKN/E_SW_DURATION_UNIT,
+         END OF TY_DATA,
+         TT_DATA TYPE TABLE OF TY_DATA.
+  TYPES: BEGIN OF TY_LFA1,
+           LIFNR TYPE LFA1-LIFNR,
+           LAND1 TYPE LFA1-LAND1,
+           ERDAT TYPE LFA1-ERDAT,
+           LNRZA TYPE LFA1-LNRZA,
+           LOEVM TYPE LFA1-LOEVM,
+           KTOKK TYPE LFA1-KTOKK,
+           XCPDK TYPE LFA1-XCPDK,    " One time vendor
+           VBUND TYPE LFA1-VBUND,
+           STKZN TYPE LFA1-STKZN,
+           LANDX TYPE T005T-LANDX,
+           SPRAS TYPE T005T-SPRAS,
+         END OF TY_LFA1,
+         TT_LFA1 TYPE TABLE OF TY_LFA1.
+  "-----------------------------------------------
+  " 1. Parameters Definition                     "
+  "-----------------------------------------------
+  DATA_SINGLE: SW_DEST             RFCDEST,
+               LANGU               LANGU,
+               BACKDAYS            INT4,
+               FORWDAYS            INT4,
+               XCPDK               XCPDK,
+               LOEVM               LOEVM_X,
+               DURATION_UNIT       /SKN/E_SW_DURATION_UNIT,
+               DATE_REF_FLD        NAME_FELD,
+               CONVERT_KEY         CHAR1.
+  DATA_MULTY:   LIFNR             LIFNR,
+                BUKRS             DZBUKR,
+                LAND1             LAND1_GP,
+                LAUFD             LAUFD,
+                LAUFI             LAUFI,
+                XVORL             XVORL,
+                VBUND             RASSC,
+                KTOKK             KTOKK,
+                STKZN             STKZN,
+                LNRZA             LNRZA,
+                EMPFG             EMPFG,
+                ZBNKS             DZBNKS,
+                ZBNKN             DZBNKN,
+                ZBNKL             DZBNKL,
+                BANKS             BANKS,
+                BANKL             BANKK,
+                BANKN             BANKN,
+                VALID_FROM        KOVON,
+                VALID_TO          KOBIS,
+                DURATION          /SKN/E_SW_DURATION,
+                DATUM             SYDATUM,
+                COUNTER           I.
+  DATA: SY_DATLO LIKE SY-DATLO ,
+        SY_TIMLO LIKE SY-TIMLO .
+  DATA: TIME_DIFF TYPE INT4.
+  DATA: FLD(60) TYPE C.
+  DATA: REF_DATE TYPE D.
+  DATA: SY_TABIX  LIKE SY-TABIX,
+        DATE_FROM LIKE SY-DATUM,
+        DATE_TO   LIKE SY-DATUM.
+  DATA: LV_SHIFT      TYPE DDLENG,
+        LV_LENG       TYPE DDLENG,
+        LV_DOMNAME    TYPE DD07V-DOMNAME,
+        LV_DOMVALUE   TYPE DD07V-DOMVALUE_L,
+        LV_DDTEXT     TYPE DD07V-DDTEXT,
+        LV_OBJECT     TYPE CDOBJECTV,
+        LV_LIFNR      TYPE LIFNR,
+        LV_STRUCTURE  TYPE DDOBJNAME,
+        LV_INDEX      TYPE I,
+        LV_OBJECTCLAS TYPE CDOBJECTCL,
+        LV_DOC        TYPE CDCHANGENR,
+        LV_COUNT_TMP  TYPE I,
+        LV_LINES      TYPE I.
+  DATA: LS_DATA TYPE TY_DATA,
+        LS_LIFNR TYPE /SKN/S_SW_10_LIFNR,
+        LS_LFBK TYPE LFBK,
+        LS_LFA1 TYPE TY_LFA1.
+  DATA: LT_DATA  TYPE TT_DATA,
+        LT_LFA1  TYPE TT_LFA1,
+        LT_LIFNR TYPE TABLE OF /SKN/S_SW_10_LIFNR,
+        LT_LFBK  TYPE TABLE OF LFBK.
+  FIELD-SYMBOLS: <FS_DATA>    LIKE LINE OF T_DATA[],
+                          TYPE ANY.
+* Set default parameter
+  LV_BACKDAYS       = 10.
+  LV_FORWDAYS       = 10.
+  LV_DURATION_UNIT  = 'D'.
+  LV_DATE_REF_FLD   = 'LAUFD'.
+  LV_LANGU          = 'EN'.
+  LV_XCPDK          = 'X'.     " One time vendor
+*  lv_loevm          = ''.        " Deletion flag
+  SELECT_MULTY:  LIFNR,
+                 BUKRS,
+                 LAND1,
+                 LAUFD,
+                 VBUND,
+                 KTOKK,
+                 STKZN,
+                 LNRZA,
+                 EMPFG,
+                 ZBNKS,
+                 ZBNKN,
+                 ZBNKL,
+                 BANKS,
+                 BANKL,
+                 BANKN,
+                 VALID_FROM,
+                 VALID_TO,
+                 COUNTER,
+                 DATUM .
+  SELECT_SINGLE: SW_DEST,
+                 LANGU,
+                 BACKDAYS,
+                 FORWDAYS,
+                 XCPDK,
+                 LOEVM,
+                 DATE_REF_FLD,
+                 CONVERT_KEY,
+                 DATE_REF_FLD,
+                 DURATION_UNIT.
+  "--- Run Cloud Mode -----
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_07_BANK_VEND_DEF'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  CONVERT_MULTY: LIFNR ALPHA.
+  _SET_SYS_DATE_TIME LV_SW_DEST SY_DATLO SY_TIMLO.
+  " Set default value
+  IF R_DATUM[] IS INITIAL .
+* Backdays
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'BT' .
+    DATE_FROM       = SY_DATLO - LV_BACKDAYS.
+    RS_DATUM-LOW    = DATE_FROM .
+    DATE_TO         = SY_DATLO + LV_FORWDAYS.
+    RS_DATUM-HIGH   = DATE_TO .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF .
+  CASE LV_DATE_REF_FLD.
+    WHEN 'LAUFD'.
+      IF R_LAUFD[] IS INITIAL AND R_DATUM[] IS NOT INITIAL.
+        R_LAUFD[] = R_DATUM[].
+      ENDIF.
+*    WHEN 'ERDAT'.
+*      IF r_erdat[] IS INITIAL AND r_datum[] IS NOT INITIAL.
+*        r_erdat[] = r_datum[].
+*      ENDIF.
+  ENDCASE.
+*  SELECT lfa1~lifnr lfa1~land1 lfa1~erdat lfa1~lnrza lfa1~loevm lfa1~ktokk
+*         lfa1~xcpdk lfa1~vbund lfa1~stkzn
+*         t005t~landx
+*    INTO CORRESPONDING FIELDS OF TABLE lt_lfa1
+*    FROM lfa1 LEFT OUTER JOIN t005t ON  t005t~land1 EQ lfa1~land1
+*                                    AND t005t~spras EQ lv_langu
+*    WHERE lfa1~lifnr  IN r_lifnr[]
+*    AND   lfa1~land1  IN r_land1[]
+*    AND   lfa1~ktokk  IN r_ktokk[]
+*    AND   lfa1~lnrza  IN r_lnrza[]
+*    AND   lfa1~xcpdk  EQ lv_xcpdk
+**    AND   loevm EQ lv_loevm
+*    AND   lfa1~vbund  IN r_vbund[]
+*    AND   lfa1~stkzn  IN r_stkzn[].
+*
+*  IF lt_lfa1 IS NOT INITIAL.
+*    SORT lt_lfa1 BY lifnr.
+*  ENDIF.
+*
+*  IF lt_lfa1 IS NOT INITIAL.
+*    SELECT *
+*      FROM reguh
+*      INTO CORRESPONDING FIELDS OF TABLE t_data
+*      FOR ALL ENTRIES IN lt_lfa1
+*      WHERE lifnr EQ lt_lfa1-lifnr
+*      AND   zbukr IN r_bukrs[]
+*      AND   empfg IN r_empfg[]
+*      AND   zbnks IN r_zbnks[]
+*      AND   zbnkn IN r_zbnkn[]
+*      AND   zbnkl IN r_zbnkl[].
+*  ENDIF.
+* Select From LFA1 and REGUH by LIFNR
+*  SELECT r~laufd r~laufi r~xvorl r~zbukr r~lifnr
+*         r~kunnr r~empfg r~vblnr r~zbnks r~zbnkn r~zbnkl
+*         l~land1 l~erdat l~lnrza l~loevm l~ktokk
+*         l~xcpdk l~vbund l~stkzn
+*         t~spras t~landx
+*    INTO CORRESPONDING FIELDS OF TABLE lt_data
+*    FROM reguh AS r INNER JOIN lfa1       AS l ON  r~lifnr EQ l~lifnr
+*                    LEFT OUTER JOIN t005t AS t ON  l~land1 EQ t~land1
+*                                               AND t~spras EQ lv_langu
+*    WHERE r~laufd IN r_laufd[]
+*    AND   r~laufi IN r_laufi[]
+*    AND   r~xvorl IN r_xvorl[]
+*    AND   r~lifnr IN r_lifnr[]
+*    AND   r~zbukr IN r_bukrs[]
+*    AND   r~empfg EQ space
+*    AND   r~zbnks IN r_zbnks[]
+*    AND   r~zbnkn IN r_zbnkn[]
+*    AND   r~zbnkl IN r_zbnkl[]
+*    AND   l~ktokk IN r_ktokk[]
+*    AND   l~xcpdk EQ lv_xcpdk
+*    AND   l~vbund IN r_vbund[]
+*    AND   l~stkzn IN r_stkzn[].
+  SELECT R~LAUFD R~LAUFI R~XVORL R~ZBUKR R~LIFNR
+         R~KUNNR R~EMPFG R~VBLNR R~ZBNKS R~ZBNKN R~ZBNKL
+         L2~LIFNR AS PAYEE L2~LAND1 L2~ERDAT L2~LNRZA L2~LOEVM L2~KTOKK
+         L2~XCPDK L2~VBUND L2~STKZN
+*         t~spras t~landx
+    INTO CORRESPONDING FIELDS OF TABLE LT_DATA
+    FROM REGUH AS R INNER JOIN LFA1       AS L  ON  R~LIFNR EQ L~LIFNR
+                    INNER JOIN LFA1       AS L2 ON  R~EMPFG EQ L2~LIFNR
+*                    LEFT OUTER JOIN t005t AS t  ON  l~land1  EQ t~land1
+*                                                AND t~spras  EQ lv_langu
+    WHERE R~LAUFD  IN R_LAUFD[]
+    AND   R~LAUFI  IN R_LAUFI[]
+    AND   R~XVORL  IN R_XVORL[]
+    AND   R~LIFNR  IN R_LIFNR[]
+    AND   R~ZBUKR  IN R_BUKRS[]
+*    AND   r~empfg  EQ space
+    AND   R~ZBNKS  IN R_ZBNKS[]
+    AND   R~ZBNKN  IN R_ZBNKN[]
+    AND   R~ZBNKL  IN R_ZBNKL[]
+    AND   L~KTOKK  IN R_KTOKK[]
+    AND   L~XCPDK  NE LV_XCPDK
+    AND   L~VBUND  IN R_VBUND[]
+    AND   L~STKZN  IN R_STKZN[]
+    AND   L2~XCPDK NE LV_XCPDK.
+* Select From LFA1 and REGUH by EMPFG
+*  SELECT r~laufd r~laufi r~xvorl r~zbukr r~lifnr
+*         r~kunnr r~empfg r~vblnr r~zbnks r~zbnkn r~zbnkl
+*         l~lifnr AS payee l~land1 l~erdat l~lnrza l~loevm l~ktokk
+*         l~xcpdk l~vbund l~stkzn
+*         t~spras t~landx
+*    APPENDING CORRESPONDING FIELDS OF TABLE lt_data
+*    FROM reguh AS r INNER JOIN lfa1       AS l ON  r~empfg EQ l~lifnr
+*                    LEFT OUTER JOIN t005t AS t ON  l~land1 EQ t~land1
+*                                               AND t~spras EQ lv_langu
+*    WHERE r~laufd IN r_laufd[]
+*    AND   r~laufi IN r_laufi[]
+*    AND   r~xvorl IN r_xvorl[]
+*    AND   r~lifnr IN r_lifnr[]
+*    AND   r~zbukr IN r_bukrs[]
+*    AND   r~empfg NE space
+*    AND   r~zbnks IN r_zbnks[]
+*    AND   r~zbnkn IN r_zbnkn[]
+*    AND   r~zbnkl IN r_zbnkl[]
+*    AND   l~ktokk IN r_ktokk[]
+*    AND   l~xcpdk EQ lv_xcpdk
+*    AND   l~vbund IN r_vbund[]
+*    AND   l~stkzn IN r_stkzn[].
+**** Select LFA1 ******
+**** Select LFA1 ******
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT LT_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'LS_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    CHECK  IS ASSIGNED.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-TIMLO
+          D_TO        = SY-DATLO
+          T_TO        = SY-TIMLO
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          LS_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          LS_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE LT_DATA WHERE DURATION  NOT IN R_DURATION .
+*********************************************************************************
+  CHECK LT_DATA IS NOT INITIAL.
+  SORT LT_DATA BY LIFNR ZBNKS ZBNKN ZBNKL.
+* Get MD data of Vendor
+  SELECT *
+    FROM LFBK
+    INTO TABLE LT_LFBK
+    FOR ALL ENTRIES IN LT_DATA
+    WHERE LIFNR EQ LT_DATA-LIFNR
+    AND   BANKS EQ LT_DATA-ZBNKS
+    AND   BANKL EQ LT_DATA-ZBNKL
+    AND   BANKN EQ LT_DATA-ZBNKN.
+*      AND   banks IN r_banks
+*      AND   bankl IN r_bankl
+*      AND   bankn IN r_bankn.
+*      AND   kovon IN r_valid_from[]
+*      AND   kobis IN r_valid_to[].
+  IF LT_LFBK IS NOT INITIAL.
+    SORT LT_LFBK BY LIFNR BANKS BANKL BANKN.
+  ENDIF.
+  LOOP AT LT_DATA INTO LS_DATA.
+    CLEAR: LS_LIFNR.
+    LS_LIFNR-LIFNR = LS_DATA-PAYEE.
+    APPEND LS_LIFNR TO LT_LIFNR.
+  ENDLOOP.
+  IF LT_LIFNR IS NOT INITIAL.
+    SORT LT_LIFNR BY LIFNR.
+    DELETE ADJACENT DUPLICATES FROM LT_LIFNR COMPARING LIFNR.
+  ENDIF.
+*********************************************************************************
+  LOOP AT LT_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX.
+    CLEAR: T_DATA, LS_LFBK.
+    READ TABLE LT_LFBK INTO LS_LFBK WITH KEY LIFNR = LS_DATA-LIFNR
+                                             BANKS = LS_DATA-ZBNKS
+                                             BANKL = LS_DATA-ZBNKL
+                                             BANKN = LS_DATA-ZBNKN
+                                             BINARY SEARCH.
+    IF SY-SUBRC = 0.
+* If bank account(for payment) is defined in MD, but have not validation
+      IF LS_LFBK-KOVON IS NOT INITIAL AND LS_LFBK-KOBIS IS NOT INITIAL
+           AND NOT ( LS_DATA-LAUFD BETWEEN LS_LFBK-KOVON AND LS_LFBK-KOBIS ).
+        MOVE-CORRESPONDING LS_DATA TO T_DATA.
+        MOVE-CORRESPONDING LS_LFBK TO T_DATA.
+        T_DATA-BUKRS = LS_DATA-ZBUKR.
+      ELSE.
+        CONTINUE.
+      ENDIF.
+* If bank account(for payment) is not defined in MD
+    ELSE.
+      MOVE-CORRESPONDING LS_DATA TO T_DATA.
+      T_DATA-BUKRS = LS_DATA-ZBUKR.
+    ENDIF.
+    IF T_DATA-LIFNR IS NOT INITIAL.
+**    "--- Get  Vendor Decriptions
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC_ENH'
+        EXPORTING
+          LIFNR        = T_DATA-LIFNR
+        IMPORTING
+          VENDOR_DESC  = T_DATA-NAME1
+        TABLES
+          ALL_ENTRIES  = LT_LIFNR
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+    ENDIF.
+    IF T_DATA-PAYEE IS NOT INITIAL.
+*    "--- Get  Vendor Decriptions
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        = T_DATA-PAYEE
+        IMPORTING
+          VENDOR_DESC  = T_DATA-NAME1_PAYEE
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+    ENDIF.
+    IF T_DATA-BUKRS IS NOT INITIAL.
+*    "--- Get  BUKRS Decription
+      CALL FUNCTION '/SKN/F_SW_10_COMP_CODE_DESC'
+        EXPORTING
+          BUKRS          = T_DATA-BUKRS  " Company Code
+        IMPORTING
+          COMP_CODE_DESC = T_DATA-BUTXT  " Name of Company Code or Company
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+    ENDIF.
+    IF T_DATA-LAND1 IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_COUNTRY_DESC'
+        EXPORTING
+          LAND1      = T_DATA-LAND1
+          LANGU      = LV_LANGU
+        IMPORTING
+          LANDX      = T_DATA-LANDX
+*         NATIO      =
+*         LANDX50    =
+*         NATIO50    =
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+*      IF <fs_data>-ekorg IS NOT INITIAL.
+**   "-- EKORG_DESC
+*        CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+*          EXPORTING
+*            ekorg        = <fs_data>-ekorg
+*            "LANGU              = lv_LANGU
+*          IMPORTING
+*            pur_org_desc = <fs_data>-ekotx
+*          EXCEPTIONS
+*            wrong_code   = 1
+*            OTHERS       = 2.
+*
+*      ENDIF.
+    APPEND T_DATA.
+  ENDLOOP.
+*    IF ls_data-matkl IS NOT INITIAL.
+** Material group desc.
+*      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+*      EXPORTING
+*        matkl              = ls_data-matkl
+*      IMPORTING
+*        matkl_desc         = ls_data-wgbez
+**       MATKL_DESC_L       =
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2
+*        .
+*    ENDIF.
+**
+*    IF ls_data-bsart IS NOT INITIAL AND ls_data-bstyp IS NOT INITIAL.
+**    "-- BSART_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_BSART_DESC'
+*      EXPORTING
+*        bsart            = ls_data-bsart
+*        langu            = lv_langu
+*        bstyp            = ls_data-bstyp
+*      IMPORTING
+*        type_desc        = ls_data-batxt
+*      EXCEPTIONS
+*        wrong_code       = 1
+*        OTHERS           = 2.
+*    ENDIF.
+*
+*    IF ls_data-statu IS NOT INITIAL.
+*      "-- STATU_DESC
+*      lv_domname = 'ESTAK'.
+*      lv_domvalue = ls_data-statu.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-statu_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-bstyp IS NOT INITIAL.
+**    "-- BSTYP_DESC
+*      lv_domname = 'EBSTYP'.
+*      lv_domvalue = <fs_data>-bstyp.
+*
+*      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+*      EXPORTING
+*        i_domname        = lv_domname
+*        i_domvalue       = lv_domvalue
+*        langu            = lv_langu
+**       SW_DEST          =
+*      IMPORTING
+*        e_ddtext         = lv_ddtext
+*      EXCEPTIONS
+*        not_exist        = 1
+*        OTHERS           = 2.
+*      IF sy-subrc = 0.
+*        ls_data-bstyp_desc = lv_ddtext.
+*      ENDIF.
+*    ENDIF.
+**
+*    IF ls_data-lifnr IS NOT INITIAL.
+**    "--- Get  Vendor Decriptions
+*      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+*      EXPORTING
+*        lifnr              = ls_data-lifnr
+*      IMPORTING
+*        vendor_desc        = ls_data-name1
+*      EXCEPTIONS
+*        wrong_vendor       = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+*    IF ls_data-ekorg IS NOT INITIAL.
+**   "-- EKORG_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+*      EXPORTING
+*        ekorg              = ls_data-ekorg
+*      IMPORTING
+*        pur_org_desc       = ls_data-ekotx
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*
+*    ENDIF.
+**
+**
+*    IF ls_data-ekgrp IS NOT INITIAL.
+**   "-- EKGRP_DESC
+*      CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+*      EXPORTING
+*        ekgrp              = ls_data-ekgrp
+*      IMPORTING
+*        pur_grp_desc       = ls_data-eknam
+*      EXCEPTIONS
+*        wrong_code         = 1
+*        OTHERS             = 2.
+*    ENDIF.
+*    APPEND ls_data TO t_data[].
+*  LOOP AT t_data ASSIGNING <fs_data>.
+*      CLEAR: lt_ret, ls_addr.
+*      CALL FUNCTION 'BAPI_USER_GET_DETAIL'
+*        EXPORTING
+*          username = <fs_data>-username
+*        IMPORTING
+*          address  = ls_addr
+*        TABLES
+*          return   = lt_ret.
+*
+*      IF sy-subrc = 0.
+*        <fs_data>-name_first = ls_addr-firstname.
+*        <fs_data>-name_last  = ls_addr-lastname.
+*      ENDIF.
+*  ENDLOOP.
+  READ TABLE T_DATA INDEX 1.
+  CHECK SY-TFILL IS NOT INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

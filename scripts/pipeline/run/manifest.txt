@@ -1,2 +1,2 @@
-output_basename=SKN_S_SW_10_07_FI_DOC_POSTED
-title=Exception Indicator: FI documents posted to previous fiscal period ( SW_10_07_FI_DOC_POSTED)
+output_basename=SKN_S_SW_10_03_OPEN_PO_DET
+title=Exception Indicator: Determine Open Purchase orders ( SW_10_03_OPEN_PO_DET)

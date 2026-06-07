@@ -4,7 +4,7 @@ EI Doc Pipeline (Option B, no API).
 Verify: one of each input file (Metadata, Available fields, Structure, Code); stems Metadata/Structure/Code match; Available fields may match that or output name from metadata (B8/B9). If names only differ slightly (e.g. space), prompt user to proceed. Optional --yes to assume yes.
 Prepare: clear run/, discover input/, read Metadata, write 7 prompts with paths injected.
 Assemble: read 7 responses, build one .md, convert to .docx.
-Verify: check response files (e.g. 03: Parameters table rows A–Z by Field; 04: no "output only", parameter count match; when `input/params_dictionary.xlsx` lists a parameter, 04 must include that canonical explanation; optional `input/checked params.txt` toggles yellow `<mark>` wrapping for dictionary-only parameters (BACKDAYS exempt from duplicate mark when dictionary text equals the mandatory window sentence); no duplicate `###`+`##` same title per section; 02: no **Training** subsection under Suggested Resolution; 06: blank line between each **Use Case N: …** title and **Purpose:**). Run before or after generating responses; assemble runs verify automatically. `prepare --generate-037` sorts the Parameters sheet rows A–Z when building 03/04/07 and prefers dictionary text for 04 where available. MD→DOCX renders parameter **Options** lists and list items under Parameter Relationships / Default Values as plain paragraphs (no Word list bullets). Document title: `Exception Indicator: Name ( ID)`.
+Verify: check response files (e.g. 03: Parameters table rows A–Z by Field; 01/02: no parameter or output-field names from 03/07 or global blocklist—business language only; 04: no "output only", parameter count match; unused parameters (not on output sheet and not used in ABAP) must have **`Not in use`** after the main description; used parameters must not; parameters in `run/unused_params.txt` must not appear in 05/06; when `input/params_dictionary.xlsx` lists a parameter, 04 main explanation must match that dictionary text exactly (`**Not in use**` line excluded from compare); optional `input/checked params.txt` toggles yellow `<mark>` wrapping for dictionary-only parameters (unchecked only; verify fails if checked dictionary params use `<mark>`; BACKDAYS/FORWDAYS exempt from duplicate mark when dictionary text equals the mandatory window sentence; FORWDAYS anchor lines mirror BACKDAYS per §3c); no duplicate `###`+`##` same title per section; 02: no **Training** subsection under Suggested Resolution; 06: blank line before **Purpose:**; no ranges on BACKDAYS/FORWDAYS/DURATION/DURATION_UNIT/DURATION_D/DURATION_H/DURATION_M in use cases; DURATION_UNIT=F requires Purpose "exactly N full days ago"). Run before or after generating responses; assemble runs verify automatically. `prepare --generate-037` sorts the Parameters sheet rows A–Z when building 03/04/07, marks unused parameters, writes `run/unused_params.txt`, and prefers dictionary text for 04 where available. MD→DOCX renders parameter **Options** lists and list items under Parameter Relationships / Default Values as plain paragraphs (no Word list bullets). Document title: `Exception Indicator: Name ( ID)`.
 Run from repo root: python scripts/pipeline/pipeline.py prepare [--skip-verify] [--yes] [--generate-037] | verify | assemble
   --generate-037: after prepare, build 03_response.md, 04_response.md, and 07_response.md from input xlsx/code (no separate generator script).
 """
@@ -28,6 +28,18 @@ PARAMS_DICTIONARY_PATH = INPUT_DIR / "params_dictionary.xlsx"
 # Optional: one parameter name per line (A–Z field names). When present and non-empty, dictionary text for params
 # listed in the dictionary but NOT in this file is wrapped in <mark>…</mark> (yellow in Word via md_to_docx).
 CHECKED_PARAMS_PATH = INPUT_DIR / "checked params.txt"
+UNUSED_PARAMS_RUN_FILE = RUN_DIR / "unused_params.txt"
+
+sys.path.insert(0, str(PIPELINE_DIR))
+from unused_params import (  # noqa: E402
+    NOT_IN_USE_LINE,
+    analyze_unused_params,
+    format_unused_params_prompt_block,
+    read_unused_params_file,
+    write_unused_params_file,
+)
+
+UNUSED_PARAMS_PROMPT_PLACEHOLDER = "[UNUSED_PARAMS_PIPELINE_BLOCK]"
 
 SECTION_SPEC = [
     ("01", "PROMPT_General_Overview_section.md", ["structure", "params", "code"]),
@@ -463,6 +475,128 @@ _06_INITIAL_RUNTIME_TREATED_AS_LINE = re.compile(
     r"(?is)^treated\s+as\s+.+\bby\s+code\b(?:\s+[^();]+)?\.?\s*$",
 )
 
+# Practical use cases: these parameters must use a single value, never low - high.
+_06_NO_RANGE_PARAMS = frozenset(
+    {
+        "BACKDAYS",
+        "FORWDAYS",
+        "DURATION",
+        "DURATION_UNIT",
+        "DURATION_D",
+        "DURATION_H",
+        "DURATION_M",
+    }
+)
+_06_PARAM_ASSIGNMENT_LINE_RE = re.compile(r"^([A-Za-z0-9_]+)\s*=\s*(.+)$")
+_06_VALUE_LOOKS_LIKE_RANGE_RE = re.compile(r"[\u2013\u2014\-]\s*\S")
+
+
+def _06_iter_use_case_blocks(text06: str) -> list[dict[str, str | int | list[str]]]:
+    """Yield use-case chunks from the Practical Example section: num, purpose, code lines."""
+    chunk = _06_practical_section_text(text06)
+    if not chunk.strip():
+        return []
+    pat = re.compile(r"(?m)^\*\*Use Case\s+(\d+)\s*:[^\n]*\*\*[ \t]*$")
+    matches = list(pat.finditer(chunk))
+    blocks: list[dict[str, str | int | list[str]]] = []
+    for i, m in enumerate(matches):
+        body_start = m.end()
+        body_end = matches[i + 1].start() if i + 1 < len(matches) else len(chunk)
+        body = chunk[body_start:body_end]
+        fence_pos = body.find("```")
+        if fence_pos == -1:
+            continue
+        before_fence = body[:fence_pos]
+        after_first_fence = body[fence_pos + 3 :]
+        fence_end = after_first_fence.find("```")
+        code_body = after_first_fence[:fence_end] if fence_end >= 0 else after_first_fence
+        purpose = ""
+        pm = re.search(r"\*\*Purpose:\*\*\s*(.+)", before_fence, re.DOTALL)
+        if pm:
+            purpose = pm.group(1).strip()
+        code_lines = [
+            ln.strip()
+            for ln in code_body.splitlines()
+            if ln.strip() and "=" in ln and re.match(r"^[A-Za-z0-9_]+\s*=", ln.strip())
+        ]
+        blocks.append(
+            {
+                "num": int(m.group(1)),
+                "purpose": purpose,
+                "code_lines": code_lines,
+            }
+        )
+    return blocks
+
+
+def _06_no_range_time_param_issues(text06: str) -> list[str]:
+    """Use-case code blocks must not use ranges on time/duration selection parameters."""
+    issues: list[str] = []
+    for block in _06_iter_use_case_blocks(text06):
+        num = block["num"]
+        for line in block["code_lines"]:
+            m = _06_PARAM_ASSIGNMENT_LINE_RE.match(line)
+            if not m:
+                continue
+            param = m.group(1).upper()
+            if param not in _06_NO_RANGE_PARAMS:
+                continue
+            value = m.group(2).strip()
+            if _06_VALUE_LOOKS_LIKE_RANGE_RE.search(value):
+                issues.append(
+                    f"06_response.md: Use Case {num}: **{param}** must be a single value, "
+                    f"not a range (found `{line}`)."
+                )
+    return issues
+
+
+def _06_duration_unit_f_purpose_issues(
+    text06: str, params_in_03: set[str], unused: set[str] | None = None
+) -> list[str]:
+    """When DURATION_UNIT and DURATION are in Parameters: require F example + exactly-N-days Purpose."""
+    skip = unused or set()
+    active = {p for p in params_in_03 if p.upper() not in skip}
+    if "DURATION_UNIT" not in active or "DURATION" not in active:
+        return []
+    issues: list[str] = []
+    blocks = _06_iter_use_case_blocks(text06)
+    has_f_example = False
+    for block in blocks:
+        num = block["num"]
+        purpose = str(block["purpose"])
+        dur_val: str | None = None
+        unit_f = False
+        for line in block["code_lines"]:
+            um = re.match(r"^DURATION_UNIT\s*=\s*(\S+)\s*$", line, re.IGNORECASE)
+            if um and um.group(1).upper() == "F":
+                unit_f = True
+            dm = re.match(r"^DURATION\s*=\s*(\d+)\s*$", line, re.IGNORECASE)
+            if dm:
+                dur_val = dm.group(1)
+        if not unit_f:
+            continue
+        has_f_example = True
+        if dur_val is None:
+            issues.append(
+                f"06_response.md: Use Case {num}: with DURATION_UNIT = F, **DURATION** must be a "
+                "single positive integer (e.g. DURATION = 7), not a range."
+            )
+            continue
+        if not re.search(
+            rf"(?i)exactly\s+{re.escape(dur_val)}\s+(?:full\s+)?days?\s+ago",
+            purpose,
+        ):
+            issues.append(
+                f"06_response.md: Use Case {num}: **Purpose:** must state that the scope is "
+                f"exactly {dur_val} full days ago when DURATION_UNIT = F and DURATION = {dur_val}."
+            )
+    if not has_f_example:
+        issues.append(
+            "06_response.md: at least one use case must include DURATION_UNIT = F with a "
+            "single-value DURATION when DURATION_UNIT and DURATION are in the Parameters table."
+        )
+    return issues
+
 
 def _06_default_values_section_chunk(text06: str) -> str:
     """Markdown between ### Default Values and ### Practical Example of Parameter Configuration."""
@@ -493,10 +627,13 @@ def _06_default_values_covers_param(dv_chunk: str, param: str) -> bool:
     return False
 
 
-def _06_initial_runtime_default_bullets_issues(text03: str, text06: str) -> list[str]:
-    """Enforce prompt 06: BACKDAYS, DURATION, DURATION_UNIT, AGGLEVEL when in 03."""
+def _06_initial_runtime_default_bullets_issues(
+    text03: str, text06: str, unused: set[str] | None = None
+) -> list[str]:
+    """Enforce prompt 06: BACKDAYS, DURATION, DURATION_UNIT, AGGLEVEL when in 03 (active only)."""
     ordered, _ = _param_names_ordered_from_03_table(text03)
-    needed = _DEFAULT_VALUES_INITIAL_RUNTIME_PARAMS.intersection(set(ordered))
+    active = [p for p in ordered if p.upper() not in (unused or set())]
+    needed = _DEFAULT_VALUES_INITIAL_RUNTIME_PARAMS.intersection(set(active))
     if not needed:
         return []
     dv = _06_default_values_section_chunk(text06)
@@ -529,12 +666,15 @@ def _06_initial_effect_text_for_param(dv_chunk: str, param: str) -> str | None:
     return None
 
 
-def _06_initial_runtime_effect_clarity_issues(text03: str, text06: str) -> list[str]:
+def _06_initial_runtime_effect_clarity_issues(
+    text03: str, text06: str, unused: set[str] | None = None
+) -> list[str]:
     """
     Enforce standard shape: `- **PARAM** - initial - treated as … by code` (concise; no parentheses).
     """
     ordered, _ = _param_names_ordered_from_03_table(text03)
-    needed = _DEFAULT_VALUES_INITIAL_RUNTIME_PARAMS.intersection(set(ordered))
+    active = [p for p in ordered if p.upper() not in (unused or set())]
+    needed = _DEFAULT_VALUES_INITIAL_RUNTIME_PARAMS.intersection(set(active))
     if not needed:
         return []
     dv = _06_default_values_section_chunk(text06)
@@ -957,15 +1097,19 @@ def _04_confusable_param_differentiation_issues(text04: str) -> list[str]:
     return issues
 
 
-def _05_time_filter_clarity_issues(text05: str, params_in_03: set[str]) -> list[str]:
+def _05_time_filter_clarity_issues(
+    text05: str, params_in_03: set[str], unused: set[str] | None = None
+) -> list[str]:
     """
     Enforce clear, plain-language relationship description for date fallback vs duration
     when these parameters exist in the EI.
     """
     issues: list[str] = []
-    has_backdays = "BACKDAYS" in params_in_03
-    has_duration = "DURATION" in params_in_03 and "DURATION_UNIT" in params_in_03
-    has_explicit_date = any(p in params_in_03 for p in {"DATUM", "SND_DATE", "WAIT_DATE", "STAT_DATE"})
+    skip = unused or set()
+    active = {p for p in params_in_03 if p.upper() not in skip}
+    has_backdays = "BACKDAYS" in active
+    has_duration = "DURATION" in active and "DURATION_UNIT" in active
+    has_explicit_date = any(p in active for p in {"DATUM", "SND_DATE", "WAIT_DATE", "STAT_DATE"})
     if not (has_backdays and has_duration and has_explicit_date):
         return issues
 
@@ -975,7 +1119,6 @@ def _05_time_filter_clarity_issues(text05: str, params_in_03: set[str]) -> list[
     has_duration_additional_filter_text = ("duration" in t) and ("duration_unit" in t) and any(
         k in t for k in ["additional filter", "second filter", "then filter", "after date", "age filter"]
     )
-    has_final_both_text = ("both" in t) and ("date" in t) and ("duration" in t)
 
     if not has_explicit_date_text:
         issues.append(
@@ -990,9 +1133,16 @@ def _05_time_filter_clarity_issues(text05: str, params_in_03: set[str]) -> list[
         issues.append(
             "05_response.md: explain that DURATION + DURATION_UNIT is an additional/second filter after date selection."
         )
-    if not has_final_both_text:
+    return issues
+
+
+def _05_combined_effect_block_issues(text05: str) -> list[str]:
+    """Reject a global **Combined effect:** (or similar) closing block in Parameter Relationships."""
+    issues: list[str] = []
+    if re.search(r"^\s*\*\*Combined effect:\*\*", text05, re.MULTILINE | re.IGNORECASE):
         issues.append(
-            "05_response.md: add a clear final statement that both date and duration conditions are applied together."
+            "05_response.md: remove the **Combined effect:** block; explain how parameters combine "
+            "within each relationship group only (no global closing summary)."
         )
     return issues
 
@@ -1020,6 +1170,12 @@ def _code_path_and_text_for_verify() -> tuple[str | None, str | None]:
             if p.exists():
                 t = p.read_text(encoding="utf-8", errors="replace")
                 return str(p), t
+        r07 = RUN_DIR / "07_response.md"
+        if r07.exists():
+            text07 = r07.read_text(encoding="utf-8", errors="replace")
+            m = re.search(r"```abap\s*\n([\s\S]*?)```", text07, re.IGNORECASE)
+            if m and m.group(1).strip():
+                return str(r07), m.group(1)
     codes = sorted(INPUT_DIR.glob("Code_*.txt")) + sorted(INPUT_DIR.glob("Code _*.txt"))
     if len(codes) == 1:
         p = codes[0]
@@ -1027,24 +1183,62 @@ def _code_path_and_text_for_verify() -> tuple[str | None, str | None]:
     return None, None
 
 
-def _infer_backdays_anchor_field_from_code(code: str) -> str | None:
+_DATE_RANGE_TABLE_NAMES = (
+    "R_DATUM",
+    "R_CREDATE",
+    "R_ERDAT",
+    "R_ERSDA",
+    "R_BEDAT",
+    "R_MODDA",
+    "R_UDATE",
+)
+
+
+def _infer_date_anchor_field_from_code(code: str) -> str | None:
     """
-    Best-effort: SAP field whose values are compared to the BACKDAYS-driven range (R_DATUM / R_CREDATE patterns).
-    Returns None when the snippet does not show a clear field—do not guess (no ERDAT or other default).
+    Best-effort: SAP field whose values are compared via a standard R_* date range table.
+    Matches TABLE~FIELD IN R_* and FIELD IN R_* patterns. Returns None when unclear—do not guess.
     """
     if not code.strip():
         return None
-    for m in re.finditer(r"~([A-Za-z][A-Za-z0-9_]*)\s+IN\s+R_DATUM\b", code, re.IGNORECASE):
-        fld = m.group(1).upper()
-        if len(fld) >= 4:
-            return fld
-    m = re.search(r"\b([A-Za-z][A-Za-z0-9_]{2,})\s+IN\s+R_CREDATE\b", code, re.IGNORECASE)
-    if m:
-        return m.group(1).upper()
-    m = re.search(r"\b([A-Za-z][A-Za-z0-9_]{2,})\s+IN\s+R_DATUM\b", code, re.IGNORECASE)
-    if m and m.group(1).upper() not in ("AND", "OR", "NOT"):
-        return m.group(1).upper()
+    range_names = _DATE_RANGE_TABLE_NAMES
+    seen: set[str] = set()
+    for rng in range_names:
+        for m in re.finditer(
+            rf"~([A-Za-z][A-Za-z0-9_]*)\s+IN\s+{rng}\b",
+            code,
+            re.IGNORECASE,
+        ):
+            fld = m.group(1).upper()
+            if len(fld) >= 4 and fld not in seen:
+                seen.add(fld)
+                return fld
+    for rng in range_names:
+        m = re.search(
+            rf"\b([A-Za-z][A-Za-z0-9_]{{2,}})\s+IN\s+{rng}\b",
+            code,
+            re.IGNORECASE,
+        )
+        if m and m.group(1).upper() not in ("AND", "OR", "NOT"):
+            return m.group(1).upper()
     return None
+
+
+def _infer_backdays_anchor_field_from_code(code: str) -> str | None:
+    """Alias for shared date-range inference used by BACKDAYS anchor lines."""
+    return _infer_date_anchor_field_from_code(code)
+
+
+def _infer_forwdays_anchor_field_from_code(code: str) -> str | None:
+    """
+    SAP date field for FORWDAYS anchor lines. When FORWDAYS only rewrites BACKDAYS
+    (LV_BACKDAYS = LV_FORWDAYS …), the effective filter field is the same as BACKDAYS.
+    """
+    if not code.strip():
+        return None
+    if re.search(r"LV_BACKDAYS\s*=\s*LV_FORWDAYS\b", code, re.IGNORECASE):
+        return _infer_date_anchor_field_from_code(code)
+    return _infer_date_anchor_field_from_code(code)
 
 
 def _04_parameter_block_chunk_for_param(text04: str, param: str) -> str:
@@ -1053,7 +1247,239 @@ def _04_parameter_block_chunk_for_param(text04: str, param: str) -> str:
         rf"(?m)^\*\*{re.escape(param)}\*\*[^\n]*\n([\s\S]*?)(?=^\*\*[A-Za-z0-9_])",
         text04,
     )
-    return m.group(1) if m else ""
+    if m:
+        return m.group(1)
+    m_last = re.search(
+        rf"(?m)^\*\*{re.escape(param)}\*\*[^\n]*\n([\s\S]*)$",
+        text04,
+    )
+    return m_last.group(1) if m_last else ""
+
+
+def _04_chunk_stops_at_subsection(line: str) -> bool:
+    s = line.strip()
+    if not s:
+        return False
+    if re.match(r"^\*\*[^*]+ Options:\*\*", s, re.IGNORECASE):
+        return True
+    if re.search(r"\bConnection:\*\*\s*$", s, re.IGNORECASE):
+        return True
+    return False
+
+
+def _04_main_explanation_for_dictionary_compare(chunk: str, pname: str) -> str:
+    """
+    Main explanation text used for dictionary verbatim checks (excludes Options/Connection subsections).
+    """
+    u = pname.strip().upper()
+    lines: list[str] = []
+    for line in chunk.splitlines():
+        if _04_chunk_stops_at_subsection(line):
+            break
+        lines.append(line)
+    text = "\n".join(lines).strip()
+    if u == "BACKDAYS":
+        for sent in (_BACKDAYS_WINDOW_SENTENCE_EN_DASH, _BACKDAYS_WINDOW_SENTENCE_ASCII_DASH):
+            text = text.replace(sent, "")
+        text = re.sub(
+            r"Backdays is based on [^\n.]+\.?\s*",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+        return text.strip()
+    if u == "FORWDAYS":
+        for sent in (_FORWDAYS_WINDOW_SENTENCE_EN_DASH, _FORWDAYS_WINDOW_SENTENCE_ASCII_DASH):
+            text = text.replace(sent, "")
+        text = re.sub(
+            r"Forwdays is based on [^\n.]+\.?\s*",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
+        return text.strip()
+    if u in ("USER_FLD", "USR_FLD"):
+        if text.startswith(_USER_FLD_DRL_FIXED_MARKDOWN):
+            text = text[len(_USER_FLD_DRL_FIXED_MARKDOWN) :].lstrip("\n")
+        if re.search(r"(?im)^Explicit values from the supplied ABAP:\s*$", text):
+            text = re.split(r"(?im)^Explicit values from the supplied ABAP:\s*$", text, maxsplit=1)[0]
+        return text.strip()
+    text = re.sub(r"(?m)^\*\*Not in use\*\*\s*$", "", text)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
+
+
+def _serial_group_member_names(first: str, last: str, ordered_names: list[str]) -> list[str]:
+    mf = re.match(r"^(.+?)(\d+)$", first)
+    ml = re.match(r"^(.+?)(\d+)$", last)
+    if not mf or not ml or mf.group(1) != ml.group(1):
+        return [first]
+    prefix = mf.group(1)
+    n0, n1 = int(mf.group(2)), int(ml.group(2))
+    members = []
+    for p in ordered_names:
+        m = re.match(rf"^{re.escape(prefix)}(\d+)$", p, re.IGNORECASE)
+        if m and n0 <= int(m.group(1)) <= n1:
+            members.append(p)
+    return members or [first]
+
+
+def _members_from_04_heading(
+    heading: str, ordered_names: list[str], serial_series: list[tuple[str, str]]
+) -> list[str]:
+    heading = heading.strip()
+    if " - " in heading and " / " not in heading:
+        fr, lr = [x.strip() for x in heading.split(" - ", 1)]
+        for a, b in serial_series:
+            if fr == a and lr == b:
+                return _serial_group_member_names(fr, lr, ordered_names)
+    tok = re.match(r"^([A-Za-z0-9_]+)", heading)
+    return [tok.group(1)] if tok else [heading]
+
+
+def _04_append_not_in_use_if_unused(parts: list[str], unused: set[str], members: list[str]) -> None:
+    if members and all(m.strip().upper() in unused for m in members):
+        parts.append("")
+        parts.append(NOT_IN_USE_LINE)
+
+
+def _04_insert_not_in_use_lines(
+    text04: str, unused: set[str], ordered_names: list[str]
+) -> str:
+    if not unused:
+        return text04
+    serial_series = _serial_series_from_03_param_names(ordered_names)
+    lines = text04.splitlines()
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        hm = re.match(r"^\*\*([^*]+)\*\*\s*\(", line)
+        if hm:
+            members = _members_from_04_heading(hm.group(1), ordered_names, serial_series)
+            out.append(line)
+            i += 1
+            block_lines: list[str] = []
+            while i < len(lines):
+                nl = lines[i]
+                if re.match(r"^\*\*[^*]+\*\*", nl):
+                    break
+                block_lines.append(nl)
+                i += 1
+            opts_idx = None
+            for j, bl in enumerate(block_lines):
+                if re.match(r"^\*\*.+ Options:\*\*", bl.strip()):
+                    opts_idx = j
+                    break
+            main_part = block_lines if opts_idx is None else block_lines[:opts_idx]
+            opts_part = [] if opts_idx is None else block_lines[opts_idx:]
+            out.extend(main_part)
+            if members and all(m.upper() in unused for m in members):
+                if not any(NOT_IN_USE_LINE in bl for bl in main_part):
+                    if out and out[-1].strip():
+                        out.append("")
+                    out.append(NOT_IN_USE_LINE)
+            out.extend(opts_part)
+            continue
+        out.append(line)
+        i += 1
+    return "\n".join(out)
+
+
+def _resolve_unused_params_set(paths: dict[str, Path] | None = None) -> set[str]:
+    cached = read_unused_params_file(UNUSED_PARAMS_RUN_FILE)
+    if cached:
+        return cached
+    if paths and paths.get("code") and paths.get("params"):
+        return analyze_unused_params(
+            paths["code"], paths["params"], search_dirs=[INPUT_DIR, INPUT_DIR / "old"]
+        )
+    discovered = _discover_inputs(assume_yes=True)
+    if discovered and discovered.get("code") and discovered.get("params"):
+        return analyze_unused_params(
+            discovered["code"],
+            discovered["params"],
+            search_dirs=[INPUT_DIR, INPUT_DIR / "old"],
+        )
+    return set()
+
+
+def _04_block_has_not_in_use(chunk: str) -> bool:
+    return bool(re.search(r"(?m)^\*\*Not in use\*\*\s*$", chunk))
+
+
+def _04_not_in_use_marker_issues(text04: str, text03: str, unused: set[str]) -> list[str]:
+    issues: list[str] = []
+    ordered, _ = _param_names_ordered_from_03_table(text03)
+    serial_series = _serial_series_from_03_param_names(ordered)
+    serial_skip = _serial_series_members_to_skip(ordered, serial_series)
+    checked_blocks: set[str] = set()
+    for pname in ordered:
+        if pname in serial_skip:
+            continue
+        members = [pname]
+        block_key = pname
+        for fr, lr in serial_series:
+            if pname == fr:
+                members = _serial_group_member_names(fr, lr, ordered)
+                block_key = f"{fr}-{lr}"
+                break
+        if block_key in checked_blocks:
+            continue
+        checked_blocks.add(block_key)
+        chunk = _04_parameter_block_chunk_for_param(text04, pname)
+        if not chunk.strip():
+            continue
+        has_marker = _04_block_has_not_in_use(chunk)
+        all_unused = bool(members) and all(m.upper() in unused for m in members)
+        if all_unused and not has_marker:
+            label = f"**{pname}**" if len(members) == 1 else f"serial group **{members[0]} - {members[-1]}**"
+            issues.append(
+                f"04_response.md: unused parameter block {label} must include {NOT_IN_USE_LINE} "
+                "after its main description."
+            )
+        elif not all_unused and has_marker:
+            label = f"**{pname}**" if len(members) == 1 else f"serial group **{members[0]} - {members[-1]}**"
+            issues.append(
+                f"04_response.md: active parameter block {label} must not include {NOT_IN_USE_LINE}."
+            )
+    return issues
+
+
+def _text_mentions_param_token(text: str, param: str) -> bool:
+    u = param.upper()
+    if re.search(rf"\*\*{re.escape(param)}\*\*", text, re.IGNORECASE):
+        return True
+    return bool(re.search(rf"(?<![A-Za-z0-9_]){re.escape(u)}(?![A-Za-z0-9_])", text, re.IGNORECASE))
+
+
+def _05_unused_param_presence_issues(text05: str, unused: set[str]) -> list[str]:
+    issues: list[str] = []
+    for p in sorted(unused):
+        if _text_mentions_param_token(text05, p):
+            issues.append(
+                f"05_response.md: unused parameter {p!r} must not appear in Parameter Relationships "
+                f"(documented with {NOT_IN_USE_LINE} in section 04 only)."
+            )
+    return issues
+
+
+def _06_unused_param_presence_issues(text06: str, unused: set[str]) -> list[str]:
+    issues: list[str] = []
+    dv = _06_default_values_section_chunk(text06)
+    for p in sorted(unused):
+        if _06_default_values_covers_param(dv, p):
+            issues.append(
+                f"06_response.md: unused parameter {p!r} must not appear in Default Values."
+            )
+    for block in _06_iter_use_case_blocks(text06):
+        for line in block.get("code_lines", []):
+            m = _06_PARAM_ASSIGNMENT_LINE_RE.match(str(line).strip())
+            if m and m.group(1).upper() in unused:
+                issues.append(
+                    f"06_response.md: Use Case {block['num']}: unused parameter {m.group(1)!r} "
+                    "must not appear in practical configuration examples."
+                )
+    return issues
 
 
 # Mandatory verbatim BACKDAYS wording in 04 (user-specified; do not paraphrase).
@@ -1066,6 +1492,33 @@ _BACKDAYS_WINDOW_SENTENCE_ASCII_DASH = (
     "to retrieve records. 0 - today, 1 - today + yesterday etc."
 )
 _BACKDAYS_ANCHOR_DATE_REF_SENTENCE_EXACT = "Backdays is based on DATE_REF_FLD field."
+
+# Mandatory verbatim FORWDAYS wording in 04 (mirror of BACKDAYS §3a).
+_FORWDAYS_WINDOW_SENTENCE_EN_DASH = (
+    "FORWDAYS defines the historical monitoring window by specifying how many days forward from today "
+    "to retrieve records. 0 \u2013 today, 1 \u2013 today + tomorrow etc."
+)
+_FORWDAYS_WINDOW_SENTENCE_ASCII_DASH = (
+    "FORWDAYS defines the historical monitoring window by specifying how many days forward from today "
+    "to retrieve records. 0 - today, 1 - today + tomorrow etc."
+)
+_FORWDAYS_ANCHOR_DATE_REF_SENTENCE_EXACT = "Forwdays is based on DATE_REF_FLD field."
+
+# DURATION_UNIT Options subsection (single source of truth; matches PROMPT_Parameter_Configuration_Guidelines_section.md).
+_DURATION_UNIT_OPTIONS_HEADING = "**DURATION_UNIT Options:**"
+_DURATION_UNIT_OPTION_LINES: tuple[str, ...] = (
+    "- H: Hours",
+    "- M: Minutes",
+    "- D: Days",
+    "- F: Full days for specific day filtering",
+)
+
+
+def _append_duration_unit_options_block(parts: list[str]) -> None:
+    parts.append(_DURATION_UNIT_OPTIONS_HEADING)
+    parts.extend(_DURATION_UNIT_OPTION_LINES)
+    parts.append("")
+
 
 # USER_FLD / DRL: mandatory narrative in section 04 (do not paraphrase). See PROMPT_Parameter_Configuration_Guidelines_section.md §3b.
 _USER_FLD_DRL_FIXED_MARKDOWN = (
@@ -1178,6 +1631,11 @@ def _user_fld_literal_values_from_code(code: str) -> list[str]:
     return out[:40]
 
 
+def _04_user_fld_drl_present(chunk: str) -> bool:
+    low = re.sub(r"\s+", " ", chunk).strip().lower()
+    return all(p in low for p in _USER_FLD_DRL_VERIFY_PHRASES)
+
+
 def _04_user_fld_guideline_issues(text04: str, params_in_03: set[str]) -> list[str]:
     """
     When USER_FLD or USR_FLD is in Parameters, 04 must include the mandatory DRL narrative (verbatim intent)
@@ -1235,6 +1693,11 @@ def _04_backdays_window_sentence_present(chunk: str) -> bool:
     return _BACKDAYS_WINDOW_SENTENCE_EN_DASH in chunk or _BACKDAYS_WINDOW_SENTENCE_ASCII_DASH in chunk
 
 
+def _04_forwdays_window_sentence_present(chunk: str) -> bool:
+    """True if chunk contains the exact FORWDAYS window sentence (en-dash or ASCII hyphen variants)."""
+    return _FORWDAYS_WINDOW_SENTENCE_EN_DASH in chunk or _FORWDAYS_WINDOW_SENTENCE_ASCII_DASH in chunk
+
+
 def _04_backdays_wording_issues(text04: str, params_in_03: set[str]) -> list[str]:
     """
     When BACKDAYS is in 03, the BACKDAYS block in 04 must contain the verbatim window sentence; an anchor
@@ -1277,6 +1740,52 @@ def _04_backdays_wording_issues(text04: str, params_in_03: set[str]) -> list[str
             if re.search(r"Backdays is based on\b", chunk, re.IGNORECASE):
                 issues.append(
                     "04_response.md: BACKDAYS block must not include a 'Backdays is based on …' line when the "
+                    "anchor field cannot be inferred from the Code file (omit it), unless DATE_REF_FLD is in Parameters."
+                )
+    return issues
+
+
+def _04_forwdays_wording_issues(text04: str, params_in_03: set[str]) -> list[str]:
+    """
+    When FORWDAYS is in 03, the FORWDAYS block in 04 must contain the verbatim forward window sentence;
+    an anchor line mirrors BACKDAYS (DATE_REF_FLD or code-inferred FIELD). See prompt §3c.
+    """
+    issues: list[str] = []
+    if "FORWDAYS" not in params_in_03:
+        return issues
+    chunk = _04_parameter_block_chunk_for_param(text04, "FORWDAYS")
+    if not chunk.strip():
+        issues.append(
+            "04_response.md: FORWDAYS appears in 03 but no **FORWDAYS** parameter block was found in 04."
+        )
+        return issues
+    if not _04_forwdays_window_sentence_present(chunk):
+        issues.append(
+            "04_response.md: FORWDAYS block must contain this sentence exactly (en-dash or hyphen-minus OK "
+            "only for the two dashes): "
+            f"'{_FORWDAYS_WINDOW_SENTENCE_EN_DASH}' "
+            f"or '{_FORWDAYS_WINDOW_SENTENCE_ASCII_DASH}'."
+        )
+    if "DATE_REF_FLD" in params_in_03:
+        if _FORWDAYS_ANCHOR_DATE_REF_SENTENCE_EXACT not in chunk:
+            issues.append(
+                "04_response.md: When DATE_REF_FLD is in Parameters, FORWDAYS block must contain exactly: "
+                f"'{_FORWDAYS_ANCHOR_DATE_REF_SENTENCE_EXACT}'"
+            )
+    else:
+        _cp, code = _code_path_and_text_for_verify()
+        inferred = _infer_forwdays_anchor_field_from_code(code) if code else None
+        if inferred:
+            required = f"Forwdays is based on {inferred}"
+            if required not in chunk:
+                issues.append(
+                    "04_response.md: Without DATE_REF_FLD in Parameters, FORWDAYS block must contain exactly "
+                    f"(no extra words): '{required}' (FIELD inferred from Code file)."
+                )
+        else:
+            if re.search(r"Forwdays is based on\b", chunk, re.IGNORECASE):
+                issues.append(
+                    "04_response.md: FORWDAYS block must not include a 'Forwdays is based on …' line when the "
                     "anchor field cannot be inferred from the Code file (omit it), unless DATE_REF_FLD is in Parameters."
                 )
     return issues
@@ -1333,6 +1842,33 @@ def _04_date_ref_fld_guideline_issues(text04: str, params_in_03: set[str]) -> li
     return issues
 
 
+def _04_duration_unit_options_issues(text04: str, params_in_03: set[str]) -> list[str]:
+    """When DURATION_UNIT is in 03, Options block must match _DURATION_UNIT_OPTION_LINES verbatim."""
+    issues: list[str] = []
+    if "DURATION_UNIT" not in params_in_03:
+        return issues
+    chunk = _04_parameter_block_chunk_for_param(text04, "DURATION_UNIT")
+    if not chunk.strip():
+        issues.append(
+            "04_response.md: DURATION_UNIT appears in 03 but no **DURATION_UNIT** parameter block was found in 04."
+        )
+        return issues
+    opt = _04_options_block_text(text04, "DURATION_UNIT")
+    if not opt.strip():
+        issues.append(
+            "04_response.md: DURATION_UNIT appears in 03 but no **DURATION_UNIT Options:** block was found in 04."
+        )
+        return issues
+    opt_norm = opt.replace("\r\n", "\n")
+    for line in _DURATION_UNIT_OPTION_LINES:
+        if line not in opt_norm:
+            issues.append(
+                "04_response.md: DURATION_UNIT Options must include this line exactly "
+                f"(see pipeline.py _DURATION_UNIT_OPTION_LINES): {line!r}"
+            )
+    return issues
+
+
 def _04_aggr_level_guideline_issues(text04: str, params_in_03: set[str]) -> list[str]:
     """
     When AGGR_LEVEL/AGGLEVEL exists and ABAP has explicit literals, 04 must list them in Options.
@@ -1361,10 +1897,10 @@ def _04_aggr_level_guideline_issues(text04: str, params_in_03: set[str]) -> list
     return issues
 
 
-def _04_params_dictionary_canonical_substring_issues(text04: str, text03: str) -> list[str]:
+def _04_params_dictionary_canonical_issues(text04: str, text03: str) -> list[str]:
     """
-    When input/params_dictionary.xlsx contains an entry for a parameter listed in 03, the corresponding
-    **PARAM** block in 04 must include that explanation text verbatim (after whitespace normalization).
+    When input/params_dictionary.xlsx contains an entry for a parameter listed in 03, the main
+    explanation in 04 must match that dictionary text verbatim (no appended EI/table clauses).
     """
     param_canon = _load_params_dictionary_explanations()
     if not param_canon:
@@ -1372,26 +1908,91 @@ def _04_params_dictionary_canonical_substring_issues(text04: str, text03: str) -
     issues: list[str] = []
     param_names_ordered, _ = _param_names_ordered_from_03_table(text03)
     seen_upper: set[str] = set()
+    n_mand_en = _normalize_text_for_dictionary_compare(_BACKDAYS_WINDOW_SENTENCE_EN_DASH)
+    n_mand_ascii = _normalize_text_for_dictionary_compare(_BACKDAYS_WINDOW_SENTENCE_ASCII_DASH)
+    n_fwd_en = _normalize_text_for_dictionary_compare(_FORWDAYS_WINDOW_SENTENCE_EN_DASH)
+    n_fwd_ascii = _normalize_text_for_dictionary_compare(_FORWDAYS_WINDOW_SENTENCE_ASCII_DASH)
     for pname in param_names_ordered:
         u = pname.strip().upper()
         if u in seen_upper:
             continue
         seen_upper.add(u)
-        if pname in ("USER_FLD", "USR_FLD"):
-            continue
         canon = param_canon.get(u)
         if not canon:
             continue
         chunk = _04_parameter_block_chunk_for_param(text04, pname)
         if not chunk.strip():
             continue
-        n_chunk = _normalize_text_for_dictionary_compare(chunk)
         n_exp = _normalize_text_for_dictionary_compare(canon)
-        if n_exp and n_exp not in n_chunk:
+        if not n_exp:
+            continue
+        if u == "BACKDAYS":
+            if not _04_backdays_window_sentence_present(chunk):
+                issues.append(
+                    "04_response.md: **BACKDAYS** must include the mandatory monitoring-window sentence "
+                    "(see PROMPT_Parameter_Configuration_Guidelines_section.md §3a)."
+                )
+            n_extra = _normalize_text_for_dictionary_compare(
+                _04_main_explanation_for_dictionary_compare(chunk, "BACKDAYS")
+            )
+            if n_exp in (n_mand_en, n_mand_ascii):
+                if n_extra:
+                    issues.append(
+                        "04_response.md: **BACKDAYS** must not add text beyond the mandatory window sentence "
+                        "and optional anchor when the dictionary entry is only that sentence."
+                    )
+            elif n_extra != n_exp:
+                issues.append(
+                    "04_response.md: dictionary entry for "
+                    f"{pname!r} must be the only extra main text before the mandatory BACKDAYS sentence "
+                    "(verbatim; no appended clauses)."
+                )
+            continue
+        if u == "FORWDAYS":
+            if not _04_forwdays_window_sentence_present(chunk):
+                issues.append(
+                    "04_response.md: **FORWDAYS** must include the mandatory forward monitoring-window sentence "
+                    "(see PROMPT_Parameter_Configuration_Guidelines_section.md §3c)."
+                )
+            n_extra = _normalize_text_for_dictionary_compare(
+                _04_main_explanation_for_dictionary_compare(chunk, "FORWDAYS")
+            )
+            if n_exp in (n_fwd_en, n_fwd_ascii):
+                if n_extra:
+                    issues.append(
+                        "04_response.md: **FORWDAYS** must not add text beyond the mandatory window sentence "
+                        "and optional anchor when the dictionary entry is only that sentence."
+                    )
+            elif n_extra != n_exp:
+                issues.append(
+                    "04_response.md: dictionary entry for "
+                    f"{pname!r} must be the only extra main text before the mandatory FORWDAYS sentence "
+                    "(verbatim; no appended clauses)."
+                )
+            continue
+        if u in ("USER_FLD", "USR_FLD"):
+            if not _04_user_fld_drl_present(chunk):
+                issues.append(
+                    "04_response.md: **USER_FLD** / **USR_FLD** must include the mandatory DRL narrative "
+                    "(see PROMPT_Parameter_Configuration_Guidelines_section.md §3b)."
+                )
+            n_dict = _normalize_text_for_dictionary_compare(
+                _04_main_explanation_for_dictionary_compare(chunk, pname)
+            )
+            if n_dict != n_exp:
+                issues.append(
+                    "04_response.md: dictionary entry for "
+                    f"{pname!r} must appear verbatim after the DRL block (no paraphrase or extra wording)."
+                )
+            continue
+        n_main = _normalize_text_for_dictionary_compare(
+            _04_main_explanation_for_dictionary_compare(chunk, pname)
+        )
+        if n_main != n_exp:
             issues.append(
                 "04_response.md: dictionary entry exists for "
-                f"{pname!r} in input/params_dictionary.xlsx; the **{pname}** block must include that "
-                "canonical explanation text (same wording; whitespace may differ)."
+                f"{pname!r} in input/params_dictionary.xlsx; the main explanation must be that text "
+                "verbatim only (no appended or prepended sentences; Options/Connection subsections may follow)."
             )
     return issues
 
@@ -1434,11 +2035,53 @@ def _04_dictionary_mark_when_unchecked_issues(text04: str, text03: str) -> list[
             n_ascii = _normalize_text_for_dictionary_compare(_BACKDAYS_WINDOW_SENTENCE_ASCII_DASH)
             if n_c and (n_c == n_en or n_c == n_ascii):
                 continue
+        if u == "FORWDAYS" and _04_forwdays_window_sentence_present(chunk):
+            canon_f = param_canon.get("FORWDAYS") or ""
+            n_c = _normalize_text_for_dictionary_compare(canon_f)
+            n_en = _normalize_text_for_dictionary_compare(_FORWDAYS_WINDOW_SENTENCE_EN_DASH)
+            n_ascii = _normalize_text_for_dictionary_compare(_FORWDAYS_WINDOW_SENTENCE_ASCII_DASH)
+            if n_c and (n_c == n_en or n_c == n_ascii):
+                continue
         if "<mark>" not in chunk.lower():
             issues.append(
                 "04_response.md: parameter "
                 f"{pname!r} is in input/params_dictionary.xlsx but not in input/checked params.txt; "
                 "wrap the dictionary main paragraph in <mark>...</mark> (see PROMPT_Parameter_Configuration_Guidelines_section.md rule 0)."
+            )
+    return issues
+
+
+def _04_dictionary_mark_when_checked_issues(text04: str, text03: str) -> list[str]:
+    """
+    When checked params.txt is active, parameters in both the dictionary and the checked list
+    must not wrap the main explanation in <mark> (yellow highlight is for unchecked dictionary only).
+    """
+    checked = _load_checked_params_set()
+    if checked is None:
+        return []
+    param_canon = _load_params_dictionary_explanations()
+    if not param_canon:
+        return []
+    issues: list[str] = []
+    param_names_ordered, _ = _param_names_ordered_from_03_table(text03)
+    seen_upper: set[str] = set()
+    for pname in param_names_ordered:
+        u = pname.strip().upper()
+        if u in seen_upper:
+            continue
+        seen_upper.add(u)
+        if u not in param_canon or u not in checked:
+            continue
+        chunk = _04_parameter_block_chunk_for_param(text04, pname)
+        if not chunk.strip():
+            continue
+        main = _04_main_explanation_for_dictionary_compare(chunk, pname)
+        searchable = main if main else chunk
+        if "<mark>" in searchable.lower():
+            issues.append(
+                "04_response.md: parameter "
+                f"{pname!r} is in input/params_dictionary.xlsx and input/checked params.txt; "
+                "do not wrap the dictionary main paragraph in <mark>...</mark> (see PROMPT_Parameter_Configuration_Guidelines_section.md rule 0)."
             )
     return issues
 
@@ -1460,16 +2103,36 @@ def verify_responses() -> list[str]:
         for msg in _duplicate_md_heading_issues(text, num):
             errors.append(f"{r.name}: {msg}")
 
+    t03a: str | None = None
     r03_alpha = RUN_DIR / "03_response.md"
     if r03_alpha.exists():
         t03a = _strip_bom_and_zwsp(r03_alpha.read_text(encoding="utf-8"))
         for msg in _03_parameters_sorted_alphabetically_issues(t03a):
             errors.append(msg)
 
+    r01 = RUN_DIR / "01_response.md"
     r02 = RUN_DIR / "02_response.md"
+    r07 = RUN_DIR / "07_response.md"
+    text03_for_0102: str | None = t03a
+    text07_for_0102: str | None = None
+    if r07.exists():
+        text07_for_0102 = _strip_bom_and_zwsp(r07.read_text(encoding="utf-8"))
+    forbidden_0102 = _01_02_forbidden_name_tokens(text03_for_0102, text07_for_0102)
+    if r01.exists():
+        for msg in _01_02_business_language_issues(
+            _strip_bom_and_zwsp(r01.read_text(encoding="utf-8")),
+            "01_response.md",
+            forbidden_0102,
+        ):
+            errors.append(msg)
     if r02.exists():
-        for msg in _02_suggested_resolution_forbidden_subsection_issues(
-            _strip_bom_and_zwsp(r02.read_text(encoding="utf-8"))
+        text02 = _strip_bom_and_zwsp(r02.read_text(encoding="utf-8"))
+        for msg in _02_suggested_resolution_forbidden_subsection_issues(text02):
+            errors.append(msg)
+        for msg in _01_02_business_language_issues(
+            text02,
+            "02_response.md",
+            forbidden_0102,
         ):
             errors.append(msg)
 
@@ -1523,13 +2186,19 @@ def verify_responses() -> list[str]:
             params_in_03 = set(param_names_ordered)
             for msg in _04_backdays_wording_issues(text04, params_in_03):
                 errors.append(msg)
+            for msg in _04_forwdays_wording_issues(text04, params_in_03):
+                errors.append(msg)
             for msg in _04_date_ref_fld_guideline_issues(text04, params_in_03):
+                errors.append(msg)
+            for msg in _04_duration_unit_options_issues(text04, params_in_03):
                 errors.append(msg)
             for msg in _04_aggr_level_guideline_issues(text04, params_in_03):
                 errors.append(msg)
-            for msg in _04_params_dictionary_canonical_substring_issues(text04, text03):
+            for msg in _04_params_dictionary_canonical_issues(text04, text03):
                 errors.append(msg)
             for msg in _04_dictionary_mark_when_unchecked_issues(text04, text03):
+                errors.append(msg)
+            for msg in _04_dictionary_mark_when_checked_issues(text04, text03):
                 errors.append(msg)
             for msg in _04_user_fld_guideline_issues(text04, params_in_03):
                 errors.append(msg)
@@ -1602,16 +2271,25 @@ def verify_responses() -> list[str]:
                         "04_response.md: MANAGE_IN_UTC Options must include both 'X' (UTC mode) "
                         "and empty/blank/local-time mode."
                     )
+            unused_04 = _resolve_unused_params_set()
+            for msg in _04_not_in_use_marker_issues(text04, text03, unused_04):
+                errors.append(msg)
             # Check 04 IMPORTANT line matches expanded parameter count from 03
-            match = re.search(r"ALL\s+(\d+)\s+parameters", text04, re.IGNORECASE)
+            match = re.search(
+                r"(?:ALL|defines)\s+(\d+)\s+parameters", text04, re.IGNORECASE
+            )
             if match and expected_count > 0:
                 n_in_04 = int(match.group(1))
                 if n_in_04 != expected_count:
                     errors.append(
                         f"04_response.md IMPORTANT line says {n_in_04} parameters but 03 expands to {expected_count} parameters"
                     )
-            elif expected_count > 0 and not re.search(r"IMPORTANT.*\d+.*parameters", text04, re.IGNORECASE):
-                errors.append("04_response.md missing IMPORTANT line with parameter count (e.g. ALL N parameters)")
+            elif expected_count > 0 and not re.search(
+                r"IMPORTANT.*\d+.*parameters", text04, re.IGNORECASE
+            ):
+                errors.append(
+                    "04_response.md missing IMPORTANT line with parameter count (e.g. defines N parameters)"
+                )
 
     # 05_response.md formatting: title must be H3; "How parameter combinations..." must be normal text (not heading)
     r05 = RUN_DIR / "05_response.md"
@@ -1621,12 +2299,17 @@ def verify_responses() -> list[str]:
             errors.append("05_response.md: heading must be H3: '### Parameter Relationship' (or '### Parameter Relationships').")
         if re.search(r"^#{1,6}\s+How parameter combinations work together\s*$", text05, re.MULTILINE | re.IGNORECASE):
             errors.append("05_response.md: 'How parameter combinations work together' must be normal text, not a heading.")
+        unused_05 = _resolve_unused_params_set()
         if r03.exists():
             text03 = _strip_bom_and_zwsp(r03.read_text(encoding="utf-8"))
             param_names_ordered_05, _ = _param_names_ordered_from_03_table(text03)
             params_in_03_05 = set(param_names_ordered_05)
-            for msg in _05_time_filter_clarity_issues(text05, params_in_03_05):
+            for msg in _05_time_filter_clarity_issues(text05, params_in_03_05, unused_05):
                 errors.append(msg)
+        for msg in _05_combined_effect_block_issues(text05):
+            errors.append(msg)
+        for msg in _05_unused_param_presence_issues(text05, unused_05):
+            errors.append(msg)
 
     # 06_response.md: title/heading formatting + practical examples rules
     r06 = RUN_DIR / "06_response.md"
@@ -1646,13 +2329,16 @@ def verify_responses() -> list[str]:
             errors.append("06_response.md: malformed code fence '`' found; use triple backticks for each example block.")
         for msg in _06_default_values_format_issues(text06):
             errors.append(msg)
+        unused_06 = _resolve_unused_params_set()
         r03 = RUN_DIR / "03_response.md"
         if r03.exists():
             text03_06 = _strip_bom_and_zwsp(r03.read_text(encoding="utf-8"))
-            for msg in _06_initial_runtime_default_bullets_issues(text03_06, text06):
+            for msg in _06_initial_runtime_default_bullets_issues(text03_06, text06, unused_06):
                 errors.append(msg)
-            for msg in _06_initial_runtime_effect_clarity_issues(text03_06, text06):
+            for msg in _06_initial_runtime_effect_clarity_issues(text03_06, text06, unused_06):
                 errors.append(msg)
+        for msg in _06_unused_param_presence_issues(text06, unused_06):
+            errors.append(msg)
         param_counts = _06_practical_example_param_counts(text06)
         bold_use_cases, non_bold_use_cases = _06_use_case_title_counts(text06)
         if non_bold_use_cases > 0:
@@ -1684,6 +2370,13 @@ def verify_responses() -> list[str]:
                     "06_response.md: No use case has 3–5 (or more) parameters. "
                     "At least one practical configuration example must include 3–5 parameters in its code block."
                 )
+        for msg in _06_no_range_time_param_issues(text06):
+            errors.append(msg)
+        if r03.exists():
+            text03_06b = _strip_bom_and_zwsp(r03.read_text(encoding="utf-8"))
+            ordered_06, _ = _param_names_ordered_from_03_table(text03_06b)
+            for msg in _06_duration_unit_f_purpose_issues(text06, set(ordered_06), unused_06):
+                errors.append(msg)
 
     return errors
 
@@ -1751,6 +2444,110 @@ def _dedupe_duplicate_md_section_headings(md: str, section_num: str) -> str:
         out.append(line)
         i += 1
     return "".join(out)
+
+
+# 01/02: business-oriented sections must not name input parameters or output fields (see prompts 01/02).
+_01_02_GLOBAL_FORBIDDEN_NAMES = frozenset(
+    {
+        "T_DATA",
+        "R_DATUM",
+        "R_UDATE",
+        "R_UDATE_REPET",
+        "R_AEDAT",
+        "R_BEDAT",
+        "R_DURATION",
+        "SY_DATLO",
+        "SY_TIMLO",
+        "SY_DATUM",
+        "SY_UZEIT",
+        "DATE_FROM",
+        "DATE_REF_FLD",
+        "TIME_REF_FLD",
+        "DURATION_UNIT",
+        "FORWDAYS",
+        "REPET_BACKDAYS",
+        "UDATE_REPET",
+        "USER_FLD",
+        "USR_FLD",
+    }
+)
+
+
+def _output_field_names_from_07_table(text07: str) -> list[str]:
+    """Field Name column from the EI Function Structure markdown table in 07."""
+    names: list[str] = []
+    for line in text07.splitlines():
+        if not line.strip().startswith("|"):
+            continue
+        parts = [p.strip() for p in line.split("|")]
+        if len(parts) < 4:
+            continue
+        if parts[1].lower() in ("structure name", "---") or parts[2].lower() == "field name":
+            continue
+        fld = parts[2].strip().strip("`")
+        if fld and fld.lower() not in ("field name",):
+            names.append(fld)
+    return names
+
+
+def _01_02_forbidden_name_tokens(
+    text03: str | None,
+    text07: str | None,
+) -> set[str]:
+    """Union of 03 parameter names, 07 output field names, and global blocklist for 01/02 checks."""
+    tokens: set[str] = set(_01_02_GLOBAL_FORBIDDEN_NAMES)
+    if text03:
+        for name in _param_names_ordered_from_03_table(text03)[0]:
+            u = name.strip().upper()
+            if u:
+                tokens.add(u)
+    if text07:
+        for name in _output_field_names_from_07_table(text07):
+            u = name.strip().upper()
+            if u:
+                tokens.add(u)
+    return tokens
+
+
+def _01_02_business_language_issues(
+    md: str,
+    response_name: str,
+    forbidden_tokens: set[str],
+) -> list[str]:
+    """
+    01_response.md / 02_response.md: no parameter or output-field tokens from 03/07;
+    business language only (see PROMPT_General_Overview_section.md and
+    PROMPT_Problem_Description_and_Suggested_Resolution_section.md).
+    """
+    if not forbidden_tokens:
+        return []
+    issues: list[str] = []
+    # Longest names first so nested tokens (e.g. DURATION vs DURATION_UNIT) report the specific match.
+    ordered = sorted(forbidden_tokens, key=len, reverse=True)
+    seen_lines: set[int] = set()
+    for line_no, line in enumerate(md.splitlines(), 1):
+        for token in ordered:
+            if re.search(rf"\*\*{re.escape(token)}\*\*", line, re.IGNORECASE):
+                if line_no not in seen_lines:
+                    seen_lines.add(line_no)
+                    issues.append(
+                        f"{response_name} line {line_no}: business sections must not name parameters or "
+                        f"output fields ({token!r}); use business language — see "
+                        "prompts/PROMPT_General_Overview_section.md and "
+                        "prompts/PROMPT_Problem_Description_and_Suggested_Resolution_section.md."
+                    )
+                break
+            if re.search(rf"\b{re.escape(token)}\b", line, re.IGNORECASE):
+                if line_no not in seen_lines:
+                    seen_lines.add(line_no)
+                    issues.append(
+                        f"{response_name} line {line_no}: business sections must not name parameters or "
+                        f"output fields ({token!r}); use business language — see "
+                        "prompts/PROMPT_General_Overview_section.md and "
+                        "prompts/PROMPT_Problem_Description_and_Suggested_Resolution_section.md."
+                    )
+                break
+    return issues
 
 
 _02_SUGGESTED_RES_FORBIDDEN_SUBSECTION = re.compile(
@@ -1980,7 +2777,7 @@ def _write_manifest(paths: dict) -> None:
 
 
 def _normalize_text_for_dictionary_compare(s: str) -> str:
-    """Collapse whitespace and strip for substring checks between 04 body and dictionary text."""
+    """Collapse whitespace and strip for exact dictionary match checks in section 04."""
     s = _strip_bom_and_zwsp(s)
     # Ignore <mark> wrappers used for dictionary-only (unchecked) highlighting in 04.
     s = re.sub(r"(?is)</?mark\b[^>]*>", "", s)
@@ -2152,12 +2949,17 @@ def _markdown_04_from_parameter_rows(
     important_n: int,
     params_in_03: set[str],
     code_path: Path,
+    params_path: Path,
 ) -> str:
+    unused = analyze_unused_params(
+        code_path, params_path, search_dirs=[INPUT_DIR, INPUT_DIR / "old"]
+    )
     parts: list[str] = [
         "### Parameter Configuration Guidelines",
         "",
-        f"IMPORTANT: Configure ALL {important_n} parameters listed in the Parameters Reference Table when tuning this EI; "
-        "each influences which records are read, filtered, aged, and surfaced for alerting.",
+        f"IMPORTANT: This EI defines {important_n} parameters in the Parameters Reference Table. "
+        "Configure parameters that affect selection and alerting; parameters marked "
+        f"{NOT_IN_USE_LINE} are declared in the interface but do not change results for this EI.",
         "",
     ]
     code_text = ""
@@ -2224,6 +3026,34 @@ def _markdown_04_from_parameter_rows(
                     parts.append(f"Backdays is based on {inf}")
             parts.append("")
             continue
+        if fld == "FORWDAYS":
+            mand = _FORWDAYS_WINDOW_SENTENCE_ASCII_DASH
+            canon_f = param_canon.get("FORWDAYS")
+            n_m = _normalize_text_for_dictionary_compare(mand)
+
+            def _wrap_forwdays(t: str) -> str:
+                return _04_wrap_dictionary_explanation(t, "FORWDAYS", checked_params)
+
+            if canon_f:
+                n_c = _normalize_text_for_dictionary_compare(canon_f)
+                if n_c == n_m:
+                    parts.append(mand)
+                elif n_m in n_c:
+                    parts.append(_wrap_forwdays(canon_f))
+                else:
+                    parts.append(_wrap_forwdays(canon_f))
+                    parts.append(mand)
+            else:
+                parts.append(mand)
+            parts.append("")
+            if "DATE_REF_FLD" in params_in_03:
+                parts.append(_FORWDAYS_ANCHOR_DATE_REF_SENTENCE_EXACT)
+            else:
+                inf = _infer_forwdays_anchor_field_from_code(code_text)
+                if inf:
+                    parts.append(f"Forwdays is based on {inf}")
+            parts.append("")
+            continue
         if fld == "DURATION_UNIT":
             if param_canon.get("DURATION_UNIT"):
                 parts.append(
@@ -2236,12 +3066,7 @@ def _markdown_04_from_parameter_rows(
                     "Unit for elapsed time between each session's creation date and time and the evaluation clock."
                 )
             parts.append("")
-            parts.append("**DURATION_UNIT Options:**")
-            parts.append("- **H** — Hours.")
-            parts.append("- **M** — Minutes (preset in code before the selection read when not overridden).")
-            parts.append("- **D** — Days.")
-            parts.append("- **F** — Full-day style counting where applicable to the duration helper.")
-            parts.append("")
+            _append_duration_unit_options_block(parts)
             continue
         if fld == "TIME_DIFF_UNIT":
             if param_canon.get("TIME_DIFF_UNIT"):
@@ -2414,7 +3239,7 @@ def _markdown_04_from_parameter_rows(
         else:
             parts.append(_auto_04_opener(i, fld, desc))
         parts.append("")
-    return "\n".join(parts)
+    return _04_insert_not_in_use_lines("\n".join(parts), unused, ordered_names)
 
 
 def _markdown_07_structure_and_abap(structure_path: Path, code_path: Path) -> str:
@@ -2460,7 +3285,13 @@ def generate_sections_03_04_07(paths: dict[str, Path]) -> int:
     text03 = _markdown_03_from_parameter_rows(rows)
     ordered, _ = _param_names_ordered_from_03_table(text03)
     important_n = len(ordered)
-    text04 = _markdown_04_from_parameter_rows(rows, important_n, set(ordered), paths["code"])
+    unused = analyze_unused_params(
+        paths["code"], paths["params"], search_dirs=[INPUT_DIR, INPUT_DIR / "old"]
+    )
+    write_unused_params_file(UNUSED_PARAMS_RUN_FILE, unused)
+    text04 = _markdown_04_from_parameter_rows(
+        rows, important_n, set(ordered), paths["code"], paths["params"]
+    )
     text07 = _markdown_07_structure_and_abap(paths["structure"], paths["code"])
     RUN_DIR.mkdir(parents=True, exist_ok=True)
     (RUN_DIR / "03_response.md").write_text(text03, encoding="utf-8")
@@ -2546,6 +3377,14 @@ def prepare(
             )
         return text
 
+    unused = analyze_unused_params(
+        paths["code"], paths["params"], search_dirs=[INPUT_DIR, INPUT_DIR / "old"]
+    )
+    write_unused_params_file(UNUSED_PARAMS_RUN_FILE, unused)
+    unused_prompt_block = format_unused_params_prompt_block(unused)
+    if unused:
+        print("Unused parameters (excluded from sections 05/06):", ", ".join(sorted(unused)))
+
     for num, template_name, _ in SECTION_SPEC:
         template_path = PROMPTS_DIR / template_name
         if not template_path.exists():
@@ -2553,6 +3392,11 @@ def prepare(
             sys.exit(1)
         text = template_path.read_text(encoding="utf-8")
         text = replace_placeholders(text)
+        if UNUSED_PARAMS_PROMPT_PLACEHOLDER in text:
+            if num in ("05", "06"):
+                text = text.replace(UNUSED_PARAMS_PROMPT_PLACEHOLDER, unused_prompt_block)
+            else:
+                text = text.replace(UNUSED_PARAMS_PROMPT_PLACEHOLDER, "")
         (RUN_DIR / f"{num}_prompt.txt").write_text(text, encoding="utf-8")
 
     if generate_037:

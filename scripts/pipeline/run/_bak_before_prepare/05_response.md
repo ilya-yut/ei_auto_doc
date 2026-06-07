@@ -2,16 +2,16 @@
 
 How parameter combinations work together
 
-**DATUM** supplies an explicit monitoring-date range when you populate it, so the evaluation clock for duration calculations and any monitor-supplied date context is anchored to calendar bounds you choose instead of relying only on relative lookback.
+**Aggregation path:** **AGG_LVL** selects how differences are rolled up before detail lines are returned: empty (line level), **WERKS** (plant and posting date), or **IBLNR** (inventory document and fiscal year). **DIFF_AMOUNT** and **RESULT_COMP** define the symmetric difference band applied in having/selection logic.
 
-When **DATUM** is not provided, **BACKDAYS** is the fallback that builds the lower monitoring date from the evaluation day backward for the date axis the online monitor uses before attribute rows are aged.
+**Date window:** When the monitor date range is empty, **BACKDAYS** is the fallback that builds a lower bound applied to the field named in **DATE_REF_FLD**; explicit date selections override that fallback.
 
-**DURATION** and **DURATION_UNIT** act as an additional filter after date-oriented selection: only destinations whose computed elapsed interval from last change timestamp to the evaluation moment still fit the configured duration band remain in the extract.
+**Duration filter:** After date selection, **DURATION** with **DURATION_UNIT** is an additional age filter on the reference date field named in **DATE_REF_FLD**.
 
-Both the date criteria (explicit **DATUM** or **BACKDAYS**-driven window) and the **DURATION** / **DURATION_UNIT** age test are applied together—rows must satisfy the date side and the duration side before the result set is considered final for alerting.
+**Difference scope:** **PRESENT_ZERO** controls whether zero **DMBTR** differences are excluded; when empty, non-zero differences are required.
 
-**MANAGE_IN_UTC** shifts whether the evaluation clock used with **DATUM** and duration math follows UTC semantics versus local application-server time, so calendar and duration results stay consistent with how your landscape runs the monitor.
+**Comparison fields:** **REF_TABNAME1**, **REF_FIELD1**, **REF_TABNAME2**, **REF_FIELD2**, **COMP_OPERATOR**, and **WAERS_FR** configure optional cross-field amount comparison with currency handling via **WAERS**, **BWKEY**, **BUKRS**, and **KTOPL** when used.
 
-**RFCDEST** ranges define which logical destinations enter the join; **CUNAME**, **CUDATE**, **MUNAME**, and **MUDATE** filters refine which attribute history rows are considered part of the same evaluation pass.
+**Organizational filters:** **VGART**, **WERKS**, **LGORT**, **SOBKZ**, status fields, and user parameters narrow which inventory documents and items enter the selection.
 
-**LANGU** aligns description lookups and language-sensitive presentation with the monitor session when populated.
+**Execution and text:** **SW_DEST** delegates to the cloud function when set; **LANGU** drives material descriptions; **MANAGE_IN_UTC** applies framework UTC handling when set.
