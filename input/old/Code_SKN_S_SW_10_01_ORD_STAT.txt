@@ -1,0 +1,578 @@
+FUNCTION /SKN/F_SW_10_01_ORD_STAT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_STAT OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU  LANGU,
+             BACKDAYS INT4,
+             FORWDAYS INT4,
+             BP1_FUNCT   PARVW,
+             BP2_FUNCT   PARVW,
+             BP3_FUNCT   PARVW,
+             DATE_REF_FLD NAME_FELD,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+             ITEM_DETAILS   CHAR1 .
+ LV_BACKDAYS = 1.
+ LV_DURATION_UNIT = 'D'.
+ LV_LANGU = SY-LANGU. """27-5-19
+ """lv_DATE_REF_FLD = 'ERDAT'."Creation date   'AUDAT'. "Document Date (Date Received/Sent)
+ SELECT_SINGLE: MANAGE_IN_UTC,
+                LANGU,
+                BACKDAYS,
+                FORWDAYS,
+                BP1_FUNCT,
+                BP2_FUNCT,
+                BP3_FUNCT,
+                DATE_REF_FLD,
+                DURATION_UNIT,
+                ITEM_DETAILS.
+DATA_MULTY: KUNNR        VBAK-KUNNR,
+            VBELN        VBAK-VBELN,
+            VKORG        VBAK-VKORG,
+            VTWEG        VBAK-VTWEG,
+            SPART        VBAK-SPART,
+            VBTYP        VBTYP,
+            AUART        VBAK-AUART,
+            ERDAT        VBAK-ERDAT,
+            AUDAT        VBAK-AUDAT,
+            AEDAT        VBAK-AEDAT,
+            GUEBG        GUEBG, "Valid-from date contract
+            GUEEN        GUEEN, "Valid-to date contract
+            ANGDT        ANGDT_V, "Valid-from date quatetion
+            BNDDT        BNDDT, "Valid-to date quatetion
+            VDATU        VBAK-VDATU, "Requested delivery date
+            ERNAM        VBAK-ERNAM,
+            DATUM        SY-DATUM,
+"            DURATION_M   /SKN/E_SW_DURATION_M,
+"            DURATION_H   /SKN/E_SW_DURATION_H,
+"            DURATION_D   /SKN/E_SW_DURATION_D,
+            DURATION    /SKN/E_SW_DURATION,
+            RFSTK       RFSTK,
+            RFGSK       RFGSK,
+            BESTK       BESTK,
+            LFSTK       LFSTK,
+            LFGSK       LKGSK,
+            FKSAK       FKSAK,
+            ABSTK       ABSTK,
+            GBSTK       GBSTK,
+            UVALS       UVVLS_SU,
+            UVVLS       UVVLS_SU,
+            UVFAS       UVFAK_SU,
+            UVALL       UVALL_UK,
+            UVVLK       UVVLK_UK,
+            UVFAK       UVFAK_UK,
+            UVPRS       UVPRS_UK,
+            CMPSA       CMPSA,
+            CMPSB       CMPSB,
+            CMPSD       CMPSD,
+            CMPSE       CMPSE,
+            CMPSF       CMPSF,
+            CMPSG       CMPSG,
+            CMPSH       CMPSH,
+            CMPSI       CMPSI,
+            CMPSJ       CMPSJ,
+            CMPSK       CMPSK,
+            CMPSL       CMPSL,
+            CMPS0       CMPS0,
+            CMGST       CMGST,
+            COSTA       COSTA_D,
+            SPSTG       SPSTG,
+            FSSTK       FSSTK,
+            LSSTK       LSSTK,
+            BLOCK       BLOCK_VB,
+            FKIVK       FKIVK,
+            TRSTA       TRSTA,
+            UVWAS       UVWAK_SU,
+            UVPAK       UVPAK_UK,
+            UVPIK       UVPIK_UK,
+            UVWAK       UVWAK_UK,
+            CMPSM       CMPSM,
+            DCSTK       DCSTK,
+            CMPS_CM     CMPS_CM,
+            CMPS_TE     CHAR1,
+            VKGRP       VKGRP,
+            VKBUR       VKBUR,
+            LIFSK       LIFSK,
+            FAKSK       FAKSK,
+            BP1_CODE    KUNNR,
+            BP2_CODE    KUNNR,
+            BP3_CODE    KUNNR,
+            BP_FUNCT    PARVW,
+            POSNR       POSNR_VA,
+            MATNR       MATNR,
+            MPROK       MPROK,  """"27-5-19
+            WAVWR       WAVWR
+            .
+SELECT_MULTY: KUNNR,
+            VBELN,
+            VKORG ,
+            VTWEG ,
+            SPART,
+            VBTYP,
+            AUART,
+            ERDAT,
+            AUDAT,
+            AEDAT,
+            GUEBG,
+            GUEEN,
+            ANGDT,
+            BNDDT,
+            VDATU,
+            ERNAM,
+            DATUM,
+"            DURATION_M,
+"            DURATION_H ,
+"            DURATION_D,
+            DURATION,
+            RFSTK,
+            RFGSK,
+            BESTK,
+            LFSTK,
+            LFGSK,
+            FKSAK,
+            ABSTK,
+            GBSTK,
+            UVALS,
+            UVVLS,
+            UVFAS,
+            UVALL,
+            UVVLK,
+            UVFAK,
+            UVPRS,
+            CMPSA,
+            CMPSB,
+            CMPSD,
+            CMPSE,
+            CMPSF,
+            CMPSG,
+            CMPSH,
+            CMPSI,
+            CMPSJ,
+            CMPSK,
+            CMPSL,
+            CMPS0,
+            CMGST,
+            COSTA,
+            SPSTG,
+            FSSTK,
+            LSSTK,
+            BLOCK,
+            FKIVK,
+            TRSTA,
+            UVWAS,
+            UVPAK,
+            UVPIK,
+            UVWAK,
+            CMPSM,
+            DCSTK,
+            VKGRP,
+            VKBUR,
+            CMPS_CM,
+            CMPS_TE,
+            LIFSK,
+            FAKSK,
+            BP1_CODE,
+            BP2_CODE,
+            BP3_CODE,
+            POSNR,
+            MATNR,
+            MPROK,  """ 27-5-19
+            WAVWR.
+CONVERT_MULTY: KUNNR ALPHA,
+               VBELN ALPHA,
+               BP1_CODE ALPHA,
+               BP2_CODE ALPHA,
+               BP3_CODE ALPHA,
+               MATNR MATN1. ""3-8-16
+  ""Tanya 14/11/18 :
+  CONVERT_SINGLE:  BP1_FUNCT PARVW,
+                   BP2_FUNCT PARVW ,
+                   BP3_FUNCT PARVW .
+  CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+         R_FLD_VAL FOR DD03P-FIELDNAME .
+DATA :   FLD_NAME TYPE FIELDNAME.
+DATA : I TYPE I,
+       CI(1) TYPE C,
+       NFIELDS TYPE I VALUE 3.   "
+DATA : BACKDAYS  TYPE I ,
+       FORWDAYS TYPE I,
+       DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM .
+DATA : LANGU LIKE SY-LANGU .
+DATA : IS_OUT(1) TYPE C.
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : W_DATA LIKE LINE OF T_DATA .
+DATA : WA_VBPA TYPE VBPA.
+DATA : LV_VBELN TYPE VBELN,
+       LV_POSNR TYPE POSNR,
+       LV_PARVW TYPE PARVW,
+       LV_KUNNR TYPE  KUNNR,
+       LV_KUNNR_NAME TYPE  NAME1_GP,
+       LV_LIFNR TYPE  LIFNR,
+       LV_LIFNR_NAME TYPE  NAME1_GP,
+       LV_PERNR TYPE  PERNR_D,
+       LV_PERNR_NAME TYPE  NAME1_GP,
+       LV_NRART TYPE NRART.
+DATA: LV_VBTYP TYPE VBTYP.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : FLD(60) TYPE C .
+DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+FIELD-SYMBOLS:  TYPE ANY ,
+               <FS_V> TYPE ANY .
+DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+  INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+DATA : END OF SW_STRUCTURE .
+DATA : LS_VBPA TYPE VBPA,
+       LT_VBPA LIKE TABLE OF LS_VBPA.
+DATA : LV_DATA_POSNR TYPE POSNR.
+"--- 02/08/2016
+DATA: LS_VBAP TYPE VBAP,
+      LT_VBAP LIKE TABLE OF LS_VBAP.
+DATA: LS_DATA LIKE LINE OF T_DATA,
+      LT_DATA LIKE TABLE OF LS_DATA.
+""" 27-5-19
+DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+      LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+      LV_DDTEXT LIKE  DD07V-DDTEXT.
+IF NOT LV_FORWDAYS  IS INITIAL.
+    LV_BACKDAYS = LV_FORWDAYS * ( -1 ).
+ENDIF.
+   IF R_DATUM[] IS INITIAL .
+     RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'GE' .
+       DATE_FROM = SY-DATUM - LV_BACKDAYS .
+       RS_DATUM-LOW = DATE_FROM .
+        APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+   "--- Set Reference Date Field
+   DATE_FROM = SY-DATUM.
+   READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+   IF SY-SUBRC IS INITIAL.
+     DATE_FROM = RS_DATUM-LOW.
+     DATE_TO = RS_DATUM-HIGH.
+     IF DATE_TO < DATE_FROM.
+       DATE_TO = DATE_FROM.
+     ENDIF.
+   ENDIF.
+   "--- Check Quatetion or Contracts types
+   IF LV_DATE_REF_FLD IS INITIAL.
+     READ TABLE R_VBTYP INTO RS_VBTYP INDEX 1.
+     IF SY-TFILL = 1. " the single record only
+       IF RS_VBTYP-OPTION = 'EQ'.
+         LV_VBTYP = RS_VBTYP-LOW.
+       ENDIF.
+     ENDIF.
+     IF LV_VBTYP = 'G'.
+       LV_DATE_REF_FLD = 'GUEBG'.
+     ELSEIF LV_VBTYP = 'B'.
+       LV_DATE_REF_FLD = 'ANGDT'.
+     ENDIF.
+ "    endif.
+   ENDIF.
+   "---
+   CASE LV_DATE_REF_FLD.
+     WHEN 'ERDAT'.
+       R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+     WHEN 'AEDAT'.
+       R_AEDAT[] = R_DATUM[]. "Changed On
+     WHEN 'AUDAT'.
+       R_AUDAT[] = R_DATUM[]. "Document Date (Date Received/Sent)
+     WHEN 'VDATU'.
+       R_VDATU[] = R_DATUM[]. "Requested delivery date
+****************************************************************
+     WHEN 'GUEBG' OR 'GUEEN'.
+***         RS_GUEBG-SIGN = 'I' .
+***         RS_GUEBG-OPTION = 'LE'.   "'LE' .
+***         RS_GUEBG-LOW = DATE_TO .
+***         APPEND RS_GUEBG to R_GUEBG.
+***         RS_GUEEN-SIGN = 'I' .
+***         RS_GUEEN-OPTION = 'GE'.   "'GE' .
+***         RS_GUEEN-LOW = DATE_FROM .
+***         APPEND RS_GUEEN to R_GUEEN.
+         RS_GUEBG-SIGN = 'I' .
+         RS_GUEBG-OPTION = 'LE'.   "'LE' .
+         RS_GUEBG-LOW = SY-DATUM .
+         APPEND RS_GUEBG TO R_GUEBG.
+         RS_GUEEN-SIGN = 'I' .
+         RS_GUEEN-OPTION = 'BT'.
+         RS_GUEEN-LOW = SY-DATUM .
+         RS_GUEEN-HIGH = DATE_TO .
+         APPEND RS_GUEEN TO R_GUEEN.
+     WHEN 'ANGDT' OR 'BNDDT'.
+***         RS_ANGDT-SIGN = 'I' .
+***         RS_ANGDT-OPTION = 'LE'.    "'LE' .
+***         RS_ANGDT-LOW = DATE_TO .
+***         APPEND RS_ANGDT to R_ANGDT.
+***         RS_BNDDT-SIGN = 'I' .
+***         RS_BNDDT-OPTION = 'GE' .   "'GE' .
+***         RS_BNDDT-LOW = DATE_FROM .
+***         APPEND RS_BNDDT to R_BNDDT.
+         RS_ANGDT-SIGN = 'I' .
+         RS_ANGDT-OPTION = 'LE'.    "'LE' .
+         RS_ANGDT-LOW = SY-DATUM .
+         APPEND RS_ANGDT TO R_ANGDT.
+         RS_BNDDT-SIGN = 'I' .
+         RS_BNDDT-OPTION = 'BT' .   "'GE' .
+         RS_BNDDT-LOW = SY-DATUM .
+         RS_BNDDT-HIGH = DATE_TO .
+         APPEND RS_BNDDT TO R_BNDDT.
+     WHEN OTHERS.
+       R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+       IF LV_DATE_REF_FLD IS INITIAL.
+         LV_DATE_REF_FLD = 'ERDAT'.
+       ENDIF.
+   ENDCASE.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    DATA: LV_IS_HANA(1) TYPE C.
+    CALL FUNCTION '/SKN/F_SW_IS_RFCDEST_HANA'
+      EXPORTING
+        DEST          = LV_SW_DEST
+      IMPORTING
+        IS_HANA       =  LV_IS_HANA.
+   IF LV_IS_HANA IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FH_SW_10_01_ORD_STAT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+   ELSE.
+    CALL FUNCTION '/SKN/FC_SW_10_01_ORD_STAT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+   ENDIF.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT *
+    FROM VBAK AS A
+    INNER JOIN VBUK AS K
+    ON A~VBELN = K~VBELN
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE A~VBELN IN R_VBELN
+      AND  A~KUNNR IN R_KUNNR
+      AND A~VKORG IN R_VKORG
+      AND A~VKGRP IN R_VKGRP
+      AND A~VKBUR IN R_VKBUR
+      AND A~VTWEG IN R_VTWEG
+      AND A~SPART IN R_SPART
+      AND A~ERDAT IN R_ERDAT
+      AND A~AUDAT IN R_AUDAT
+      AND A~AEDAT IN R_AEDAT
+      AND A~AUART IN R_AUART
+      AND A~GUEBG IN R_GUEBG
+      AND A~GUEEN IN R_GUEEN
+      AND A~ANGDT IN R_ANGDT
+      AND A~BNDDT IN R_BNDDT
+      AND A~VDATU IN R_VDATU
+      AND A~LIFSK IN R_LIFSK
+      AND A~FAKSK IN R_FAKSK
+      AND A~VBTYP IN R_VBTYP
+      AND A~ERNAM IN R_ERNAM
+      AND K~RFSTK IN R_RFSTK
+      AND K~RFGSK IN R_RFGSK
+      AND K~BESTK IN R_BESTK
+      AND K~LFSTK IN R_LFSTK
+      AND K~LFGSK IN R_LFGSK
+      AND K~FKSAK IN R_FKSAK
+      AND K~ABSTK IN R_ABSTK
+      AND K~GBSTK IN R_GBSTK
+      AND K~UVALS IN R_UVALS
+      AND K~UVVLS IN R_UVVLS
+      AND K~UVFAS IN R_UVFAS
+      AND K~UVALL IN R_UVALL
+      AND K~UVVLK IN R_UVVLK
+      AND K~UVFAK IN R_UVFAK
+      AND K~UVPRS IN R_UVPRS
+      AND K~CMPSA IN R_CMPSA
+      AND K~CMPSB IN R_CMPSB
+      AND K~CMPSD IN R_CMPSD
+      AND K~CMPSE IN R_CMPSE
+      AND K~CMPSF IN R_CMPSF
+      AND K~CMPSG IN R_CMPSG
+      AND K~CMPSH IN R_CMPSH
+      AND K~CMPSI IN R_CMPSI
+      AND K~CMPSJ IN R_CMPSJ
+      AND K~CMPSK IN R_CMPSK
+      AND K~CMPSL IN R_CMPSL
+      AND K~CMPS0 IN R_CMPS0
+      AND K~CMGST IN R_CMGST
+      AND K~COSTA IN R_COSTA
+      AND K~SPSTG IN R_SPSTG
+      AND K~FSSTK IN R_FSSTK
+      AND K~LSSTK IN R_LSSTK
+      AND K~BLOCK IN R_BLOCK
+      AND K~FKIVK IN R_FKIVK
+      AND K~TRSTA IN R_TRSTA
+      AND K~UVWAS IN R_UVWAS
+      AND K~UVPAK IN R_UVPAK
+      AND K~UVPIK IN R_UVPIK
+      AND K~UVWAK IN R_UVWAK
+      AND K~CMPSM IN R_CMPSM
+      AND K~DCSTK IN R_DCSTK
+      AND K~CMPS_CM IN R_CMPS_CM.
+***************************************************************************
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    IF  IS NOT ASSIGNED.
+      CONTINUE.
+    ENDIF.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = REF_DATE
+          T_FROM            = SY-UZEIT
+          D_TO              = SY-DATUM
+          T_TO              = SY-UZEIT
+          TIME_UNIT         = LV_DURATION_UNIT  "'D'
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+************************************************************************
+  "--- Get BPs
+  IF T_DATA[] IS NOT INITIAL.
+    "--- Fill R_BP_FUNCT ----
+    REFRESH R_BP_FUNCT.
+    SET_BP_RANGE 1.
+    SET_BP_RANGE 2.
+    SET_BP_RANGE 3.
+   IF R_BP_FUNCT[] IS NOT INITIAL.
+     SELECT * FROM VBPA
+        INTO CORRESPONDING FIELDS OF TABLE LT_VBPA
+        FOR ALL ENTRIES IN T_DATA
+        WHERE VBELN = T_DATA-VBELN
+          AND PARVW IN R_BP_FUNCT.
+     SORT LT_VBPA BY VBELN POSNR PARVW.
+     LOOP AT T_DATA.
+       SY_TABIX = SY-TABIX .
+       GET_BP_ATTR 1.
+       GET_BP_ATTR 2.
+       GET_BP_ATTR 3.
+       MODIFY T_DATA INDEX SY_TABIX.
+     ENDLOOP.
+    DELETE T_DATA WHERE BP1_CODE NOT IN R_BP1_CODE.
+    DELETE T_DATA WHERE BP2_CODE NOT IN R_BP2_CODE.
+    DELETE T_DATA WHERE BP3_CODE NOT IN R_BP3_CODE.
+   ENDIF.
+  ENDIF.
+  "--- Get BPs
+"Delete  CMPS_TE
+  DELETE T_DATA WHERE CMPS_TE NOT IN R_CMPS_TE.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR                = T_DATA-KUNNR
+      IMPORTING
+        CUST_DESC            = T_DATA-CUST_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER       = 1
+        OTHERS               = 2              .
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+"--- 02/08/2016
+ IF LV_ITEM_DETAILS IS NOT INITIAL.
+  IF T_DATA[] IS NOT INITIAL.
+   "--- Add Item details
+   REFRESH LT_VBAP.
+   SELECT *
+     FROM VBAP
+     INTO CORRESPONDING FIELDS OF TABLE LT_VBAP
+     FOR ALL ENTRIES IN T_DATA
+     WHERE VBELN = T_DATA-VBELN
+       AND POSNR IN R_POSNR
+       AND MATNR IN R_MATNR
+       AND MPROK IN R_MPROK  """ 27-5-19
+       AND WAVWR IN R_WAVWR.
+  REFRESH LT_DATA.
+  LT_DATA[] = T_DATA[].
+  REFRESH T_DATA.
+  SORT LT_DATA BY VBELN.
+  LOOP AT LT_VBAP INTO LS_VBAP.
+    READ TABLE LT_DATA INTO LS_DATA
+                       WITH KEY VBELN = LS_VBAP-VBELN
+                       BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      "  Calculations for TADIRAN
+**        ls_data-NETPR_VAT = ls_VBAP-NETWR   +  ls_VBAP-MWSBP. " Net price for TADIRAN
+**        ls_data-NETWR_VAT = ( ls_VBAP-NETWR   +  ls_VBAP-MWSBP ) * ls_VBAP-KWMENG. "Net Value for TADIRAN
+   "***Changed on 15-9-16
+      IF LS_VBAP-KWMENG <> 0.
+        LS_DATA-NETPR_VAT = ( LS_VBAP-NETWR   +  LS_VBAP-MWSBP ) /  LS_VBAP-KWMENG. " Net price for TADIRAN
+      ELSE.
+        LS_DATA-NETPR_VAT = 0.
+      ENDIF.
+        LS_DATA-NETWR_VAT =  LS_VBAP-NETWR   +  LS_VBAP-MWSBP  . "Net Value for TADIRAN
+        LS_DATA-KWMENG_INT = LS_VBAP-KWMENG. " Int Quantaty for TADIRAN
+      MOVE-CORRESPONDING LS_DATA TO T_DATA.
+    ENDIF.
+    MOVE-CORRESPONDING LS_VBAP TO T_DATA.
+    APPEND T_DATA.
+  ENDLOOP.
+ """" 27-5-19
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    LV_DOMNAME = 'MPROK'.
+    LV_DOMVALUE = T_DATA-MPROK.
+      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+        EXPORTING
+          I_DOMNAME        = LV_DOMNAME
+          I_DOMVALUE       = LV_DOMVALUE
+          LANGU            = LV_LANGU
+*         SW_DEST          =
+       IMPORTING
+         E_DDTEXT          = LV_DDTEXT
+       EXCEPTIONS
+         NOT_EXIST        = 1
+         OTHERS           = 2
+                .
+     IF SY-SUBRC = 0.
+      T_DATA-MPROK_DESC = LV_DDTEXT.
+     ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+   ENDLOOP.
+  ENDIF.
+ ENDIF.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

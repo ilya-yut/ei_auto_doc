@@ -1,0 +1,250 @@
+FUNCTION /SKN/F_SW_10_01_ADDR_CH .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ADDR_CH OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE:
+             BACKDAYS INT4,
+             DATE_REF_FLD NAME_FELD,
+             LANGU  SPRAS,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT
+             .
+LV_BACKDAYS = 1.
+LV_DATE_REF_FLD = 'UDATE'.
+LV_LANGU = 'EN'.
+LV_DURATION_UNIT = 'D'.
+SELECT_SINGLE:
+             BACKDAYS,
+             DATE_REF_FLD,
+             LANGU,
+             DURATION_UNIT
+             .
+DATA_MULTY:   OBJECTCLAS   CDOBJECTCL,
+              USERNAME     CDUSERNAME,
+              UDATE        CDDATUM,
+              TCODE        CDTCODE,
+              ADDR_GROUP   CHAR4,
+              ADDRNUMBER   ADRNR,
+              VBPA_ADRNR   ADRNR,
+              KUNNR        KUNNR,
+              KUNNR2       KUNNR,
+              PARVW        PARVW,
+              VBELN        VBELN,
+              POSNR        POSNR,
+              DURATION  /SKN/E_SW_DURATION,
+              DATUM    SY-DATUM
+              .
+SELECT_MULTY:
+              OBJECTCLAS,
+              USERNAME,
+              UDATE,
+              TCODE,
+              KUNNR,
+              PARVW,
+              VBELN,
+              POSNR,
+*              ADDR_GROUP,
+*              ADDRNUMBER,
+              DURATION,
+              DATUM
+              .
+FIELD-SYMBOLS:  TYPE ANY ,
+               <FS_V> TYPE ANY,
+               <FS_DATA> TYPE /SKN/S_SW_10_01_ADDR_CH .
+DATA : SY_TABIX LIKE SY-TABIX ,
+       FLD(60) TYPE C ,
+       REF_DATE TYPE D.
+DATA : BACKDAYS  TYPE I ,
+       DATE_FROM LIKE SY-DATUM,
+       TIME_DIFF TYPE  INT4  .
+DATA: LT_DATA1      TYPE STANDARD TABLE OF /SKN/S_SW_10_01_ADDR_CH,
+      LS_DATA1      TYPE  /SKN/S_SW_10_01_ADDR_CH,
+      LT_DATA2      TYPE STANDARD TABLE OF /SKN/S_SW_10_01_ADDR_CH,
+      LS_DATA2      TYPE  /SKN/S_SW_10_01_ADDR_CH,
+      LT_DATA3      TYPE STANDARD TABLE OF /SKN/S_SW_10_01_ADDR_CH,
+      LS_DATA3      TYPE  /SKN/S_SW_10_01_ADDR_CH,
+      LS_DATA       TYPE  /SKN/S_SW_10_01_ADDR_CH,
+      LT_CDHDR      TYPE  STANDARD TABLE OF CDHDR,
+      LS_CDHDR      TYPE  CDHDR,
+      LT_VBPA       TYPE  STANDARD TABLE OF VBPA,
+      LT_VBPA2      TYPE  STANDARD TABLE OF VBPA,
+      LS_VBPA2      TYPE  VBPA,
+      LT_KUNNR2     TYPE  STANDARD TABLE OF VBPA,
+      LS_KUNNR2     TYPE  VBPA,
+      LS_VBPA       TYPE  VBPA
+      .
+IF R_DATUM[] IS INITIAL .
+   RS_DATUM-SIGN   = 'I' .
+   RS_DATUM-OPTION = 'GE' .
+   DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+   RS_DATUM-LOW    = DATE_FROM .
+   APPEND RS_DATUM TO R_DATUM.
+ENDIF.
+*  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_ADDR_CH'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*  "--- Run Cloud Mode -----
+ "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'UDATE'.
+      R_UDATE[] = R_DATUM[]. "Creation date of the change document
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT.
+  REFRESH T_DATA.
+" ----  Get changes in CDHDR ----
+  "SELECT DISTINCT OBJECTID
+    SELECT *
+    INTO CORRESPONDING FIELDS OF TABLE LT_CDHDR
+    FROM CDHDR AS C
+    WHERE C~OBJECTCLAS = 'ADRESSE'
+      AND ( TCODE LIKE 'VA%' OR TCODE LIKE 'VL%' )
+      AND C~UDATE IN R_UDATE
+      AND C~OBJECTCLAS IN R_OBJECTCLAS
+      AND C~USERNAME   IN R_USERNAME
+      AND C~TCODE      IN R_TCODE
+    .
+    SORT LT_CDHDR BY OBJECTID.
+    IF R_UDATE IS NOT INITIAL.
+      DELETE LT_CDHDR WHERE UDATE NOT IN R_UDATE.
+    ENDIF.
+    DELETE ADJACENT DUPLICATES FROM LT_CDHDR COMPARING OBJECTID.
+" ----  Split address and fill relevant ranges ----
+  LOOP AT LT_CDHDR INTO LS_CDHDR.
+   RS_ADDR_GROUP-SIGN   = 'I' .
+   RS_ADDR_GROUP-OPTION = 'EQ' .
+   RS_ADDR_GROUP-LOW    =  LS_CDHDR-OBJECTID(4) .
+   APPEND RS_ADDR_GROUP TO R_ADDR_GROUP.
+   RS_ADDRNUMBER-SIGN   = 'I' .
+   RS_ADDRNUMBER-OPTION = 'EQ' .
+   RS_ADDRNUMBER-LOW    =  LS_CDHDR-OBJECTID+4(86) .
+   APPEND RS_ADDRNUMBER TO R_ADDRNUMBER.
+  ENDLOOP.
+  SORT R_ADDR_GROUP BY LOW ASCENDING.
+  SORT R_ADDRNUMBER BY LOW ASCENDING.
+  DELETE ADJACENT DUPLICATES FROM R_ADDR_GROUP COMPARING LOW.
+  DELETE ADJACENT DUPLICATES FROM R_ADDRNUMBER COMPARING LOW.
+  "modified  & original addresses
+  SELECT A~ADDRNUMBER AS ADDRNUMBER_MOD
+       A~NAME1 AS NAME1_MOD
+       A~NAME2 AS NAME2_MOD
+       A~NAME3 AS NAME3_MOD
+       A~NAME4 AS NAME4_MOD
+       A~STREET AS STREET_MOD
+       A~COUNTRY AS COUNTRY_MOD
+       A~LANGU AS LANGU_MOD
+       A2~ADDRNUMBER AS ADDRNUMBER_ORGNL
+       A2~NAME1 AS NAME1_ORGNL
+       A2~NAME2 AS NAME2_ORGNL
+       A2~NAME3 AS NAME3_ORGNL
+       A2~NAME4 AS NAME4_ORGNL
+       V~VBELN
+       V~POSNR
+       V~KUNNR
+       V~PARVW
+       K~KUNNR
+  INTO CORRESPONDING FIELDS OF TABLE LT_DATA2
+  FROM ADRC AS A
+  INNER JOIN VBPA AS V
+   ON A~ADDRNUMBER = V~ADRNR
+  INNER JOIN KNA1 AS K
+   ON V~KUNNR = K~KUNNR
+  INNER JOIN ADRC AS A2
+   ON A2~ADDRNUMBER = K~ADRNR
+  WHERE
+          V~ADRNR IN R_ADDRNUMBER
+      AND V~ADRDA IN ('B', 'C', 'E', 'F') " temporarily commented out to bring any data from SKD
+      AND V~KUNNR IS NOT NULL
+      AND ( K~XCPDK IS NULL  OR K~XCPDK EQ '' ) " temporarily commented out to bring any data from SKD
+      AND K~KUNNR IN R_KUNNR
+      .
+ SORT LT_DATA2 BY VBELN PARVW KUNNR.
+" Unite address data with fields from CDHDR
+ LOOP AT LT_DATA2 INTO LS_DATA2.
+   READ TABLE LT_CDHDR INTO LS_CDHDR
+    WITH KEY OBJECTID+4(86) = LS_DATA2-ADDRNUMBER_MOD
+    BINARY SEARCH.
+   IF SY-SUBRC = 0.
+     LS_DATA2-OBJECTID    = LS_CDHDR-OBJECTID.
+     LS_DATA2-OBJECTCLAS  = LS_CDHDR-OBJECTCLAS.
+     LS_DATA2-USERNAME    = LS_CDHDR-USERNAME.
+     LS_DATA2-UDATE       = LS_CDHDR-UDATE.
+     LS_DATA2-TCODE       = LS_CDHDR-TCODE.
+   ENDIF.
+   APPEND LS_DATA2 TO LT_DATA3.
+ ENDLOOP.
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  READ TABLE LT_DATA3 INDEX 1 TRANSPORTING NO FIELDS.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  LOOP AT LT_DATA3 ASSIGNING <FS_DATA>.
+   SY_TABIX = SY-TABIX .
+   FLD = LV_DATE_REF_FLD.
+   ASSIGN COMPONENT FLD OF STRUCTURE <FS_DATA> TO .
+   REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      <FS_DATA>-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          <FS_DATA>-DURATION  = TIME_DIFF .
+        ELSE.
+          <FS_DATA>-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+  ENDLOOP.
+  DELETE LT_DATA3 WHERE DURATION  NOT IN R_DURATION .
+ "--- Get Decriptions
+ " --- Populate global tables for descriprions ---
+  "Customer description - popuplate list of KUNNR in the global table
+  SELECT *
+  FROM KNA1 AS K
+  INTO CORRESPONDING FIELDS OF TABLE  GT_KNA1
+  FOR ALL ENTRIES IN LT_DATA3
+  WHERE K~KUNNR = LT_DATA3-KUNNR.
+  SORT GT_KNA1 BY KUNNR.
+    "--- Get  Customer Decriptions  KUNNR
+  LOOP AT LT_DATA3 INTO LS_DATA3.
+   IF LS_DATA3-KUNNR IS NOT INITIAL.
+     CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR                = LS_DATA3-KUNNR
+      IMPORTING
+        CUST_DESC            = LS_DATA3-KUNNR_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER       = 1
+        OTHERS               = 2              .
+     IF SY-SUBRC <> 0.
+     ENDIF.
+   ENDIF.
+   APPEND LS_DATA3 TO T_DATA.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

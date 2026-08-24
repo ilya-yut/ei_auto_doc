@@ -1,0 +1,427 @@
+FUNCTION /SKN/F_SW_10_03_PO_SH_LEAD_TIM .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_PO_SH_LEAD_TIM OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: LANGU          LANGU,
+             BACKDAYS       INT4,
+             LEADTIME       INT4,
+             DATE_REF_FLD   NAME_FELD,
+             SHKZG          SHKZG,
+             VGABE          VGABE,
+             MD_CHECK       CHAR1,
+             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+* Default values
+ LV_BACKDAYS      = 10.       " back days for GR date
+ LV_SHKZG         = 'S'.      " debit/credit indic.
+ LV_VGABE         = '1'.
+ LV_DURATION_UNIT = 'D'. " duration unit
+ LV_LANGU         = SY-LANGU.
+ LV_DATE_REF_FLD  = 'CPUDT'. " GR date ref. field
+ SELECT_SINGLE: LANGU,
+                BACKDAYS,
+                DATE_REF_FLD,
+                MD_CHECK,
+                DURATION_UNIT.
+DATA_MULTY: EBELN         EBELN,
+            EBELP         EBELP,
+            BUKRS         BUKRS,
+            BSART         BSART,
+            LOEKZ         ELOEK,
+            AEDAT_EKKO    ERDAT,
+            AEDAT_EKPO    ERDAT,
+            LIFNR         ELIFN,
+            EKORG         EKORG,
+            EKGRP         BKGRP,
+            MATNR         MATNR,
+            WERKS         EWERK,
+            MATKL         MATKL,
+            KNTTP         KNTTP,
+            BWTAR         BWTAR_D,
+            PSTYP         PSTYP,
+            BEDAT         ETBDT,
+            CPUDT         CPUDT,
+            GJAHR         MJAHR,
+            ZEKKN         DZEKKN,
+            VGABE         VGABE,
+            SHKZG         SHKZG,
+            BANFN         BANFN,
+            BNFPO         BNFPO,
+            ESTKZ         ESTKZ,
+            PLIFZ         PLIFZ,
+            VBUND         RASSC,
+            BSTYP         EBSTYP,
+            DATUM         SY-DATUM,
+            DATUM2        SY-DATUM,
+            LEADTIME      INT4,
+            DURATION      /SKN/E_SW_DURATION.
+SELECT_MULTY: EBELN,
+              EBELP,
+              BUKRS,
+              BSART,
+              LOEKZ,
+              AEDAT_EKKO,
+              AEDAT_EKPO,
+              LIFNR,
+              EKORG,
+              EKGRP,
+              MATNR,
+              WERKS,
+              MATKL,
+              KNTTP,
+              BWTAR,
+              PSTYP,
+              BEDAT,
+              CPUDT,
+              GJAHR,
+              ZEKKN,
+              VGABE,
+              SHKZG,
+              BANFN,
+              BNFPO,
+              ESTKZ,
+              PLIFZ,
+              VBUND,
+              BSTYP,
+              DATUM,
+              DATUM2,
+              LEADTIME,
+              DURATION.
+CONVERT_MULTY: EBELN ALPHA,
+               LIFNR ALPHA.
+DATA: TIME_DIFF TYPE INT4.
+DATA: FLD(60) TYPE C.
+DATA: REF_DATE TYPE D.
+DATA: DATE_FROM TYPE SY-DATUM.
+DATA: SY_TABIX LIKE SY-TABIX .
+DATA: LV_DAYS       TYPE I,
+      LV_PLIFZ      TYPE MARC-PLIFZ,
+      LV_TABIX      TYPE I,
+      LV_CREAT_DATE LIKE EKKO-AEDAT,
+      LV_MENGE      TYPE ETMEN,
+      LV_WEMNG      TYPE WEEMG,
+      LV_VAL_TMP1   TYPE P DECIMALS 3,
+      LV_VAL_TMP2   TYPE P DECIMALS 3.
+DATA: LS_DATA TYPE /SKN/S_SW_10_03_PO_SH_LEAD_TIM.
+DATA: LT_DATA TYPE TABLE OF /SKN/S_SW_10_03_PO_SH_LEAD_TIM.
+ FIELD-SYMBOLS: <FS_DATA> LIKE LINE OF T_DATA[].
+ FIELD-SYMBOLS:    TYPE ANY ,
+                <FS_V> TYPE ANY .
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_03_PO_SH_LEAD_TI'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+* Calc. GR date
+   IF R_CPUDT[] IS INITIAL .
+     RS_DATUM-SIGN   = 'I' .
+     RS_DATUM-OPTION = 'GT' .
+     DATE_FROM       = SY-DATUM - LV_BACKDAYS.
+     RS_DATUM-LOW    = DATE_FROM.
+*     rs_datum-high   = sy-datum.
+     APPEND RS_DATUM TO R_DATUM.
+      R_CPUDT[] = R_DATUM[].           "GR date
+   ENDIF.
+* Initial debit/credit indic.
+  IF R_SHKZG IS INITIAL.
+    RS_SHKZG-SIGN   = 'I'.
+    RS_SHKZG-OPTION = 'EQ'.
+    RS_SHKZG-LOW    = LV_SHKZG.
+    APPEND RS_SHKZG TO R_SHKZG[].
+  ENDIF.
+* Initial Transaction type
+  IF R_VGABE[] IS INITIAL.
+    RS_VGABE-SIGN   = 'I'.
+    RS_VGABE-OPTION = 'EQ'.
+    RS_VGABE-LOW    = LV_VGABE.
+    APPEND RS_VGABE TO R_VGABE[].
+  ENDIF.
+* Initial Lead Time
+  IF LV_MD_CHECK IS NOT INITIAL.
+    IF R_LEADTIME[] IS INITIAL AND LV_LEADTIME NE 0.
+      RS_LEADTIME-SIGN = 'I'.
+      IF LV_MD_CHECK EQ 'L'.
+        RS_LEADTIME-OPTION = 'LT'.
+      ELSEIF LV_MD_CHECK EQ 'G'.
+        RS_LEADTIME-OPTION = 'GT'.
+      ENDIF.
+      RS_LEADTIME-LOW = LV_LEADTIME.
+      APPEND RS_LEADTIME TO R_LEADTIME[].
+    ENDIF.
+  ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT EKBE~EBELN EKBE~EBELP EKBE~ZEKKN EKBE~GJAHR
+         EKBE~VGABE EKBE~SHKZG EKBE~CPUDT EKBE~MATNR EKBE~WERKS
+         EKKO~BUKRS EKKO~BSTYP EKKO~LOEKZ EKKO~BSART
+         EKKO~AEDAT AS AEDAT_EKKO EKKO~LIFNR EKKO~EKORG EKKO~EKGRP
+         EKKO~WAERS EKKO~ERNAM
+         EKPO~AEDAT AS AEDAT_EKPO
+         EKPO~MATKL EKPO~KNTTP EKPO~BWTAR EKPO~PSTYP
+         EKPO~BPUMZ EKPO~BPUMN EKPO~PEINH EKPO~NETWR EKPO~NETPR
+         EKPO~TXZ01 EKPO~MEINS
+         EKET~ETENR EKET~EINDT EKET~BEDAT EKET~MENGE EKET~WEMNG
+         EKET~BANFN EKET~BNFPO EKET~ESTKZ
+         MARC~PLIFZ
+         LFA1~VBUND
+        FROM EKBE INNER JOIN EKKO ON  EKBE~EBELN EQ EKKO~EBELN
+                  INNER JOIN EKPO ON  EKBE~EBELN EQ EKPO~EBELN
+                                  AND EKBE~EBELP EQ EKPO~EBELP
+                  INNER JOIN EKET ON  EKBE~EBELN EQ EKET~EBELN
+                                  AND EKBE~EBELP EQ EKET~EBELP
+                  INNER JOIN MARC ON  EKBE~MATNR EQ MARC~MATNR
+                                  AND EKBE~WERKS EQ MARC~WERKS
+                  INNER JOIN LFA1 ON  EKKO~LIFNR EQ LFA1~LIFNR
+        INTO CORRESPONDING FIELDS OF TABLE LT_DATA[]
+        WHERE EKBE~EBELN IN R_EBELN[]
+        AND   EKBE~VGABE IN R_VGABE[]
+        AND   EKBE~ZEKKN IN R_ZEKKN[]
+        AND   EKBE~GJAHR IN R_GJAHR[]
+        AND   EKBE~WERKS IN R_WERKS[]
+        AND   EKBE~BWTAR IN R_BWTAR[]
+        AND   EKBE~SHKZG IN R_SHKZG[]
+        AND   EKBE~CPUDT IN R_CPUDT[]
+        AND   EKBE~MATNR IN R_MATNR[]
+        AND   EKBE~WERKS IN R_WERKS[]
+        AND   EKKO~EBELN IN R_EBELN[]
+        AND   EKKO~BUKRS IN R_BUKRS[]
+        AND   EKKO~BSTYP IN R_BSTYP[]
+        AND   EKKO~LOEKZ IN R_LOEKZ[]
+        AND   EKKO~BSART IN R_BSART[]
+        AND   EKKO~AEDAT IN R_AEDAT_EKKO[]
+        AND   EKKO~LIFNR IN R_LIFNR[]
+        AND   EKKO~EKORG IN R_EKORG[]
+        AND   EKKO~EKGRP IN R_EKGRP[]
+        AND   EKPO~AEDAT IN R_AEDAT_EKPO[]
+        AND   EKPO~MATKL IN R_MATKL[]
+        AND   EKPO~KNTTP IN R_KNTTP[]
+        AND   EKPO~BWTAR IN R_BWTAR[]
+        AND   EKPO~PSTYP IN R_PSTYP[]
+        AND   EKET~BEDAT IN R_BEDAT[]
+        AND   EKET~BEDAT NE '00000000'
+        AND   MARC~PLIFZ IN R_PLIFZ
+        AND   LFA1~VBUND IN R_VBUND.
+  CHECK LT_DATA[] IS NOT INITIAL.
+  SORT LT_DATA[] BY EBELN EBELP ETENR.
+  DELETE ADJACENT DUPLICATES FROM LT_DATA COMPARING EBELN EBELP ETENR.
+  SORT LT_DATA BY EBELN EBELP ETENR BEDAT.
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT LT_DATA INTO LS_DATA.
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'LS_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM            = REF_DATE
+          T_FROM            = SY-UZEIT
+          D_TO              = SY-DATUM
+          T_TO              = SY-UZEIT
+          TIME_UNIT         = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF         = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE       = 1
+          OTHERS            = 2    .
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          LS_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          LS_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY LT_DATA FROM LS_DATA. "INDEX sy_tabix.
+    ENDIF.
+  ENDLOOP.
+  DELETE LT_DATA WHERE DURATION  NOT IN R_DURATION .
+*  LOOP AT t_data ASSIGNING <fs_data>.
+  LOOP AT LT_DATA ASSIGNING <FS_DATA>.
+    LV_TABIX = SY-TABIX.
+     AT NEW EBELN.
+       CLEAR: LV_DAYS, LV_CREAT_DATE, LS_DATA, LV_MENGE, LV_WEMNG.
+     ENDAT.
+     AT NEW EBELP.
+       CLEAR: LV_DAYS, LV_CREAT_DATE, LS_DATA, LV_MENGE, LV_WEMNG.
+       MOVE-CORRESPONDING <FS_DATA> TO LS_DATA.
+       IF <FS_DATA>-AEDAT_EKKO <> <FS_DATA>-AEDAT_EKPO.
+         LV_CREAT_DATE = <FS_DATA>-BEDAT.
+       ELSE.
+         LV_CREAT_DATE = <FS_DATA>-AEDAT_EKKO. "ls_ekko-aedat_ekko.
+       ENDIF.
+       IF <FS_DATA>-CPUDT IS NOT INITIAL AND LV_CREAT_DATE IS NOT INITIAL.
+         CALL FUNCTION 'C14B_DIFF_BT_2_DATES'
+         EXPORTING
+           I_DATE_FROM                     = LV_CREAT_DATE
+           I_DATE_TO                       = <FS_DATA>-CPUDT
+         IMPORTING
+           E_DAYS                          = LV_DAYS
+         EXCEPTIONS
+           PLAUSIBILITY_CHECK_FAILED       = 1
+           OTHERS                          = 2
+            .
+         IF SY-SUBRC <> 0.
+           CONTINUE.
+         ENDIF.
+        LV_PLIFZ         = <FS_DATA>-PLIFZ.
+        LS_DATA-LEADTIME = LV_DAYS.
+*   Compare delivery time in MD to actual LT:
+*   There are 2 options of the parameter G for greater then and L for less then.
+*   Additional restriction could be done by LT.
+*   LT is defined as number of days between PO line creation date and actual GR.
+*         ls_data-leadtime = lv_days.
+*         IF lv_days NOT IN r_leadtime[].
+**           DELETE t_data[] INDEX lv_tabix.
+*           CONTINUE.
+*         ENDIF.
+*
+*         IF lv_md_check IS NOT INITIAL.
+*           IF lv_md_check EQ 'G'.
+*             IF <fs_data>-plifz >= lv_days.
+*               CONTINUE.
+*             ENDIF.
+*           ELSEIF lv_md_check EQ 'L'.
+*             IF <fs_data>-plifz <= lv_days.
+*               CONTINUE.
+*             ENDIF.
+*           ENDIF.
+*         ENDIF.
+      ENDIF.
+    ENDAT.
+********************************************
+*   Compare delivery time in MD to actual LT:
+*   There are 2 options of the parameter G for greater then and L for less then.
+*   Additional restriction could be done by LT.
+*   LT is defined as number of days between PO line creation date and actual GR.
+    IF LV_DAYS NOT IN R_LEADTIME[].
+      CONTINUE.
+    ENDIF.
+    IF LV_MD_CHECK IS NOT INITIAL.
+      IF LV_MD_CHECK EQ 'G'.
+        IF LV_PLIFZ >= LV_DAYS.
+          CONTINUE.
+        ENDIF.
+      ELSEIF LV_MD_CHECK EQ 'L'.
+        IF LV_PLIFZ <= LV_DAYS.
+          CONTINUE.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+    LV_MENGE = LV_MENGE + <FS_DATA>-MENGE.
+    LV_WEMNG = LV_WEMNG + <FS_DATA>-WEMNG.
+    AT END OF EBELP.
+      CLEAR: LV_VAL_TMP1, LV_VAL_TMP2.
+      LS_DATA-WAERS_LOCAL     = <FS_DATA>-WAERS.
+      LS_DATA-MENGE           = LV_MENGE.
+      LS_DATA-WEMNG           = LV_WEMNG.
+      LS_DATA-OPEN_ORDER_QUAN = LV_MENGE - LV_WEMNG.
+* Open value calc.
+      IF <FS_DATA>-BPUMN <> 0 AND <FS_DATA>-PEINH <> 0.
+        LV_VAL_TMP1 = <FS_DATA>-NETPR * ( LS_DATA-OPEN_ORDER_QUAN ).
+        LV_VAL_TMP2 = ( <FS_DATA>-BPUMZ / <FS_DATA>-BPUMN ) /
+        <FS_DATA>-PEINH.
+        LS_DATA-OPEN_VALUE  = LV_VAL_TMP1 * LV_VAL_TMP2.
+      ELSE.
+        LS_DATA-OPEN_VALUE = 0.
+      ENDIF.
+* Delivery value calc.
+      IF <FS_DATA>-BPUMN <> 0 AND <FS_DATA>-PEINH <> 0.
+        LV_VAL_TMP1 = <FS_DATA>-NETPR * LV_WEMNG.
+        LV_VAL_TMP2 = ( <FS_DATA>-BPUMZ / <FS_DATA>-BPUMN ) /
+        <FS_DATA>-PEINH.
+        LS_DATA-DELIVERY_VALUE  = LV_VAL_TMP1 * LV_VAL_TMP2.
+      ELSE.
+        LS_DATA-DELIVERY_VALUE = 0.
+      ENDIF.
+      IF <FS_DATA>-MATKL IS NOT INITIAL.
+* Material group desc.
+        CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+        EXPORTING
+          MATKL              = <FS_DATA>-MATKL
+          LANGU              = LV_LANGU
+        IMPORTING
+          MATKL_DESC         = LS_DATA-WGBEZ
+*       MATKL_DESC_L       =
+        EXCEPTIONS
+          WRONG_CODE         = 1
+          OTHERS             = 2
+          .
+        IF SY-SUBRC <> 0.
+*     Implement suitable error handling here
+        ENDIF.
+      ENDIF.
+      IF <FS_DATA>-LIFNR IS NOT INITIAL.
+        "--- Get  Vendor Decriptions
+        CALL FUNCTION '/SKN/FC_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        = <FS_DATA>-LIFNR
+          SW_DEST      = LV_SW_DEST
+        IMPORTING
+          VENDOR_DESC  = LS_DATA-NAME1
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+      ENDIF.
+      IF <FS_DATA>-BSART IS NOT INITIAL AND <FS_DATA>-BSTYP IS NOT INITIAL.
+        "-- BSART_DESC
+        CALL FUNCTION '/SKN/FC_SW_10_BSART_DESC'
+        EXPORTING
+          BSART      = <FS_DATA>-BSART
+          LANGU      = LV_LANGU
+          BSTYP      = <FS_DATA>-BSTYP
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          TYPE_DESC  = LS_DATA-BATXT
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      ENDIF.
+      IF <FS_DATA>-EKORG IS NOT INITIAL.
+*    "-- EKORG_DESC
+        CALL FUNCTION '/SKN/FC_SW_10_PUR_ORG_DESC'
+        EXPORTING
+          EKORG        = <FS_DATA>-EKORG
+          "LANGU              = lv_LANGU
+          SW_DEST      = LV_SW_DEST
+        IMPORTING
+          PUR_ORG_DESC = LS_DATA-EKOTX
+        EXCEPTIONS
+          WRONG_CODE   = 1
+          OTHERS       = 2.
+      ENDIF.
+      IF <FS_DATA>-EKGRP IS NOT INITIAL .
+*    "-- EKGRP_DESC
+        CALL FUNCTION '/SKN/FC_SW_10_PUR_GRP_DESC'
+        EXPORTING
+          EKGRP        = <FS_DATA>-EKGRP
+*       LANGU        = lv_LANGU
+          SW_DEST      = LV_SW_DEST
+        IMPORTING
+          PUR_GRP_DESC = LS_DATA-EKNAM
+        EXCEPTIONS
+          WRONG_CODE   = 1
+          OTHERS       = 2.
+      ENDIF.
+      APPEND LS_DATA TO T_DATA[].
+    ENDAT.
+  ENDLOOP.
+*
+**--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

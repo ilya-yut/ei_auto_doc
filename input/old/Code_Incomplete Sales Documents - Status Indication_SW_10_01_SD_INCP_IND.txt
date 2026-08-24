@@ -1,0 +1,707 @@
+FUNCTION /SKN/F_SW_10_01_ORD_INCMPL .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_INCMPL OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+             LANGU          LANGU,
+             BACKDAYS       INT4,
+             BP1_FUNCT      PARVW,
+             BP2_FUNCT      PARVW,
+             BP3_FUNCT      PARVW,
+             DATE_REF_FLD   NAME_FELD.
+ LV_BACKDAYS = 1.
+ LV_LANGU = SY-LANGU.
+ """lv_DATE_REF_FLD = 'ERDAT'."Creation date   'AUDAT'. "Document Date (Date Received/Sent)
+ SELECT_SINGLE: MANAGE_IN_UTC,
+                LANGU,
+                BACKDAYS,
+                BP1_FUNCT,
+                BP2_FUNCT,
+                BP3_FUNCT,
+                DATE_REF_FLD.
+DATA_MULTY: KUNNR        VBAK-KUNNR,
+            VBELN        VBAK-VBELN,
+            VKORG        VBAK-VKORG,
+            VTWEG        VBAK-VTWEG,
+            SPART        VBAK-SPART,
+            ERDAT        VBAK-ERDAT,
+            AUDAT        VBAK-AUDAT,
+            AEDAT        VBAK-AEDAT,
+            GUEBG        GUEBG, "Valid-from date contract
+            GUEEN        GUEEN, "Valid-to date contract
+            ANGDT        ANGDT_V, "Valid-from date quatetion
+            BNDDT        BNDDT, "Valid-to date quatetion
+            AUART        VBAK-AUART,
+            ERNAM        VBAK-ERNAM,
+            RFBSK        VBRK-RFBSK,
+            DATUM        SY-DATUM,
+            VBTYP        VBTYP,
+            TRVOG        TRVOG,
+*            DURATION_M   /SKN/E_SW_DURATION_M,
+*            DURATION_H   /SKN/E_SW_DURATION_H,
+*            DURATION_D   /SKN/E_SW_DURATION_D,
+            VDATU       EDATU_VBAK,
+            UVALS       UVVLS_SU,
+            UVVLS       UVVLS_SU,
+            UVFAS       UVFAK_SU,
+            UVALL       UVALL_UK,
+            UVVLK       UVVLK_UK,
+            UVFAK       UVFAK_UK,
+            UVPRS       UVPRS_UK,
+            UVWAS       UVWAK_SU,
+            UVPAK       UVPAK_UK,
+            UVPIK       UVPIK_UK,
+            UVWAK       UVWAK_UK,
+            CTRL_UVALL     UVALL,
+            CTRL_UVVLK     UVVLK,
+            CTRL_UVFAK     UVFAK,
+            CTRL_UVPRS     UVPRS,
+            CTRL_UVWAK     UVVWA,
+            CTRL_UVPIK     UVPIC,
+            CTRL_UVPAK     UVPAC,
+            STATG          STATG,
+            VKGRP       VKGRP,
+            VKBUR       VKBUR,
+            BP1_CODE    KUNNR,
+            BP2_CODE    KUNNR,
+            BP3_CODE    KUNNR,
+            BP_FUNCT    PARVW.
+SELECT_MULTY: KUNNR,
+              VBELN,
+              VKORG ,
+              VTWEG ,
+              SPART,
+              ERDAT,
+              AUDAT,
+              AEDAT,
+              AUART,
+              GUEBG,
+              GUEEN,
+              ANGDT,
+              BNDDT,
+              ERNAM,
+              RFBSK ,
+              DATUM,
+              VBTYP,
+              TRVOG,
+*            DURATION_M,
+*            DURATION_H ,
+*            DURATION_D,
+              VDATU,
+              UVALS,
+              UVVLS,
+              UVFAS ,
+              UVALL,
+              UVVLK ,
+              UVFAK ,
+              UVPRS,
+              UVWAS,
+              UVPAK,
+              UVPIK,
+              UVWAK,
+              CTRL_UVALL,
+              CTRL_UVVLK,
+              CTRL_UVFAK,
+              CTRL_UVPRS,
+              CTRL_UVWAK,
+              CTRL_UVPIK,
+              CTRL_UVPAK,
+              STATG,
+              VKGRP,
+              VKBUR,
+              BP1_CODE,
+              BP2_CODE,
+              BP3_CODE.
+CONVERT_MULTY: KUNNR ALPHA,
+               VBELN ALPHA,
+               BP1_CODE ALPHA,
+               BP2_CODE ALPHA,
+               BP3_CODE ALPHA.
+""Tanya 14/11/18 :
+  CONVERT_SINGLE:  BP1_FUNCT PARVW ,
+                   BP2_FUNCT PARVW,
+                   BP3_FUNCT PARVW .
+  """ ?????? """"convert_multy_C:  bp_funct PARVW lv_langu lv_sw_dest
+  CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+         R_FLD_VAL FOR DD03P-FIELDNAME .
+DATA :   FLD_NAME TYPE FIELDNAME.
+DATA : I TYPE I,
+       CI(1) TYPE C,
+       NFIELDS TYPE I VALUE 3.   "
+DATA : BACKDAYS  TYPE I ,
+       DATE_FROM LIKE SY-DATUM,
+       DATE_TO LIKE SY-DATUM .
+DATA : LANGU LIKE SY-LANGU .
+DATA : IS_OUT(1) TYPE C.
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : W_DATA LIKE LINE OF T_DATA .
+DATA : WA_VBPA TYPE VBPA.
+DATA : LV_VBELN TYPE VBELN,
+       LV_POSNR TYPE POSNR,
+       LV_PARVW TYPE PARVW,
+       LV_KUNNR TYPE  KUNNR,
+       LV_KUNNR_NAME TYPE  NAME1_GP,
+       LV_LIFNR TYPE  LIFNR,
+       LV_LIFNR_NAME TYPE  NAME1_GP,
+       LV_PERNR TYPE  PERNR_D,
+       LV_PERNR_NAME TYPE  NAME1_GP,
+       LV_NRART TYPE NRART.
+DATA: LV_VBTYP TYPE VBTYP.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : FLD(60) TYPE C .
+*data: lra_range type range of DD03P-FIELDNAME.
+FIELD-SYMBOLS:  TYPE ANY ,
+               <FS_V> TYPE ANY .
+DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+  INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+DATA : END OF SW_STRUCTURE .
+DATA: BEGIN OF LS_VBUV,
+       VBELN TYPE VBELN_VA,
+       STATG TYPE STATG,
+      END OF LS_VBUV.
+DATA: LT_VBUV LIKE TABLE OF LS_VBUV.
+DATA: BEGIN OF LS_VBUV_STAT,
+       VBELN TYPE VBELN_VA,
+       STATG TYPE STATG,
+       CNT   TYPE I,
+       UVALL  TYPE UVALL,
+       UVVLK  TYPE UVVLK,
+       UVFAK  TYPE UVFAK,
+       UVPRS  TYPE UVPRS,
+       UVWAK  TYPE UVVWA,
+       UVPIK  TYPE UVPIC,
+       UVPAK  TYPE UVPAC,
+       UVGEK  TYPE DUMMY,
+      END OF LS_VBUV_STAT.
+DATA: LT_VBUV_STAT LIKE TABLE OF LS_VBUV_STAT.
+DATA: LV_VBELN_OLD TYPE VBELN_VA,
+      LV_STATG_OLD TYPE STATG,
+      LV_CNT   TYPE I.
+DATA: LS_TVUVS TYPE TVUVS,
+      LT_TVUVS LIKE TABLE OF LS_TVUVS.
+DATA: BEGIN OF LS_VBAK_STAT,
+       VBELN TYPE VBELN_VA,
+       CNT   TYPE I,
+       UVALL  TYPE UVALL,
+       UVVLK  TYPE UVVLK,
+       UVFAK  TYPE UVFAK,
+       UVPRS  TYPE UVPRS,
+       UVWAK  TYPE UVVWA,
+       UVPIK  TYPE UVPIC,
+       UVPAK  TYPE UVPAC,
+       UVGEK  TYPE DUMMY,
+      END OF LS_VBAK_STAT.
+DATA: LT_VBAK_STAT LIKE TABLE OF LS_VBAK_STAT.
+DATA: BEGIN OF LS_STAT,
+       CNT   TYPE I,
+       UVALL  TYPE UVALL,
+       UVVLK  TYPE UVVLK,
+       UVFAK  TYPE UVFAK,
+       UVPRS  TYPE UVPRS,
+       UVWAK  TYPE UVVWA,
+       UVPIK  TYPE UVPIC,
+       UVPAK  TYPE UVPAC,
+       UVGEK  TYPE DUMMY,
+      END OF LS_STAT.
+DATA : LS_VBPA TYPE VBPA,
+       LT_VBPA LIKE TABLE OF LS_VBPA.
+DATA : LV_DATA_POSNR TYPE POSNR.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    DATA: LV_IS_HANA(1) TYPE C.
+    CALL FUNCTION '/SKN/F_SW_IS_RFCDEST_HANA'
+      EXPORTING
+        DEST          = LV_SW_DEST
+      IMPORTING
+        IS_HANA       =  LV_IS_HANA.
+   IF LV_IS_HANA IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FH_SW_10_01_ORD_INCMPL'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+   ELSE.
+    CALL FUNCTION '/SKN/FC_SW_10_01_ORD_INCMPL'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+   ENDIF.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+***********************************************************************************
+*define set_BP_range.
+*  if lv_BP&1_FUNCT is not initial.
+*    clear RS_BP_FUNCT.
+*    RS_BP_FUNCT-sign = 'I'.
+*    RS_BP_FUNCT-OPTION = 'EQ'.
+*    RS_BP_FUNCT-low = lv_BP&1_FUNCT.
+*    append RS_BP_FUNCT to R_BP_FUNCT.
+*  endif.
+*
+*end-of-definition.
+*define get_BP_attr.
+*  clear: t_data-BP&1_NAME.
+*  t_data-BP&1_FUNCT = lv_BP&1_FUNCT.
+*  CALL FUNCTION 'CONVERSION_EXIT_PARVW_INPUT'
+*    EXPORTING
+*      input         = lv_BP&1_FUNCT
+*    IMPORTING
+*      OUTPUT        = lv_PARVW.
+*  t_data-BP&1_FUNCT = lv_PARVW.
+*
+*if lv_PARVW is not initial.
+*  lv_VBELN = t_data-VBELN.
+**  select single *
+**    from VBPA
+**    into wa_VBPA
+**    where VBELN = lv_VBELN
+**      and POSNR = lv_POSNR
+**      and PARVW = lv_PARVW.
+*
+*  "--- Get BP for Line
+*  clear wa_VBPA.
+*  lv_POSNR = lv_data_POSNR.  " t_data-POSNR.
+*  if lv_POSNR is not initial.
+*    read table lt_VBPA into wa_VBPA
+*               with key VBELN = lv_VBELN
+*                        POSNR = lv_POSNR
+*                       PARVW = lv_PARVW
+*               BINARY SEARCH.
+*  endif.
+*  if wa_VBPA is initial.
+*    clear  lv_POSNR.
+*    read table lt_VBPA into wa_VBPA
+*            with key VBELN = lv_VBELN
+*                     POSNR = lv_POSNR
+*                     PARVW = lv_PARVW
+*            BINARY SEARCH.
+*  endif.
+*  if wa_VBPA is not initial.
+*  "-- Get Partner Type
+*  clear lv_NRART.
+*  select single NRART
+*    from TPAR
+*    into lv_NRART
+*    where PARVW = lv_PARVW.
+*  if sy-subrc is initial.
+*    CASE lv_NRART.
+*      when 'KU'.
+*        t_data-BP&1_CODE = wa_VBPA-KUNNR.
+*        lv_KUNNR = wa_VBPA-KUNNR.
+*        CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+*          EXPORTING
+*            KUNNR                = lv_KUNNR
+*          IMPORTING
+*            CUST_DESC            = lv_KUNNR_NAME
+*          EXCEPTIONS
+*            WRONG_CUSTOMER       = 1
+*          OTHERS               = 2              .
+*        IF SY-SUBRC = 0.
+*          t_data-BP&1_NAME = lv_KUNNR_NAME.
+*        ENDIF.
+*      when 'LI'.
+*        t_data-BP&1_CODE = wa_VBPA-LIFNR.
+*        lv_LIFNR = wa_VBPA-LIFNR.
+*        CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+*          EXPORTING
+*            lifnr              = lv_LIFNR
+*          IMPORTING
+*            VENDOR_DESC        = lv_LIFNR_NAME
+*          EXCEPTIONS
+*            WRONG_VENDOR       = 1
+*            OTHERS             = 2.
+*        IF sy-subrc = 0.
+*          t_data-BP&1_NAME = lv_LIFNR_NAME.
+*        ENDIF.
+*      when 'PE'.
+*        t_data-BP&1_CODE = wa_VBPA-PERNR.
+*        lv_PERNR = wa_VBPA-PERNR.
+*        CALL FUNCTION '/SKN/F_SW_10_EMP_DESC'
+*          EXPORTING
+*            pernr                = lv_PERNR
+*          IMPORTING
+*            EMP_DESC             = lv_PERNR_NAME
+*          EXCEPTIONS
+*            WRONG_EMPLOYEE       = 1
+*            OTHERS               = 2.
+*        IF sy-subrc = 0.
+*          t_data-BP&1_NAME = lv_PERNR_NAME.
+*        ENDIF.
+*
+*      WHEN OTHERS.
+**        t_data-BP&1_CODE = wa_VBPA-KUNNR.
+**        lv_KUNNR = wa_VBPA-KUNNR.
+**        CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+**          EXPORTING
+**            KUNNR                = lv_KUNNR
+**          IMPORTING
+**            CUST_DESC            = lv_KUNNR_NAME
+**          EXCEPTIONS
+**            WRONG_CUSTOMER       = 1
+**          OTHERS               = 2              .
+**        IF SY-SUBRC = 0.
+**          t_data-BP&1_NAME = lv_KUNNR_NAME.
+**        ENDIF.
+*    ENDCASE.
+*  endif.
+* endif.
+*endif.
+*end-of-definition.
+*   if R_DATUM[] is initial .
+*     RS_DATUM-SIGN = 'I' .
+*      RS_DATUM-OPTION = 'GE' .
+*       DATE_FROM = sy-datum - lv_BACKDAYS .
+*       RS_DATUM-LOW = DATE_FROM .
+*        APPEND RS_DATUM to R_DATUM.
+*   endif.
+*
+*   "--- Set Reference Date Field
+*   DATE_FROM = sy-datum.
+*   read table R_DATUM into RS_DATUM index 1.
+*   if sy-subrc is initial.
+*     DATE_FROM = RS_DATUM-low.
+*     DATE_TO = RS_DATUM-high.
+*     if DATE_TO < DATE_FROM.
+*       DATE_TO = DATE_FROM.
+*     endif.
+*   endif.
+*   "--- Check Quatetion or Contracts types
+*   if lv_DATE_REF_FLD is initial.
+*     read table R_VBTYP into RS_VBTYP index 1.
+*     if sy-tfill = 1. " the single record only
+*       if RS_VBTYP-OPTION = 'EQ'.
+*         lv_VBTYP = RS_VBTYP-low.
+*       endif.
+*     endif.
+*     if lv_VBTYP = 'G'.
+*       lv_DATE_REF_FLD = 'GUEBG'.
+*     if lv_VBTYP = 'B'.
+*       lv_DATE_REF_FLD = 'ANGDT'.
+*     endif.
+*     endif.
+*   endif.
+*   "---
+*   CASE lv_DATE_REF_FLD.
+*     when 'ERDAT'.
+*       R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+*     when 'AEDAT'.
+*       R_AEDAT[] = R_DATUM[]. "Changed On
+*     When 'AUDAT'.
+*       R_AUDAT[] = R_DATUM[]. "Document Date (Date Received/Sent)
+**     when 'GUEBG'.
+**       R_GUEBG[] = R_DATUM[]. "Valid-from date
+**     when 'GUEEN'.
+**       R_GUEEN[] = R_DATUM[]. "Valid-to date
+*     When 'GUEBG' or 'GUEEN'.
+*       RS_GUEBG-SIGN = 'I' .
+*        RS_GUEBG-OPTION = 'LE' .
+*         RS_GUEBG-LOW = DATE_FROM .
+*          APPEND RS_GUEBG to R_GUEBG.
+*       RS_GUEEN-SIGN = 'I' .
+*        RS_GUEEN-OPTION = 'GE' .
+*         RS_GUEEN-LOW = DATE_TO .
+*          APPEND RS_GUEEN to R_GUEEN.
+*     When 'ANGDT' or 'BNDDT'.
+*       RS_ANGDT-SIGN = 'I' .
+*        RS_GUEBG-OPTION = 'LE' .
+*         RS_ANGDT-LOW = DATE_FROM .
+*          APPEND RS_ANGDT to R_ANGDT.
+*       RS_BNDDT-SIGN = 'I' .
+*        RS_BNDDT-OPTION = 'GE' .
+*         RS_BNDDT-LOW = DATE_TO .
+*          APPEND RS_BNDDT to R_BNDDT.
+*     WHEN OTHERS.
+*       R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+*
+*   ENDCASE.
+  IF R_DATUM[] IS INITIAL.
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS.
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  IF R_ERDAT[] IS INITIAL.
+    R_ERDAT[] = R_DATUM[].
+  ENDIF.
+  IF R_AUDAT[] IS INITIAL.
+    R_AUDAT[] = R_DATUM[].
+  ENDIF.
+  IF R_VDATU[] IS INITIAL .
+    R_VDATU[] = R_DATUM[].
+  ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+*--- Pre Selection
+  SELECT *  "    VBAK~VBELN VBUV-STATG
+     INTO CORRESPONDING FIELDS OF TABLE LT_VBUV
+     FROM VBAK
+       INNER JOIN VBUV
+             ON VBAK~VBELN = VBUV~VBELN
+       WHERE VBAK~VKORG IN R_VKORG
+         AND VBAK~VTWEG IN R_VTWEG
+         AND VBAK~SPART IN R_SPART
+         AND VBAK~VKBUR IN R_VKBUR
+         AND VBAK~VKGRP IN R_VKGRP
+         AND VBAK~TRVOG IN R_TRVOG
+         AND VBAK~ERNAM IN R_ERNAM
+         AND VBAK~VBTYP IN R_VBTYP
+         AND VBAK~SPART IN R_SPART
+         AND VBAK~KUNNR IN R_KUNNR
+         AND VBAK~AUART IN R_AUART
+         AND VBAK~ERDAT IN R_ERDAT
+         AND VBAK~AUDAT IN R_AUDAT
+         AND VBAK~VDATU IN R_VDATU
+         AND VBUV~STATG IN R_STATG.
+  REFRESH LT_VBUV_STAT.
+  CLEAR: LV_VBELN_OLD, LV_STATG_OLD.
+  SORT LT_VBUV BY VBELN STATG.
+  CLEAR LV_CNT.
+  LOOP AT LT_VBUV INTO LS_VBUV.
+    ADD 1 TO LV_CNT.
+    "at end of VBELN.
+      AT END OF STATG.
+        MOVE-CORRESPONDING LS_VBUV TO LS_VBUV_STAT.
+        LS_VBUV_STAT-CNT = LV_CNT.
+        APPEND LS_VBUV_STAT TO LT_VBUV_STAT.
+        CLEAR LV_CNT.
+      ENDAT.
+    "endat.
+  ENDLOOP.
+  SELECT * FROM TVUVS
+    INTO TABLE LT_TVUVS.
+    SORT LT_TVUVS BY STATG.
+  LOOP AT LT_VBUV_STAT INTO LS_VBUV_STAT.
+    SY_TABIX = SY-TABIX.
+    READ TABLE LT_TVUVS INTO LS_TVUVS
+                        WITH KEY STATG = LS_VBUV_STAT-STATG
+                        BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      MOVE-CORRESPONDING LS_TVUVS TO LS_VBUV_STAT.
+    ENDIF.
+    MODIFY LT_VBUV_STAT FROM LS_VBUV_STAT INDEX SY_TABIX .
+  ENDLOOP.
+  "----
+  REFRESH LT_VBAK_STAT.
+  SORT LT_VBUV_STAT BY VBELN.
+  LOOP AT LT_VBUV_STAT INTO LS_VBUV_STAT.
+    AT NEW VBELN.
+      CLEAR LS_STAT.
+    ENDAT.
+    ADD LS_VBUV_STAT-CNT TO LS_STAT-CNT.
+    IF LS_VBUV_STAT-UVALL = 'X'.  LS_STAT-UVALL = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVVLK = 'X'.  LS_STAT-UVVLK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVFAK = 'X'.  LS_STAT-UVFAK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVPRS = 'X'.  LS_STAT-UVPRS = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVWAK = 'X'.  LS_STAT-UVWAK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVPIK = 'X'.  LS_STAT-UVPIK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVPAK = 'X'.  LS_STAT-UVPAK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVGEK = 'X'.  LS_STAT-UVGEK = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVALL = 'X'.  LS_STAT-UVALL = 'X'. ENDIF.
+    IF LS_VBUV_STAT-UVALL = 'X'.  LS_STAT-UVALL = 'X'. ENDIF.
+    AT END OF VBELN.
+      MOVE-CORRESPONDING LS_VBUV_STAT TO LS_VBAK_STAT.
+      MOVE-CORRESPONDING LS_STAT TO LS_VBAK_STAT.
+      APPEND LS_VBAK_STAT TO LT_VBAK_STAT.
+    ENDAT.
+    SY_TABIX = SY-TABIX.
+  ENDLOOP.
+  SORT LT_VBAK_STAT BY VBELN.
+*DELETE FROM lt_VBAK_STAT not selected statuse controls
+DELETE LT_VBAK_STAT WHERE UVALL NOT IN R_CTRL_UVALL.
+DELETE LT_VBAK_STAT WHERE UVVLK NOT IN R_CTRL_UVVLK.
+DELETE LT_VBAK_STAT WHERE UVFAK NOT IN R_CTRL_UVFAK.
+DELETE LT_VBAK_STAT WHERE UVPRS NOT IN R_CTRL_UVPRS.
+DELETE LT_VBAK_STAT WHERE UVWAK NOT IN R_CTRL_UVWAK.
+DELETE LT_VBAK_STAT WHERE UVPIK NOT IN R_CTRL_UVPIK.
+DELETE LT_VBAK_STAT WHERE UVPAK NOT IN R_CTRL_UVPAK.
+CHECK LT_VBAK_STAT[] IS NOT INITIAL.
+  SELECT *
+    FROM VBAK AS A
+    INNER JOIN VBUK AS K
+    ON A~VBELN = K~VBELN
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    FOR ALL ENTRIES IN LT_VBAK_STAT
+    WHERE A~VBELN = LT_VBAK_STAT-VBELN
+      AND A~VBELN IN R_VBELN
+      AND A~KUNNR IN R_KUNNR
+      AND A~VKORG IN R_VKORG
+      AND A~VKGRP IN R_VKGRP
+      AND A~VKBUR IN R_VKBUR
+      AND A~VTWEG IN R_VTWEG
+      AND A~SPART IN R_SPART
+      AND A~ERDAT IN R_ERDAT
+      AND A~AUDAT IN R_AUDAT
+      AND A~AEDAT IN R_AEDAT
+      AND A~AUART IN R_AUART
+      AND A~GUEBG IN R_GUEBG
+      AND A~GUEEN IN R_GUEEN
+      AND A~VBTYP IN R_VBTYP
+      AND A~ERNAM IN R_ERNAM
+      AND K~UVALS IN R_UVALS
+      AND K~UVVLS IN R_UVVLS
+      AND K~UVFAS IN R_UVFAS
+      AND K~UVALL IN R_UVALL
+      AND K~UVVLK IN R_UVVLK
+      AND K~UVFAK IN R_UVFAK
+      AND K~UVPRS IN R_UVPRS
+      AND K~UVWAS IN R_UVWAS
+      AND K~UVPAK IN R_UVPAK
+      AND K~UVPIK IN R_UVPIK
+      AND K~UVWAK IN R_UVWAK
+      .
+*****************************************************************************
+*Changed on duration
+*  loop at t_data .
+*    sy_tabix = sy-tabix .
+*    if not t_data-AEDAT is initial.
+*      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*        EXPORTING
+*          D_FROM            = t_data-AEDAT
+*          T_FROM            = t_data-ERZET
+*          D_TO              = sy-datum
+*          T_TO              = sy-uzeit
+*          TIME_UNIT         = 'M'
+*        IMPORTING
+*          TIME_DIFF         = TIME_DIFF
+*        EXCEPTIONS
+*          WRONG_VALUE       = 1
+*          OTHERS            = 2    .
+*      IF SY-SUBRC = 0.
+*        if TIME_DIFF < '999999'.
+*          t_data-DURATION_M = TIME_DIFF .
+*          t_data-DURATION_H = t_data-DURATION_M / 60.
+*          t_data-DURATION_D = t_data-DURATION_H / 24.
+*        else.
+*          t_data-DURATION_M = '999999'.
+*          CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*           EXPORTING
+*             D_FROM            = t_data-AEDAT
+*             T_FROM            = t_data-ERZET
+*             D_TO              = sy-datum
+*             T_TO              = sy-uzeit
+*             TIME_UNIT         = 'H'
+*           IMPORTING
+*             TIME_DIFF         = TIME_DIFF
+*           EXCEPTIONS
+*             WRONG_VALUE       = 1
+*             OTHERS            = 2    .
+*          IF SY-SUBRC = 0.
+*            if TIME_DIFF < '999999'.
+*              t_data-DURATION_H = TIME_DIFF .
+*              t_data-DURATION_D = t_data-DURATION_H / 24.
+*            else.
+*              t_data-DURATION_H = '999999'.
+*              CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+*                EXPORTING
+*                  D_FROM            = t_data-AEDAT
+*                  T_FROM            = t_data-ERZET
+*                  D_TO              = sy-datum
+*                  T_TO              = sy-uzeit
+*                  TIME_UNIT         = 'D'
+*                IMPORTING
+*                  TIME_DIFF         = TIME_DIFF
+*                EXCEPTIONS
+*                  WRONG_VALUE       = 1
+*                  OTHERS            = 2    .
+*              IF SY-SUBRC = 0.
+*                if TIME_DIFF < '999999'.
+*                  t_data-DURATION_D = TIME_DIFF .
+*                else.
+*                  t_data-DURATION_D = '999999'.
+*                endif.
+*              endif.
+*            endif.
+*          endif.
+*          modify t_data index sy_tabix.
+*        ENDIF.
+*      endif.
+*    endif.
+*  endloop.
+*
+*  delete t_data where DURATION_M not in R_DURATION_M.
+*  delete t_data where DURATION_H not in R_DURATION_H.
+*  delete t_data where DURATION_D not in R_DURATION_D.
+**********************************************************************
+  "--- Get BPs
+    "--- Fill R_BP_FUNCT ----
+    REFRESH R_BP_FUNCT.
+    SET_BP_RANGE 1.
+    SET_BP_RANGE 2.
+    SET_BP_RANGE 3.
+  IF R_BP_FUNCT[] IS NOT INITIAL.
+    SELECT * FROM VBPA
+      INTO CORRESPONDING FIELDS OF TABLE LT_VBPA
+      FOR ALL ENTRIES IN LT_VBAK_STAT
+      WHERE VBELN = LT_VBAK_STAT-VBELN
+        AND PARVW IN R_BP_FUNCT.
+    SORT LT_VBPA BY VBELN POSNR PARVW.
+    LOOP AT T_DATA.
+      SY_TABIX = SY-TABIX .
+      GET_BP_ATTR 1.
+      GET_BP_ATTR 2.
+      GET_BP_ATTR 3.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDLOOP.
+    "--- Get BPs
+    DELETE T_DATA WHERE BP1_CODE NOT IN R_BP1_CODE.
+    DELETE T_DATA WHERE BP2_CODE NOT IN R_BP2_CODE.
+    DELETE T_DATA WHERE BP3_CODE NOT IN R_BP3_CODE.
+  ENDIF.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR                = T_DATA-KUNNR
+      IMPORTING
+        CUST_DESC            = T_DATA-CUST_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER       = 1
+        OTHERS               = 2              .
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    CALL FUNCTION '/SKN/F_SW_10_DOC_CAT_DESC'
+      EXPORTING
+        VBTYP                = T_DATA-VBTYP
+       LANGU                = LV_LANGU
+     IMPORTING
+       CAT_DESC             = T_DATA-VBTYP_DESC
+     EXCEPTIONS
+       WRONG_CODE           = 1
+       OTHERS               = 2
+              .
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    READ TABLE LT_VBAK_STAT INTO LS_VBAK_STAT
+                             WITH KEY VBELN = T_DATA-VBELN.
+    IF SY-SUBRC IS INITIAL.
+      T_DATA-CTRL_UVALL  = LS_VBAK_STAT-UVALL.
+      T_DATA-CTRL_UVVLK  = LS_VBAK_STAT-UVVLK.
+      T_DATA-CTRL_UVFAK  = LS_VBAK_STAT-UVFAK.
+      T_DATA-CTRL_UVPRS  = LS_VBAK_STAT-UVPRS.
+      T_DATA-CTRL_UVWAK  = LS_VBAK_STAT-UVWAK.
+      T_DATA-CTRL_UVPIK  = LS_VBAK_STAT-UVPIK.
+      T_DATA-CTRL_UVPAK  = LS_VBAK_STAT-UVPAK.
+      T_DATA-CTRL_UVGEK  = LS_VBAK_STAT-UVGEK.
+      T_DATA-CNT         = LS_VBAK_STAT-CNT.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

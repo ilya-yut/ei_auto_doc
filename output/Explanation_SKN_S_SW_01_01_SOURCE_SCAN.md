@@ -2,55 +2,61 @@
 
 ## General Overview
 
-This Exception Indicator reviews ABAP repository objects that appear on active transport tasks, loads their published source, and searches that source for configured text patterns so development governance teams can spot risky coding constructs before release.
+This Exception Indicator scans ABAP source that was recently transported—reports, includes, function modules, and class methods—for configured search strings, and returns each matching source line with transport, development artifact, and program context. It gives Basis, development, and audit teams a focused list of code changes that contain patterns such as table updates or other high-risk statements.
 
-This EI serves as an essential control for change management and secure development by:
-- Surfacing repository programs, includes, function modules, and class methods tied to transport workflows when their source matches sensitive search terms
-- Enabling detection of data-changing statements and similar constructs that may violate development standards or segregation-of-duties expectations
-- Supporting transport coordinators and security reviewers with line-level context, object metadata, and request status for prioritized follow-up
-- Helping audit teams demonstrate that technical changes were screened against agreed search policies before import to production
-- Complementing manual code walkthroughs with repeatable, parameterized scans across object types and transport populations
+This EI serves as an essential control for change and development governance by:
+- Enabling detection of recently transported programs that contain specified source patterns before those changes settle in production
+- Supporting accountability by showing which transport, development artifact, author, and source line matched the search
+- Helping security and audit teams sample high-risk statements such as database-changing commands in transported code
+- Providing transport status and type context so reviewers can distinguish workbench versus customizing and open versus released requests
+- Supporting recurring surveillance of source content after transports are imported or released
 
-Typical use includes pre-import checks for emergency transports, periodic reviews of workbench changes, and investigations after policy updates to forbidden statement lists. Results are intended for exception workflows rather than full repository exports.
+This monitoring is useful after release waves, emergency transports, and periodic code-quality or security reviews. It is especially relevant where teams need evidence that transported ABAP was scanned for agreed patterns before the next operational window.
 
-The routine first resolves transport-linked technical objects, retrieves their source through standard repository services, applies pattern matching with optional table-name validation for database-changing statements, and raises an alert when qualifying lines remain after age filtering.
+The EI uses transport details together with ABAP source retrieved for report, include, function, and method units.
 
 
 ## Problem Description
 
-Failure to monitor ABAP source on in-flight or recent transport objects for disallowed or high-risk coding patterns creates multiple risks across secure development, change governance, and compliance.
+Failure to scan recently transported ABAP source for agreed patterns creates risks across change control, security, and operational stability:
 
-**Secure Development and Code Quality Risks**
-- Unauthorized database-changing logic may reach production without independent review of the actual source lines
-- Emergency or fast-track transports can bypass informal peer checks when automated source screening is absent
-- Repeated use of sensitive statement types may go unnoticed until an incident or audit finding
+**Change and Security Risks**
 
-**Change Management and Transport Risks**
-- Coordinators lack a consolidated view tying transport requests, object types, and matching source lines before release
-- Objects modified outside agreed packages or by unexpected owners are harder to detect without object and author scoping
-- Released versus modifiable transport populations cannot be compared systematically when status filters are not applied consistently
+- High-risk statements such as database-changing commands can reach production without a structured source review
+- Emergency or late transports can introduce unreviewed code patterns that bypass standard development checks
+- Missing transport and program context delays identification of who introduced a matching source line and in which request
 
-**Audit and Accountability Risks**
-- Evidence of pre-import technical review is weaker when search policies are not executed and retained on a schedule
-- Investigations after a security event require manual SE80-style browsing instead of a repeatable exception list with line numbers
+**Operational Risks**
+
+- Review windows that do not match transport cadence can miss recent imports or retain stale matches
+- Search patterns that are too broad flood reviewers; patterns that are too narrow hide critical statements
+- Mixing unrelated program types or authors into the same queue reduces the ability to act quickly
+
+**Control and Audit Risks**
+
+- Weak source scanning reduces evidence that transported code was reviewed for agreed patterns
+- Lack of recurring exception review limits accountability between development, Basis, and audit teams
+- Missing source-line detail delays escalation of commercially or security-significant matches
 
 ## Suggested Resolution
 
 **Immediate Response**
-- Review each flagged transport object together with the matching source line, request status, and last-changed metadata shown in the exception
-- Confirm with the developer or transport owner whether the statement is approved, documented, or requires rework before import
-- Hold or return transports that contain non-approved patterns until remediation or formal risk acceptance is recorded
+
+- Review flagged matches for transport, program, author, search pattern, and the source line that matched
+- Confirm with development and Basis whether each match is authorized, documented, and aligned with change policy
+- Prioritize database-changing statements, recently released requests, and objects owned by high-volume authors
 
 **System Assessment**
-- Compare this cycle to prior runs after search-policy changes, mass transport activity, or major release windows
-- Look for concentrations by object type, package, author, or transport status to see whether one project or team drives most hits
-- Validate that the search terms and age window still match the current development standard and release cadence
+
+- Validate lookback window and age filters against how quickly transports must be reviewed after import or release
+- Tune search patterns and program, package, and author scope so results stay actionable
+- Compare match volumes by request type, status, and program type to identify systematic gaps
 
 **Corrective Actions**
-- Remove or refactor disallowed source through your standard development and transport process with required approvals
-- Tighten monitoring scope after root cause so the queue stays actionable for transport operations
-- Update written secure-coding guidance and developer training when the same pattern recurs across teams
-- Route repeat systemic issues into defect or change management when repository scanning rules or transport paths require fixes
+
+- Remediate unauthorized or unsafe source through standard development and transport processes where review confirms action is required
+- Adjust search patterns and monitoring windows after cleanup so results stay focused on true exceptions
+- Document review outcomes and schedule recurring scans after release cycles and emergency transport windows
 
 
 ## Parameters
@@ -61,72 +67,106 @@ This table lists all configurable input parameters. Users set values for these p
 
 | # | Field | Description | Type | Length | Decimal | Data Element | Domain |
 |---|-------|-------------|------|--------|---------|--------------|--------|
-| 1 | AS4USER | As4User | CHAR | 50 | 0 | AS4USER | AS4USER |
-| 2 | AUTHOR | Author | CHAR | 50 | 0 | AUTHOR | AUTHOR |
-| 3 | BACKDAYS | Backdays | INT4 | 10 | 0 | BACKDAYS | BACKDAYS |
-| 4 | CDAT | Cdat | DATS | 8 | 0 | CDAT | CDAT |
-| 5 | CNAM | Cnam | CHAR | 50 | 0 | CNAM | CNAM |
-| 6 | CREATEDON | Createdon | DATS | 8 | 0 | CREATEDON | CREATEDON |
-| 7 | DATUM | Datum | DATS | 8 | 0 | DATUM | DATUM |
-| 8 | DEVCLASS | Devclass | CHAR | 50 | 0 | DEVCLASS | DEVCLASS |
-| 9 | DURATION | Duration | INT4 | 10 | 0 | DURATION | DURATION |
-| 10 | DURATION_UNIT | Duration Unit | CHAR | 1 | 0 | DURATION_UNIT | DURATION_UNIT |
-| 11 | INCLUDE | Include | CHAR | 40 | 0 | INCLUDE | INCLUDE |
-| 12 | LANGU | Langu | CHAR | 1 | 0 | LANGU | LANGU |
-| 13 | OBJNAME | Objname | CHAR | 40 | 0 | OBJNAME | OBJNAME |
-| 14 | OBJTYPE | Objtype | CHAR | 4 | 0 | TROBJTYPE | TROBJTYPE |
-| 15 | PGMID | Pgmid | CHAR | 4 | 0 | PGMID | PGMID |
-| 16 | SRCSYSTEM | Srcsystem | CHAR | 50 | 0 | SRCSYSTEM | SRCSYSTEM |
-| 17 | STATE | State | CHAR | 50 | 0 | STATE | STATE |
-| 18 | STRING_SEARCH | String Search | CHAR | 255 | 0 | /SKN/E_SW_SOURCE_SCAN_STRING | /SKN/E_SW_SOURCE_SCAN_STRING |
-| 19 | SUBC | Subc | CHAR | 50 | 0 | SUBC | SUBC |
-| 20 | SW_DEST | Sw Dest | CHAR | 32 | 0 | RFCDEST | RFCDEST |
-| 21 | TRFUNCTION | Trfunction | CHAR | 1 | 0 | TRFUNCTION | TRFUNCTION |
-| 22 | TRKORR | Trkorr | CHAR | 20 | 0 | TRKORR | TRKORR |
-| 23 | TRSTATUS | Trstatus | CHAR | 1 | 0 | TRSTATUS | TRSTATUS |
-| 24 | UDAT | Udat | DATS | 8 | 0 | UDAT | UDAT |
-| 25 | UNAM | Unam | CHAR | 50 | 0 | UNAM | UNAM |
-| 26 | VERN | Vern | CHAR | 50 | 0 | VERN | VERN |
+| 1 | ACTFLG | tp Active Flag | CHAR | 1 | 0 | TRTPACTFLG |  |
+| 2 | ACTIVITY | IMG Activity | CHAR | 20 | 0 | TRACTIVITY | CUS_IMG_AC |
+| 3 | AS4DATE | Date | DATS | 8 | 0 | AS4DATE | AS4DATE |
+| 4 | AS4POS | Dictionary: Line item | NUMC | 6 | 0 | DDPOSITION | DDPOSITION |
+| 5 | AS4TIME | Time | TIMS | 6 | 0 | AS4TIME | AS4TIME |
+| 6 | AS4USER | Owner | CHAR | 12 | 0 | TR_AS4USER | AS4USER |
+| 7 | BACKDAYS | Backdays |  | 0 | 0 |  |  |
+| 8 | BUFLVL | Counter | NUMC | 1 | 0 | COUNTER | COUNTER |
+| 9 | BUFPOS | Dictionary: Line item | NUMC | 6 | 0 | DDPOSITION | DDPOSITION |
+| 10 | CDAT | Created on | DATS | 8 | 0 | RDIR_CDATE | SYDATS |
+| 11 | CNAM | Created By | CHAR | 12 | 0 | CNAM | SYCHAR12 |
+| 12 | DOMNAM | Transport Domain | CHAR | 10 | 0 | TMSDOMNAM | TMSDOMNAM |
+| 13 | DURATION | Duration In Time Units | INT4 | 10 | 0 | /SKN/E_SW_DURATION |  |
+| 14 | DURATION_UNIT | Duration Unit | CHAR | 1 | 0 | /SKN/E_SW_DURATION_UNIT | /SKN/D_SW_DURATION_UNIT |
+| 15 | IMPSING | Indicator | CHAR | 1 | 0 | FLAG | FLAG |
+| 16 | LANG | Language Key | LANG | 1 | 0 | SPRAS | SPRAS |
+| 17 | LINE_NO | Line | NUMC | 6 | 0 | RSROW | RSROW |
+| 18 | LINE_SCAN | Line source scan | CHAR | 255 | 0 | /SKN/E_SW_SOURCE_SCAN_STRING | TEXT255 |
+| 19 | LOCKFLAG | Lock/Import Status | CHAR | 1 | 0 | LOCKFLAG | TR_IMPORT_STATUS |
+| 20 | OBJ_NAME | Obj. Name | CHAR | 120 | 0 | TROBJ_NAME | TROBJ_NAME |
+| 21 | OBJECT | Object Type | CHAR | 4 | 0 | TROBJTYPE | OBJECT |
+| 22 | OBJFUNC | Function | CHAR | 1 | 0 | OBJFUNC | OBJFUNC |
+| 23 | PGMID | Program ID | CHAR | 4 | 0 | PGMID | PGMID |
+| 24 | PROJECT | CTS Project | CHAR | 20 | 0 | TRKORR_P | TRKORR |
+| 25 | STRING_SCAN | String source scan | CHAR | 255 | 0 | /SKN/E_SW_SOURCE_SCAN_STRING | TEXT255 |
+| 26 | STRING_SEARCH | String Source Search | CHAR | 72 | 0 | /SKN/E_SW_SOURCE_SEARCH_STRING | TXLINE |
+| 27 | STRKORR | Higher-Level Request | CHAR | 20 | 0 | STRKORR | TRKORR |
+| 28 | SUBC | Program Type | CHAR | 1 | 0 | SUBC | SUBC |
+| 29 | SYSNAM | System Name | CHAR | 10 | 0 | TMSSYSNAM | SYSNAME |
+| 30 | TARCLI | Target client | CHAR | 3 | 0 | TRTARCLI | CHAR3 |
+| 31 | TARSYSTEM | Transport Target | CHAR | 10 | 0 | TR_TARGET | TR_TARGET |
+| 32 | TEXT | Short Description | CHAR | 60 | 0 | AS4TEXT | AS4TEXT |
+| 33 | TRFUNCTION | Type of request/task | CHAR | 1 | 0 | TRFUNCTION | TRFUNCTION |
+| 34 | TRFUNCTION_TEXT | Short Description | CHAR | 60 | 0 | AS4TEXT | AS4TEXT |
+| 35 | TRKORR | Request/Task | CHAR | 20 | 0 | TRKORR | TRKORR |
+| 36 | TRSTATUS | Status | CHAR | 1 | 0 | TRSTATUS | TRSTATUS |
+| 37 | TRSTATUS_TEXT | Short Description | CHAR | 60 | 0 | AS4TEXT | AS4TEXT |
+| 38 | UDAT | Changed On | DATS | 8 | 0 | RDIR_UDATE | SYDATS |
+| 39 | UNAM | Last changed by | CHAR | 12 | 0 | UNAM | SYCHAR12 |
+| 40 | VERN | Version number | CHAR | 6 | 0 | VERN | SYCHAR06 |
 
 
 ### Parameter Configuration Guidelines
 
-IMPORTANT: Configure ALL 26 parameters listed in the Parameters Reference Table when tuning this EI; each influences which records are read, filtered, aged, and surfaced for alerting.
+IMPORTANT: This EI defines 40 parameters in the Parameters Reference Table. Configure parameters that affect selection and alerting; parameters marked **Not in use** are declared in the interface but do not change results for this EI.
 
-**AS4USER** (As4User)
+**ACTFLG** (tp Active Flag)
+
+Activity or processing-active flag on the captured row marking whether the object is live versus completed or inactive.
+
+**ACTIVITY** (IMG Activity)
+
+When harmonized with related filters, img activity on ACTIVITY isolates the highest-risk record families.
+
+**AS4DATE** (Date)
+
+Repository last-changed date of a DDIC or ABAP object for technical object staleness and transport comparisons.
+
+**AS4POS** (Dictionary: Line item)
+
+<mark>Repository object position/index in version-management listings ordering includes or subobjects in a transportable unit.</mark>
+
+**Not in use**
+**AS4TIME** (Time)
+
+Repository last-changed time paired with the repository last-changed date for precise DDIC object timestamping.
+
+**AS4USER** (Owner)
 
 <mark>User who last changed a repository object in CTS/SE11-style metadata used for ownership of technical changes.</mark>
 
-**AUTHOR** (Author)
-
-Combines with related filters so author on AUTHOR refines which records remain for duration or state checks.
-
 **BACKDAYS** (Backdays)
 
-BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 - today, 1 - today + yesterday etc.
+BACKDAYS defines the historical monitoring window by specifying how many days backward from today to retrieve records. 0 – today, 1 – today + yesterday etc.
 
 
-**CDAT** (Cdat)
+**BUFLVL** (Counter)
 
-When harmonized with related filters, cdat on CDAT isolates the highest-risk record families.
+<mark>Buffer hierarchy level in application-server buffer statistics distinguishing global versus local buffer pools.</mark>
 
-**CNAM** (Cnam)
+**Not in use**
+**BUFPOS** (Dictionary: Line item)
 
-For operations, cnam on CNAM indicates whether a row belongs in the current monitoring pass versus historical noise.
+<mark>Buffer entry position or sub-index within a buffer snapshot row for technical buffer-dump analysis.</mark>
 
-**CREATEDON** (Createdon)
+**Not in use**
+**CDAT** (Created on)
 
-Allows phased rollout: first widen CREATEDON for createdon, then tighten thresholds once baseline noise is understood.
+Prevents accidental global scans when created on (CDAT) is meant to stay within a controlled application slice.
 
-**DATUM** (Datum)
+**CNAM** (Created By)
 
-Gives auditors traceable criteria because datum on DATUM is applied consistently before any alert flag is raised.
+When left open per framework rules, CNAM does not restrict created by; when set, only matching rows remain.
 
-**DEVCLASS** (Devclass)
+**DOMNAM** (Transport Domain)
 
-ABAP package/development class used to scope technical object ownership.
+<mark>Domain name in DDIC describing allowed values for a data element used in technical validation filters.</mark>
 
-**DURATION** (Duration)
+**Not in use**
+**DURATION** (Duration In Time Units)
 
 Relative-age filter: elapsed interval from the row's reference timestamp to evaluation time, expressed in DURATION_UNIT
 
@@ -135,144 +175,196 @@ Relative-age filter: elapsed interval from the row's reference timestamp to eval
 DURATION_UNIT defines the measurement unit for DURATION calculations.
 
 **DURATION_UNIT Options:**
-- **H** — Hours.
-- **M** — Minutes (preset in code before the selection read when not overridden).
-- **D** — Days.
-- **F** — Full-day style counting where applicable to the duration helper.
+- H: Hours
+- M: Minutes
+- D: Days
+- F: Full days for specific day filtering
 
-**INCLUDE** (Include)
+**IMPSING** (Indicator)
 
-When harmonized with related filters, include on INCLUDE isolates the highest-risk record families.
+Single-record import mode indicator controlling whether IDoc or batch interfaces process one item at a time.
 
-**LANGU** (Langu)
+**LANG** (Language Key)
 
 Language key used for language-dependent texts and user-language filtering.
 
-**OBJNAME** (Objname)
+**LINE_NO** (Line)
 
-Supports operational control by evaluating objname through OBJNAME for each candidate record.
+For operations, line on LINE_NO indicates whether a row belongs in the current monitoring pass versus historical noise.
 
-**OBJTYPE** (Objtype)
+**LINE_SCAN** (Line source scan)
 
-Reflects real administration where objtype on OBJTYPE is routinely restricted to a single productive client or object family.
+For operations, line source scan on LINE_SCAN indicates whether a row belongs in the current monitoring pass versus historical noise.
 
-**PGMID** (Pgmid)
+**LOCKFLAG** (Lock/Import Status)
 
-Supports escalation where pgmid on PGMID signals ownership for follow-up between Basis and functional teams.
+Enqueue lock held flag on technical lock rows indicating whether the lock entry is active.
 
-**SRCSYSTEM** (Srcsystem)
+**OBJ_NAME** (Obj. Name)
 
-Allows phased rollout: first widen SRCSYSTEM for srcsystem, then tighten thresholds once baseline noise is understood.
+<mark>Generic object name key on workflow or technical traces identifying the business object instance.</mark>
 
-**STATE** (State)
+**OBJECT** (Object Type)
 
-When harmonized with related filters, state on STATE isolates the highest-risk record families.
+<mark>Business object discriminator: may hold authorization object, number-range object, BAL object, or other object id per structure.</mark>
 
-**STRING_SEARCH** (String Search)
+**OBJFUNC** (Function)
 
-Aligns exception volume with the chosen scope by testing string search via STRING_SEARCH before alert evaluation.
+<mark>Object function or role code describing how a referenced technical object participates in the process.</mark>
 
-**SUBC** (Subc)
+**PGMID** (Program ID)
 
-Separates cross-client noise from in-scope work when subc on SUBC correlates with client or user attributes.
+Separates cross-client noise from in-scope work when program id on PGMID correlates with client or user attributes.
 
-**SW_DEST** (Sw Dest)
+**PROJECT** (CTS Project)
 
-SW_DEST selects cloud destination/rfc destination context used for remote execution path.
+<mark>Project id or WBS hierarchy key when extracts join CO-PS project data to operational metrics.</mark>
 
-**TRFUNCTION** (Trfunction)
+**STRING_SCAN** (String source scan)
+
+Gives auditors traceable criteria because string source scan on STRING_SCAN is applied consistently before any alert flag is raised.
+
+**Not in use**
+**STRING_SEARCH** (String Source Search)
+
+Supports operational control by evaluating string source search through STRING_SEARCH for each candidate record.
+
+**STRKORR** (Higher-Level Request)
+
+<mark>Structure or stack correlation key on short-dump or trace rows grouping related failure events.</mark>
+
+**SUBC** (Program Type)
+
+When harmonized with related filters, program type on SUBC isolates the highest-risk record families.
+
+**SYSNAM** (System Name)
+
+System name in multi-system landscapes identifying the SAP SID or managed system in telemetry exports.
+
+**Not in use**
+**TARCLI** (Target client)
+
+Target client for cross-client distribution or transportable changes in CTS-style technical rows.
+
+**TARSYSTEM** (Transport Target)
+
+Target logical system in ALE distribution identifying where replicated objects are sent.
+
+**TEXT** (Short Description)
+
+<mark>General text payload field used for message/contextual filtering.</mark>
+
+**Not in use**
+**TRFUNCTION** (Type of request/task)
 
 Transport function code on CTS requests describing import, export, or repair actions on repository.
 
-**TRKORR** (Trkorr)
+**TRFUNCTION_TEXT** (Short Description)
+
+Stabilizes week-over-week metrics by fixing short description (TRFUNCTION_TEXT) while allowing duration thresholds to move.
+
+**TRKORR** (Request/Task)
 
 Transport request or task id in CTS identifying a repository change package.
 
-**TRSTATUS** (Trstatus)
+**TRSTATUS** (Status)
 
 Transport request status such as modifiable or released governing CTS workflow.
 
-**UDAT** (Udat)
+**TRSTATUS_TEXT** (Short Description)
 
-Prevents accidental global scans when udat (UDAT) is meant to stay within a controlled application slice.
+Connects to alert semantics: rows removed for failing short description on TRSTATUS_TEXT never reach downstream filtering.
 
-**UNAM** (Unam)
+**UDAT** (Changed On)
 
-Reduces false positives during peak windows by tightening unam through UNAM alongside state filters.
+Valuable when comparing health before and after a release—hold changed on on UDAT constant while varying other filters.
 
-**VERN** (Vern)
+**UNAM** (Last changed by)
 
-For distributed landscapes, vern on VERN often anchors which application server or destination appears in results.
+Mirrors how administrators slice operational lists: last changed by (UNAM) is one lever that shapes which rows are comparable run over run.
 
+**VERN** (Version number)
+
+Captures edge cases where version number (VERN) must be non-default to reproduce a customer-specific monitoring scenario.
 
 ### Parameter Relationships
 
-How parameter combinations work together
+**Lookback window:** When no explicit date range is supplied, **BACKDAYS** builds the initial date window used to retrieve transport details. Explicit **DATUM** ranges override that fallback.
 
-**Explicit calendar window versus default lookback:** **DATUM** supplies explicit calendar bounds on transport-related change dates when populated. When explicit dates are not provided, **BACKDAYS** is the fallback that builds the default backward window from the evaluation date before transport objects are collected.
+**Source search:** **STRING_SEARCH** supplies the search strings applied to retrieved ABAP source. Matching lines are written to **LINE_SCAN** with **LINE_NO**. For database-changing commands (MODIFY, UPDATE, INSERT, DELETE), the scan keeps only hits that reference a real table name.
 
-**Age filter after selection:** **DURATION** with **DURATION_UNIT** is an additional filter applied after source lines are found: each hit must still fit the configured elapsed-time band measured from the transport change timestamp to the evaluation clock.
+**Age after selection:** After matches are built, elapsed time from the transport date and time to evaluation time is stored in **DURATION** using **DURATION_UNIT**. Rows outside the configured **DURATION** range are removed. This is an additional filter after the date window.
 
-**Source pattern scope:** **STRING_SEARCH** works with object-type and transport filters (**OBJTYPE**, **OBJNAME**, **TRKORR**, **TRSTATUS**, **TRFUNCTION**, **AUTHOR**, **AS4USER**, and related repository attributes) so only relevant transports and technical objects are scanned for the configured text.
+**Transport scope:** **TRKORR**, **TRSTATUS**, **TRFUNCTION**, **STRKORR**, **AS4USER**, **PROJECT**, **TARSYSTEM**, **TARCLI**, **LOCKFLAG**, **IMPSING**, and **ACTFLG** narrow which requests and tasks feed the source scan.
 
-**Remote execution path:** **SW_DEST** enables evaluation against a connected system when populated, including domain text retrieval for transport status and function codes.
+**Object and program scope:** **PGMID**, **OBJECT**, **OBJ_NAME**, **OBJFUNC**, **ACTIVITY**, **SUBC**, **CNAM**, **CDAT**, **UNAM**, **UDAT**, **VERN**, and **AS4DATE** / **AS4TIME** restrict repository objects and program attributes included in the scan.
 
-**Language context:** **LANGU** aligns descriptive texts loaded for transport domains with the language used during review.
+**Remote execution:** When **SW_DEST** is set, source and domain description lookups run on the specified destination.
 
-**Final selection:** Both the date side (explicit **DATUM** or **BACKDAYS** fallback when applicable) and the **DURATION**/**DURATION_UNIT** age filter apply together with **STRING_SEARCH** and transport or object filters—rows must satisfy the active combination of date, duration, pattern, and scope conditions before they appear in the final alert population.
+**Language:** **LANG** is read for language-dependent domain descriptions such as transport status and request-type descriptions.
 
 
 ### Default Values
 
-- **BACKDAYS** - 1
-- **DURATION_UNIT** - H
-- **LANGU** - E
+- **BACKDAYS** - initial - treated as 1 by code
 - **DURATION** - initial - treated as unconstrained by code
+- **DURATION_UNIT** - initial - treated as H by code
+- **LANG** - initial - treated as E by code
 
 ### Practical Example of Parameter Configuration
 
-**Use Case 1: Daily scan for direct database changes**
+**Use Case 1: Recent transported source with table updates**
 
-**Purpose:** Catch MODIFY, UPDATE, INSERT, or DELETE patterns in recent workbench transports with a one-day lookback and hour-based aging.
+**Purpose:** Scan last-day transports for database-changing statements in ABAP source.
+
 ```
 BACKDAYS = 1
+STRING_SEARCH = UPDATE
+DURATION_UNIT = H
+```
+
+**Use Case 2: Released workbench requests**
+
+**Purpose:** Review released workbench transports for a configured source pattern.
+
+```
+TRSTATUS = R
+TRFUNCTION = K
+STRING_SEARCH = INSERT
+BACKDAYS = 7
+```
+
+**Use Case 3: Specific package and author**
+
+**Purpose:** Scan source for one development package and responsible user.
+
+```
+ACTIVITY = ZFI*
+AS4USER = DEVELOPER1
+STRING_SEARCH = DELETE
+BACKDAYS = 14
+```
+
+**Use Case 4: Function modules with duration cap**
+
+**Purpose:** Flag matching function-module source that is still within a short age window in hours.
+
+```
+OBJECT = FUNC
 STRING_SEARCH = MODIFY
-OBJTYPE = PROG
-TRSTATUS = D
 DURATION = 24
 DURATION_UNIT = H
 ```
 
-**Use Case 2: Full-day age band on released tasks**
+**Use Case 5: Exactly seven full days from transport date**
 
-**Purpose:** Review source hits on released transports where the last change is at least seven full days old, useful for post-release hygiene checks.
+**Purpose:** Return rows whose scope is exactly 7 full days ago when DURATION_UNIT = F and DURATION = 7.
+
 ```
-BACKDAYS = 14
-TRSTATUS = R
 DURATION = 7
 DURATION_UNIT = F
-AUTHOR = DEV*
-```
-
-**Use Case 3: Explicit change-date window**
-
-**Purpose:** Limit the transport population to a known release weekend using explicit dates instead of the default lookback.
-```
-DATUM = 20250328 - 20250330
-STRING_SEARCH = DELETE
-TRKORR = DEVK*
-```
-
-**Use Case 4: Class method review in a package**
-
-**Purpose:** Focus on class methods in selected development packages with English texts and a remote system destination.
-```
-OBJTYPE = METH
-DEVCLASS = ZCUSTOM*
-LANGU = E
-SW_DEST = S4H_DEV
-STRING_SEARCH = UPDATE
-BACKDAYS = 3
+BACKDAYS = 30
+STRING_SEARCH = SELECT
 ```
 
 
@@ -282,31 +374,38 @@ This table lists all output fields returned by the EI. These fields contain the 
 
 | Structure Name | Field Name | Description | Data Type | Component Type |
 |---|---|---|---|---|
-| /SKN/S_SW_01_01_SOURCE_SCAN | AS4USER | AS4USER | CHAR(50) | AS4USER |
-| /SKN/S_SW_01_01_SOURCE_SCAN | AUTHOR | AUTHOR | CHAR(50) | AUTHOR |
-| /SKN/S_SW_01_01_SOURCE_SCAN | BACKDAYS | BACKDAYS | INT4(10) | BACKDAYS |
-| /SKN/S_SW_01_01_SOURCE_SCAN | CDAT | CDAT | DATS(8) | CDAT |
-| /SKN/S_SW_01_01_SOURCE_SCAN | CNAM | CNAM | CHAR(50) | CNAM |
-| /SKN/S_SW_01_01_SOURCE_SCAN | CREATEDON | CREATEDON | DATS(8) | CREATEDON |
-| /SKN/S_SW_01_01_SOURCE_SCAN | DATUM | DATUM | DATS(8) | DATUM |
-| /SKN/S_SW_01_01_SOURCE_SCAN | DEVCLASS | DEVCLASS | CHAR(50) | DEVCLASS |
-| /SKN/S_SW_01_01_SOURCE_SCAN | DURATION | DURATION | INT4(10) | DURATION |
-| /SKN/S_SW_01_01_SOURCE_SCAN | DURATION_UNIT | DURATION_UNIT | CHAR(1) | DURATION_UNIT |
-| /SKN/S_SW_01_01_SOURCE_SCAN | INCLUDE | INCLUDE | CHAR(40) | INCLUDE |
-| /SKN/S_SW_01_01_SOURCE_SCAN | LANGU | LANGU | CHAR(1) | LANGU |
-| /SKN/S_SW_01_01_SOURCE_SCAN | OBJNAME | OBJNAME | CHAR(40) | OBJNAME |
-| /SKN/S_SW_01_01_SOURCE_SCAN | OBJTYPE | OBJTYPE | CHAR(4) | TROBJTYPE |
-| /SKN/S_SW_01_01_SOURCE_SCAN | PGMID | PGMID | CHAR(4) | PGMID |
-| /SKN/S_SW_01_01_SOURCE_SCAN | SRCSYSTEM | SRCSYSTEM | CHAR(50) | SRCSYSTEM |
-| /SKN/S_SW_01_01_SOURCE_SCAN | STATE | STATE | CHAR(50) | STATE |
-| /SKN/S_SW_01_01_SOURCE_SCAN | STRING_SEARCH | STRING_SEARCH | CHAR(255) | /SKN/E_SW_SOURCE_SCAN_STRING |
-| /SKN/S_SW_01_01_SOURCE_SCAN | SUBC | SUBC | CHAR(50) | SUBC |
-| /SKN/S_SW_01_01_SOURCE_SCAN | TRFUNCTION | TRFUNCTION | CHAR(1) | TRFUNCTION |
-| /SKN/S_SW_01_01_SOURCE_SCAN | TRKORR | TRKORR | CHAR(20) | TRKORR |
-| /SKN/S_SW_01_01_SOURCE_SCAN | TRSTATUS | TRSTATUS | CHAR(1) | TRSTATUS |
-| /SKN/S_SW_01_01_SOURCE_SCAN | UDAT | UDAT | DATS(8) | UDAT |
-| /SKN/S_SW_01_01_SOURCE_SCAN | UNAM | UNAM | CHAR(50) | UNAM |
-| /SKN/S_SW_01_01_SOURCE_SCAN | VERN | VERN | CHAR(50) | VERN |
+| /SKN/S_SW_01_01_SOURCE_SCAN | ACTFLG | tp Active Flag | CHAR(1) | TRTPACTFLG |
+| /SKN/S_SW_01_01_SOURCE_SCAN | ACTIVITY | Activity that wrote the entry to the object list | CHAR(20) | TRACTIVITY |
+| /SKN/S_SW_01_01_SOURCE_SCAN | AS4DATE | Date of Last Change | DATS(8) | AS4DATE |
+| /SKN/S_SW_01_01_SOURCE_SCAN | AS4TIME | Last changed at | TIMS(6) | AS4TIME |
+| /SKN/S_SW_01_01_SOURCE_SCAN | AS4USER | Owner of a Request or Task | CHAR(12) | TR_AS4USER |
+| /SKN/S_SW_01_01_SOURCE_SCAN | CDAT | Created on | DATS(8) | RDIR_CDATE |
+| /SKN/S_SW_01_01_SOURCE_SCAN | CNAM | Author | CHAR(12) | CNAM |
+| /SKN/S_SW_01_01_SOURCE_SCAN | DURATION | SW: Duration In Time Units (defined separatly) | INT4(10) | /SKN/E_SW_DURATION |
+| /SKN/S_SW_01_01_SOURCE_SCAN | DURATION_UNIT | SW: Duration Unit | CHAR(1) | /SKN/E_SW_DURATION_UNIT |
+| /SKN/S_SW_01_01_SOURCE_SCAN | IMPSING | General Flag | CHAR(1) | FLAG |
+| /SKN/S_SW_01_01_SOURCE_SCAN | LANG | Language Key | LANG(1) | SPRAS |
+| /SKN/S_SW_01_01_SOURCE_SCAN | LINE_NO | Line number | NUMC(6) | RSROW |
+| /SKN/S_SW_01_01_SOURCE_SCAN | LINE_SCAN |  | CHAR(255) | /SKN/E_SW_SOURCE_SCAN_STRING |
+| /SKN/S_SW_01_01_SOURCE_SCAN | LOCKFLAG | Lock status or import status of an object entry | CHAR(1) | LOCKFLAG |
+| /SKN/S_SW_01_01_SOURCE_SCAN | OBJECT | Object Type | CHAR(4) | TROBJTYPE |
+| /SKN/S_SW_01_01_SOURCE_SCAN | OBJFUNC | Object function | CHAR(1) | OBJFUNC |
+| /SKN/S_SW_01_01_SOURCE_SCAN | OBJ_NAME | Object Name in Object List | CHAR(120) | TROBJ_NAME |
+| /SKN/S_SW_01_01_SOURCE_SCAN | PGMID | Program ID in Requests and Tasks | CHAR(4) | PGMID |
+| /SKN/S_SW_01_01_SOURCE_SCAN | PROJECT | Project in Change and Transport System | CHAR(20) | TRKORR_P |
+| /SKN/S_SW_01_01_SOURCE_SCAN | STRING_SEARCH |  | CHAR(72) | /SKN/E_SW_SOURCE_SEARCH_STRING |
+| /SKN/S_SW_01_01_SOURCE_SCAN | STRKORR | Higher-Level Request | CHAR(20) | STRKORR |
+| /SKN/S_SW_01_01_SOURCE_SCAN | SUBC | Program type | CHAR(1) | SUBC |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TARCLI | Target client for the request | CHAR(3) | TRTARCLI |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TARSYSTEM | Transport Target of Request | CHAR(10) | TR_TARGET |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TRFUNCTION | Type of request/task | CHAR(1) | TRFUNCTION |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TRFUNCTION_TEXT | Short Description of Repository Objects | CHAR(60) | AS4TEXT |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TRKORR | Request/Task | CHAR(20) | TRKORR |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TRSTATUS | Status of request/task | CHAR(1) | TRSTATUS |
+| /SKN/S_SW_01_01_SOURCE_SCAN | TRSTATUS_TEXT | Short Description of Repository Objects | CHAR(60) | AS4TEXT |
+| /SKN/S_SW_01_01_SOURCE_SCAN | UDAT | Changed On | DATS(8) | RDIR_UDATE |
+| /SKN/S_SW_01_01_SOURCE_SCAN | UNAM | Last changed by | CHAR(12) | UNAM |
+| /SKN/S_SW_01_01_SOURCE_SCAN | VERN | Version number | CHAR(6) | VERN |
 
 ## ABAP Code
 

@@ -1,0 +1,1190 @@
+FUNCTION /SKN/FC_SW_10_01_ORD_CHNG .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_CHNG OPTIONAL
+*"----------------------------------------------------------------------
+  INCLUDE /SKN/PC_SQL_DATA.
+  DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+               LANGU  LANGU,
+               BACKDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               DESC   CHAR1.
+  LV_BACKDAYS = 1.
+  LV_DURATION_UNIT = 'D'.
+  LV_DATE_REF_FLD = 'LDDAT'.
+  LV_LANGU = SY-LANGU. """Tanya 07/11/18
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 DURATION_UNIT,
+                 DESC.
+  DATA_MULTY: KUNNR        VBAK-KUNNR,
+              VBELN        VBAK-VBELN,
+              VKORG        VBAK-VKORG,
+              WERKS        WERKS_EXT,
+              VTWEG        VBAK-VTWEG,
+              SPART        VBAK-SPART,
+              VBTYP        VBTYP,
+              AUART        VBAK-AUART,
+              BDDAT        VBEP-BDDAT,
+              RSDAT        VBEP-RSDAT,
+              TDDAT        VBEP-TDDAT,
+              MBDAT        VBEP-MBDAT,
+              LDDAT        VBEP-LDDAT,
+              WADAT        VBEP-WADAT,
+              EDATU        VBEP-EDATU,
+              ERNAM        VBAK-ERNAM,
+              DATUM        SY-DATUM,
+              DURATION    /SKN/E_SW_DURATION,
+              POSNR       POSNR_VA,
+              MATNR       MATNR.
+  SELECT_MULTY: KUNNR,
+              VBELN,
+              VKORG ,
+              VTWEG ,
+              SPART,
+              VBTYP,
+              AUART,
+              BDDAT,
+              RSDAT,
+              TDDAT,
+              MBDAT,
+              LDDAT,
+              WADAT,
+              EDATU,
+              ERNAM,
+              DATUM,
+              DURATION,
+              POSNR,
+              MATNR.
+  DATA_MULTY: VALUE_CANCEL CDFLDVALN, " Cancelletion values
+              CHNG_TYP  CHAR2,
+              PERIOD_TYP CHAR2,
+              FR_C1_PERIOD INT2,
+              SL_C1_PERIOD INT2,
+              FR_Q1_PERIOD INT2,
+              SL_Q1_PERIOD INT2,
+              FR_D1_PERIOD INT2,
+              SL_D1_PERIOD INT2,
+              FR_A1_PERIOD INT2,
+              SL_A1_PERIOD INT2,
+              FR_C2_PERIOD INT2,
+              SL_C2_PERIOD INT2,
+              FR_Q2_PERIOD INT2,
+              SL_Q2_PERIOD INT2,
+              FR_D2_PERIOD INT2,
+              SL_D2_PERIOD INT2,
+              FR_A2_PERIOD INT2,
+              SL_A2_PERIOD INT2.
+  SELECT_MULTY: VALUE_CANCEL,
+                CHNG_TYP,
+                PERIOD_TYP,
+                FR_C1_PERIOD,
+                SL_C1_PERIOD,
+                FR_Q1_PERIOD,
+                SL_Q1_PERIOD,
+                FR_D1_PERIOD,
+                SL_D1_PERIOD,
+                FR_A1_PERIOD,
+                SL_A1_PERIOD,
+                FR_C2_PERIOD,
+                SL_C2_PERIOD,
+                FR_Q2_PERIOD,
+                SL_Q2_PERIOD,
+                FR_D2_PERIOD,
+                SL_D2_PERIOD,
+                FR_A2_PERIOD,
+                SL_A2_PERIOD.
+  DATA_SINGLE: CHECK_IMPORTED CHAR1,
+               PERIOD_UNIT  /SKN/E_SW_DURATION_UNIT.
+  LV_PERIOD_UNIT = 'W'.
+  SELECT_SINGLE: CHECK_IMPORTED,
+                 PERIOD_UNIT.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  DATA : SY_DATLO LIKE SY-DATLO ,
+         SY_TIMLO LIKE SY-TIMLO .
+  _SET_SYS_DATE_TIME LV_SW_DEST SY_DATLO SY_TIMLO.
+  CONVERT_MULTY: KUNNR ALPHA,
+                 VBELN ALPHA,
+                 MATNR MATN1. ""3-8-16
+  CONVERT_MULTY_C:  AUART AUART LV_LANGU LV_SW_DEST. """Tanya 07/11/18
+***ranges : R_FLD_NAME for DD03P-FIELDNAME,
+***         R_FLD_VAL for DD03P-FIELDNAME .
+***
+***data :   FLD_NAME type FIELDNAME.
+***data : i type I,
+***       ci(1) type c,
+***       nfields type I value 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM,
+         DATE_TO LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : TIME_DIFF TYPE  INT4 .
+***data : lv_VBELN type VBELN,
+***       lv_POSNR type POSNR,
+***       lv_PARVW type PARVW,
+***       lv_KUNNR TYPE  KUNNR,
+***       lv_KUNNR_NAME TYPE  NAME1_GP.
+***data: lv_VBTYP type VBTYP.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LV_DATA_POSNR TYPE POSNR.
+  DATA: LS_DATA LIKE LINE OF T_DATA,
+        LT_DATA LIKE TABLE OF LS_DATA.
+  DATA: IS_SUBST(1) TYPE C.
+  DATA: LV_TABKEY LIKE CDPOS-TABKEY.
+  DATA: LV_SL_PERIOD LIKE LS_DATA-SL_PERIOD,
+        LV_FR_PERIOD LIKE LS_DATA-FR_PERIOD,
+        LV_PERIOD_FROM LIKE LS_DATA-SL_PERIOD,
+        LV_PERIOD_TO LIKE LS_DATA-SL_PERIOD.
+  DATA_MULTY: VBELN_FLT        VBAK-VBELN.
+  DEFINE CALC_PERIOD_TYP.
+    "-- &1 - Type (C/Q/D/S)
+    "-- &2 - Mat Category (1/2)
+    """if ls_data-DURATION in R_FR_C1_PERIOD.
+    IF LS_DATA-DURATION IN R_FR_&1&2_PERIOD.
+      LS_DATA-PERIOD_TYP = 'FR'.
+    ELSEIF LS_DATA-DURATION IN R_SL_&1&2_PERIOD.
+      LS_DATA-PERIOD_TYP = 'SL'.
+    ELSE.
+    ENDIF.
+    "--- Get SL / FR period strings
+    GET_PERIOD_RANGE &1 &2 FR.
+    GET_PERIOD_RANGE &1 &2 SL.
+  END-OF-DEFINITION.
+  DEFINE GET_PERIOD_RANGE.
+    "-- &1 - Type (C/Q/D/S)
+    "-- &2 - Mat Category (1/2)
+    "-- &3 - FR/SL
+    CLEAR LV_&3_PERIOD.
+    READ TABLE R_&3_&1&2_PERIOD INTO RS_&3_&1&2_PERIOD INDEX 1.
+    IF SY-SUBRC IS INITIAL.
+      LV_PERIOD_FROM = RS_&3_&1&2_PERIOD-LOW.
+        SHIFT LV_PERIOD_FROM LEFT DELETING LEADING ' '.
+      LV_PERIOD_TO = RS_&3_&1&2_PERIOD-HIGH.
+        SHIFT LV_PERIOD_TO LEFT DELETING LEADING ' '.
+     CONCATENATE LV_PERIOD_FROM '-' LV_PERIOD_TO INTO LV_&3_PERIOD SEPARATED BY ' '.
+    ENDIF.
+  END-OF-DEFINITION.
+  "--- Set Default values
+  DATA_MULTY: FR_PERIOD INT2,
+              SL_PERIOD INT2.
+  RS_FR_PERIOD-SIGN = 'I'.
+  RS_FR_PERIOD-OPTION = 'LE'.
+  RS_FR_PERIOD-LOW = '56'.  "8 Weeks in Days
+  APPEND RS_FR_PERIOD TO R_FR_PERIOD.
+  RS_SL_PERIOD-SIGN = 'I'.
+  RS_SL_PERIOD-OPTION = 'BT'.
+  RS_SL_PERIOD-LOW = '56'.  "8 Weeks in Days
+  RS_SL_PERIOD-HIGH = '84'.  "12 Weeks in Days
+  APPEND RS_SL_PERIOD TO R_SL_PERIOD.
+  IF R_FR_C1_PERIOD[] IS INITIAL.
+    R_FR_C1_PERIOD[] = R_FR_PERIOD[].
+  ENDIF.
+  IF R_SL_C1_PERIOD IS INITIAL.
+    R_SL_C1_PERIOD[] = R_SL_PERIOD.
+  ENDIF.
+  IF R_FR_Q1_PERIOD[] IS INITIAL.
+    R_FR_Q1_PERIOD[] = R_FR_PERIOD[].
+  ENDIF.
+  IF R_SL_Q1_PERIOD IS INITIAL.
+    R_SL_Q1_PERIOD[] = R_SL_PERIOD.
+  ENDIF.
+  IF R_FR_D1_PERIOD[] IS INITIAL.
+    R_FR_D1_PERIOD[] = R_FR_PERIOD[].
+  ENDIF.
+  IF R_SL_D1_PERIOD IS INITIAL.
+    R_SL_D1_PERIOD[] = R_SL_PERIOD.
+  ENDIF.
+  IF R_FR_A1_PERIOD[] IS INITIAL.
+    R_FR_A1_PERIOD[] = R_FR_PERIOD[].
+  ENDIF.
+  IF R_SL_A1_PERIOD IS INITIAL.
+    R_SL_A1_PERIOD[] = R_SL_PERIOD.
+  ENDIF.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  DATE_FROM = SY-DATUM.
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    DATE_FROM = RS_DATUM-LOW.
+    DATE_TO = RS_DATUM-HIGH.
+    IF DATE_TO < DATE_FROM.
+      DATE_TO = DATE_FROM.
+    ENDIF.
+  ENDIF.
+  "---
+***   CASE lv_DATE_REF_FLD.
+***     when 'ERDAT'.
+***       R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+***     when 'AEDAT'.
+***       R_AEDAT[] = R_DATUM[]. "Changed On
+***     When 'AUDAT'.
+***       R_AUDAT[] = R_DATUM[]. "Document Date (Date Received/Sent)
+***   ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  "==> 1  Get CDHDR
+  CHECK R_DATUM[] IS NOT INITIAL.  "!!!
+  DATA: LS_CDHDR TYPE CDHDR,
+        LT_CDHDR LIKE TABLE OF LS_CDHDR.
+***   select *
+***     from CDHDR
+***     into CORRESPONDING FIELDS OF table lt_CDHDR
+***     where OBJECTCLAS = 'VERKBELEG'
+***       and UDATE in R_DATUM.
+* Table List
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'CDHDR' '' ''.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+* Selection Fields
+  REFRESH LT_SEL_FIELDS[].
+  _ADAPT_SEL_FIELDS 'CDHDR' 'CDHDR'  LT_SEL_FIELDS LV_SW_DEST.
+* Select's Condition
+  CLEAR: LT_OPTIONS.
+  _RANGE_TO_SEL_TABLE 'UDATE' DATUM.
+  LT_OPTIONS[] = LT_OUT_WHERE_COND[].
+  CLEAR LS_OPTIONS.
+  LS_OPTIONS-TEXT = '( OBJECTCLAS = ''VERKBELEG'' )'.
+  IF LT_OPTIONS IS NOT INITIAL.
+    CONCATENATE 'AND' LS_OPTIONS-TEXT INTO LS_OPTIONS-TEXT SEPARATED BY SPACE.
+  ENDIF.
+  APPEND LS_OPTIONS TO LT_OPTIONS.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTIONS[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      JOIN_CONDITION       = LT_JOIN_CONDITION
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      SORT_OPTIONS         = LT_SORT_OPTIONS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0.
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_CDHDR LT_OUTPUT_FIELDS 1.
+  ENDIF.
+  SORT LT_CDHDR BY OBJECTCLAS OBJECTID CHANGENR.
+  "==> 2  Get CDPOS
+  CHECK LT_CDHDR[] IS NOT INITIAL.
+  DATA: LS_CDPOS TYPE CDPOS,
+        LT_CDPOS LIKE TABLE OF LS_CDPOS.
+***   select *
+***     from CDPOS
+***     into CORRESPONDING FIELDS OF table lt_CDPOS
+***     FOR ALL ENTRIES IN lt_CDHDR
+***     where OBJECTCLAS = lt_CDHDR-OBJECTCLAS
+***       and OBJECTID   = lt_CDHDR-OBJECTID
+***       and CHANGENR   = lt_CDHDR-CHANGENR
+***       and TABNAME  in ( 'VBAP' , 'VBEP' )
+***       and FNAME in ('ABGRU' , 'WMENG' , 'EDATU')
+***        and CHNGIND    = 'U'.
+  CLEAR: LT_OPTIONS[], LT_DATA_RFC[], LT_TABLES_LIST[], LT_SEL_FIELDS[], LT_OUTPUT_FIELDS[],
+         LT_DFIES[], LT_RETURN[], LT_OUT_WHERE_COND[].
+* Table List
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'CDPOS' '' ''.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+  _ALL_ENTRIES_CONDITION 'OBJECTCLAS' 'OBJECTCLAS' ''.
+  _ALL_ENTRIES_CONDITION 'OBJECTID' 'OBJECTID' ''.
+  _ALL_ENTRIES_CONDITION 'CHANGENR' 'CHANGENR' ''.
+* Selection Fields
+  REFRESH LT_SEL_FIELDS[].
+  _ADAPT_SEL_FIELDS 'CDPOS' 'CDPOS'  LT_SEL_FIELDS LV_SW_DEST.
+* Select's Condition
+  LT_OPTIONS[] = LT_OUT_WHERE_COND.
+  CLEAR LS_OPTIONS.
+  LS_OPTIONS-TEXT = '( TABNAME  in ( ''VBAP'' , ''VBEP'' ) )'.
+  APPEND LS_OPTIONS TO LT_OPTIONS.
+  LS_OPTIONS-TEXT = '( FNAME in ( ''ABGRU'' , ''WMENG'' ,  ''BMENG'',  ''EDATU'' ) )'.
+  CONCATENATE 'AND' LS_OPTIONS-TEXT INTO LS_OPTIONS-TEXT SEPARATED BY SPACE.
+  APPEND LS_OPTIONS TO LT_OPTIONS.
+  LS_OPTIONS-TEXT = '( CHNGIND    = ''U'')'.
+  CONCATENATE 'AND' LS_OPTIONS-TEXT INTO LS_OPTIONS-TEXT SEPARATED BY SPACE.
+  APPEND LS_OPTIONS TO LT_OPTIONS.
+*    Convert lt_CDHDR to string table
+  _ALL_ENTRIES_CONVERT  LT_CDHDR  'CDHDR'  1.
+*   'For All Entries' Fields
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      TABNAME        = 'CDHDR'
+    TABLES
+      DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+    EXCEPTIONS
+      NOT_FOUND      = 1
+      INTERNAL_ERROR = 2
+      OTHERS         = 3.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_ALL_ENTRIES_DFIES[].
+  ENDIF.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTIONS[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+      ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+      ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+      ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0 .
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_CDPOS LT_OUTPUT_FIELDS 2.
+  ENDIF.
+  "==> 3  Clean CDPOS
+  IF R_VALUE_CANCEL[] IS INITIAL.
+    RS_VALUE_CANCEL-SIGN = 'I'.
+    RS_VALUE_CANCEL-OPTION = 'EQ'.
+    RS_VALUE_CANCEL-LOW = '08'.
+    APPEND RS_VALUE_CANCEL TO R_VALUE_CANCEL.
+    RS_VALUE_CANCEL-SIGN = 'I'.
+    RS_VALUE_CANCEL-OPTION = 'EQ'.
+    RS_VALUE_CANCEL-LOW = '10'.
+    APPEND RS_VALUE_CANCEL TO R_VALUE_CANCEL.
+  ENDIF.
+  DELETE LT_CDPOS WHERE FNAME = 'ABGRU'
+                   AND VALUE_NEW NOT IN R_VALUE_CANCEL.
+  "==> 4  Aggregate CDPOS
+  "==> 5  Get Keys
+  DATA: BEGIN OF LS_OBJECT_KEY,
+          OBJECTCLAS  TYPE CDOBJECTCL,
+          OBJECTID  TYPE CDOBJECTV,
+        END OF LS_OBJECT_KEY.
+  DATA: LT_OBJECT_KEY LIKE TABLE OF LS_OBJECT_KEY.
+  REFRESH LT_OBJECT_KEY.
+  LOOP AT LT_CDPOS INTO LS_CDPOS.
+    MOVE-CORRESPONDING LS_CDPOS TO LS_OBJECT_KEY.
+    APPEND LS_OBJECT_KEY TO LT_OBJECT_KEY.
+  ENDLOOP.
+  SORT LT_OBJECT_KEY BY OBJECTCLAS OBJECTID.
+  DELETE ADJACENT DUPLICATES FROM LT_OBJECT_KEY.
+  "==> 6  Get First Date (from log)
+  "  Min Ghange NR for Object Class + Object ID + FNAME
+  DATA: LT_CDPOS_OBJ LIKE TABLE OF LS_CDPOS.
+  IF LT_OBJECT_KEY[] IS NOT INITIAL.
+***     select *
+***       from CDPOS
+***       into CORRESPONDING FIELDS OF table lt_CDPOS_obj
+***       FOR ALL ENTRIES IN lt_OBJECT_Key
+***       where OBJECTCLAS = lt_OBJECT_Key-OBJECTCLAS
+***         and OBJECTID   = lt_OBJECT_Key-OBJECTID
+***         and TABNAME  = 'VBEP'    "    in ( 'VBAP' , 'VBEP' )
+***          and FNAME = 'LDDAT'       "  in ('ABGRU' , 'MENGE' , 'EDATU')
+***         .  " and CHNGIND    = 'U'.
+    CLEAR: LT_OPTIONS[], LT_DATA_RFC[], LT_TABLES_LIST[], LT_SEL_FIELDS[], LT_OUTPUT_FIELDS[],
+           LT_DFIES[], LT_RETURN[], LT_OUT_WHERE_COND[].
+    REFRESH: LT_ALL_ENTRIES_TAB, LT_ALL_ENTRIES_COND, LT_ALL_ENTRIES_DFIES.
+* Table List
+    REFRESH LT_TABLES_LIST[].
+    _APPEND_TABLES_LIST 'CDPOS' '' ''.
+* Join condition
+    REFRESH LT_JOIN_CONDITION[].
+    _ALL_ENTRIES_CONDITION 'OBJECTCLAS' 'OBJECTCLAS' ''.
+    _ALL_ENTRIES_CONDITION 'OBJECTID' 'OBJECTID' ''.
+* Selection Fields
+    REFRESH LT_SEL_FIELDS[].
+    _ADAPT_SEL_FIELDS 'CDPOS' 'CDPOS'  LT_SEL_FIELDS LV_SW_DEST.
+* Select's Condition
+    LT_OPTIONS[] = LT_OUT_WHERE_COND.
+    CLEAR LS_OPTIONS.
+    LS_OPTIONS-TEXT = '( TABNAME  =  ''VBEP'' )'.
+    APPEND LS_OPTIONS TO LT_OPTIONS.
+    "ls_options-text = '( FNAME = ''LDDAT'' )'.
+    CONCATENATE  '''' LV_DATE_REF_FLD ''''  INTO LS_OPTIONS-TEXT.
+    CONCATENATE  '( FNAME = ' LS_OPTIONS-TEXT ' )'  INTO LS_OPTIONS-TEXT SEPARATED BY SPACE.
+    CONCATENATE 'AND' LS_OPTIONS-TEXT INTO LS_OPTIONS-TEXT SEPARATED BY SPACE.
+    APPEND LS_OPTIONS TO LT_OPTIONS.
+*    Convert lt_CDHDR to string table
+    _ALL_ENTRIES_CONVERT  LT_OBJECT_KEY  'CDPOS'  7.
+*   'For All Entries' Fields
+    CALL FUNCTION 'DDIF_FIELDINFO_GET'
+      EXPORTING
+        TABNAME        = 'CDPOS'
+      TABLES
+        DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+      EXCEPTIONS
+        NOT_FOUND      = 1
+        INTERNAL_ERROR = 2
+        OTHERS         = 3.
+    IF SY-SUBRC NE 0.
+      CLEAR LT_ALL_ENTRIES_DFIES[].
+    ENDIF.
+    CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+      DESTINATION LV_SW_DEST
+      TABLES
+        OPTIONS              = LT_OPTIONS[]
+        DATA                 = LT_DATA_RFC[]
+        TABLES_LIST          = LT_TABLES_LIST[]
+        SEL_FIELDS           = LT_SEL_FIELDS[]
+        OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+        DFIES                = LT_DFIES[]
+        RETURN               = LT_RETURN[]
+        ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+        ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+        ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+      EXCEPTIONS
+        TABLE_NOT_AVAILABLE  = 1
+        TABLE_WITHOUT_DATA   = 2
+        OPTION_NOT_VALID     = 3
+        FIELD_NOT_VALID      = 4
+        NOT_AUTHORIZED       = 5
+        DATA_BUFFER_EXCEEDED = 6
+        OTHERS               = 7.
+    IF SY-SUBRC <> 0 .
+      CLEAR LT_DATA_RFC[].
+    ELSE.
+      _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_CDPOS_OBJ  LT_OUTPUT_FIELDS 7.
+    ENDIF.
+    SORT LT_CDPOS_OBJ BY TABKEY TABNAME FNAME CHANGENR.
+    DELETE ADJACENT DUPLICATES FROM LT_CDPOS_OBJ COMPARING TABKEY TABNAME FNAME.
+    SORT LT_CDPOS_OBJ BY TABKEY TABNAME FNAME.
+  ENDIF.
+  "==> 7  Complete First Date (from VBEP) if no change detected
+  "==> 8  Prepare Key
+  DATA: BEGIN OF LS_CHANGED_KEY.
+          INCLUDE STRUCTURE CDPOS.
+  DATA:   VBELN  TYPE VBELN_VA,
+          POSNR  TYPE POSNR_VA,
+          ETENR  TYPE ETENR,
+        END OF LS_CHANGED_KEY.
+  DATA:  LT_CHANGED_KEY LIKE TABLE OF LS_CHANGED_KEY.
+  DATA: BEGIN OF LS_KEY,
+          MANDT  TYPE MANDT,
+          VBELN  TYPE VBELN_VA,
+          POSNR  TYPE POSNR_VA,
+          ETENR  TYPE ETENR,
+        END OF LS_KEY.
+  DATA: LT_KEY LIKE TABLE OF LS_KEY.
+  LOOP AT LT_CDPOS INTO LS_CDPOS.
+    MOVE-CORRESPONDING LS_CDPOS TO LS_CHANGED_KEY.
+    LS_KEY = LS_CDPOS-TABKEY.
+    MOVE-CORRESPONDING LS_KEY TO LS_CHANGED_KEY.
+    APPEND LS_CHANGED_KEY TO LT_CHANGED_KEY.
+    APPEND LS_KEY TO LT_KEY.
+  ENDLOOP.
+  "==> 9  Get SD Documents (VBAK/VBAP/VBEP) --> Only requiered fields
+  DATA: LS_VBAK TYPE VBAK,    " To bechanged
+        LT_VBAK LIKE TABLE OF LS_VBAK.
+  DATA: BEGIN OF LS_VBAK_KEY,
+          VBELN  TYPE VBELN_VA,
+        END OF LS_VBAK_KEY.
+  DATA: LT_VBAK_KEY LIKE TABLE OF LS_VBAK_KEY.
+  "data: ls_VBAP type VBAP,    " To bechanged
+  DATA: BEGIN OF LS_VBAP.
+          INCLUDE STRUCTURE VBAP.
+  """ data: YLDDAT type DATUM,
+      DATA YAUGRU TYPE AUGRU.
+  DATA:      END OF LS_VBAP.
+  DATA: LT_VBAP LIKE TABLE OF LS_VBAP.
+  DATA: BEGIN OF LS_VBAP_KEY,
+          VBELN  TYPE VBELN_VA,
+          POSNR  TYPE POSNR_VA,
+        END OF LS_VBAP_KEY.
+  DATA: LT_VBAP_KEY LIKE TABLE OF LS_VBAP_KEY.
+  DATA: LS_VBEP TYPE VBEP,    " To bechanged
+        LT_VBEP LIKE TABLE OF LS_VBEP,
+        LS_VBEP_TMP TYPE VBEP.
+  DATA: VBEP_TABIX LIKE SY-TABIX.
+  DATA: BEGIN OF LS_VBEP_KEY,
+          VBELN  TYPE VBELN_VA,
+          POSNR  TYPE POSNR_VA,
+          ETENR  TYPE ETENR,
+        END OF LS_VBEP_KEY.
+  DATA: LT_VBEP_KEY LIKE TABLE OF LS_VBEP_KEY.
+  REFRESH: LT_VBAK_KEY, LT_VBAP_KEY, LT_VBEP_KEY.
+  DELETE LT_KEY WHERE VBELN NOT IN R_VBELN.
+  LOOP AT LT_KEY INTO LS_KEY.
+    MOVE-CORRESPONDING LS_KEY TO LS_VBAK_KEY.
+    APPEND LS_VBAK_KEY TO LT_VBAK_KEY.
+    "--
+    MOVE-CORRESPONDING LS_KEY TO LS_VBAP_KEY.
+    APPEND LS_VBAP_KEY TO LT_VBAP_KEY.
+    "--
+    MOVE-CORRESPONDING LS_KEY TO LS_VBEP_KEY.
+    APPEND LS_VBEP_KEY TO LT_VBEP_KEY.
+  ENDLOOP.
+  SORT LT_VBAK_KEY.
+  DELETE ADJACENT DUPLICATES FROM LT_VBAK_KEY.
+  SORT LT_VBAP_KEY.
+  DELETE ADJACENT DUPLICATES FROM LT_VBAP_KEY.
+  SORT LT_VBEP_KEY.
+  DELETE ADJACENT DUPLICATES FROM LT_VBEP_KEY.
+  CHECK LT_VBAK_KEY[] IS NOT INITIAL. "!!!
+***  select *
+***    from VBAK
+***    into CORRESPONDING FIELDS OF table lt_VBAK
+***    FOR ALL ENTRIES IN lt_VBAK_Key
+***    where VBELN = lt_VBAK_Key-VBELN.
+  CLEAR: LT_OPTIONS[], LT_DATA_RFC[], LT_TABLES_LIST[], LT_SEL_FIELDS[], LT_OUTPUT_FIELDS[],
+         LT_DFIES[], LT_RETURN[], LT_OUT_WHERE_COND[].
+* Table List
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'VBAK' '' ''.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+  REFRESH LT_ALL_ENTRIES_COND.
+  _ALL_ENTRIES_CONDITION 'VBELN' 'VBELN' ''.
+* Selection Fields
+  REFRESH LT_SEL_FIELDS[].
+  _ADAPT_SEL_FIELDS 'VBAK' 'VBAK'  LT_SEL_FIELDS LV_SW_DEST.
+  "_adapt_sel_fields 'VBAK' '/SKN/S_SW_10_01_ORD_CHNG'  lt_sel_fields lv_sw_dest.
+* Select's Condition
+*    Convert lt_CDHDR to string table
+  _ALL_ENTRIES_CONVERT  LT_VBAK_KEY  'VBAK'  3.
+*   'For All Entries' Fields
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      TABNAME        = 'VBAK'
+    TABLES
+      DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+    EXCEPTIONS
+      NOT_FOUND      = 1
+      INTERNAL_ERROR = 2
+      OTHERS         = 3.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_ALL_ENTRIES_DFIES[].
+  ENDIF.
+  "--- Take Key Only
+  DELETE LT_ALL_ENTRIES_DFIES WHERE KEYFLAG IS INITIAL.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTIONS[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+      ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+      ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+      ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0 .
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_VBAK LT_OUTPUT_FIELDS 3.
+  ENDIF.
+  DELETE LT_VBAK WHERE KUNNR NOT IN R_KUNNR.
+  DELETE LT_VBAK WHERE VBELN NOT IN R_VBELN.
+  DELETE LT_VBAK WHERE VKORG NOT IN R_VKORG.
+  DELETE LT_VBAK WHERE VTWEG NOT IN R_VTWEG.
+  DELETE LT_VBAK WHERE SPART NOT IN R_SPART.
+  DELETE LT_VBAK WHERE VBTYP NOT IN R_VBTYP.
+  DELETE LT_VBAK WHERE AUART NOT IN R_AUART.
+  SORT LT_VBAK BY VBELN.
+  "--- Remove unused Docs
+  REFRESH R_VBELN_FLT.
+  LOOP AT LT_VBAK INTO LS_VBAK.
+    RS_VBELN_FLT-SIGN = 'I'.
+    RS_VBELN_FLT-OPTION = 'EQ'.
+    RS_VBELN_FLT-LOW = LS_VBAK-VBELN.
+    APPEND RS_VBELN_FLT TO R_VBELN_FLT.
+  ENDLOOP.
+  DELETE LT_VBAP_KEY WHERE VBELN NOT IN R_VBELN_FLT.
+  "--- Remove unused Docs
+***  select *
+***    from VBAP
+***    into CORRESPONDING FIELDS OF table lt_VBAP
+***    FOR ALL ENTRIES IN lt_VBAP_Key
+***    where VBELN = lt_VBAP_Key-VBELN
+***      and POSNR = lt_VBAP_Key-POSNR.
+  CLEAR: LT_OPTIONS[], LT_DATA_RFC[], LT_TABLES_LIST[], LT_SEL_FIELDS[], LT_OUTPUT_FIELDS[],
+         LT_DFIES[], LT_RETURN[], LT_OUT_WHERE_COND[].
+* Table List
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'VBAP' '' ''.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+  REFRESH LT_ALL_ENTRIES_COND.
+  _ALL_ENTRIES_CONDITION 'VBELN' 'VBELN' ''.
+  _ALL_ENTRIES_CONDITION 'POSNR' 'POSNR' ''.
+* Selection Fields
+  REFRESH LT_SEL_FIELDS[].
+  "_adapt_sel_fields 'VBAP' 'VBAP'  lt_sel_fields lv_sw_dest.
+  _ADAPT_SEL_FIELDS 'VBAP' '/SKN/S_SW_10_01_ORD_CHNG'  LT_SEL_FIELDS LV_SW_DEST.
+* Select's Condition
+*    Convert lt_VBAK_Key to string table
+  _ALL_ENTRIES_CONVERT  LT_VBAP_KEY  'VBAP'  4.
+*   'For All Entries' Fields
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      TABNAME        = 'VBAP'
+    TABLES
+      DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+    EXCEPTIONS
+      NOT_FOUND      = 1
+      INTERNAL_ERROR = 2
+      OTHERS         = 3.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_ALL_ENTRIES_DFIES[].
+  ENDIF.
+  "--- Take Key Only
+  DELETE LT_ALL_ENTRIES_DFIES WHERE KEYFLAG IS INITIAL.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTIONS[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+      ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+      ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+      ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0 .
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_VBAP LT_OUTPUT_FIELDS 4.
+  ENDIF.
+  SORT LT_VBAP BY VBELN POSNR.
+***  select *
+***    from VBEP
+***    into CORRESPONDING FIELDS OF table lt_VBEP
+***    FOR ALL ENTRIES IN lt_VBEP_Key
+***    where VBELN = lt_VBEP_Key-VBELN
+***      and POSNR = lt_VBEP_Key-POSNR
+***      """and ETENR  = lt_VBEP_Key-ETENR.
+  "--- Remove unused Docs
+  DELETE LT_VBEP_KEY WHERE VBELN NOT IN R_VBELN_FLT.
+  "--- Remove unused Docs
+  CLEAR: LT_OPTIONS[], LT_DATA_RFC[], LT_TABLES_LIST[], LT_SEL_FIELDS[], LT_OUTPUT_FIELDS[],
+         LT_DFIES[], LT_RETURN[], LT_OUT_WHERE_COND[].
+* Table List
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'VBEP' '' ''.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+  REFRESH LT_ALL_ENTRIES_COND.
+  _ALL_ENTRIES_CONDITION 'VBELN' 'VBELN' ''.
+  _ALL_ENTRIES_CONDITION 'POSNR' 'POSNR' ''.
+  """"_all_entries_condition 'ETENR' 'ETENR' ''.
+* Selection Fields
+  REFRESH LT_SEL_FIELDS[].
+  _ADAPT_SEL_FIELDS 'VBEP' 'VBEP'  LT_SEL_FIELDS LV_SW_DEST.
+  "_adapt_sel_fields 'VBEP' '/SKN/S_SW_10_01_ORD_CHNG'  lt_sel_fields lv_sw_dest.
+* Select's Condition
+*    Convert lt_VBAK_Key to string table
+  _ALL_ENTRIES_CONVERT  LT_VBEP_KEY  'VBEP'  5.
+*   'For All Entries' Fields
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      TABNAME        = 'VBEP'
+    TABLES
+      DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+    EXCEPTIONS
+      NOT_FOUND      = 1
+      INTERNAL_ERROR = 2
+      OTHERS         = 3.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_ALL_ENTRIES_DFIES[].
+  ENDIF.
+  "--- Take Key Only
+  DELETE LT_ALL_ENTRIES_DFIES WHERE KEYFLAG IS INITIAL.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTIONS[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+      ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+      ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+      ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0 .
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_VBEP LT_OUTPUT_FIELDS 5.
+  ENDIF.
+  SORT LT_VBEP BY VBELN POSNR ETENR.
+  "==> 10  Prepare Calculations
+  REFRESH LT_DATA.
+  LOOP AT LT_CHANGED_KEY INTO LS_CHANGED_KEY.
+    CLEAR LS_DATA.
+    MOVE-CORRESPONDING LS_CHANGED_KEY TO LS_DATA.
+    "--- Set CHNG_TYP
+    CASE LS_CHANGED_KEY-FNAME.
+      WHEN 'ABGRU'.
+        LS_DATA-CHNG_TYP = 'C'.
+      WHEN 'WMENG'.
+        LS_DATA-CHNG_TYP = 'Q'.
+      WHEN 'BMENG'.
+        LS_DATA-CHNG_TYP = 'Q'.
+        CONTINUE .  "!!!
+      WHEN 'EDATU'.
+        IF LS_CHANGED_KEY-VALUE_NEW > LS_CHANGED_KEY-VALUE_OLD.
+          LS_DATA-CHNG_TYP = 'D'.
+        ELSE.
+          LS_DATA-CHNG_TYP = 'A'.
+        ENDIF.
+      WHEN OTHERS.
+    ENDCASE.
+    CLEAR LS_VBEP.
+    CLEAR VBEP_TABIX.
+    IF LS_CHANGED_KEY-ETENR > 0.
+      READ TABLE LT_VBEP INTO LS_VBEP
+                         WITH KEY VBELN  = LS_CHANGED_KEY-VBELN
+                                  POSNR  = LS_CHANGED_KEY-POSNR
+                                  ETENR  = LS_CHANGED_KEY-ETENR
+                         BINARY SEARCH.
+      IF SY-SUBRC IS INITIAL.
+        VBEP_TABIX = SY-TABIX.
+      ENDIF.
+    ELSE.  " Cancelletion (no Scheduling Line)
+      READ TABLE LT_VBEP INTO LS_VBEP
+                         WITH KEY VBELN  = LS_CHANGED_KEY-VBELN
+                                  POSNR  = LS_CHANGED_KEY-POSNR
+                         BINARY SEARCH.
+      IF SY-SUBRC IS INITIAL.
+        LOOP AT LT_VBEP INTO LS_VBEP FROM SY-TABIX
+                        WHERE VBELN = LS_CHANGED_KEY-VBELN
+                          AND POSNR = LS_CHANGED_KEY-POSNR.
+          IF LS_VBEP-WMENG <> 0.
+            VBEP_TABIX = SY-TABIX.
+            " Complete the TABKEY !!!
+            LV_TABKEY = LS_CHANGED_KEY-TABKEY.
+            LV_TABKEY+19 = LS_VBEP-ETENR.
+            LS_CHANGED_KEY-TABKEY = LV_TABKEY.
+            EXIT.
+          ENDIF.
+        ENDLOOP.
+      ENDIF.
+    ENDIF.
+    CLEAR LS_CDHDR.
+    READ TABLE LT_CDHDR INTO LS_CDHDR
+                       WITH KEY OBJECTCLAS  = LS_CHANGED_KEY-OBJECTCLAS
+                                OBJECTID    = LS_CHANGED_KEY-OBJECTID
+                                CHANGENR    = LS_CHANGED_KEY-CHANGENR
+                       BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      MOVE-CORRESPONDING LS_CDHDR TO LS_DATA.
+    ENDIF.
+    CLEAR LS_VBAP.
+    READ TABLE LT_VBAP INTO LS_VBAP
+                       WITH KEY VBELN  = LS_CHANGED_KEY-VBELN
+                                POSNR  = LS_CHANGED_KEY-POSNR
+                       BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      MOVE-CORRESPONDING LS_VBAP TO LS_DATA.
+    ENDIF.
+    CLEAR LS_VBAK.
+    READ TABLE LT_VBAK INTO LS_VBAK
+                       WITH KEY VBELN  = LS_CHANGED_KEY-VBELN
+                       BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      MOVE-CORRESPONDING LS_VBAK TO LS_DATA.
+    ENDIF.
+    IF LS_VBEP IS NOT INITIAL.
+      MOVE-CORRESPONDING LS_VBEP TO LS_DATA.
+    ENDIF.
+    "--- Set ref Date
+    "ls_data-REF_DATE = ls_VBEP-LDDAT.   " !!!
+    CONCATENATE 'ls_VBEP-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    IF  IS ASSIGNED.
+      LS_DATA-REF_DATE =  .
+      LS_DATA-REF_DATE_ORG =  .
+    ENDIF.
+    "--- Correct VBEP atttributes id it was substituted
+    CLEAR IS_SUBST.
+    IF VBEP_TABIX > 1.
+      IF LS_VBEP-WMENG = 0.  " Suuposed to substituted
+        "--- Take Ordered qty and ref date from the previous record
+        DO.
+          VBEP_TABIX = VBEP_TABIX - 1.
+          READ TABLE LT_VBEP INTO LS_VBEP_TMP INDEX VBEP_TABIX.
+          IF LS_VBEP_TMP-VBELN = LS_VBEP-VBELN AND
+             LS_VBEP_TMP-POSNR = LS_VBEP-POSNR AND
+             LS_VBEP_TMP-WMENG > 0.
+            MOVE LS_VBEP_TMP-WMENG TO LS_DATA-WMENG.
+            CONCATENATE 'ls_VBEP_tmp-' LV_DATE_REF_FLD INTO FLD .
+            ASSIGN (FLD) TO .
+            IF  IS ASSIGNED.
+              LS_DATA-REF_DATE =  .
+            ENDIF.
+            IS_SUBST = 'X'.
+            LV_TABKEY = LS_CHANGED_KEY-TABKEY.
+            LV_TABKEY+19 = LS_VBEP_TMP-ETENR.
+            EXIT.
+          ELSE.
+            EXIT.
+          ENDIF.
+        ENDDO.
+      ENDIF.
+    ENDIF.
+    "-- Get the Change log oroginal value.
+    IF IS_SUBST IS INITIAL.
+      LV_TABKEY = LS_CHANGED_KEY-TABKEY.
+    ENDIF.
+    READ TABLE LT_CDPOS_OBJ INTO LS_CDPOS
+                             WITH KEY TABKEY = LV_TABKEY    "ls_Changed_Key-TABKEY
+                                     TABNAME = 'VBEP'   "ls_Changed_Key-TABNAME
+                                     FNAME   =  LV_DATE_REF_FLD   "  'LDDAT'        "ls_Changed_Key-FNAME
+                             BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      LS_DATA-REF_DATE = LS_CDPOS-VALUE_OLD.
+    ENDIF.
+    APPEND LS_DATA TO LT_DATA.
+  ENDLOOP.
+  DELETE LT_DATA WHERE CHNG_TYP NOT IN R_CHNG_TYP.
+***  loop at lt_VBEP into ls_VBEP.
+***
+***    read table lt_VBAP into ls_VBAP
+***                       with key VBELN  = ls_VBEP-VBELN
+***                                POSNR  = ls_VBEP-POSNR
+***                       BINARY SEARCH.
+***    if sy-subrc is initial.
+***      move-CORRESPONDING ls_VBAP to ls_data.
+***    endif.
+***    read table lt_VBAK into ls_VBAK
+***                       with key VBELN  = ls_VBEP-VBELN
+***                       BINARY SEARCH.
+***    if sy-subrc is initial.
+***      move-CORRESPONDING ls_VBAK to ls_data.
+***    endif.
+***    move-CORRESPONDING ls_VBEP to ls_data.
+***    "--- Set ref Date
+***    ls_data-REF_DATE = ls_VBEP-LDDAT.   " !!!
+***    append ls_data to lt_data.
+***  endloop.
+  LOOP AT LT_DATA INTO LS_DATA .
+    SY_TABIX = SY-TABIX .
+    LS_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+    CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+      EXPORTING
+        D_FROM      = LS_DATA-UDATE
+        T_FROM      = SY-UZEIT
+        D_TO        = LS_DATA-REF_DATE
+        T_TO        = SY-UZEIT
+        TIME_UNIT   = LV_DURATION_UNIT  "'D'
+      IMPORTING
+        TIME_DIFF   = TIME_DIFF
+      EXCEPTIONS
+        WRONG_VALUE = 1
+        OTHERS      = 2.
+    IF SY-SUBRC = 0.
+      IF TIME_DIFF < '999999'.
+        LS_DATA-DURATION  = TIME_DIFF .
+      ELSE.
+        LS_DATA-DURATION  = '999999'.
+      ENDIF.
+    ENDIF.
+    MODIFY LT_DATA FROM LS_DATA  INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE LT_DATA WHERE KUNNR NOT IN R_KUNNR.
+  DELETE LT_DATA WHERE VBELN NOT IN R_VBELN.
+  DELETE LT_DATA WHERE VKORG NOT IN R_VKORG.
+  DELETE LT_DATA WHERE VTWEG NOT IN R_VTWEG.
+  DELETE LT_DATA WHERE SPART NOT IN R_SPART.
+  DELETE LT_DATA WHERE VBTYP NOT IN R_VBTYP.
+  DELETE LT_DATA WHERE AUART NOT IN R_AUART.
+  DELETE LT_DATA WHERE MATNR NOT IN R_MATNR.
+  DELETE LT_DATA WHERE WERKS NOT IN R_WERKS.
+  DELETE LT_DATA WHERE MATNR IS INITIAL.
+  "==> 10  Get Material Attr
+  DATA: BEGIN OF LS_MAT_PLANT,
+           MATNR TYPE MATNR,
+           WERKS TYPE WERKS_D,
+           IS_IMPORTED TYPE CHAR1,
+          END OF LS_MAT_PLANT.
+  DATA: LT_MAT_PLANT LIKE TABLE OF LS_MAT_PLANT.
+  DATA: LV_IS_IMPORTED TYPE CHAR1,
+        LV_IMPORTED_TYP TYPE CHAR1.
+  DATA: LV_FM LIKE  RS38L-NAME,
+        LV_FM_IS_EXIST TYPE CHAR1.
+  LOOP AT LT_VBAP INTO LS_VBAP.
+    MOVE-CORRESPONDING LS_VBAP TO LS_MAT_PLANT.
+    APPEND LS_MAT_PLANT TO LT_MAT_PLANT.
+  ENDLOOP.
+  SORT LT_MAT_PLANT BY MATNR WERKS.
+  DELETE ADJACENT DUPLICATES FROM LT_MAT_PLANT.
+  "-- Calculate Material Attributes
+  IF LV_CHECK_IMPORTED IS NOT INITIAL .
+    LV_FM = '/SKN/F_SW_200005_IS_IMP_COMP'.  "!!!!!
+    LV_FM_IS_EXIST = 'X'.
+    CALL FUNCTION 'FUNCTION_EXISTS'
+      EXPORTING
+        FUNCNAME              = LV_FM
+***     IMPORTING
+***       GROUP                    = GROUP
+***       INCLUDE                  = INCLUDE
+***       NAMESPACE                = NAMESPACE
+***       STR_AREA                 = STR_AREA
+      EXCEPTIONS
+        FUNCTION_NOT_EXIST    = 1
+        COMMUNICATION_FAILURE = 11
+        SYSTEM_FAILURE        = 12
+        OTHERS                = 9.
+    IF SY-SUBRC <> 0.
+      CLEAR LV_FM_IS_EXIST.
+    ENDIF.
+    IF LV_FM_IS_EXIST IS NOT INITIAL.
+      LOOP AT LT_MAT_PLANT INTO LS_MAT_PLANT.
+        SY_TABIX = SY-TABIX.
+        CLEAR LV_IS_IMPORTED.
+        "--- Call FM for MAT, Plant
+        CALL FUNCTION LV_FM     """   '/SKN/F_SW_200005_IS_IMP_COMP'
+          EXPORTING
+            SW_DEST               = LV_SW_DEST
+            MATNR                 = LS_MAT_PLANT-MATNR
+            WERKS                 = LS_MAT_PLANT-WERKS
+          IMPORTING
+            IS_IMPORTED           = LV_IS_IMPORTED
+          EXCEPTIONS
+            WRONG_PARAMETERS      = 1
+            MISSING_AUTHORIZATION = 2
+            OTHERS                = 3.
+        IF SY-SUBRC <> 0.
+        ENDIF.
+        LS_MAT_PLANT-IS_IMPORTED = LV_IS_IMPORTED.
+        MODIFY LT_MAT_PLANT FROM LS_MAT_PLANT INDEX SY_TABIX..
+      ENDLOOP.
+    ENDIF.
+  ENDIF.
+  "--- Calculate PERIOD_TYP
+  LOOP AT LT_DATA INTO LS_DATA .
+    SY_TABIX = SY-TABIX .
+    IF LS_DATA-DURATION < 0.
+      IF LS_DATA-CHNG_TYP =  'A' OR  LS_DATA-CHNG_TYP =  'D'.
+        LS_DATA-CHNG_TYP = 'L'.    "!!!
+      ENDIF.
+    ENDIF.
+    CLEAR LS_DATA-PERIOD_TYP.
+    LV_IMPORTED_TYP = '1'.
+    CLEAR LV_IS_IMPORTED.
+    READ TABLE LT_MAT_PLANT INTO LS_MAT_PLANT
+                            WITH KEY MATNR = LS_DATA-MATNR
+                                     WERKS = LS_DATA-WERKS
+                            BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      IF LS_MAT_PLANT-IS_IMPORTED IS NOT INITIAL.
+        LV_IMPORTED_TYP = '2'.
+      ENDIF.
+    ENDIF.
+    IF LV_IS_IMPORTED IS INITIAL.
+      CASE LS_DATA-CHNG_TYP.
+        WHEN 'C'.
+***        if ls_data-DURATION in R_FR_C1_PERIOD.
+***          ls_data-PERIOD_TYP = 'FR'.
+***        elseif ls_data-DURATION in R_SL_C1_PERIOD.
+***          ls_data-PERIOD_TYP = 'SL'.
+***        else.
+***        endif.
+          CALC_PERIOD_TYP C 1.
+        WHEN 'Q'.
+          CALC_PERIOD_TYP Q 1.
+        WHEN 'D'.
+          CALC_PERIOD_TYP D 1.
+        WHEN 'A'.
+          CALC_PERIOD_TYP A 1.
+        WHEN OTHERS.
+      ENDCASE.
+    ELSE.
+      CASE LS_DATA-CHNG_TYP.
+        WHEN 'C'.
+          CALC_PERIOD_TYP C 2.
+        WHEN 'Q'.
+          CALC_PERIOD_TYP Q 2.
+        WHEN 'D'.
+          CALC_PERIOD_TYP D 2.
+        WHEN 'A'.
+          CALC_PERIOD_TYP A 2.
+        WHEN OTHERS.
+      ENDCASE.
+    ENDIF.
+    LS_DATA-SL_PERIOD = LV_SL_PERIOD.
+    LS_DATA-FR_PERIOD = LV_FR_PERIOD.
+    LS_DATA-IMP_TYP = LV_IMPORTED_TYP.
+    MODIFY LT_DATA FROM LS_DATA  INDEX SY_TABIX.
+  ENDLOOP.
+  DELETE LT_DATA WHERE CHNG_TYP NOT IN R_CHNG_TYP.
+  DELETE LT_DATA WHERE PERIOD_TYP NOT IN R_PERIOD_TYP.
+  """delete t_data where DURATION  not in R_DURATION .
+******************************************************************************
+*  Get Descriptions
+************************************************************************
+  IF LV_DESC IS NOT INITIAL.
+    LOOP AT LT_DATA INTO LS_DATA .
+      SY_TABIX = SY-TABIX .
+      CALL FUNCTION '/SKN/FC_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR          = LS_DATA-KUNNR
+          SW_DEST        = LV_SW_DEST
+        IMPORTING
+          CUST_DESC      = LS_DATA-KUNNR_DESC
+          LAND1          = LS_DATA-LAND1
+        EXCEPTIONS
+          WRONG_CUSTOMER = 1
+          OTHERS         = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX.
+    ENDLOOP.
+    LOOP AT LT_DATA INTO LS_DATA .
+      SY_TABIX = SY-TABIX .
+      CALL FUNCTION '/SKN/FC_SW_10_MATERIAL_DESC'
+        EXPORTING
+          MATNR         = LS_DATA-MATNR
+          LANGU         = LV_LANGU
+          SW_DEST       = LV_SW_DEST
+        IMPORTING
+          MATERIAL_DESC = LS_DATA-MATERIAL_DESC
+        EXCEPTIONS
+          WRONG_CODE    = 1
+          OTHERS        = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      CALL FUNCTION '/SKN/FC_SW_10_PLANT_DESC'
+        EXPORTING
+          WERKS      = LS_DATA-WERKS
+          LANGU      = LV_LANGU
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          PLANT_DESC = LS_DATA-WERKS_DESC
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      CALL FUNCTION '/SKN/FC_SW_10_SALES_ORG_DESC'
+        EXPORTING
+          VKORG          = LS_DATA-VKORG
+          LANGU          = LV_LANGU
+          SW_DEST        = LV_SW_DEST
+        IMPORTING
+          SALES_ORG_DESC = LS_DATA-VKORG_DESC
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      PERFORM GET_CHNG_TYP_DESC USING LS_DATA-CHNG_TYP
+                                CHANGING LS_DATA-CHNG_TYP_DESC.
+      CALL FUNCTION '/SKN/F_SW_10_COUNTRY_DESC'
+        EXPORTING
+          LAND1      = LS_DATA-LAND1
+          LANGU      = LV_LANGU
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          LANDX      = LS_DATA-LAND_DESC
+*         NATIO      =
+*         LANDX50    =
+*         NATIO50    =
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      PERFORM GET_IMP_TYP_DESC USING LS_DATA-IMP_TYP
+                                CHANGING LS_DATA-IMP_TYP_DESC.
+      PERFORM GET_PERIOD_TYP_DESC USING LS_DATA-PERIOD_TYP
+                                    CHANGING LS_DATA-PERIOD_TYP_DESC.
+      CALL FUNCTION '/SKN/FC_SW_10_AUGRU_DESC'
+        EXPORTING
+          AUGRU            = LS_DATA-AUGRU
+          LANGU            = LV_LANGU
+          SW_DEST          = LV_SW_DEST
+        IMPORTING
+          AUGRU_DESC       = LS_DATA-AUGRU_DESC
+        EXCEPTIONS
+          WRONG_CODE       = 1
+          OTHERS           = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      CALL FUNCTION '/SKN/FC_SW_10_AUGRU_DESC'
+        EXPORTING
+          AUGRU            = LS_DATA-YAUGRU
+          LANGU            = LV_LANGU
+          SW_DEST          = LV_SW_DEST
+        IMPORTING
+          AUGRU_DESC       = LS_DATA-YAUGRU_DESC
+        EXCEPTIONS
+          WRONG_CODE       = 1
+          OTHERS           = 2.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+      MODIFY LT_DATA FROM LS_DATA INDEX SY_TABIX.
+    ENDLOOP.
+*MATERIAL_DESC
+  ENDIF.
+  T_DATA[] = LT_DATA[].
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

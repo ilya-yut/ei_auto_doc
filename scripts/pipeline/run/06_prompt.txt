@@ -163,21 +163,21 @@ Use the **Default Values** and **Practical Configuration Examples** subsections 
 
 ---
 
-**Unused parameters (pipeline analysis):** None. All interface parameters are used in code or appear on the output structure sheet.
+**Unused parameters (pipeline analysis — exclude from this section):** AS4POS, BUFLVL, BUFPOS, DOMNAM, STRING_SCAN, SYSNAM, TEXT. These parameters are documented in section 04 with **Not in use** and must not appear here.
 
 ## Inputs (provide below)
 
 **1. Output structure / fields file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Structure_SKN_S_SW_10_03_OPEN_PO_DET.xlsx
+C:\vibe code dev\ei_auto_doc\input\Structure_SKN_S_SW_01_01_SOURCE_SCAN.xlsx
 
 **2. Parameters (Name (Description)) file** (path or paste – Parameters sheet from Available fields Excel):
 
-C:\vibe code dev\ei_auto_doc\input\Available fields_SKN_S_SW_10_03_OPEN_PO_DET.xlsx
+C:\vibe code dev\ei_auto_doc\input\Available fields_SKN_S_SW_01_01_SOURCE_SCAN.xlsx
 
 **3. ABAP code file** (path or paste):
 
-C:\vibe code dev\ei_auto_doc\input\Code_SKN_S_SW_10_03_OPEN_PO_DET.txt
+C:\vibe code dev\ei_auto_doc\input\Code_SKN_S_SW_01_01_SOURCE_SCAN.txt
 
 **4. Additional code (called function)** (path or paste – only if this EI calls another FM whose source is provided):
 

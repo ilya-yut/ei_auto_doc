@@ -1244,7 +1244,7 @@ def _infer_forwdays_anchor_field_from_code(code: str) -> str | None:
 def _04_parameter_block_chunk_for_param(text04: str, param: str) -> str:
     """Body text under **PARAM** ... up to (but not including) the next **SomeName** heading line."""
     m = re.search(
-        rf"(?m)^\*\*{re.escape(param)}\*\*[^\n]*\n([\s\S]*?)(?=^\*\*[A-Za-z0-9_])",
+        rf"(?m)^\*\*{re.escape(param)}\*\*[^\n]*\n([\s\S]*?)(?=^\*\*(?!Not in use\*\*)[A-Za-z0-9_])",
         text04,
     )
     if m:
@@ -1287,6 +1287,7 @@ def _04_main_explanation_for_dictionary_compare(chunk: str, pname: str) -> str:
             text,
             flags=re.IGNORECASE,
         )
+        text = re.sub(r"(?m)^\*\*Not in use\*\*\s*$", "", text)
         return text.strip()
     if u == "FORWDAYS":
         for sent in (_FORWDAYS_WINDOW_SENTENCE_EN_DASH, _FORWDAYS_WINDOW_SENTENCE_ASCII_DASH):
@@ -1297,6 +1298,7 @@ def _04_main_explanation_for_dictionary_compare(chunk: str, pname: str) -> str:
             text,
             flags=re.IGNORECASE,
         )
+        text = re.sub(r"(?m)^\*\*Not in use\*\*\s*$", "", text)
         return text.strip()
     if u in ("USER_FLD", "USR_FLD"):
         if text.startswith(_USER_FLD_DRL_FIXED_MARKDOWN):

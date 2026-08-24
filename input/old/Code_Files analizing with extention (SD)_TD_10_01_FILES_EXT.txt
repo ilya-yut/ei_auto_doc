@@ -1,0 +1,180 @@
+FUNCTION ZSWF_TAD_10_01_FILES_EXT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  ZSWS_TAD_10_01_FILES_EXT OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: LANGU  LANGU.
+***             BACKDAYS INT4,
+***             DATE_REF_FLD NAME_FELD,
+***             DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+***
+***
+*** lv_BACKDAYS = 3.
+*** lv_DURATION_UNIT = 'D'.
+ LV_LANGU = SY-LANGU.
+***
+*** lv_DATE_REF_FLD = 'AEDAT'. "PO Creation
+ SELECT_SINGLE: LANGU.
+***                BACKDAYS,
+***                DATE_REF_FLD,
+***                DURATION_UNIT.
+***
+***
+***data_multy: FRGRL        FRGRL,
+***            EBELN        EBELN,
+***            BUKRS        BUKRS,
+***            BSTYP        EBSTYP,
+***            BSART        ESART,
+***            EKORG        EKORG,
+***            EKGRP        BKGRP,
+***            FRGGR        FRGGR,
+***            FRGSX        FRGSX,
+***            FRGCO        FRGCO,
+***
+***            LIFNR        ELIFN,
+***            RESWK        RESWK,
+***            ZTERM        DZTERM,
+***            ERNAM        ERNAM,
+***
+***            AEDAT        ERDAT,
+***            BEDAT        EBDAT,
+***
+***            WAERS        WAERS,
+***
+***            PROCSTAT    MEPROCSTATE,
+***
+***            DATUM        sy-datum,
+***
+***            DURATION    /SKN/E_SW_DURATION,
+***            PO_GRP_AMOUNT BPREI.
+***
+***select_multy:
+***            FRGRL,
+***            EBELN,
+***            BUKRS,
+***            BSTYP,
+***            BSART,
+***            EKORG,
+***            EKGRP,
+***            FRGGR,
+***            FRGSX,
+***            FRGCO,
+***
+***            LIFNR,
+***            RESWK,
+***            ZTERM,
+***            ERNAM,
+***
+***            AEDAT,
+***            BEDAT,
+***
+***            WAERS,
+***
+***            PROCSTAT,
+***            DATUM,
+***            DURATION,
+***            PO_GRP_AMOUNT.
+***
+***convert_multy: EBELN ALPHA,
+***               LIFNR ALPHA.
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA: LS_FILES TYPE /SKN/S_SW_01_04_FILES,
+      LT_FILES LIKE TABLE OF LS_FILES.
+DATA: LS_DATA LIKE LINE OF T_DATA.
+DATA: LV_VBELN TYPE VBELN_VF.
+DATA: LV_STR1 TYPE STRING,
+      LV_STR2 TYPE STRING.
+DATA: LV_FILE_NAME TYPE LOCALFILE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  REFRESH LT_FILES.
+  CALL FUNCTION '/SKN/F_SW_01_04_FILES'
+    IMPORTING
+      IS_ALERT       = IS_ALERT
+   TABLES
+     T_SELECT       = T_SELECT
+     T_DATA         = LT_FILES.
+  LOOP AT LT_FILES INTO LS_FILES.
+    MOVE-CORRESPONDING LS_FILES TO LS_DATA.
+    LV_FILE_NAME = LS_FILES-FILE_NAME.
+    SPLIT LV_FILE_NAME AT '.' INTO LV_STR1 LV_STR2.
+   " find FIRST OCCURRENCE OF '.' in lv_FILE_NAME.
+    LV_VBELN = LV_STR1.
+    CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+      EXPORTING
+        INPUT         = LV_VBELN
+      IMPORTING
+        OUTPUT        = LV_VBELN .
+   "-- Check VBRLN
+    LS_DATA-VBELN = LV_VBELN.
+    APPEND LS_DATA TO T_DATA.
+  ENDLOOP.
+*********************************************************************************
+***  "--- Check Release group - Release strategy combination
+***  loop at t_data .
+***    sy_tabix = sy-tabix .
+***    CALL FUNCTION '/SKN/F_SW_10_REL_GRP_STRT_CHK'
+***      EXPORTING
+****       FRGOT                   = '2'
+****       FRGCO                   =
+***        frggr                   = t_data-FRGGR
+***        FRGSX                   = t_data-FRGSX
+***      IMPORTING
+***        FRGCO                   = lv_FRGCO
+****       WA                      =
+***      TABLES
+***        T_FRGCO                 = R_FRGCO
+***      EXCEPTIONS
+***        WRONG_COMBINATION       = 1
+***        OTHERS                  = 2.
+***    IF sy-subrc <> 0.
+***      delete t_data index sy_tabix.
+***    ENDIF.
+***  endloop.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    SELECT SINGLE KONDA KUNRG KUNAG
+    FROM VBRK
+    INTO CORRESPONDING FIELDS OF  T_DATA
+    WHERE VBELN = T_DATA-VBELN.
+    IF SY-SUBRC <> 0.
+      CLEAR T_DATA-VBELN.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*---  GET Descriptions
+LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    IF T_DATA-KUNRG IS NOT INITIAL.
+         SELECT SINGLE NAME1
+         FROM KNA1
+         INTO T_DATA-KUNRG_DESC
+         WHERE KUNNR = T_DATA-KUNRG.
+    ENDIF.
+    IF T_DATA-KUNAG IS NOT INITIAL.
+         SELECT SINGLE NAME1
+         FROM KNA1
+         INTO T_DATA-KUNAG_DESC
+         WHERE KUNNR = T_DATA-KUNAG.
+    ENDIF.
+    IF T_DATA-KONDA IS NOT INITIAL.
+       SELECT SINGLE VTEXT
+         FROM T188T
+         INTO T_DATA-KONDA_DESC
+         WHERE KONDA = T_DATA-KONDA
+         AND SPRAS =  LV_LANGU.
+*
+    ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+ENDLOOP.
+*---
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

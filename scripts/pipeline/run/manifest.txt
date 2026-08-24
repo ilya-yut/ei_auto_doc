@@ -1,2 +1,2 @@
-output_basename=SKN_S_SW_10_03_OPEN_PO_DET
-title=Exception Indicator: Determine Open Purchase orders ( SW_10_03_OPEN_PO_DET)
+output_basename=SKN_S_SW_01_01_SOURCE_SCAN
+title=Exception Indicator: Scan ABAP Report Sources ( SW_01_01_SOURCE_SCAN)

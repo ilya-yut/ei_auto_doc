@@ -1,0 +1,1009 @@
+FUNCTION /SKN/F_SW_10_01_ORD_STAT_CHK .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_STAT_CHK OPTIONAL
+*"----------------------------------------------------------------------
+  INCLUDE /SKN/PC_SW_AI_TOP.
+  TYPES: BEGIN OF TY_WAERK,
+           WAERK  TYPE VBAP-WAERK,
+         END OF TY_WAERK,
+         TT_WAERK TYPE STANDARD TABLE OF TY_WAERK.
+  DATA_SINGLE: MANAGE_IN_UTC     CHAR1,
+               LANGU             LANGU,
+               BACKDAYS          INT4,
+               FORWDAYS          INT4,
+               BP1_FUNCT         PARVW,
+               BP2_FUNCT         PARVW,
+               BP3_FUNCT         PARVW,
+               DATE_REF_FLD      NAME_FELD,
+               DURATION_UNIT     /SKN/E_SW_DURATION_UNIT,
+               ITEM_DETAILS      CHAR1,
+               REF_TABNAME1      TABNAME,
+               REF_TABNAME2      TABNAME,
+               REF_FIELD1        NAME_FELD,
+               REF_FIELD2        NAME_FELD,
+               COMP_OPERATOR     BUCC_OPERATOR,
+               WAERK_FR          WAERK,
+               INC_NOT_CONV_CURR BOOLE_D.                  " ++ 06.10.20
+  LV_BACKDAYS      = 1.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU         = SY-LANGU.
+  LV_COMP_OPERATOR = '>'.
+  LV_WAERK_FR      = 'USD'.
+  """lv_DATE_REF_FLD = 'ERDAT'."Creation date   'AUDAT'. "Document Date (Date Received/Sent)
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 BACKDAYS,
+                 FORWDAYS,
+                 BP1_FUNCT,
+                 BP2_FUNCT,
+                 BP3_FUNCT,
+                 DATE_REF_FLD,
+                 DURATION_UNIT,
+                 ITEM_DETAILS,
+                 REF_TABNAME1,
+                 REF_TABNAME2,
+                 REF_FIELD1,
+                 REF_FIELD2,
+                 COMP_OPERATOR,
+                 WAERK_FR,
+                 INC_NOT_CONV_CURR.      " ++ 06.10.20
+  DATA_MULTY: KUNNR        VBAK-KUNNR,
+              VBELN        VBAK-VBELN,
+              VKORG        VBAK-VKORG,
+              VTWEG        VBAK-VTWEG,
+              VBTYP        VBTYP,
+              AUART        VBAK-AUART,
+              AUDAT        VBAK-AUDAT,
+              AEDAT        VBAK-AEDAT,
+              GUEBG        GUEBG,          " Valid-from date contract
+              GUEEN        GUEEN,          " Valid-to date contract
+              ANGDT        ANGDT_V,        " Valid-from date quatetion
+              BNDDT        BNDDT,          " Valid-to date quatetion
+              VDATU        VBAK-VDATU,     " Requested delivery date
+              ERNAM        VBAK-ERNAM,
+              DATUM        SY-DATUM,
+              DURATION    /SKN/E_SW_DURATION,
+*** VBUK
+              RFSTK        RFSTK,
+              RFGSK        RFGSK,
+              BESTK        BESTK,
+              LFSTK        LFSTK,
+              LFGSK        LKGSK,
+              FKSAK        FKSAK,
+              ABSTK        ABSTK,
+              GBSTK        GBSTK,
+              UVALS        UVVLS_SU,
+              UVVLS        UVVLS_SU,
+              UVFAS        UVFAK_SU,
+              UVALL        UVALL_UK,
+              UVVLK        UVVLK_UK,
+              UVFAK        UVFAK_UK,
+              UVPRS        UVPRS_UK,
+              CMPSA        CMPSA,
+              CMPSB        CMPSB,
+              CMPSD        CMPSD,
+              CMPSE        CMPSE,
+              CMPSF        CMPSF,
+              CMPSG        CMPSG,
+              CMPSH        CMPSH,
+              CMPSI        CMPSI,
+              CMPSJ        CMPSJ,
+              CMPSK        CMPSK,
+              CMPSL        CMPSL,
+              CMPS0        CMPS0,
+              CMGST        CMGST,
+              COSTA        COSTA_D,
+              SPSTG        SPSTG,
+              FSSTK        FSSTK,
+              LSSTK        LSSTK,
+              BLOCK        BLOCK_VB,
+              FKIVK        FKIVK,
+              TRSTA        TRSTA,
+              UVWAS        UVWAK_SU,
+              UVPAK        UVPAK_UK,
+              UVPIK        UVPIK_UK,
+              UVWAK        UVWAK_UK,
+              CMPSM        CMPSM,
+              DCSTK        DCSTK,
+              CMPS_CM      CMPS_CM,
+              CMPS_TE      CHAR1,
+              VKGRP        VKGRP,
+              VKBUR        VKBUR,
+              LIFSK        LIFSK,
+              FAKSK        FAKSK,
+              BP1_CODE     KUNNR,
+              BP2_CODE     KUNNR,
+              BP3_CODE     KUNNR,
+              BP_FUNCT     PARVW,
+*** VBUK
+**** VBAP
+              POSNR        POSNR_VA,
+              MATNR        VBAP-MATNR,
+              SPART        VBAP-SPART,
+              ERDAT        VBAP-ERDAT,
+              MPROK        VBAP-MPROK,
+              WAVWR        VBAP-WAVWR,
+              MATKL        VBAP-MATKL,
+              LFREL        LFREL_AP,
+              FKREL        VBAP-FKREL,
+              UEPOS        VBAP-UEPOS,
+              ABGRU        ABGRU_VA,
+              PRODH        PRODH_D,
+              KDMAT        MATNR_KU,
+              WERKS        WERKS_EXT,
+              VGTYP        VBTYP_V,
+**** VBAP
+              RESULT_COMP1 NETWR_AP,
+              RESULT_COMP2 NETWR_AP.
+  SELECT_MULTY: KUNNR,
+                VBELN,
+                VKORG,
+                VTWEG,
+                VBTYP,
+                AUART,
+                AUDAT,
+                AEDAT,
+                GUEBG,
+                GUEEN,
+                ANGDT,
+                BNDDT,
+                VDATU,
+                ERNAM,
+                DATUM,
+                DURATION,
+*** VBUK
+                RFSTK,
+                RFGSK,
+                BESTK,
+                LFSTK,
+                LFGSK,
+                FKSAK,
+                ABSTK,
+                GBSTK,
+                UVALS,
+                UVVLS,
+                UVFAS,
+                UVALL,
+                UVVLK,
+                UVFAK,
+                UVPRS,
+                CMPSA,
+                CMPSB,
+                CMPSD,
+                CMPSE,
+                CMPSF,
+                CMPSG,
+                CMPSH,
+                CMPSI,
+                CMPSJ,
+                CMPSK,
+                CMPSL,
+                CMPS0,
+                CMGST,
+                COSTA,
+                SPSTG,
+                FSSTK,
+                LSSTK,
+                BLOCK,
+                FKIVK,
+                TRSTA,
+                UVWAS,
+                UVPAK,
+                UVPIK,
+                UVWAK,
+                CMPSM,
+                DCSTK,
+                VKGRP,
+                VKBUR,
+                CMPS_CM,
+                CMPS_TE,
+                LIFSK,
+                FAKSK,
+*** VBUK
+*** VBAP
+                POSNR,
+                MATNR,
+                SPART,
+                ERDAT,
+                MPROK,
+                WAVWR,
+                MATKL,
+                LFREL,
+                FKREL,
+                UEPOS,
+                ABGRU,
+                PRODH,
+                KDMAT,
+                WERKS,
+                VGTYP,
+*** VBAP
+                BP1_CODE,
+                BP2_CODE,
+                BP3_CODE,
+                RESULT_COMP1,
+                RESULT_COMP2.
+  CONVERT_MULTY: KUNNR    ALPHA,
+                 VBELN    ALPHA,
+                 BP1_CODE ALPHA,
+                 BP2_CODE ALPHA,
+                 BP3_CODE ALPHA,
+                 MATNR    MATN1,
+                 AUART    AUART.
+  CONVERT_SINGLE:  BP1_FUNCT PARVW,
+                   BP2_FUNCT PARVW,
+                   BP3_FUNCT PARVW.
+  DATA: FLD_NAME TYPE FIELDNAME.
+  DATA: I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA: BACKDAYS  TYPE I ,
+        FORWDAYS TYPE I,
+        DATE_FROM LIKE SY-DATUM,
+        DATE_TO LIKE SY-DATUM .
+  DATA: LANGU LIKE SY-LANGU .
+  DATA: IS_OUT(1) TYPE C.
+  DATA: TIME_DIFF TYPE  INT4 .
+  DATA : W_DATA LIKE LINE OF T_DATA .
+  DATA : WA_VBPA TYPE VBPA.
+  DATA : LV_VBELN      TYPE VBELN,
+         LV_POSNR      TYPE POSNR,
+         LV_PARVW      TYPE PARVW,
+         LV_KUNNR      TYPE KUNNR,
+         LV_KUNNR_NAME TYPE NAME1_GP,
+         LV_LIFNR      TYPE LIFNR,
+         LV_LIFNR_NAME TYPE NAME1_GP,
+         LV_PERNR      TYPE PERNR_D,
+         LV_PERNR_NAME TYPE NAME1_GP,
+         LV_NRART      TYPE NRART,
+         LV_VBTYP      TYPE VBTYP,
+         LV_FROM1      TYPE STRING,
+         LV_FROM2      TYPE STRING,
+         LV_COND       TYPE STRING,
+         LV_FROM       TYPE STRING,
+         LV_QUERY_CURR TYPE STRING,
+         LV_QUERY1     TYPE /SKN/E_SW_ALIAS,
+         LV_QUERY2     TYPE /SKN/E_SW_ALIAS,
+         LV_QUERY      TYPE STRING,
+         LV_TEXT1      TYPE STRING,
+         LV_TEXT2      TYPE STRING,
+         LV_ALIAS1     TYPE /SKN/E_SW_ALIAS,
+         LV_ALIAS2     TYPE /SKN/E_SW_ALIAS,
+         LV_ALIAS_CURR TYPE /SKN/E_SW_ALIAS,
+         LV_SUBRC      TYPE SYSUBRC,
+         LV_NOT_CONV   TYPE CHAR1,
+         LV_EXIT       TYPE BOOLE_D,
+         LV_OPEN       TYPE BOOLE_D,
+         LV_RATE       TYPE UKURS_CURR,
+         LV_TOTAL_SPEC TYPE VBAP-NETWR.
+  DATA: LT_OPTION         TYPE TABLE OF RFC_DB_OPT,
+        LT_OUT_WHERE_COND TYPE TABLE OF /SKN/S_SW_WHERE_TAB,
+        LT_IN_RANGE	      TYPE TABLE OF /SKN/S_SW_RANGE_TAB,
+        LT_SEL_FIELDS     TYPE /SKN/TT_SEL_FIELDS.
+  DATA: LWA_OUT_WHERE_COND LIKE LINE OF LT_OUT_WHERE_COND,
+        LWA_IN_RANGE       LIKE LINE OF LT_IN_RANGE,
+        LS_OPTION          LIKE LINE OF LT_OPTION,
+        LS_SEL_FIELDS      LIKE LINE OF LT_SEL_FIELDS.
+*  DATA: rt_netwr TYPE tt_range_netwr,
+*        rs_netwr TYPE ty_range_netwr.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+  DATA: LS_VBAK TYPE VBAK,
+        LT_VBAK LIKE TABLE OF LS_VBAK.
+  DATA: LS_DATA LIKE LINE OF T_DATA,
+        LT_DATA LIKE TABLE OF LS_DATA.
+  DATA: LS_WAERK TYPE TY_WAERK.
+  DATA: LT_WAERK TYPE TT_WAERK.
+  DATA: LS_DD03L TYPE DD03L.
+  DATA: LT_DD03L TYPE TABLE OF DD03L.
+  DATA: LV_DOMNAME      LIKE DD07V-DOMNAME,
+        LV_DOMVALUE     LIKE DD07V-DOMVALUE_L,
+        LV_DDTEXT       LIKE DD07V-DDTEXT,
+        LV_RESULT       TYPE NETWR_AP,
+        LV_TYPE1        TYPE DATATYPE_D,
+        LV_TYPE2        TYPE DATATYPE_D,
+        LV_FIELD1_EXIST TYPE BOOLE_D,
+        LV_FIELD2_EXIST TYPE BOOLE_D,
+        LV_SEL_VBAK     TYPE STRING,
+        LV_SEL_VBAP     TYPE STRING,
+        LV_SEL_CLAUSE   TYPE STRING,
+        LV_VAL          TYPE CHAR21,
+        LV_LINES        TYPE I,
+        LV_RESULT_TXT   TYPE STRING,
+        LV_WHILE        TYPE BOOLE_D,
+        LV_TABIX        TYPE SYTABIX,
+        LV_TABIX_WHILE  TYPE STRING,
+        LV_WAERK        TYPE WAERK,
+        LV_AMOUNT       TYPE VBAP-NETWR,
+        LV_AMOUNT_FR    LIKE VBAP-NETWR.
+  DATA: LR_DATA     TYPE REF TO DATA,
+        LR_DATATYPE TYPE REF TO CL_ABAP_DATADESCR.
+  FIELD-SYMBOLS: <FS_FIELD> TYPE ANY,
+                 <FS_AMOUNT> TYPE ANY,
+                 <FS_WAERK>  TYPE TY_WAERK.
+  FIELD-SYMBOLS: <FS_DATA>       LIKE LINE OF T_DATA[],
+                 <FS_AMOUNT_TAB> TYPE TABLE,
+                 <FS_AMOUNT_STR> TYPE ANY.
+  IF NOT LV_FORWDAYS IS INITIAL.
+    LV_BACKDAYS = LV_FORWDAYS * ( -1 ).
+  ENDIF.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  DATE_FROM = SY-DATUM.
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    DATE_FROM = RS_DATUM-LOW.
+    DATE_TO   = RS_DATUM-HIGH.
+    IF DATE_TO < DATE_FROM.
+      DATE_TO = DATE_FROM.
+    ENDIF.
+  ENDIF.
+  "--- Check Quatetion or Contracts types
+  IF LV_DATE_REF_FLD IS INITIAL.
+    READ TABLE R_VBTYP INTO RS_VBTYP INDEX 1.
+    IF SY-TFILL = 1. " the single record only
+      IF RS_VBTYP-OPTION = 'EQ'.
+        LV_VBTYP = RS_VBTYP-LOW.
+      ENDIF.
+    ENDIF.
+    IF LV_VBTYP = 'G'.
+      LV_DATE_REF_FLD = 'GUEBG'.
+    ELSEIF LV_VBTYP = 'B'.
+      LV_DATE_REF_FLD = 'ANGDT'.
+    ENDIF.
+  ENDIF.
+  "---
+  CASE LV_DATE_REF_FLD.
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+    WHEN 'AEDAT'.
+      R_AEDAT[] = R_DATUM[]. "Changed On
+    WHEN 'AUDAT'.
+      R_AUDAT[] = R_DATUM[]. "Document Date (Date Received/Sent)
+    WHEN 'VDATU'.
+      R_VDATU[] = R_DATUM[]. "Requested delivery date
+****************************************************************
+    WHEN 'GUEBG' OR 'GUEEN'.
+      RS_GUEBG-SIGN   = 'I' .
+      RS_GUEBG-OPTION = 'LE'.   "'LE' .
+      RS_GUEBG-LOW    = DATE_TO .
+      APPEND RS_GUEBG TO R_GUEBG.
+      RS_GUEEN-SIGN   = 'I' .
+      RS_GUEEN-OPTION = 'GE'.   "'GE' .
+      RS_GUEEN-LOW    = DATE_FROM .
+      APPEND RS_GUEEN TO R_GUEEN.
+    WHEN 'ANGDT' OR 'BNDDT'.
+      RS_ANGDT-SIGN   = 'I' .
+      RS_ANGDT-OPTION = 'LE'.    "'LE' .
+      RS_ANGDT-LOW    = DATE_TO .
+      APPEND RS_ANGDT TO R_ANGDT.
+      RS_BNDDT-SIGN   = 'I' .
+      RS_BNDDT-OPTION = 'GE' .   "'GE' .
+      RS_BNDDT-LOW    = DATE_FROM .
+      APPEND RS_BNDDT TO R_BNDDT.
+    WHEN OTHERS.
+      R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+      IF LV_DATE_REF_FLD IS INITIAL.
+        LV_DATE_REF_FLD = 'ERDAT'.
+      ENDIF.
+  ENDCASE.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_ORD_STAT_CHK'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+**** Get all Currencies type of documents from VBAK Table
+  IF LV_WAERK_FR IS NOT INITIAL AND
+      ( R_RESULT_COMP1[] IS NOT INITIAL OR R_RESULT_COMP2[] IS NOT INITIAL ).
+    REFRESH: LT_OUT_WHERE_COND.
+*** VBAP
+    _RANGE_TO_SEL_TABLE 'POSNR' POSNR.
+    _RANGE_TO_SEL_TABLE 'MATNR' MATNR.
+    _RANGE_TO_SEL_TABLE 'SPART' SPART.
+    _RANGE_TO_SEL_TABLE 'MATKL' MATKL.
+    _RANGE_TO_SEL_TABLE 'LFREL' LFREL.
+    _RANGE_TO_SEL_TABLE 'FKREL' FKREL.
+    _RANGE_TO_SEL_TABLE 'UEPOS' UEPOS.
+    _RANGE_TO_SEL_TABLE 'ABGRU' ABGRU.
+    _RANGE_TO_SEL_TABLE 'PRODH' PRODH.
+    _RANGE_TO_SEL_TABLE 'KDMAT' KDMAT.
+    _RANGE_TO_SEL_TABLE 'WERKS' WERKS.
+    _RANGE_TO_SEL_TABLE 'VGTYP' VGTYP.
+    _RANGE_TO_SEL_TABLE 'ERDAT' ERDAT.
+    _RANGE_TO_SEL_TABLE 'AEDAT' AEDAT.
+    _RANGE_TO_SEL_TABLE 'MPROK' MPROK.
+**** VBAP ****
+    LT_OPTION[] = LT_OUT_WHERE_COND[].
+    SELECT WAERK
+      FROM VBAP
+      INTO TABLE LT_WAERK
+      WHERE (LT_OPTION)
+      GROUP BY WAERK.
+  ENDIF.
+**** Get all Currencies type of documents from VBAK Table
+**************** Get Table field details ******************
+  CLEAR: LT_OPTION[], LT_OUT_WHERE_COND[].
+  CLEAR: LS_OPTION.
+  IF LV_REF_TABNAME1 IS NOT INITIAL.
+    IF LT_OPTION IS NOT INITIAL.
+      CONCATENATE 'AND' 'TABNAME' 'EQ' INTO LV_QUERY SEPARATED BY SPACE.
+    ELSE.
+      CONCATENATE 'TABNAME' 'EQ' INTO LV_QUERY SEPARATED BY SPACE.
+    ENDIF.
+    CONCATENATE ''''LV_REF_TABNAME1''''  INTO LV_REF_TABNAME1.
+    CONCATENATE LV_QUERY LV_REF_TABNAME1 INTO LS_OPTION-TEXT SEPARATED BY SPACE.
+    APPEND LS_OPTION TO LT_OPTION.
+  ENDIF.
+  CLEAR: LS_OPTION.
+  IF LV_REF_TABNAME2 IS NOT INITIAL.
+    IF LT_OPTION IS NOT INITIAL.
+      CONCATENATE 'AND' 'TABNAME' 'EQ' INTO LV_QUERY SEPARATED BY SPACE.
+    ELSE.
+      CONCATENATE 'TABNAME' 'EQ' INTO LV_QUERY SEPARATED BY SPACE.
+    ENDIF.
+    CONCATENATE ''''LV_REF_TABNAME2''''  INTO LV_REF_TABNAME2.
+    CONCATENATE LV_QUERY LV_REF_TABNAME2 INTO LS_OPTION-TEXT SEPARATED BY SPACE.
+    APPEND LS_OPTION TO LT_OPTION.
+  ENDIF.
+  IF LT_OPTION IS NOT INITIAL.
+    SELECT *
+      FROM DD03L
+      INTO TABLE LT_DD03L
+      WHERE (LT_OPTION).
+    CLEAR: LS_OPTION,
+           LT_OPTION.
+    READ TABLE LT_DD03L INTO LS_DD03L WITH KEY FIELDNAME = LV_REF_FIELD1.
+    IF SY-SUBRC = 0.
+      LV_FIELD1_EXIST = 'X'.
+      LV_TYPE1        = LS_DD03L-DATATYPE.
+    ENDIF.
+    CLEAR: LS_DD03L.
+    READ TABLE LT_DD03L INTO LS_DD03L WITH KEY FIELDNAME = LV_REF_FIELD2.
+    IF SY-SUBRC = 0.
+      LV_FIELD2_EXIST = 'X'.
+      LV_TYPE2        = LS_DD03L-DATATYPE.
+    ENDIF.
+    CLEAR: LV_RESULT, LV_DDTEXT.
+    REPLACE ALL OCCURRENCES OF '''' IN LV_REF_TABNAME1 WITH ''.
+    REPLACE ALL OCCURRENCES OF '''' IN LV_REF_TABNAME2 WITH ''.
+    IF LV_FIELD1_EXIST EQ 'X'.
+      CASE LV_REF_TABNAME1.
+        WHEN 'VBAK'.
+          LV_ALIAS1 = 'K'.
+        WHEN 'VBAP'.
+          LV_ALIAS1 = 'P'.
+        WHEN OTHERS.
+      ENDCASE.
+      CONCATENATE LV_ALIAS1 LV_REF_FIELD1 INTO LV_QUERY1
+        SEPARATED BY '~'.
+    ENDIF.
+    IF LV_FIELD2_EXIST EQ 'X'.
+      IF LV_REF_TABNAME1 <> LV_REF_TABNAME2 AND LV_REF_TABNAME2 IS NOT INITIAL.
+        CASE LV_REF_TABNAME2.
+          WHEN 'VBAK'.
+            LV_ALIAS2 = 'K'.
+          WHEN 'VBAP'.
+            LV_ALIAS2 = 'P'.
+          WHEN OTHERS.
+        ENDCASE.
+      ELSE.
+        LV_ALIAS2 = LV_ALIAS1.
+      ENDIF.
+      CONCATENATE LV_ALIAS2 LV_REF_FIELD2 INTO LV_QUERY2
+        SEPARATED BY '~'.
+    ENDIF.
+  ENDIF.
+**************** Get Table field details ******************
+********* Prepare Condition Query *************************
+  REFRESH: LT_OPTION[], LT_OUT_WHERE_COND[].
+  CLEAR: LV_QUERY.
+********* Prepare Condition Query *************************
+**** Prepare Selection Clause *********
+  _BUILD_SQL_SEL_CLAUSE 'VBAP' '/SKN/S_SW_10_01_ORD_STAT_CHK' 'P' '' LV_SEL_VBAP.
+  _BUILD_SQL_SEL_CLAUSE 'VBAK' '/SKN/S_SW_10_01_ORD_STAT_CHK' 'K' '' LV_SEL_VBAK.
+  CONCATENATE LV_SEL_VBAK LV_SEL_VBAP
+    INTO LV_SEL_CLAUSE SEPARATED BY SPACE.
+  SHIFT LV_SEL_CLAUSE LEFT DELETING LEADING SPACE.
+**** Prepare FROM statement ***********
+  CONCATENATE 'VBAK' 'AS' 'K' INTO LV_FROM1 SEPARATED BY SPACE.
+  CONCATENATE 'VBAP' 'AS' 'P' INTO LV_FROM2 SEPARATED BY SPACE.
+  CONCATENATE 'ON' 'K~VBELN' 'EQ' 'P~VBELN' INTO LV_COND SEPARATED BY SPACE.
+  CONCATENATE LV_FROM1 'INNER JOIN' LV_FROM2 LV_COND INTO LV_FROM
+    SEPARATED BY SPACE.
+**** VBAK *****
+  _RANGE_TO_SEL_TABLE 'K~VBELN'   VBELN.
+  _RANGE_TO_SEL_TABLE 'K~KUNNR'   KUNNR.
+  _RANGE_TO_SEL_TABLE 'K~VKORG'   VKORG.
+  _RANGE_TO_SEL_TABLE 'K~VKGRP'   VKGRP.
+  _RANGE_TO_SEL_TABLE 'K~VKBUR'   VKBUR.
+  _RANGE_TO_SEL_TABLE 'K~VTWEG'   VTWEG.
+*  _range_to_sel_table 'K~SPART'   spart.
+*  _range_to_sel_table 'K~ERDAT'   erdat.
+  _RANGE_TO_SEL_TABLE 'K~AUDAT'   AUDAT.
+  _RANGE_TO_SEL_TABLE 'K~AEDAT'   AEDAT.
+  _RANGE_TO_SEL_TABLE 'K~VDATU'   VDATU.
+  _RANGE_TO_SEL_TABLE 'K~AUART'   AUART.
+  _RANGE_TO_SEL_TABLE 'K~GUEBG'   GUEBG .
+  _RANGE_TO_SEL_TABLE 'K~GUEEN'   GUEEN.
+  _RANGE_TO_SEL_TABLE 'K~ANGDT'   ANGDT.
+  _RANGE_TO_SEL_TABLE 'K~BNDDT'   BNDDT.
+  _RANGE_TO_SEL_TABLE 'K~LIFSK'   LIFSK.
+  _RANGE_TO_SEL_TABLE 'K~FAKSK'   FAKSK.
+  _RANGE_TO_SEL_TABLE 'K~VBTYP'   VBTYP.
+  _RANGE_TO_SEL_TABLE 'K~ERNAM'   ERNAM.
+  _RANGE_TO_SEL_TABLE 'K~RFSTK'   RFSTK.
+  _RANGE_TO_SEL_TABLE 'K~RFGSK'   RFGSK.
+  _RANGE_TO_SEL_TABLE 'K~BESTK'   BESTK.
+  _RANGE_TO_SEL_TABLE 'K~LFSTK'   LFSTK.
+  _RANGE_TO_SEL_TABLE 'K~LFGSK'   LFGSK.
+  _RANGE_TO_SEL_TABLE 'K~FKSAK'   FKSAK.
+  _RANGE_TO_SEL_TABLE 'K~ABSTK'   ABSTK.
+  _RANGE_TO_SEL_TABLE 'K~GBSTK'   GBSTK.
+  _RANGE_TO_SEL_TABLE 'K~UVALS'   UVALS.
+  _RANGE_TO_SEL_TABLE 'K~UVVLS'   UVVLS.
+  _RANGE_TO_SEL_TABLE 'K~UVFAS'   UVFAS.
+  _RANGE_TO_SEL_TABLE 'K~UVALL'   UVALL.
+  _RANGE_TO_SEL_TABLE 'K~UVVLK'   UVVLK.
+  _RANGE_TO_SEL_TABLE 'K~UVFAK'   UVFAK.
+  _RANGE_TO_SEL_TABLE 'K~UVPRS'   UVPRS.
+  _RANGE_TO_SEL_TABLE 'K~CMPSA'   CMPSA.
+  _RANGE_TO_SEL_TABLE 'K~CMPSB'   CMPSB.
+  _RANGE_TO_SEL_TABLE 'K~CMPSD'   CMPSD.
+  _RANGE_TO_SEL_TABLE 'K~CMPSE'   CMPSE.
+  _RANGE_TO_SEL_TABLE 'K~CMPSF'   CMPSF.
+  _RANGE_TO_SEL_TABLE 'K~CMPSG'   CMPSG.
+  _RANGE_TO_SEL_TABLE 'K~CMPSH'   CMPSH.
+  _RANGE_TO_SEL_TABLE 'K~CMPSI'   CMPSI.
+  _RANGE_TO_SEL_TABLE 'K~CMPSJ'   CMPSJ.
+  _RANGE_TO_SEL_TABLE 'K~CMPSK'   CMPSK.
+  _RANGE_TO_SEL_TABLE 'K~CMPSL'   CMPSL.
+  _RANGE_TO_SEL_TABLE 'K~CMPS0'   CMPS0.
+  _RANGE_TO_SEL_TABLE 'K~CMGST'   CMGST.
+  _RANGE_TO_SEL_TABLE 'K~COSTA'   COSTA.
+  _RANGE_TO_SEL_TABLE 'K~SPSTG'   SPSTG.
+  _RANGE_TO_SEL_TABLE 'K~FSSTK'   FSSTK.
+  _RANGE_TO_SEL_TABLE 'K~LSSTK'   LSSTK.
+  _RANGE_TO_SEL_TABLE 'K~BLOCK'   BLOCK.
+  _RANGE_TO_SEL_TABLE 'K~FKIVK'   FKIVK.
+  _RANGE_TO_SEL_TABLE 'K~TRSTA'   TRSTA.
+  _RANGE_TO_SEL_TABLE 'K~UVWAS'   UVWAS.
+  _RANGE_TO_SEL_TABLE 'K~UVPAK'   UVPAK.
+  _RANGE_TO_SEL_TABLE 'K~UVPIK'   UVPIK.
+  _RANGE_TO_SEL_TABLE 'K~UVWAK'   UVWAK.
+  _RANGE_TO_SEL_TABLE 'K~CMPSM'   CMPSM.
+  _RANGE_TO_SEL_TABLE 'K~DCSTK'   DCSTK.
+  _RANGE_TO_SEL_TABLE 'K~CMPS_CM' CMPS_CM.
+**** VBAK *****
+**** VBAP *****
+  _RANGE_TO_SEL_TABLE 'P~POSNR'  POSNR.
+  _RANGE_TO_SEL_TABLE 'P~MATNR'  MATNR.
+  _RANGE_TO_SEL_TABLE 'P~ERDAT'  ERDAT.
+  _RANGE_TO_SEL_TABLE 'P~SPART'  SPART.
+  _RANGE_TO_SEL_TABLE 'P~MATKL'  MATKL.
+  _RANGE_TO_SEL_TABLE 'P~LFREL'  LFREL.
+  _RANGE_TO_SEL_TABLE 'P~FKREL'  FKREL.
+  _RANGE_TO_SEL_TABLE 'P~UEPOS'  UEPOS.
+  _RANGE_TO_SEL_TABLE 'P~ABGRU'  ABGRU.
+  _RANGE_TO_SEL_TABLE 'P~PRODH'  PRODH.
+  _RANGE_TO_SEL_TABLE 'P~KDMAT'  KDMAT.
+  _RANGE_TO_SEL_TABLE 'P~WERKS'  WERKS.
+  _RANGE_TO_SEL_TABLE 'P~VGTYP'  VGTYP.
+**** VBAP *****
+  APPEND LINES OF LT_OUT_WHERE_COND TO LT_OPTION.
+  CLEAR: LS_OPTION.
+****
+  IF LV_FIELD1_EXIST EQ 'X' AND LV_FIELD2_EXIST EQ 'X' AND
+       R_RESULT_COMP1[] IS INITIAL AND R_RESULT_COMP2[] IS INITIAL.
+* Compare between parameter field1 and field2, with compare operator from parameter screen
+    IF LV_COMP_OPERATOR IS NOT INITIAL.
+      CLEAR: LV_QUERY.
+      CONCATENATE LV_QUERY1 LV_COMP_OPERATOR LV_QUERY2 INTO LV_QUERY
+        SEPARATED BY SPACE.
+    ENDIF.
+    IF LV_QUERY IS NOT INITIAL.
+      IF LT_OPTION IS NOT INITIAL.
+        CONCATENATE 'AND' LV_QUERY INTO LS_OPTION-TEXT
+          SEPARATED BY SPACE.
+      ELSE.
+        LS_OPTION-TEXT = LV_QUERY.
+      ENDIF.
+      APPEND LS_OPTION TO LT_OPTION.
+    ENDIF.
+    SELECT (LV_SEL_CLAUSE)
+      FROM (LV_FROM)         " vbak as k inner join vbap as p on k~vbeln EQ p~vbeln
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA[]
+      WHERE (LT_OPTION).
+* Compare parameter field name with result_comp(parameter value) - if just 1 parameter exist
+  ELSEIF LV_FIELD1_EXIST EQ 'X' AND R_RESULT_COMP1[] IS NOT INITIAL.
+****** Currency conversion
+    LV_ALIAS_CURR = 'K'.
+    DESCRIBE TABLE LT_VBAK LINES LV_LINES.
+    LV_WHILE = 'X'.
+    WHILE LV_WHILE EQ 'X'.
+      CLEAR: LV_AMOUNT.
+      LV_TABIX_WHILE = LV_TABIX_WHILE + 1.
+      CONCATENATE 'R_RESULT_COMP' ''LV_TABIX_WHILE'' INTO LV_RESULT_TXT.
+      LR_DATATYPE ?= CL_ABAP_TYPEDESCR=>DESCRIBE_BY_DATA( LV_RESULT_TXT ).
+      IF SY-SUBRC = 0 AND LR_DATATYPE IS BOUND.
+        FREE LR_DATATYPE.
+        ASSIGN (LV_RESULT_TXT) TO <FS_AMOUNT_TAB>.
+      ELSE.
+        CLEAR: LV_WHILE.
+        EXIT.
+      ENDIF.
+      IF <FS_AMOUNT_TAB> IS ASSIGNED AND <FS_AMOUNT_TAB> IS NOT INITIAL.
+        READ TABLE <FS_AMOUNT_TAB> ASSIGNING <FS_AMOUNT_STR> INDEX LV_TABIX_WHILE.
+        IF SY-SUBRC = 0 AND <FS_AMOUNT_STR> IS ASSIGNED.
+          ASSIGN COMPONENT 'LOW' OF STRUCTURE <FS_AMOUNT_STR> TO <FS_FIELD>.
+          IF SY-SUBRC = 0 AND <FS_FIELD> IS ASSIGNED.
+            LV_AMOUNT = <FS_FIELD>.
+          ENDIF.
+        ENDIF.
+      ELSE.
+        EXIT.
+      ENDIF.
+      LOOP AT LT_WAERK INTO LS_WAERK.
+        LV_TABIX = SY-TABIX.
+        CLEAR: LV_WAERK, LT_OPTION, LS_OPTION, LV_SUBRC, LV_EXIT.
+        LV_OPEN = 'X'.
+        LV_AMOUNT = RS_RESULT_COMP1-LOW.
+        LV_WAERK  = LS_WAERK-WAERK.
+        APPEND LINES OF LT_OUT_WHERE_COND TO LT_OPTION.
+        IF LV_WAERK_FR IS NOT INITIAL AND LV_WAERK IS NOT INITIAL AND
+             LV_AMOUNT IS NOT INITIAL.
+*    _range_to_sel_table lv_query1 result_comp1.
+          LOOP AT R_RESULT_COMP1 INTO RS_RESULT_COMP1.
+            CLEAR: LV_AMOUNT_FR, LS_OPTION, LV_QUERY_CURR, LV_TEXT1,
+                   LV_TEXT2, LV_VAL, LV_SUBRC.
+            IF LV_AMOUNT <> 0.
+              IF LV_WAERK <> LV_WAERK_FR.
+* Unit conversion for REF_FIELD1
+                CALL FUNCTION 'CONVERT_TO_FOREIGN_CURRENCY'
+                  EXPORTING
+                    DATE             = SY-DATUM
+                    FOREIGN_CURRENCY = LV_WAERK       " Document Curr
+                    LOCAL_AMOUNT     = LV_AMOUNT
+                    LOCAL_CURRENCY   = LV_WAERK_FR    " Foreign Curr
+                  IMPORTING
+*                    exchange_rate
+                    FOREIGN_AMOUNT   = LV_AMOUNT_FR
+                  EXCEPTIONS
+                    NO_RATE_FOUND    = 1
+                    OVERFLOW         = 2
+                    NO_FACTORS_FOUND = 3
+                    NO_SPREAD_FOUND  = 4
+                    DERIVED_2_TIMES  = 5
+                    OTHERS           = 6.
+                LV_SUBRC = SY-SUBRC.
+              ELSE.
+                LV_AMOUNT_FR = LV_AMOUNT.
+              ENDIF.
+              IF LV_AMOUNT_FR IS NOT INITIAL OR
+                   LV_INC_NOT_CONV_CURR EQ 'X'.
+*** ++ 06.10.20
+                IF LV_AMOUNT_FR IS INITIAL AND LV_INC_NOT_CONV_CURR EQ 'X'.
+                  LV_NOT_CONV = 'X'.
+                ELSE.
+                  CLEAR: LV_NOT_CONV.
+                ENDIF.
+*** ++ 06.10.20
+                IF LT_OPTION IS NOT INITIAL.
+                  LS_OPTION-TEXT = 'AND'.
+                  APPEND LS_OPTION TO LT_OPTION.
+                ENDIF.
+                CLEAR: LS_OPTION.
+                IF LV_OPEN = 'X'.
+                  CLEAR LV_OPEN.
+                  LS_OPTION-TEXT = '('.
+                  APPEND LS_OPTION TO LT_OPTION.
+                ENDIF.
+                CLEAR: LS_OPTION.
+                LV_VAL = LV_AMOUNT_FR.
+                SHIFT LV_VAL RIGHT DELETING TRAILING SPACE.
+                SHIFT LV_VAL LEFT DELETING LEADING SPACE.
+                CONCATENATE ''''LV_WAERK'''' INTO LV_QUERY_CURR.
+                CONCATENATE LV_ALIAS_CURR '~' 'WAERK' INTO LV_TEXT1.
+                CONCATENATE LV_TEXT1 'EQ' LV_QUERY_CURR INTO LV_TEXT2
+                  SEPARATED BY SPACE.
+                CONCATENATE ''''LV_VAL'''' INTO LV_VAL IN CHARACTER MODE.
+                CONCATENATE LV_TEXT2 'AND'
+                            LV_QUERY1 RS_RESULT_COMP1-OPTION LV_VAL
+                  INTO LS_OPTION-TEXT SEPARATED BY SPACE.
+****** Conversion 'HIGH' value
+                IF <FS_AMOUNT_STR> IS ASSIGNED AND <FS_AMOUNT_STR> IS NOT INITIAL.
+                  ASSIGN COMPONENT 'HIGH' OF STRUCTURE <FS_AMOUNT_STR> TO <FS_FIELD>.
+                  IF SY-SUBRC = 0 AND <FS_FIELD> IS ASSIGNED.
+                    LV_AMOUNT = <FS_FIELD>.
+                  ENDIF.
+                ENDIF.
+                IF LV_AMOUNT <> 0.
+                  CLEAR: LV_AMOUNT_FR.
+* Unit conversion for REF_FIELD1
+                  CALL FUNCTION 'CONVERT_TO_FOREIGN_CURRENCY'
+                    EXPORTING
+                      DATE             = SY-DATUM
+                      FOREIGN_CURRENCY = LV_WAERK       " Document Curr
+                      LOCAL_AMOUNT     = LV_AMOUNT
+                      LOCAL_CURRENCY   = LV_WAERK_FR    " Foreign Curr
+                    IMPORTING
+                      FOREIGN_AMOUNT   = LV_AMOUNT_FR
+                    EXCEPTIONS
+                      NO_RATE_FOUND    = 1
+                      OVERFLOW         = 2
+                      NO_FACTORS_FOUND = 3
+                      NO_SPREAD_FOUND  = 4
+                      DERIVED_2_TIMES  = 5
+                      OTHERS           = 6.
+                  IF SY-SUBRC = 0 AND LV_AMOUNT_FR IS NOT INITIAL.
+                    LV_VAL = LV_AMOUNT_FR.
+                    CONCATENATE ''''LV_VAL'''' INTO LV_VAL.
+                    CONCATENATE LS_OPTION-TEXT 'AND' LV_VAL "')'
+                      INTO LS_OPTION-TEXT SEPARATED BY SPACE.
+                  ENDIF.
+                ENDIF.
+****** Conversion 'HIGH' value
+              ELSE.
+                LV_SUBRC = SY-SUBRC.
+*** ++ 06.10.20
+                LV_EXIT = 'X'.
+                EXIT.
+*** ++ 06.10.20
+              ENDIF.
+            ENDIF.
+            IF LV_OPEN IS INITIAL.
+              CONCATENATE LS_OPTION-TEXT ')' INTO LS_OPTION-TEXT
+                SEPARATED BY SPACE.
+            ENDIF.
+            IF LS_OPTION IS NOT INITIAL.
+              APPEND LS_OPTION TO LT_OPTION.
+            ENDIF.
+          ENDLOOP.       " RESULT_COMP P.S.
+        ELSE.
+        ENDIF.           " Compare Currency
+*** ++ 06.10.20
+        IF LV_EXIT EQ 'X'.
+          CONTINUE.
+        ENDIF.
+*** ++ 06.10.20
+        IF LV_SUBRC = 0.
+          SELECT (LV_SEL_CLAUSE)
+            FROM (LV_FROM)         " vbak as k inner join vbap as p on k~vbeln EQ p~vbeln
+            INTO CORRESPONDING FIELDS OF TABLE LT_DATA
+            WHERE (LT_OPTION).
+        ENDIF.
+        IF LT_DATA IS NOT INITIAL.
+*** ++ 06.10.20
+          IF LV_NOT_CONV IS NOT INITIAL.
+            LOOP AT LT_DATA ASSIGNING <FS_DATA>.
+              <FS_DATA>-INC_NOT_CONV_CURR = LV_NOT_CONV.
+            ENDLOOP.
+          ENDIF.
+*** ++ 06.10.20
+          APPEND LINES OF LT_DATA TO T_DATA[].
+          CLEAR: LT_DATA.
+        ENDIF.
+      ENDLOOP.        " WAERK
+****** Currency conversion **************
+    ENDWHILE.
+*** 01.12.20 ++
+  ELSE.
+    SELECT (LV_SEL_CLAUSE)
+    FROM (LV_FROM)         " vbak as k inner join vbap as p on k~vbeln EQ p~vbeln
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA[]
+    WHERE (LT_OPTION).
+*** 01.12.20 ++
+  ENDIF.
+  CHECK T_DATA[] IS NOT INITIAL.
+  SORT T_DATA BY VBELN POSNR.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    IF  IS NOT ASSIGNED.
+      CONTINUE.
+    ENDIF.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT  "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION .
+******************************************************************************
+  "--- Get BPs
+  IF T_DATA[] IS NOT INITIAL.
+*    "--- Fill R_BP_FUNCT ----
+    REFRESH R_BP_FUNCT.
+    SET_BP_RANGE 1.
+    SET_BP_RANGE 2.
+    SET_BP_RANGE 3.
+    IF R_BP_FUNCT[] IS NOT INITIAL.
+*
+      SELECT *
+        FROM VBPA
+        INTO CORRESPONDING FIELDS OF TABLE LT_VBPA
+        FOR ALL ENTRIES IN T_DATA[]
+        WHERE VBELN EQ T_DATA-VBELN
+        AND   PARVW IN R_BP_FUNCT.
+      SORT LT_VBPA BY VBELN POSNR PARVW.
+      LOOP AT T_DATA.
+        SY_TABIX = SY-TABIX .
+        GET_BP_ATTR 1.
+        GET_BP_ATTR 2.
+        GET_BP_ATTR 3.
+        MODIFY T_DATA INDEX SY_TABIX.
+      ENDLOOP.
+      DELETE T_DATA WHERE BP1_CODE NOT IN R_BP1_CODE.
+      DELETE T_DATA WHERE BP2_CODE NOT IN R_BP2_CODE.
+      DELETE T_DATA WHERE BP3_CODE NOT IN R_BP3_CODE.
+    ENDIF.
+  ENDIF.
+  "--- Get BPs
+  "Delete  CMPS_TE
+  DELETE T_DATA WHERE CMPS_TE NOT IN R_CMPS_TE.
+  CHECK T_DATA[] IS NOT INITIAL.
+  REFRESH LT_DATA.
+  LT_DATA[] = T_DATA[].
+  REFRESH T_DATA.
+  SORT LT_DATA BY VBELN.
+  READ TABLE R_RESULT_COMP1 INTO RS_RESULT_COMP1 INDEX 1.
+  READ TABLE R_RESULT_COMP2 INTO RS_RESULT_COMP2 INDEX 1.
+  LOOP AT LT_DATA INTO LS_DATA.
+    LS_DATA-REF_FIELD_NAME1 = LV_REF_FIELD1.
+    IF RS_RESULT_COMP1 IS NOT INITIAL.
+      LS_DATA-VALUE_COMP1    = RS_RESULT_COMP1-LOW.
+    ENDIF.
+    LS_DATA-REF_FIELD_NAME2 = LV_REF_FIELD2.
+    IF RS_RESULT_COMP2 IS NOT INITIAL.
+      LS_DATA-VALUE_COMP2    = RS_RESULT_COMP2-LOW.
+    ENDIF.
+    IF RS_RESULT_COMP1 IS INITIAL AND RS_RESULT_COMP2 IS INITIAL.
+      LS_DATA-COMP_OPERATOR = LV_COMP_OPERATOR.
+    ELSE.
+      LS_DATA-COMP_OPERATOR = RS_RESULT_COMP1-OPTION.
+    ENDIF.
+    LS_DATA-WAERK_FR = LV_WAERK_FR.
+* Get Descriptions
+    IF LS_DATA-KUNNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+        EXPORTING
+          KUNNR          = T_DATA-KUNNR
+        IMPORTING
+          CUST_DESC      = LS_DATA-CUST_DESC
+        EXCEPTIONS
+          WRONG_CUSTOMER = 1
+          OTHERS         = 2.
+    ENDIF.
+    IF LS_DATA-MPROK IS NOT INITIAL.
+      LV_DOMNAME = 'MPROK'.
+      LV_DOMVALUE = LS_DATA-MPROK.
+      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+        EXPORTING
+          I_DOMNAME  = LV_DOMNAME
+          I_DOMVALUE = LV_DOMVALUE
+          LANGU      = LV_LANGU
+*         SW_DEST    =
+        IMPORTING
+          E_DDTEXT   = LV_DDTEXT
+        EXCEPTIONS
+          NOT_EXIST  = 1
+          OTHERS     = 2.
+      IF SY-SUBRC = 0.
+        LS_DATA-MPROK_DESC = LV_DDTEXT.
+      ENDIF.
+    ENDIF.
+    IF LS_DATA-AUART IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_DOC_TYPE_DESC'
+        EXPORTING
+          AUART      = LS_DATA-AUART
+          LANGU      = LV_LANGU
+        IMPORTING
+          TYPE_DESC  = LS_DATA-DOC_TYPE_DESC
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+    IF LS_DATA-VKORG IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_SALES_ORG_DESC'
+        EXPORTING
+          VKORG          = LS_DATA-VKORG
+          LANGU          = LV_LANGU
+        IMPORTING
+          SALES_ORG_DESC = LS_DATA-SALES_ORG_DESC
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+    IF LS_DATA-VKGRP IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_SALES_GRP_DESC'
+        EXPORTING
+          VKGRP          = LS_DATA-VKGRP
+          LANGU          = SY-LANGU
+        IMPORTING
+          SALES_GRP_DESC = LS_DATA-SALES_GRP_DESC
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+    IF LS_DATA-VKBUR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_SALES_OFF_DESC'
+        EXPORTING
+          VKBUR          = LS_DATA-VKBUR
+          LANGU          = LV_LANGU
+        IMPORTING
+          SALES_OFF_DESC = LS_DATA-SALES_OFF_DESC
+        EXCEPTIONS
+          WRONG_CODE     = 1
+          OTHERS         = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+    ENDIF.
+    APPEND LS_DATA TO T_DATA[].
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

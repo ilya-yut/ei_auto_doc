@@ -1,0 +1,427 @@
+FUNCTION /SKN/F_SW_10_03_PO_1_TIME_DET .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_PO_1_TIME_DET OPTIONAL
+*"----------------------------------------------------------------------
+*** Begin Yuri C.++ 29.01.19
+  TYPES: BEGIN OF TY_T001,
+           BUKRS TYPE T001-BUKRS,
+           WAERS TYPE T001-WAERS,
+         END OF TY_T001,
+         TT_T001 TYPE STANDARD TABLE OF TY_T001.
+*** End Yuri C.++ 29.01.19
+  DATA_SINGLE: LANGU  LANGU,
+               BACKDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+  LV_BACKDAYS = 10.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU.
+  LV_DATE_REF_FLD = 'BEDAT'. "PO date
+  SELECT_SINGLE: LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 DURATION_UNIT.
+  DATA_MULTY: FRGRL        FRGRL,
+              EBELN        EBELN,
+              BUKRS        BUKRS,
+              BSTYP        EBSTYP,
+              BSART        ESART,
+              EKORG        EKORG,
+              EKGRP        BKGRP,
+              FRGGR        FRGGR,
+              FRGSX        FRGSX,
+              FRGCO        FRGCO,
+              FRGKE        FRGKE,
+              LIFNR        ELIFN,
+              RESWK        RESWK,
+              ZTERM        DZTERM,
+              ERNAM        ERNAM,
+*            AEDAT        ERDAT,        " Yuri C.-- 20.12.17
+              AEDAT_EKKO   ERDAT,       " Yuri C.++ 20.12.17
+              AEDAT_EKPO   ERDAT,       " Yuri C.++ 20.12.17
+              BEDAT        EBDAT,
+              WAERS        WAERS,
+              BRTWR        BBWERT,
+              NETWR        BWERT,
+              WAERS_LOCAL  WAERS,
+              BRTWR_LOCAL  BBWERT,
+              NETWR_LOCAL  BWERT,
+              PROCSTAT    MEPROCSTATE,
+              DATUM        SY-DATUM,
+              DURATION    /SKN/E_SW_DURATION,
+              OBJECTCLAS  CDOBJECTCL,         " Yuri C.++ 28.12.17
+              OBJECTID    CDOBJECTV.          " Yuri C.++ 28.12.17
+  SELECT_MULTY:
+              FRGRL,
+              EBELN,
+              BUKRS,
+              BSTYP,
+              BSART,
+              EKORG,
+              EKGRP,
+              FRGGR,
+              FRGSX,
+              FRGCO,
+              FRGKE,
+              LIFNR,
+              RESWK,
+              ZTERM,
+              ERNAM,
+*            AEDAT,        " Yuri C.-- 20.12.17
+              AEDAT_EKKO,  " Yuri C.++ 20.12.17
+              AEDAT_EKPO,  " Yuri C.++ 20.12.17
+              BEDAT,
+              BRTWR,
+              NETWR,
+              WAERS,
+              WAERS_LOCAL,
+              BRTWR_LOCAL,
+              NETWR_LOCAL,
+              PROCSTAT,
+              DATUM,
+              DURATION,
+              OBJECTID,   " Yuri C.++ 28.12.17
+              OBJECTCLAS. " Yuri C.++ 28.12.17
+  CONVERT_MULTY: EBELN ALPHA,
+                 LIFNR ALPHA.
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+           R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA :   FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+        LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+        LV_DDTEXT LIKE  DD07V-DDTEXT.
+  DATA: LV_FRGCO  TYPE FRGCO.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+*** Begin change of Yuri C.++ 28.12.17
+  DATA: LT_DATA TYPE TABLE OF /SKN/S_SW_10_03_PO_1_TIME_DET.
+  DATA: LS_T001 TYPE TY_T001.
+  DATA: LT_T001 TYPE TT_T001.
+  FIELD-SYMBOLS: <FS_DATA> TYPE /SKN/S_SW_10_03_PO_1_TIME_DET.
+*** End change of Yuri C.++ 28.12.17
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+**** Begin change of Yuri C.++ 28.12.17
+* Configuration Alert
+*  CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+*    IMPORTING
+*      is_alert = is_alert
+*    TABLES
+*      t_select = t_select
+*      t_data   = lt_data.
+*** End change of Yuri C.++ 28.12.17
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_03_PO_1_TIME_DET'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+  "--- Run Cloud Mode -----
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN   = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW    = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+*** Begin change of Yuri C.-- 20.12.17
+*     when 'AEDAT'.
+*       R_AEDAT[] = R_DATUM[]. "Document created
+*** End change of Yuri C.-- 20.12.17
+*** Begin change of Yuri C.++ 20.12.17
+    WHEN 'AEDAT_EKKO'.
+      R_AEDAT_EKPO[] = R_DATUM[]. "Document created
+    WHEN 'AEDAT_EKPO'.
+      R_AEDAT_EKPO[] = R_DATUM[]. "Document created
+*** End change of Yuri C.++ 20.12.17
+    WHEN 'BEDAT'.
+      R_BEDAT[] = R_DATUM[]. "PO Date
+    WHEN OTHERS.
+      R_BEDAT[] = R_DATUM[]. "Billing date
+  ENDCASE.
+  "--- Set R_PROCSTAT
+***  if R_PROCSTAT[] is initial.
+***    RS_PROCSTAT-sign = 'I'.
+***     RS_PROCSTAT-option = 'EQ'.
+***      RS_PROCSTAT-low = space.
+***       APPEND RS_PROCSTAT to R_PROCSTAT.
+***      RS_PROCSTAT-low = '02'.
+***       APPEND RS_PROCSTAT to R_PROCSTAT.
+***      RS_PROCSTAT-low = '03'.
+***       APPEND RS_PROCSTAT to R_PROCSTAT.
+***      RS_PROCSTAT-low = '05'.
+***       APPEND RS_PROCSTAT to R_PROCSTAT.
+***  endif.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT *
+    FROM EKKO AS K INNER JOIN EKPO      AS P ON K~EBELN EQ P~EBELN
+                   INNER JOIN LFA1      AS L ON K~LIFNR EQ L~LIFNR
+                   LEFT OUTER JOIN ADRC AS A ON K~ADRNR EQ A~ADDRNUMBER
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE K~FRGRL    IN R_FRGRL
+      AND K~FRGGR    IN R_FRGGR
+      AND K~FRGSX    IN R_FRGSX
+      AND K~EBELN    IN R_EBELN
+      AND K~BSTYP    IN R_BSTYP
+      AND K~EKORG    IN R_EKORG
+      AND K~BUKRS    IN R_BUKRS
+      AND K~LIFNR    IN R_LIFNR
+      AND K~RESWK    IN R_RESWK
+      AND K~BEDAT    IN R_BEDAT
+      AND K~AEDAT    IN R_AEDAT_EKKO
+      AND K~BSART    IN R_BSART
+      AND K~EKGRP    IN R_EKGRP
+      AND K~ERNAM    IN R_ERNAM
+      AND K~ZTERM    IN R_ZTERM
+      AND K~WAERS    IN R_WAERS
+      AND K~LOEKZ    EQ SPACE
+      AND K~MEMORY   EQ ' '               " (hold)
+      AND K~PROCSTAT IN R_PROCSTAT
+      AND K~FRGKE    IN R_FRGKE
+      AND P~AEDAT    IN R_AEDAT_EKPO
+      AND P~BRTWR    GT 0
+      AND P~LOEKZ    EQ SPACE
+      AND L~XCPDK    EQ 'X'.   " 1-time Vendors
+*** Begin Yuri C.++ 29.01.19
+  IF T_DATA[] IS NOT INITIAL.
+    LT_DATA = T_DATA[].
+    SORT LT_DATA BY BUKRS.
+    SELECT BUKRS WAERS
+      FROM T001
+      INTO TABLE LT_T001
+      FOR ALL ENTRIES IN LT_DATA
+      WHERE BUKRS EQ LT_DATA-BUKRS
+      AND   WAERS IN R_WAERS_LOCAL.
+    IF SY-SUBRC = 0.
+      SORT LT_T001 BY BUKRS.
+    ENDIF.
+  ENDIF.
+*** End Yuri C.++ 29.01.19
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+    SY_TABIX = SY-TABIX .
+*** Begin Yuri C.-- 29.01.19
+*    t_data-brtwr_local = t_data-brtwr * t_data-wkurs.
+*    t_data-netwr_local = t_data-netwr * t_data-wkurs .
+*    t_data-waers_local = t_data-waers .
+*** End Yuri C.-- 29.01.19
+***  Begin Yuri C.++ 29.01.19
+    CLEAR: LS_T001.
+    <FS_DATA>-BRTWR_LOCAL = <FS_DATA>-BRTWR * <FS_DATA>-WKURS.
+    <FS_DATA>-NETWR_LOCAL = <FS_DATA>-NETWR * <FS_DATA>-WKURS .
+    IF <FS_DATA>-BUKRS IS NOT INITIAL.
+      READ TABLE LT_T001 INTO LS_T001 WITH KEY BUKRS = <FS_DATA>-BUKRS
+                                      BINARY SEARCH.
+      IF SY-SUBRC = 0.
+        <FS_DATA>-WAERS_LOCAL = LS_T001-WAERS.
+      ENDIF.
+    ENDIF.
+*** End Yuri C.++ 29.01.19
+*    MODIFY t_data INDEX sy_tabix.     " Yuri C.-- 29.01.19
+  ENDLOOP.
+  DELETE T_DATA WHERE BRTWR NOT IN R_BRTWR.
+  DELETE T_DATA WHERE NETWR NOT IN R_NETWR.
+  DELETE T_DATA WHERE BRTWR_LOCAL NOT IN R_BRTWR_LOCAL.
+  DELETE T_DATA WHERE NETWR_LOCAL NOT IN R_NETWR_LOCAL.
+*********************************************************************************
+  "--- Get Release Code
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CALL FUNCTION '/SKN/F_SW_10_PO_GET_FRGC'
+      EXPORTING
+        FRGGR             = T_DATA-FRGGR
+        FRGSX             = T_DATA-FRGSX
+        FRGZU             = T_DATA-FRGZU
+      IMPORTING
+        FRGC              = T_DATA-FRGC
+      EXCEPTIONS
+        WRONG_COMBINATION = 1
+        OTHERS            = 2.
+    IF SY-SUBRC = 0.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+********************************************************************************
+  "--- Set Descriptions
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    "-- BSTYP_DESC
+    LV_DOMNAME = 'EBSTYP'.
+    LV_DOMVALUE = T_DATA-BSTYP.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-BSTYP_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- STATU_DESC
+    LV_DOMNAME = 'ESTAK'.
+    LV_DOMVALUE = T_DATA-STATU.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-STATU_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- PROCSTAT_DESC
+    LV_DOMNAME = 'MEPROCSTATE'.
+    LV_DOMVALUE = T_DATA-PROCSTAT.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+*       SW_DEST    =
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-PROCSTAT_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- BSART_DESC
+    CALL FUNCTION '/SKN/F_SW_10_BSART_DESC'
+      EXPORTING
+        BSART      = T_DATA-BSART
+        LANGU      = LV_LANGU
+        BSTYP      = T_DATA-BSTYP
+      IMPORTING
+        TYPE_DESC  = T_DATA-BSART_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- Get  Vendor Decriptions
+    CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+      EXPORTING
+        LIFNR        = T_DATA-LIFNR
+      IMPORTING
+        VENDOR_DESC  = T_DATA-VENDOR_DESC
+      EXCEPTIONS
+        WRONG_VENDOR = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKORG_DESC
+    CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+      EXPORTING
+        EKORG        = T_DATA-EKORG
+        "LANGU              = lv_LANGU
+      IMPORTING
+        PUR_ORG_DESC = T_DATA-EKORG_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKGRP_DESC
+    CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+      EXPORTING
+        EKGRP        = T_DATA-EKGRP
+*       LANGU        = lv_LANGU
+      IMPORTING
+        PUR_GRP_DESC = T_DATA-EKGRP_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- RESWK_DESC (WERKS)
+    CALL FUNCTION '/SKN/F_SW_10_PLANT_DESC'
+      EXPORTING
+        WERKS      = T_DATA-RESWK
+*       LANGU      = lv_LANGU
+      IMPORTING
+        PLANT_DESC = T_DATA-RESWK_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

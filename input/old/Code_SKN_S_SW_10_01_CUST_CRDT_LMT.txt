@@ -1,0 +1,281 @@
+FUNCTION /SKN/F_SW_10_01_CUST_CRDT_LMT .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_CUST_CRDT_LMT OPTIONAL
+*"----------------------------------------------------------------------
+DATA_SINGLE: LANGU  LANGU,
+             FORWDAYS INT4,
+             DATE_REF_FLD NAME_FELD.
+ "lv_FORWDAYS = 100.
+ "lv_DATE_REF_FLD = 'NXTRV'. "Default refference date field
+LV_LANGU = SY-LANGU.
+LV_FORWDAYS = 7.
+"lv_DATE_REF_FLD = ' ERDAT '.
+ SELECT_SINGLE: LANGU,
+                FORWDAYS,
+                DATE_REF_FLD.
+DATA_MULTY: KUNNR	KUNNR,
+            KKBER	KKBER,
+            KLIMK	KLIMK,
+            KNKLI	KNKLI,
+            SAUFT	SAUFT,
+            SKFOR	SKFOR,
+            SSOBL	SSOBL,
+            UEDAT	UEDAT,
+            XCHNG	XCHNG_KNKK,
+            ERNAM	ERNAM_RF,
+            ERDAT	ERDAT_RF,
+            CTLPC	CTLPC_CM,
+            DTREV	DTREV_CM,
+            CRBLB	CRBLB_CM,
+            SBGRP	SBGRP_CM,
+            NXTRV	NXTRV_CM,
+            KRAUS	KRAUS_CM,
+            PAYDB	PAYDB_CM,
+            DBRAT	DBRAT_CM,
+            REVDB	REVDB_CM,
+            AEDAT	AEDAT_CM,
+            AETXT	AETXT_CM,
+            GRUPP	GRUPP_CM,
+            AENAM	AENAM_CM,
+            SBDAT	SBDAT_CM,
+            KDGRP	KDGRP_CM,
+            CASHD	CASHD,
+            CASHA	CASHA,
+            CASHC	CASHC,
+            DBPAY	DBPAY_CM,
+            DBRTG	DBRTG_CM,
+            DBEKR	DBEKR_CM,
+            DBWAE	DBWAE_CM,
+            DBMON	DBMON_CM,
+            ABSBT	ABSBT_SUM,
+            KLPRZ	KLPRZ_F02L,
+            OBLIG	OBLIG_F02L ,
+            DATUM SY-DATUM.
+SELECT_MULTY:
+            KUNNR,
+            KKBER,
+            KLIMK,
+            KNKLI,
+            SAUFT,
+            SKFOR,
+            SSOBL,
+            UEDAT,
+            XCHNG,
+            ERNAM,
+            ERDAT,
+            CTLPC,
+            DTREV,
+            CRBLB,
+            SBGRP,
+            NXTRV,
+            KRAUS,
+            PAYDB,
+            DBRAT,
+            REVDB,
+            AEDAT,
+            AETXT,
+            GRUPP,
+            AENAM,
+            SBDAT,
+            KDGRP,
+            CASHD,
+            CASHA,
+            CASHC,
+            DBPAY,
+            DBRTG,
+            DBEKR,
+            DBWAE,
+            DBMON,
+            ABSBT,
+            KLPRZ,
+            OBLIG.
+CONVERT_MULTY: KUNNR ALPHA.
+DATA : S066_T TYPE TABLE OF S066,
+       S066_WA LIKE LINE OF S066_T,
+       S067_T TYPE TABLE OF S067,
+       S067_WA LIKE LINE OF S067_T,
+       DATE_FROM LIKE SY-DATUM ,
+       DATE_TO LIKE SY-DATUM.
+DATA : LANGU LIKE SY-LANGU .
+DATA : TIME_DIFF TYPE  INT4 .
+DATA : SY_TABIX LIKE SY-TABIX .
+DATA : FLD(60) TYPE C .
+DATA : REF_DATE TYPE D.
+DATA: LD_REFE1(16) TYPE P.
+CLEAR: LD_REFE1.
+FIELD-SYMBOLS: <RES_FIELDS> TYPE /SKN/S_SW_10_01_CUST_CRDT_LMT ,
+               <FS_V> TYPE ANY .
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_CUST_CRDT_LMT'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'BT' .
+      IF LV_FORWDAYS > 0 .
+        DATE_FROM = SY-DATUM .
+        DATE_TO = SY-DATUM + LV_FORWDAYS.
+      ELSE.
+        DATE_FROM = SY-DATUM + LV_FORWDAYS .
+        DATE_TO = SY-DATUM .
+      ENDIF.
+      RS_DATUM-LOW = DATE_FROM .
+      RS_DATUM-HIGH = DATE_TO .
+      APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+*   endif.
+ "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Document created
+    WHEN 'AEDAT'.
+      R_AEDAT[] = R_DATUM[]. "changed on
+    WHEN 'DBMON'.
+      R_DBMON[] = R_DATUM[]. "DBMON Date Monitoring
+    WHEN 'CASHD'.
+      R_CASHD[] = R_DATUM[]. "CASHD Date of Last Payment
+    WHEN 'SBDAT'.
+      R_SBDAT[] = R_DATUM[]. "Reference Date
+    WHEN 'AETXT'.
+      R_AETXT[] = R_DATUM[].  "Date of Last Text Change
+    WHEN 'REVDB'.
+      R_REVDB[] = R_DATUM[]. "Last review (external)
+    WHEN 'NXTRV'.
+       R_NXTRV[] = R_DATUM[]. " Next internal review
+    WHEN 'DTREV'.
+      R_DTREV[] = R_DATUM[]. "Last internal review
+    WHEN 'UEDAT'.
+      R_UEDAT[] = R_DATUM[].  "Date on which the credit limit was exceeded
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT * FROM KNKK
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE KUNNR	IN R_KUNNR AND
+            KKBER	IN R_KKBER AND
+            KLIMK	IN R_KLIMK AND
+            KNKLI	IN R_KNKLI AND
+            SAUFT	IN R_SAUFT AND
+            SKFOR	IN R_SKFOR AND
+            SSOBL	IN R_SSOBL AND
+            UEDAT	IN R_UEDAT AND
+            XCHNG	IN R_XCHNG AND
+            ERNAM	IN R_ERNAM AND
+            ERDAT	IN R_ERDAT AND
+            CTLPC	IN R_CTLPC AND
+            DTREV IN R_DTREV AND
+            CRBLB	IN R_CRBLB AND
+            SBGRP	IN R_SBGRP AND
+            NXTRV	IN R_NXTRV AND
+            KRAUS	IN R_KRAUS AND
+            PAYDB	IN R_PAYDB AND
+            DBRAT	IN R_DBRAT AND
+            REVDB	IN R_REVDB AND
+            AEDAT	IN R_AEDAT AND
+            AETXT	IN R_AETXT AND
+            GRUPP	IN R_GRUPP AND
+            AENAM	IN R_AENAM AND
+            SBDAT	IN R_SBDAT AND
+            KDGRP	IN R_KDGRP AND
+            CASHD	IN R_CASHD AND
+            CASHA	IN R_CASHA AND
+            CASHC	IN R_CASHC AND
+            DBPAY	IN R_DBPAY AND
+            DBRTG	IN R_DBRTG AND
+            DBEKR	IN R_DBEKR AND
+            DBWAE	IN R_DBWAE AND
+            DBMON	IN R_DBMON AND
+            ABSBT	IN R_ABSBT .
+  RS_KNKLI-SIGN = 'I' .
+  RS_KNKLI-OPTION = 'EQ'.
+  LOOP AT T_DATA ASSIGNING <RES_FIELDS>.
+    RS_KNKLI-LOW = <RES_FIELDS>-KNKLI.
+    APPEND RS_KNKLI TO R_KNKLI.
+  ENDLOOP.
+ SELECT KNKLI KKBER SUM( OEIKW )  AS OEIKW FROM S066
+   INTO CORRESPONDING FIELDS OF TABLE S066_T
+     WHERE KKBER IN R_KKBER AND
+           KNKLI  IN R_KNKLI
+    GROUP BY KNKLI KKBER
+   ORDER BY KNKLI KKBER.
+  SELECT KNKLI KKBER SUM( OLIKW ) AS OLIKW SUM( OFAKW ) AS OFAKW FROM S067
+   INTO CORRESPONDING FIELDS OF TABLE S067_T
+     WHERE KKBER IN R_KKBER AND
+           KNKLI  IN R_KNKLI
+    GROUP BY KNKLI KKBER
+   ORDER BY KNKLI KKBER.
+*********************************************************************************
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA ASSIGNING <RES_FIELDS>.
+    SY_TABIX = SY-TABIX .
+*    concatenate 'T_DATA-' lv_DATE_REF_FLD into fld .
+*    ASSIGN (fld) TO .
+*    ref_date =  .
+*SAUFT  CURR  15  2 Total of the sales values for the credit limit check
+*SKFOR  CURR  15  2 Total receivables (for credit limit check)
+*SSOBL  CURR  15  2 Relevant special liabilities for credit limit check
+    CLEAR S066_WA.
+    CLEAR S067_WA.
+    READ TABLE S066_T INTO S066_WA BINARY SEARCH WITH KEY
+      KNKLI = <RES_FIELDS>-KNKLI KKBER =  <RES_FIELDS>-KKBER.
+    READ TABLE S067_T INTO S067_WA BINARY SEARCH WITH KEY
+      KNKLI = <RES_FIELDS>-KNKLI KKBER =  <RES_FIELDS>-KKBER.
+    <RES_FIELDS>-SAUFT = S067_WA-OLIKW + S067_WA-OFAKW + S066_WA-OEIKW.
+    <RES_FIELDS>-OBLIG = <RES_FIELDS>-SSOBL + <RES_FIELDS>-SKFOR + <RES_FIELDS>-SAUFT.
+*      if <res_fields>-KLIMK <> 0.
+*        <res_fields>-KLPRZ = <res_fields>-OBLIG / <res_fields>-KLIMK .
+*      endif.
+      IF <RES_FIELDS>-KLIMK  = 0
+      OR <RES_FIELDS>-OBLIG < 0.
+        CLEAR: <RES_FIELDS>-KLPRZ.
+      ELSE.
+        LD_REFE1 = ( <RES_FIELDS>-OBLIG * 10000 ) / <RES_FIELDS>-KLIMK.
+      ENDIF.
+      IF <RES_FIELDS>-KLIMK = 0
+      AND <RES_FIELDS>-OBLIG > 0.
+        LD_REFE1 = 999.
+      ENDIF.
+      IF LD_REFE1 > 999.
+        <RES_FIELDS>-KLPRZ = 999.
+      ELSE.
+        <RES_FIELDS>-KLPRZ = LD_REFE1 / 100.
+      ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE OBLIG  NOT IN R_OBLIG .
+  DELETE T_DATA WHERE KLPRZ  NOT IN R_KLPRZ .
+******************************************************************************
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+*Ship-to party
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR                = T_DATA-KUNNR
+      IMPORTING
+        CUST_DESC            = T_DATA-CUST_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER       = 1
+        OTHERS               = 2              .
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.

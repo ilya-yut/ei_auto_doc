@@ -1,0 +1,688 @@
+FUNCTION /SKN/FC_SW_10_03_PR_PO_VAL_CHK .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_PR_PO_VAL_CHK OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: LANGU  LANGU,
+               BACKDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+  LV_BACKDAYS = 10.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU.
+  LV_DATE_REF_FLD = 'BADAT'. "PO date
+  SELECT_SINGLE: LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 DURATION_UNIT.
+  DATA_MULTY: LFDAT        EINDT,
+              BANFN        BANFN,
+              BNFPO        BNFPO,
+              BSART        BBSRT,
+              BSTYP        BSTYP,
+              BSAKZ        BSAKZ,
+              STATU        BANST,
+              ESTKZ        ESTKZ,
+              FRGKZ        FRGKZ,
+              EKGRP        EKGRP,
+              ERNAM        ERNAM,
+              FRGRL        FRGRL,
+              EBELN        BSTNR,
+              EKORG        EKORG,
+              FRGGR        FRGGR,
+              FRGST        FRGST,
+              RESWK        RESWK,
+              WERKS	       EWERK,
+              LIFNR        ELIFN,
+              ERDAT        AEDAT,
+              BEDAT        BEDAT,
+              BADAT        BADAT,
+              WAERS        WAERS,
+              DATUM        SY-DATUM,
+              DURATION    /SKN/E_SW_DURATION,
+              LOEKZ       ELOEK,
+              FRGC        FRGCO,
+              PO_PREQ_DIFF BWERT.
+  SELECT_MULTY:
+              LFDAT,
+              BANFN,
+              BNFPO,
+              BSART,
+              BSTYP,
+              BSAKZ,
+              STATU,
+              ESTKZ,
+              FRGKZ,
+              EKGRP,
+              ERNAM,
+              ERDAT,"Changed on
+              FRGRL,
+              EBELN,
+              EKORG,
+              FRGGR,
+              FRGST,
+              RESWK,
+              WERKS,
+              LIFNR,
+              BEDAT,
+              BADAT,
+              WAERS,
+              DATUM,
+              DURATION,
+              LOEKZ,
+              FRGC,
+              PO_PREQ_DIFF.
+  CONVERT_MULTY: EBELN ALPHA,
+                 LIFNR ALPHA.
+  "--- Set default for LOEKZ (not deleted only)
+  READ TABLE R_LOEKZ INTO RS_LOEKZ INDEX 1.
+  IF SY-TFILL = 0.
+    RS_LOEKZ-SIGN = 'I'.
+    RS_LOEKZ-OPTION = 'EQ'.
+    RS_LOEKZ-LOW = ' '.
+    APPEND RS_LOEKZ TO R_LOEKZ.
+  ENDIF.
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+           R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA : FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         DATE_FROM LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE INT4 .
+  DATA: LV_DOMNAME  LIKE DD07V-DOMNAME,
+        LV_DOMVALUE LIKE DD07V-DOMVALUE_L,
+        LV_DDTEXT   LIKE DD07V-DDTEXT.
+  DATA: LV_FRGCO    TYPE FRGCO.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+*data: lra_range type range of DD03P-FIELDNAME.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+**********
+  DATA: LV_FRGSX TYPE FRGSX.
+  DATA: LV_RESWK TYPE WERKS_D.
+  DATA: LV_WERKS TYPE WERKS_D.
+  DATA: LV_WLIEF TYPE LIFNR.
+  DATA: LV_BSART TYPE ESART.
+  DATA: LS_T161 TYPE T161,
+        LT_T161 LIKE TABLE OF LS_T161.
+  DATA: LS_EBAN TYPE EBAN,
+        LT_EBAN LIKE TABLE OF LS_EBAN.
+  DATA: BEGIN OF LS_PO,
+         BANFN  TYPE BANFN,
+         BNFPO TYPE BNFPO,
+         EBELN TYPE EBELN,
+         EBELP TYPE EBELP,
+         LIFNR TYPE WLIEF,
+         EKORG TYPE EKORG,
+         NETWR TYPE BWERT,
+         WKURS TYPE WKURS,
+         PO_WAERS TYPE WAERS,
+         BEDAT TYPE EBDAT,
+         NETWR_LOCAL_CURR TYPE BWERT,
+         PR_WAERS TYPE WAERS,
+        END OF LS_PO.
+  DATA: LT_PO LIKE TABLE OF LS_PO.
+  DATA: BEGIN OF LS_PO_PR,
+         BANFN  TYPE BANFN,
+         BNFPO TYPE BNFPO,
+         LIFNR TYPE WLIEF,
+         EKORG TYPE EKORG,
+         NETWR_LOCAL_CURR TYPE BWERT,
+        END OF LS_PO_PR.
+  DATA: LT_PO_PR LIKE TABLE OF LS_PO_PR.
+  DATA: LV_FIELD               TYPE STRING,
+        LV_TABNAME             TYPE TABNAME,
+        LS_DATA                TYPE TAB512,
+        LT_DATA                LIKE TABLE OF LS_DATA,"   TYPE usmd_tt_tab512,
+        LS_FIELDS              TYPE RFC_DB_FLD,
+        LT_FIELDS              TYPE TABLE OF RFC_DB_FLD,
+        LT_OPTION              TYPE TABLE OF RFC_DB_OPT,
+        LS_OPTION              LIKE LINE OF LT_OPTION[],
+        LT_DATA_RFC            TYPE TABLE OF /SKN/S_SW_TAB2000,
+        LT_TABLES_LIST         TYPE /SKN/TT_TABLES,
+        LWA_TABLES_LIST        LIKE LINE OF LT_TABLES_LIST[],
+        LT_JOIN_CONDITION      TYPE /SKN/TT_TABLE_JOIN,
+        LWA_JOIN_CONDITION     LIKE LINE OF LT_JOIN_CONDITION[],
+        LS_SEL_FIELDS          TYPE /SKN/S_SEL_FIELDS,
+        LT_SEL_FIELDS          TYPE /SKN/TT_SEL_FIELDS,
+        LT_OUTPUT_FIELDS       TYPE /SKN/TT_RFC_DB_FLD_EXTEND,
+        LT_DFIES               TYPE TABLE OF  DFIES,
+        LT_RETURN              TYPE BAPIRET2_T,
+        LS_SORT_OPTIONS        TYPE /SKN/S_SW_RFC_JOIN_DB_SORT,
+        LT_SORT_OPTIONS        TYPE TABLE OF /SKN/S_SW_RFC_JOIN_DB_SORT,
+        LT_IN_RANGE            TYPE TABLE OF /SKN/S_SW_RANGE_TAB,
+        LT_OUT_WHERE_COND      TYPE TABLE OF /SKN/S_SW_WHERE_TAB,
+        LWA_IN_RANGE           LIKE LINE OF  LT_IN_RANGE,
+        LWA_OUT_WHERE_COND     LIKE LINE OF LT_OUT_WHERE_COND,
+        LWA_ALL_ENTRIES_TAB    TYPE /SKN/S_SW_TAB6000,
+        LT_ALL_ENTRIES_TAB     TYPE TABLE OF /SKN/S_SW_TAB6000,
+        LWA_ALL_ENTRIES_COND   TYPE /SKN/S_TABLE_JOIN,
+        LT_ALL_ENTRIES_COND    TYPE TABLE OF /SKN/S_TABLE_JOIN,
+        LT_ALL_ENTRIES_DFIES   TYPE TABLE OF DFIES.
+  FIELD-SYMBOLS:
+        <FS_OUTPUT>            TYPE /SKN/RFC_DB_FLD_EXTEND.
+  "--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  "--- Prepare BSART
+**********************************************************************
+**********************************************************************
+**   select *
+**     from T161
+**     into CORRESPONDING FIELDS OF table lt_T161
+**     where BSTYP = 'B'
+**       and BSAKZ = ' '
+**       and BSART in R_BSART.
+  LV_TABNAME = 'T161'.
+  _RANGE_TO_SEL_TABLE 'BSART'        BSART.
+  LT_OPTION[] = LT_OUT_WHERE_COND[].
+  IF LT_OPTION[] IS INITIAL.
+    LS_OPTION-TEXT = 'BSTYP = ''B'''.
+  ELSE.
+    LS_OPTION-TEXT = 'AND BSTYP = ''B'''.
+  ENDIF.
+  APPEND LS_OPTION TO LT_OPTION.
+  LS_OPTION-TEXT = 'AND BSAKZ = '' '''.
+  APPEND LS_OPTION TO LT_OPTION.
+  CALL FUNCTION 'RFC_READ_TABLE'
+    DESTINATION LV_SW_DEST
+    EXPORTING
+      QUERY_TABLE          = LV_TABNAME
+    TABLES
+      OPTIONS              = LT_OPTION
+      FIELDS               = LT_FIELDS
+      DATA                 = LT_DATA
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_DATA[].
+  ENDIF.
+  _RFC_TO_T_DATA_INDEX LT_DATA LT_T161 LT_FIELDS 1.
+**********************************************************************
+**********************************************************************
+  REFRESH R_BSART.
+  LOOP AT LT_T161 INTO LS_T161.
+    RS_BSART-SIGN = 'I'.
+    RS_BSART-OPTION = 'EQ'.
+    RS_BSART-LOW = LS_T161-BSART.
+    APPEND RS_BSART TO R_BSART.
+  ENDLOOP.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'BEDAT'.
+      R_BEDAT[] = R_DATUM[]. "Purchase Order Date
+    WHEN 'BADAT'.
+      R_BADAT[] = R_DATUM[]. "Request Order Date
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Changed On
+    WHEN OTHERS.
+      R_BADAT[] = R_DATUM[].
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  REFRESH LT_EBAN.
+**********************************************************************
+**********************************************************************
+**  SELECT *
+**    from EBAN
+**    into CORRESPONDING FIELDS OF table lt_EBAN
+**
+**    where FRGRL in R_FRGRL    "  EQ 'X'
+**      and FRGGR in R_FRGGR
+**
+**      and EBELN in R_EBELN
+**      and BSTYP = 'F'  " PO !!! Remove for Test
+**
+**      and EKORG in R_EKORG
+**
+**      and LIFNR in R_LIFNR
+**      and RESWK in R_RESWK
+**      and BEDAT in R_BEDAT
+**      and BADAT in R_BADAT
+**      and ERDAT in R_ERDAT
+**
+**      and BSART in R_BSART
+**      and EKGRP in R_EKGRP
+**      and ERNAM in R_ERNAM
+**      and WERKS	in R_WERKS
+**      and WAERS in R_WAERS
+**
+**      """and LOEKZ  in R_LOEKZ
+**      and LOEKZ = ' '
+**      and FRGKZ in R_FRGKZ
+**
+**      and FRGST <>  ''
+**      and STATU = 'B'
+**      and ESTKZ in ('D', 'F', 'R')
+**      and KNTTP <> ' '
+**       .
+* Join table list
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'EBAN'       ''  ''.
+  REFRESH LT_SEL_FIELDS[].
+  _ADAPT_SEL_FIELDS 'EBAN'    'EBAN'  LT_SEL_FIELDS LV_SW_DEST.
+* Range condition
+  REFRESH: LT_OUT_WHERE_COND[], LT_OPTION[].
+  _RANGE_TO_SEL_TABLE 'FRGRL'    FRGRL.
+  _RANGE_TO_SEL_TABLE 'FRGGR'    FRGGR.
+  _RANGE_TO_SEL_TABLE 'EBELN'    EBELN.
+  _RANGE_TO_SEL_TABLE 'EKORG'    EKORG.
+  _RANGE_TO_SEL_TABLE 'LIFNR'    LIFNR.
+  _RANGE_TO_SEL_TABLE 'RESWK'    RESWK.
+  _RANGE_TO_SEL_TABLE 'BEDAT'    BEDAT.
+  _RANGE_TO_SEL_TABLE 'BADAT'    BADAT.
+  _RANGE_TO_SEL_TABLE 'ERDAT'    ERDAT.
+  _RANGE_TO_SEL_TABLE 'BSART'    BSART.
+  _RANGE_TO_SEL_TABLE 'EKGRP'    EKGRP.
+  _RANGE_TO_SEL_TABLE 'ERNAM'    ERNAM.
+  _RANGE_TO_SEL_TABLE 'WERKS'    WERKS.
+  _RANGE_TO_SEL_TABLE 'WAERS'    WAERS.
+  _RANGE_TO_SEL_TABLE 'FRGKZ'    FRGKZ.
+  _RANGE_TO_SEL_TABLE 'LFDAT'    LFDAT.
+  LT_OPTION[] = LT_OUT_WHERE_COND.
+***  IF lt_option[] IS INITIAL.
+***    ls_option-text = 'BSTYP = ''F'''.
+***  ELSE.
+***    ls_option-text = 'AND BSTYP = ''F'''.
+***  ENDIF.
+***  APPEND ls_option TO lt_option.
+  LS_OPTION-TEXT = 'AND LOEKZ = '' '''.
+  APPEND LS_OPTION TO LT_OPTION.
+  LS_OPTION-TEXT = 'AND FRGST <> '' '''.
+  APPEND LS_OPTION TO LT_OPTION.
+  LS_OPTION-TEXT = 'AND STATU = ''B'''.
+  APPEND LS_OPTION TO LT_OPTION.
+  LS_OPTION-TEXT = 'AND KNTTP <> '' '''.
+  APPEND LS_OPTION TO LT_OPTION.
+  LS_OPTION-TEXT = 'AND ESTKZ IN ( ''D'' , ''F'' , ''R'' )'.
+  APPEND LS_OPTION TO LT_OPTION.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTION[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      JOIN_CONDITION       = LT_JOIN_CONDITION[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      SORT_OPTIONS         = LT_SORT_OPTIONS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0.
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_EBAN LT_OUTPUT_FIELDS 2.
+  ENDIF.
+**********************************************************************
+**********************************************************************
+  CHECK LT_EBAN[] IS NOT INITIAL.
+  SORT LT_EBAN BY BANFN BNFPO.
+**********************************************************************
+**********************************************************************
+**   SELECT EKPO~EBELN EKPO~EBELP
+**          EKPO~NETWR EKKO~WAERS as PO_WAERS
+**          EKKO~BEDAT EKKO~WKURS
+**          EKKO~LIFNR EKKO~EKORG
+**          EKET~BANFN EKET~BNFPO
+**     into CORRESPONDING FIELDS OF TABLE lt_PO
+**     from EKET
+**       INNER JOIN EKPO
+**         ON EKPO~EBELN = EKET~EBELN AND
+**            EKPO~EBELP = EKET~EBELP
+**       INNER JOIN EKKO
+**         ON EKKO~EBELN = EKET~EBELN
+**     for all entries in lt_EBAN
+**     WHERE EKET~BANFN = lt_EBAN-BANFN
+**       and EKET~BNFPO = lt_EBAN-BNFPO
+**     .
+  CLEAR: LT_OPTION[], LT_DATA_RFC[], LT_OUT_WHERE_COND[], LT_ALL_ENTRIES_COND[], LT_ALL_ENTRIES_TAB[], LT_RETURN[], LT_OUTPUT_FIELDS[],
+         LT_DFIES[],  LT_ALL_ENTRIES_DFIES[].
+* Join table list
+  REFRESH LT_TABLES_LIST[].
+  _APPEND_TABLES_LIST 'EKET'       ''  'EKET'.
+  _APPEND_TABLES_LIST 'EKPO'       ''  'EKPO'.
+  _APPEND_TABLES_LIST 'EKKO'       ''  'EKKO'.
+* Join condition
+  REFRESH LT_JOIN_CONDITION[].
+  _JOIN_CONDITION 'EKET'  'EBELN'     'EKPO'   'EBELN'.
+  _JOIN_CONDITION 'EKET'  'EBELP'     'EKPO'   'EBELP'.
+  _JOIN_CONDITION 'EKET'  'EBELN'     'EKKO'   'EBELN'.
+  REFRESH LT_SEL_FIELDS[].
+  LS_SEL_FIELDS-TABLE       = 'EKPO'.
+  LS_SEL_FIELDS-FIELD       = 'EBELN'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'EBELP'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'NETWR'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-TABLE       = 'EKKO'.
+  LS_SEL_FIELDS-FIELD       = 'WAERS'.
+  LS_SEL_FIELDS-ALIAS       = 'PO_WAERS'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  CLEAR LS_SEL_FIELDS-ALIAS.
+  LS_SEL_FIELDS-FIELD       = 'BEDAT'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'WKURS'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'LIFNR'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'EKORG'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-TABLE       = 'EKET'.
+  LS_SEL_FIELDS-FIELD       = 'BANFN'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+  LS_SEL_FIELDS-FIELD       = 'BNFPO'.
+  APPEND LS_SEL_FIELDS TO LT_SEL_FIELDS.
+* Convert LT_EBAN to string table
+  _ALL_ENTRIES_CONVERT LT_EBAN  'EBAN'  1.
+* 'For All Entries' Condition
+* 'For All Entries' Condition
+  _ALL_ENTRIES_CONDITION 'EKET~BANFN'    'BANFN' ''.
+  _ALL_ENTRIES_CONDITION 'EKET~BNFPO'    'BNFPO' ''.
+* 'For All Entries' Fields
+  CALL FUNCTION 'DDIF_FIELDINFO_GET'
+    EXPORTING
+      TABNAME        = 'EBAN'
+    TABLES
+      DFIES_TAB      = LT_ALL_ENTRIES_DFIES
+    EXCEPTIONS
+      NOT_FOUND      = 1
+      INTERNAL_ERROR = 2
+      OTHERS         = 3.
+  IF SY-SUBRC NE 0.
+    CLEAR LT_ALL_ENTRIES_DFIES[].
+  ENDIF.
+  CALL FUNCTION '/SKN/RFC_JOIN_TABLES'
+    DESTINATION LV_SW_DEST
+    TABLES
+      OPTIONS              = LT_OPTION[]
+      DATA                 = LT_DATA_RFC[]
+      TABLES_LIST          = LT_TABLES_LIST[]
+      JOIN_CONDITION       = LT_JOIN_CONDITION[]
+      SEL_FIELDS           = LT_SEL_FIELDS[]
+      SORT_OPTIONS         = LT_SORT_OPTIONS[]
+      OUTPUT_FIELDS        = LT_OUTPUT_FIELDS[]
+      DFIES                = LT_DFIES[]
+      RETURN               = LT_RETURN[]
+      ALL_ENTRIES_TAB      = LT_ALL_ENTRIES_TAB[]
+      ALL_ENTRIES_COND     = LT_ALL_ENTRIES_COND[]
+      ALL_ENTRIES_DFIES    = LT_ALL_ENTRIES_DFIES[]
+    EXCEPTIONS
+      TABLE_NOT_AVAILABLE  = 1
+      TABLE_WITHOUT_DATA   = 2
+      OPTION_NOT_VALID     = 3
+      FIELD_NOT_VALID      = 4
+      NOT_AUTHORIZED       = 5
+      DATA_BUFFER_EXCEEDED = 6
+      OTHERS               = 7.
+  IF SY-SUBRC <> 0.
+    CLEAR LT_DATA_RFC[].
+  ELSE.
+    READ TABLE LT_OUTPUT_FIELDS ASSIGNING <FS_OUTPUT> WITH KEY FIELDNAME = 'WAERS'.
+    IF SY-SUBRC EQ 0.
+      <FS_OUTPUT>-FIELDNAME = 'PO_WAERS'.
+    ENDIF.
+    _RFC_TO_T_DATA_INDEX LT_DATA_RFC LT_PO LT_OUTPUT_FIELDS 3.
+  ENDIF.
+**********************************************************************
+**********************************************************************
+  SORT LT_PO BY BANFN BNFPO.
+  LOOP AT LT_PO INTO LS_PO.
+    SY_TABIX = SY-TABIX.
+    LS_PO-NETWR_LOCAL_CURR = LS_PO-NETWR.
+    READ TABLE LT_EBAN INTO LS_EBAN WITH KEY BANFN = LS_PO-BANFN
+                                             BNFPO = LS_PO-BNFPO
+                                    BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      LS_PO-PR_WAERS = LS_EBAN-WAERS.
+      IF LS_PO-PR_WAERS <> LS_PO-PO_WAERS.
+        LS_PO-NETWR_LOCAL_CURR = LS_PO-NETWR * LS_PO-WKURS.
+      ENDIF.
+    ENDIF.
+    MODIFY LT_PO FROM LS_PO INDEX SY_TABIX.
+  ENDLOOP.
+  "--- Aggregate LT_PC by BANFN
+  REFRESH LT_PO_PR.
+  LOOP AT LT_PO INTO LS_PO.
+    MOVE-CORRESPONDING LS_PO TO LS_PO_PR.
+    COLLECT LS_PO_PR INTO LT_PO_PR.
+  ENDLOOP.
+  REFRESH T_DATA.
+  LOOP AT LT_PO_PR INTO LS_PO_PR.
+    MOVE-CORRESPONDING LS_PO_PR TO T_DATA.
+    T_DATA-TOT_PO_VAL = LS_PO_PR-NETWR_LOCAL_CURR.
+    READ TABLE LT_EBAN INTO LS_EBAN WITH KEY BANFN = LS_PO_PR-BANFN
+                                             BNFPO = LS_PO_PR-BNFPO
+                                    BINARY SEARCH.
+    IF SY-SUBRC IS INITIAL.
+      MOVE-CORRESPONDING LS_EBAN  TO T_DATA.
+      MOVE-CORRESPONDING LS_PO_PR TO T_DATA.
+      IF LS_EBAN-PEINH NE 0.
+        DATA(LV_RESULT)     = LS_EBAN-MENGE * LS_EBAN-PREIS.
+        T_DATA-TOT_PREQ_VAL = LV_RESULT / LS_EBAN-PEINH.
+      ENDIF.
+      T_DATA-PO_PREQ_DIFF = T_DATA-TOT_PO_VAL - T_DATA-TOT_PREQ_VAL.
+    ENDIF.
+    IF T_DATA-PO_PREQ_DIFF IN R_PO_PREQ_DIFF.
+      APPEND T_DATA.
+    ENDIF.
+  ENDLOOP.
+*********************************************************************************
+  "--- Get Release Code
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    LV_FRGSX = T_DATA-FRGST.
+    CALL FUNCTION '/SKN/FC_SW_10_PO_GET_FRGC'
+      EXPORTING
+        FRGGR             = T_DATA-FRGGR
+        FRGSX             = LV_FRGSX         """t_data-FRGST        "-frgsx
+        FRGZU             = T_DATA-FRGZU
+        SW_DEST           = LV_SW_DEST
+      IMPORTING
+        FRGC              = T_DATA-FRGC
+      EXCEPTIONS
+        WRONG_COMBINATION = 1
+        OTHERS            = 2.
+    IF SY-SUBRC = 0.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE FRGC  NOT IN R_FRGC .
+*-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION .
+******************************************************************************
+********************************************************************************
+  "--- Set Descriptions
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    "-- BSTYP_DESC
+    LV_DOMNAME = 'BSTYP'.
+    LV_DOMVALUE = T_DATA-BSTYP.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+        SW_DEST    = LV_SW_DEST
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-BSTYP_DESC = LV_DDTEXT.
+    ENDIF.
+    "-- STATU_DESC
+    LV_DOMNAME = 'BANST'.     """''ESTAK'.
+    LV_DOMVALUE = T_DATA-STATU.
+    CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+      EXPORTING
+        I_DOMNAME  = LV_DOMNAME
+        I_DOMVALUE = LV_DOMVALUE
+        LANGU      = LV_LANGU
+        SW_DEST    = LV_SW_DEST
+      IMPORTING
+        E_DDTEXT   = LV_DDTEXT
+      EXCEPTIONS
+        NOT_EXIST  = 1
+        OTHERS     = 2.
+    IF SY-SUBRC = 0.
+      T_DATA-STATU_DESC = LV_DDTEXT.
+    ENDIF.
+**    ENDIF.
+    "-- BSART_DESC type ESART
+    LV_BSART = T_DATA-BSART.
+    CALL FUNCTION '/SKN/FC_SW_10_BSART_DESC'
+      EXPORTING
+        BSART      = LV_BSART """"t_data-BSART
+        LANGU      = LV_LANGU
+        BSTYP      = T_DATA-BSTYP
+        SW_DEST    = LV_SW_DEST
+      IMPORTING
+        TYPE_DESC  = T_DATA-BSART_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- Get  Vendor Decriptions type LIFNR
+    LV_WLIEF = T_DATA-LIFNR.
+    CALL FUNCTION '/SKN/FC_SW_10_VENDOR_DESC'
+      EXPORTING
+        LIFNR        = LV_WLIEF """t_data-LIFNR
+        SW_DEST      = LV_SW_DEST
+      IMPORTING
+        VENDOR_DESC  = T_DATA-VENDOR_DESC
+      EXCEPTIONS
+        WRONG_VENDOR = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKORG_DESC type EKORG
+    CALL FUNCTION '/SKN/FC_SW_10_PUR_ORG_DESC'
+      EXPORTING
+        EKORG        = T_DATA-EKORG
+        "LANGU              = lv_LANGU
+        SW_DEST      = LV_SW_DEST
+      IMPORTING
+        PUR_ORG_DESC = T_DATA-EKORG_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "-- EKGRP_DESC type EKGRP
+    CALL FUNCTION '/SKN/FC_SW_10_PUR_GRP_DESC'
+      EXPORTING
+        EKGRP        = T_DATA-EKGRP
+*       LANGU        = lv_LANGU
+        SW_DEST      = LV_SW_DEST
+      IMPORTING
+        PUR_GRP_DESC = T_DATA-EKGRP_DESC
+      EXCEPTIONS
+        WRONG_CODE   = 1
+        OTHERS       = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "---- WERKS_DESC lv_WERKS
+    LV_WERKS = T_DATA-WERKS.
+    CALL FUNCTION '/SKN/FC_SW_10_PLANT_DESC'
+      EXPORTING
+        WERKS      = LV_WERKS    """"t_data-RESWK
+*       LANGU      = lv_LANGU
+        SW_DEST    = LV_SW_DEST
+      IMPORTING
+        PLANT_DESC = T_DATA-WERKS_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    "--- RESWK_DESC (WERKS) type-WERKS_D
+    LV_RESWK = T_DATA-RESWK.
+    CALL FUNCTION '/SKN/FC_SW_10_PLANT_DESC'
+      EXPORTING
+        WERKS      = LV_RESWK    """"t_data-RESWK
+*       LANGU      = lv_LANGU
+        SW_DEST    = LV_SW_DEST
+      IMPORTING
+        PLANT_DESC = T_DATA-RESWK_DESC
+      EXCEPTIONS
+        WRONG_CODE = 1
+        OTHERS     = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

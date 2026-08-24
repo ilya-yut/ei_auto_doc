@@ -1,0 +1,781 @@
+FUNCTION /SKN/F_SW_10_03_PO_CONF_COMPL .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_03_PO_CONF_COMPL OPTIONAL
+*"----------------------------------------------------------------------
+  DATA: BEGIN OF EKKO.
+          INCLUDE STRUCTURE EKKO.
+  DATA:   EBELP TYPE EKPO-EBELP,
+          MATNR TYPE EKPO-MATNR,
+          VBUND TYPE LFA1-VBUND.
+  DATA: END OF EKKO.
+  DATA: BEGIN OF LS_WRK.
+          INCLUDE STRUCTURE /SKN/S_SW_10_03_PO_CONF_COMPL.
+  DATA: WRK_OBJECTID TYPE CDOBJECTV.
+  DATA: WRK_TABKEY   TYPE CDPOS-TABKEY.
+  DATA: END OF LS_WRK.
+  DATA_SINGLE: LANGU          LANGU,
+               BACKDAYS       INT4,
+               DATE_REF_FLD   NAME_FELD,
+*               elikz          elikz,
+*               loekz          eloek,
+*               wepos          wepos,
+               OBJECTCLAS     CDOBJECTCL,
+               TABNAME        TABNAME,
+               FIELDNAME      FIELDNAME,
+               LAST_ONLY      CHAR1,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT.
+*
+*
+  LV_BACKDAYS      = 10.
+  LV_DURATION_UNIT = 'D'.
+  LV_DATE_REF_FLD  = 'UDATE'.          " PO release date
+  LV_OBJECTCLAS    = 'EINKBELEG'.
+  LV_TABNAME       = 'EKKO'.
+  LV_FIELDNAME     = 'FRGKE'.
+  LV_LAST_ONLY     = 'X'.              " Take the last changes of the field
+*  lv_elikz         = space.
+*  lv_loekz         = space.
+*  lv_wepos         = 'X'.
+*
+  SELECT_SINGLE: LANGU,
+                 BACKDAYS,
+                 DATE_REF_FLD,
+                 OBJECTCLAS,
+                 TABNAME,
+                 FIELDNAME,
+                 LAST_ONLY,
+                 DURATION_UNIT.
+*
+*
+  DATA_MULTY: EBELN           EBELN,
+              EBELP           EBELP,
+              BUKRS           BUKRS,
+              BSTYP_EKKO      EBSTYP,
+              BSTYP_EBAN      BSTYP,
+              BSART_EKKO      ESART,
+              BSART_EBAN      BBSRT,
+              LOEKZ           ELOEK,
+              STATU           ESTAK,
+              AEDAT           ERDAT,
+              ERNAM           ERNAM,
+              LIFNR           ELIFN,
+              EKORG           EKORG,
+              EKGRP           BKGRP,
+              FRGGR           FRGGR,
+              FRGSX           FRGSX,
+*              frgco           frgco,
+              FRGKE           FRGKE,
+              FRGKZ           FRGKZ,
+              FRGRL           FRGRL,
+              WAERS           WAERS,
+              MATNR           MATNR,
+              WERKS           EWERK,
+              MATKL           MATKL,
+              KNTTP           KNTTP,
+              BWTAR           BWTAR_D,
+              BWTTY           BWTTY_D,
+              ELIKZ           ELIKZ,
+              EREKZ           EREKZ,
+              PSTYP           PSTYP,
+              FIPOS           FIPOS,
+              WEPOS           WEPOS,
+              BEDAT           EBDAT,
+              EINDT           EINDT,
+              BANFN           BANFN,
+              BNFPO           BNFPO,
+              ESTKZ           ESTKZ,
+              VBUND           RASSC,
+              UEBTO           UEBTO,
+              UEBTK           UEBTK,
+              SAKTO           SAKTO,
+              GSBER           GSBER,
+              KOSTL           KOSTL,
+              VBELN           VBELN,
+              VBELP           POSNR_VA,
+              ANLN1           ANLN1,
+              ANLN2           ANLN2,
+              AUFNR           AUFNR,
+              PRCTR           PRCTR,
+              BADAT           BADAT,
+              LFDAT           EINDT,
+              ERDAT           AEDAT,
+              USERNAME        CDUSERNAME,
+              UDATE           CDDATUM,
+              PROCSTAT        MEPROCSTATE,
+              WEMNG           WEEMG,
+              OPEN_ORDER_QUAN OBMNG,
+              PS_PSP_PNR      PS_PSP_PNR,
+              VALUE_OLD       CDFLDVALO,
+              VALUE_NEW       CDFLDVALN,
+              DATUM           SY-DATUM,
+              DURATION        /SKN/E_SW_DURATION.
+*
+  SELECT_MULTY: EBELN,
+                EBELP,
+                BUKRS,
+                BSTYP_EKKO,
+                BSTYP_EBAN,
+                BSART_EKKO,
+                BSART_EBAN,
+                LOEKZ,
+                STATU,
+                AEDAT,
+                ERNAM,
+                LIFNR,
+                EKORG,
+                EKGRP,
+                FRGGR,
+                FRGSX,
+*                frgco,
+                FRGKE,
+                FRGKZ,
+                FRGRL,
+                WAERS,
+                MATNR,
+                WERKS,
+                MATKL,
+                KNTTP,
+                BWTAR,
+                BWTTY,
+                ELIKZ,
+                EREKZ,
+                PSTYP,
+                FIPOS,
+                WEPOS,
+                BEDAT,
+                BANFN,
+                BNFPO,
+                ESTKZ,
+                VBUND,
+                UEBTO,
+                UEBTK,
+                SAKTO,
+                GSBER,
+                KOSTL,
+                VBELN,
+                VBELP,
+                ANLN1,
+                ANLN2,
+                AUFNR,
+                PRCTR,
+                BADAT,
+                LFDAT,
+                ERDAT,
+                USERNAME,
+                UDATE,
+                PROCSTAT,
+                WEMNG,
+                OPEN_ORDER_QUAN,
+                PS_PSP_PNR,
+                VALUE_OLD,
+                VALUE_NEW,
+                DATUM,
+                DURATION.
+*
+  CONVERT_MULTY: EBELN ALPHA,
+                 LIFNR ALPHA.
+*
+  DATA: DATE_FROM TYPE SY-DATUM.
+  DATA: SY_TABIX LIKE SY-TABIX .
+  DATA: TIME_DIFF TYPE INT4.
+  DATA: FLD(60) TYPE C.
+  DATA: REF_DATE TYPE D.
+  DATA: LV_WEMNG        TYPE EKET-WEMNG,
+        LV_MENGE        TYPE EKET-MENGE,
+        LV_DOMNAME      TYPE DD07V-DOMNAME,
+        LV_DOMVALUE     TYPE DD07V-DOMVALUE_L,
+        LV_DDTEXT       TYPE DD07V-DDTEXT,
+        LV_KTEXT        TYPE  KTEXT,
+        LV_VAL_TMP1     TYPE P DECIMALS 3,
+        LV_VAL_TMP2     TYPE P DECIMALS 3,
+        LV_WRK_OBJECTID TYPE CDOBJECTV,
+        LV_WRK_TABKEY   TYPE CDTABKEY.
+  DATA: LS_EKKO  LIKE EKKO,
+        LS_EKKN  TYPE EKKN,
+        LS_CDPOS TYPE CDPOS,
+        LS_DATA  LIKE LINE OF T_DATA[].
+  DATA: LT_WRK LIKE STANDARD TABLE OF LS_WRK.
+  DATA: LT_EKKO  LIKE TABLE OF EKKO,
+        LT_EKKN  TYPE TABLE OF EKKN,
+        LT_CDPOS TYPE STANDARD TABLE OF CDPOS.
+  FIELD-SYMBOLS: <FS_WRK> LIKE LS_WRK,
+                 <FS_DATA> LIKE LINE OF T_DATA[],
+                       TYPE ANY.
+*
+*"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_03_PO_CONF_COMPL'
+      IMPORTING
+        IS_ALERT = IS_ALERT
+      TABLES
+        T_SELECT = T_SELECT
+        T_DATA   = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*"--- Run Cloud Mode -----
+*
+** Initial Date
+  IF R_DATUM[] IS INITIAL.
+    RS_DATUM-SIGN   = 'I'.
+    RS_DATUM-OPTION = 'GT'.
+    DATE_FROM       = SY-DATUM - LV_BACKDAYS.
+    RS_DATUM-LOW    = DATE_FROM.
+*     rs_datum-high   = sy-datum.
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+*
+*  IF r_elikz[] IS INITIAL.
+*    REFRESH: r_elikz[].
+*    CLEAR rs_elikz.
+*    rs_elikz-sign   = 'I'.
+*    rs_elikz-option = 'EQ'.
+*    rs_elikz-low    = lv_elikz.
+*    APPEND rs_elikz TO r_elikz[].
+*  ENDIF.
+*
+*  IF r_loekz[] IS INITIAL.
+*    REFRESH: r_loekz[].
+*    CLEAR rs_loekz.
+*    rs_loekz-sign   = 'I'.
+*    rs_loekz-option = 'EQ'.
+*    rs_loekz-low    = lv_loekz.
+*    APPEND rs_loekz TO r_loekz[].
+*  ENDIF.
+*
+*  IF r_wepos[] IS INITIAL.
+*    REFRESH: r_wepos[].
+*    CLEAR rs_wepos.
+*    rs_wepos-sign   = 'I'.
+*    rs_wepos-option = 'EQ'.
+*    rs_wepos-low    = lv_wepos.
+*    APPEND rs_wepos TO r_wepos[].
+*  ENDIF.
+*
+  IF LV_LANGU IS INITIAL.
+    LV_LANGU = SY-LANGU.
+  ENDIF.
+*
+* "--- Set Reference Date Field
+  CASE LV_DATE_REF_FLD.
+    WHEN 'BEDAT'.
+      R_BEDAT[] = R_DATUM[].    " Purchasing document
+    WHEN 'AEDAT'.
+      R_AEDAT[] = R_DATUM[].    " Document created
+    WHEN 'UDATE'.
+      R_UDATE[] = R_DATUM[].    " Release date
+*    WHEN 'EINDT'.
+*      r_eindt[] = r_datum[]. " Item Delivery
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[].
+    WHEN 'BADAT'.
+      R_BADAT[] = R_DATUM[].
+    WHEN OTHERS.
+      R_BEDAT[] = R_DATUM[]. " Purchasing document
+  ENDCASE.
+*
+**--- Retrieve data
+  CLEAR IS_ALERT .
+  SELECT *
+    FROM EKKO AS K INNER JOIN EKPO  AS P  ON  K~EBELN     EQ P~EBELN
+                   INNER JOIN T16FB AS T  ON  K~FRGKE     EQ T~FRGKE
+                   INNER JOIN CDHDR AS CD ON  CD~OBJECTID EQ K~EBELN
+                   INNER JOIN EBAN  AS A  ON  P~BANFN     EQ A~BANFN
+                                          AND P~BNFPO     EQ A~BNFPO
+    INTO CORRESPONDING FIELDS OF TABLE LT_WRK
+* EKPO
+    WHERE P~EBELN       IN R_EBELN[]
+    AND   P~EBELP       IN R_EBELP[]
+    AND   P~MATNR       IN R_MATNR[]
+    AND   P~WERKS       IN R_WERKS[]
+    AND   P~MATKL       IN R_MATKL[]
+    AND   P~KNTTP       IN R_KNTTP[]
+    AND   P~BWTAR       IN R_BWTAR[]
+    AND   P~BWTTY       IN R_BWTTY[]
+    AND   P~EREKZ       IN R_EREKZ[]
+    AND   P~PSTYP       IN R_PSTYP[]
+    AND   P~FIPOS       IN R_FIPOS[]
+    AND   P~WEPOS       IN R_WEPOS[]
+    AND   P~UEBTO       IN R_UEBTO[]
+    AND   P~UEBTK       IN R_UEBTK[]
+* EKKO
+    AND   K~FRGRL       IN R_FRGRL[]
+    AND   K~FRGGR       IN R_FRGGR[]
+    AND   K~FRGSX       IN R_FRGSX[]
+    AND   K~BUKRS       IN R_BUKRS[]
+    AND   K~BSTYP       IN R_BSTYP_EKKO[]
+    AND   K~BSART       IN R_BSART_EKKO[]
+    AND   K~STATU       IN R_STATU[]
+    AND   K~AEDAT       IN R_AEDAT[]
+    AND   K~BEDAT       IN R_BEDAT[]
+    AND   K~LIFNR       IN R_LIFNR[]
+    AND   K~EKORG       IN R_EKORG[]
+    AND   K~EKGRP       IN R_EKGRP[]
+    AND   K~FRGSX       NE SPACE
+    AND   K~FRGKE       IN R_FRGKE[]
+    AND   K~PROCSTAT    IN R_PROCSTAT[]
+* CDHDR
+    AND   CD~OBJECTCLAS EQ LV_OBJECTCLAS
+    AND   CD~USERNAME   IN R_USERNAME
+    AND   CD~UDATE      IN R_UDATE[]
+* EBAN
+    AND   A~BSART IN R_BSART_EBAN[]
+    AND   A~BSTYP IN R_BSTYP_EBAN[]
+    AND   A~FRGKZ IN R_FRGKZ[]
+    AND   A~ESTKZ IN R_ESTKZ[]
+    AND   A~ERDAT IN R_ERDAT[]
+    AND   A~BADAT IN R_BADAT[]
+    AND   A~LFDAT IN R_LFDAT[]
+    AND   A~LOEKZ IN R_LOEKZ[]
+    AND   A~ERNAM IN R_ERNAM[].
+  SORT LT_WRK.
+  DELETE ADJACENT DUPLICATES FROM LT_WRK.
+  LOOP AT LT_WRK ASSIGNING <FS_WRK>.
+    <FS_WRK>-WRK_OBJECTID = LS_WRK-EBELN.
+  ENDLOOP.
+  IF LT_WRK[] IS NOT INITIAL.
+    LOOP AT R_FRGKE INTO RS_FRGKE.
+      RS_VALUE_NEW-SIGN   = RS_FRGKE-SIGN.
+      RS_VALUE_NEW-OPTION = RS_FRGKE-OPTION.
+      RS_VALUE_NEW-LOW    = RS_FRGKE-LOW.
+      RS_VALUE_NEW-HIGH   = RS_FRGKE-HIGH.
+      APPEND RS_VALUE_NEW TO R_VALUE_NEW.
+      CLEAR: RS_VALUE_NEW.
+    ENDLOOP.
+    SELECT *
+      FROM CDPOS
+      INTO CORRESPONDING FIELDS OF TABLE LT_CDPOS
+      FOR ALL ENTRIES IN LT_WRK
+      WHERE OBJECTCLAS EQ LV_OBJECTCLAS         " default - 'EINKBELEG'
+      AND   OBJECTID   EQ LT_WRK-WRK_OBJECTID   " EBELN
+      AND   TABNAME    EQ LV_TABNAME            " default - 'EKKO'
+      AND   FNAME      EQ LV_FIELDNAME          " default - 'FRGKE'
+      AND   VALUE_NEW  IN R_VALUE_NEW[]         "
+      AND   VALUE_OLD  IN R_VALUE_OLD[].
+    IF LT_CDPOS IS NOT INITIAL.
+      SORT LT_CDPOS BY VALUE_NEW.
+      DELETE LT_CDPOS WHERE VALUE_NEW IS INITIAL.
+    ENDIF.
+    SORT LT_CDPOS BY OBJECTCLAS OBJECTID CHANGENR DESCENDING TABKEY.
+  ENDIF.
+  LOOP AT LT_WRK ASSIGNING <FS_WRK>.
+    SY_TABIX = SY-TABIX.
+    READ TABLE LT_CDPOS INTO LS_CDPOS WITH KEY OBJECTCLAS = LV_OBJECTCLAS
+                                               OBJECTID   = <FS_WRK>-WRK_OBJECTID
+                                               CHANGENR   = <FS_WRK>-CHANGENR
+                                               BINARY SEARCH.
+    IF SY-SUBRC IS NOT INITIAL.
+      DELETE LT_WRK INDEX SY_TABIX.
+    ELSE.
+      <FS_WRK>-TABNAME   = LS_CDPOS-TABNAME.
+      <FS_WRK>-FIELDNAME = LS_CDPOS-FNAME.
+      <FS_WRK>-VALUE_NEW = LS_CDPOS-VALUE_NEW.
+      <FS_WRK>-VALUE_OLD = LS_CDPOS-VALUE_OLD.
+    ENDIF.
+  ENDLOOP.
+  SORT LT_WRK BY WRK_OBJECTID UDATE DESCENDING UTIME DESCENDING.
+  REFRESH T_DATA.
+  IF LV_LAST_ONLY IS NOT INITIAL.               " Only last release is relevant - the rest is deleted.
+    CLEAR: LV_WRK_OBJECTID, LV_WRK_TABKEY.
+    LOOP AT LT_WRK INTO LS_WRK.
+      IF LV_WRK_OBJECTID EQ LS_WRK-WRK_OBJECTID.
+        CONTINUE.
+      ELSE.
+        LV_WRK_OBJECTID = LS_WRK-WRK_OBJECTID.
+        MOVE-CORRESPONDING LS_WRK TO T_DATA.
+        T_DATA-TABNAME   = LV_TABNAME.
+        T_DATA-FIELDNAME = LV_FIELDNAME.
+        APPEND T_DATA.
+      ENDIF.
+    ENDLOOP.
+  ELSE.
+    LOOP AT LT_WRK INTO LS_WRK.
+      MOVE-CORRESPONDING LS_WRK TO T_DATA.
+      T_DATA-TABNAME   = LV_TABNAME.
+      T_DATA-FIELDNAME = LV_FIELDNAME.
+      APPEND T_DATA.
+    ENDLOOP.
+  ENDIF.
+  IF T_DATA[] IS NOT INITIAL.
+    SORT T_DATA[] BY EBELN EBELP.
+  ENDIF.
+***********************************************************************************
+*
+**-- Calculate Status Duration (associating to Reference Field (DATE_REF_FLD)
+  LOOP AT T_DATA.
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    CHECK FLD IS NOT INITIAL.
+    ASSIGN (FLD) TO .
+    CHECK  IS ASSIGNED.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT   "'D'
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION  = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION  = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION  NOT IN R_DURATION.
+*******************************************************************************
+  LOOP AT T_DATA ASSIGNING <FS_DATA>.
+*
+    SY_TABIX = SY-TABIX.
+*    CLEAR: lv_menge, lv_wemng, lv_val_tmp1, lv_val_tmp2.
+*    IF <fs_data>-menge > <fs_data>-wemng.
+*      <fs_data>-open_order_quan = <fs_data>-menge - <fs_data>-wemng.
+*    ELSE.
+*      <fs_data>-open_order_quan = 0.
+*    ENDIF.
+*    IF r_open_order_quan[] IS NOT INITIAL.
+*      IF NOT <fs_data>-open_order_quan IN r_open_order_quan[].
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*    ENDIF.
+*    READ TABLE lt_ekkn INTO ls_ekkn WITH KEY ebeln = <fs_data>-ebeln
+*                                             ebelp = <fs_data>-ebelp
+*                                             BINARY SEARCH.
+*    IF sy-subrc = 0.
+*      IF ls_ekkn-sakto IN r_sakto[] OR r_sakto[] IS INITIAL.
+*        <fs_data>-sakto = ls_ekkn-sakto.
+*      ELSE.
+*        DELETE t_data WHERE sakto      NOT IN r_sakto.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-gsber IN r_gsber[] OR r_gsber[] IS INITIAL.
+*        <fs_data>-gsber = ls_ekkn-gsber.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-kostl IN r_kostl[] OR r_kostl[] IS INITIAL.
+*        <fs_data>-kostl = ls_ekkn-kostl.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-vbeln IN r_vbeln[] OR r_vbeln[] IS INITIAL.
+*        <fs_data>-vbeln = ls_ekkn-vbeln.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-vbelp IN r_vbelp[] OR r_vbelp[] IS INITIAL.
+*        <fs_data>-vbelp = ls_ekkn-vbelp.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-anln1 IN r_anln1[] OR r_anln1[] IS INITIAL.
+*        <fs_data>-anln1 = ls_ekkn-anln1.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-anln2 IN r_anln2[] OR r_anln2[] IS INITIAL.
+*        <fs_data>-anln2 = ls_ekkn-anln2.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-aufnr IN r_aufnr[] OR r_aufnr[] IS INITIAL.
+*        <fs_data>-aufnr = ls_ekkn-aufnr.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-prctr IN r_prctr[] OR r_prctr[] IS INITIAL.
+*        <fs_data>-prctr = ls_ekkn-prctr.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*      IF ls_ekkn-ps_psp_pnr IN r_ps_psp_pnr[] OR r_ps_psp_pnr[] IS INITIAL.
+*        <fs_data>-ps_psp_pnr = ls_ekkn-ps_psp_pnr.
+*      ELSE.
+*        DELETE t_data INDEX sy_tabix.
+*        CONTINUE.
+*      ENDIF.
+*
+*    ENDIF.
+*    IF lv_menge <= lv_wemng.
+*      DELETE t_data[] INDEX sy_tabix.
+*      CONTINUE.
+*    ENDIF.
+*
+*    <fs_data>-waers_local     = <fs_data>-waers.
+*    <fs_data>-menge           = lv_menge.
+*    <fs_data>-wemng           = lv_wemng.
+*    <fs_data>-open_order_quan = lv_menge - lv_wemng.
+*
+*    IF <fs_data>-bpumn <> 0 AND <fs_data>-peinh <> 0.
+*      lv_val_tmp1 = <fs_data>-netpr * ( <fs_data>-open_order_quan ).
+*      lv_val_tmp2 = ( <fs_data>-bpumz / <fs_data>-bpumn ) /
+*                      <fs_data>-peinh.
+*
+*      <fs_data>-open_value  = lv_val_tmp1 * lv_val_tmp2.
+*    ELSE.
+*      <fs_data>-open_value = 0.
+*    ENDIF.
+* Get PO Category desc.
+    IF <FS_DATA>-BSTYP_EKKO IS NOT INITIAL.
+      "-- BSTYP_DESC
+      LV_DOMNAME = 'EBSTYP'.
+      LV_DOMVALUE = <FS_DATA>-BSTYP_EKKO.
+      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+        EXPORTING
+          I_DOMNAME  = LV_DOMNAME
+          I_DOMVALUE = LV_DOMVALUE
+          LANGU      = LV_LANGU
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          E_DDTEXT   = LV_DDTEXT
+        EXCEPTIONS
+          NOT_EXIST  = 1
+          OTHERS     = 2.
+      IF SY-SUBRC = 0.
+        <FS_DATA>-BSTYP_EKKO_DESC = LV_DDTEXT.
+      ENDIF.
+    ENDIF.
+* Get PR Category desc.
+    IF <FS_DATA>-BSTYP_EBAN IS NOT INITIAL.
+      "-- BSTYP_DESC
+      LV_DOMNAME = 'BSTYP'.
+      LV_DOMVALUE = <FS_DATA>-BSTYP_EBAN.
+      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+        EXPORTING
+          I_DOMNAME  = LV_DOMNAME
+          I_DOMVALUE = LV_DOMVALUE
+          LANGU      = LV_LANGU
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          E_DDTEXT   = LV_DDTEXT
+        EXCEPTIONS
+          NOT_EXIST  = 1
+          OTHERS     = 2.
+      IF SY-SUBRC = 0.
+        <FS_DATA>-BSTYP_EBAN_DESC = LV_DDTEXT.
+      ENDIF.
+    ENDIF.
+* G/L Account Description
+    IF <FS_DATA>-SAKTO IS NOT INITIAL AND <FS_DATA>-BUKRS IS NOT INITIAL.
+      DATA: LV_ACC_DESC TYPE  TXT20_SKAT.
+      CALL FUNCTION '/SKN/F_SW_10_SAKTO_DESC'
+        EXPORTING
+          SPRAS      = SY-LANGU
+          BUKRS      = <FS_DATA>-BUKRS
+*         KTOPL      =
+          SAKNR      = <FS_DATA>-SAKTO
+        IMPORTING
+          ACC_DESC   = LV_ACC_DESC
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+      <FS_DATA>-GL_ACC_TXT = LV_ACC_DESC.
+    ENDIF.
+* Cost Center Description
+    IF <FS_DATA>-KOSTL IS NOT INITIAL AND <FS_DATA>-KOKRS IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_KOSTL_DESC'
+        EXPORTING
+          SPRAS      = SY-LANGU
+          KOKRS      = <FS_DATA>-KOKRS
+          KOSTL      = <FS_DATA>-KOSTL
+        IMPORTING
+          KOSTL_DESC = LV_KTEXT
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+      <FS_DATA>-KOSTL_DESC = LV_KTEXT.
+    ENDIF.
+* Profit Center Description
+    IF <FS_DATA>-PRCTR IS NOT INITIAL AND <FS_DATA>-KOKRS IS NOT INITIAL.
+      DATA: LVV_KTEXT TYPE  KTEXT.
+      CALL FUNCTION '/SKN/F_SW_10_PRCTR_DESC'
+        EXPORTING
+          SPRAS      = SY-LANGU
+          PRCTR      = <FS_DATA>-PRCTR
+          KOKRS      = <FS_DATA>-KOKRS
+        IMPORTING
+          KTEXT      = LVV_KTEXT
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+      IF SY-SUBRC <> 0.
+* Implement suitable error handling here
+      ENDIF.
+      <FS_DATA>-PRCTR_DESC = LVV_KTEXT.
+    ENDIF.
+* Material group desc.
+    IF <FS_DATA>-MATKL IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MAT_GRP_DESC'
+        EXPORTING
+          MATKL      = <FS_DATA>-MATKL
+*         LANGU      = SY-LANGU
+        IMPORTING
+          MATKL_DESC = <FS_DATA>-WGBEZ
+*         MATKL_DESC_L       =
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+*    "--- Get  Vendor Decriptions
+    IF <FS_DATA>-LIFNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_VENDOR_DESC'
+        EXPORTING
+          LIFNR        = <FS_DATA>-LIFNR
+        IMPORTING
+          VENDOR_DESC  = <FS_DATA>-NAME1
+        EXCEPTIONS
+          WRONG_VENDOR = 1
+          OTHERS       = 2.
+    ENDIF.
+* Get PO Doc.Type desc.
+    IF <FS_DATA>-BSART_EKKO IS NOT INITIAL AND <FS_DATA>-BSTYP_EKKO IS NOT INITIAL.
+      "-- BSART_DESC
+      CALL FUNCTION '/SKN/FC_SW_10_BSART_DESC'
+        EXPORTING
+          BSART      = <FS_DATA>-BSART_EKKO
+          LANGU      = LV_LANGU
+          BSTYP      = <FS_DATA>-BSTYP_EKKO
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          TYPE_DESC  = <FS_DATA>-BATXT_EKKO
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+* Get PR Doc.Type desc.
+    IF <FS_DATA>-BSART_EBAN IS NOT INITIAL AND <FS_DATA>-BSTYP_EBAN IS NOT INITIAL.
+      "-- BSART_DESC
+      CALL FUNCTION '/SKN/FC_SW_10_BSART_DESC'
+        EXPORTING
+          BSART      = <FS_DATA>-BSART_EBAN
+          LANGU      = LV_LANGU
+          BSTYP      = <FS_DATA>-BSTYP_EBAN
+          SW_DEST    = LV_SW_DEST
+        IMPORTING
+          TYPE_DESC  = <FS_DATA>-BATXT_EBAN
+        EXCEPTIONS
+          WRONG_CODE = 1
+          OTHERS     = 2.
+    ENDIF.
+*   "-- EKORG_DESC
+    IF <FS_DATA>-EKORG IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PUR_ORG_DESC'
+        EXPORTING
+          EKORG        = <FS_DATA>-EKORG
+          "LANGU              = lv_LANGU
+        IMPORTING
+          PUR_ORG_DESC = <FS_DATA>-EKOTX
+        EXCEPTIONS
+          WRONG_CODE   = 1
+          OTHERS       = 2.
+    ENDIF.
+    IF <FS_DATA>-MATNR IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_MATERIAL_DESC'
+        EXPORTING
+          MATNR         = <FS_DATA>-MATNR
+        IMPORTING
+          MATERIAL_DESC = <FS_DATA>-MAKTX
+        EXCEPTIONS
+          WRONG_CODE    = 1
+          OTHERS        = 2.
+    ENDIF.
+*   "-- EKGRP_DESC
+    IF <FS_DATA>-EKGRP IS NOT INITIAL.
+      CALL FUNCTION '/SKN/F_SW_10_PUR_GRP_DESC'
+        EXPORTING
+          EKGRP        = <FS_DATA>-EKGRP
+*         LANGU        = lv_LANGU
+        IMPORTING
+          PUR_GRP_DESC = <FS_DATA>-EKNAM
+        EXCEPTIONS
+          WRONG_CODE   = 1
+          OTHERS       = 2.
+    ENDIF.
+    IF <FS_DATA>-USERNAME IS NOT INITIAL.
+* Username (Username(CDHDR))
+      CALL FUNCTION '/SKN/F_SW_10_GET_USER_DET_ENH'
+        EXPORTING
+          BNAME      = <FS_DATA>-USERNAME
+        IMPORTING
+          NAME_FIRST = <FS_DATA>-NAME_FIRST_USER
+          NAME_LAST  = <FS_DATA>-NAME_LAST_USER
+          NAME_TEXT  = <FS_DATA>-NAME_TEXT_USER
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+    ENDIF.
+    IF <FS_DATA>-ERNAM_EKKO IS NOT INITIAL.
+* Username (EKKO-ERNAM)
+      CALL FUNCTION '/SKN/F_SW_10_GET_USER_DET_ENH'
+        EXPORTING
+          BNAME      = <FS_DATA>-ERNAM_EKKO
+        IMPORTING
+          NAME_FIRST = <FS_DATA>-NAME_FIRST_EKKO
+          NAME_LAST  = <FS_DATA>-NAME_LAST_EKKO
+          NAME_TEXT  = <FS_DATA>-NAME_TEXT_EKKO
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+    ENDIF.
+    IF <FS_DATA>-ERNAM_EBAN IS NOT INITIAL.
+* Username (EBAN-ERNAM)
+      CALL FUNCTION '/SKN/F_SW_10_GET_USER_DET_ENH'
+        EXPORTING
+          BNAME      = <FS_DATA>-ERNAM_EBAN
+        IMPORTING
+          NAME_FIRST = <FS_DATA>-NAME_FIRST_EBAN
+          NAME_LAST  = <FS_DATA>-NAME_LAST_EBAN
+          NAME_TEXT  = <FS_DATA>-NAME_TEXT_EBAN
+        EXCEPTIONS
+          NO_DATA    = 1
+          OTHERS     = 2.
+    ENDIF.
+  ENDLOOP.
+*
+**
+***--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

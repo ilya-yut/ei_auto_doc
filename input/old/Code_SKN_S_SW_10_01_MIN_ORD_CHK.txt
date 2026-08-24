@@ -1,0 +1,170 @@
+FUNCTION /SKN/F_SW_10_01_MIN_ORD_CHK.
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_MIN_ORD_CHK OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: SW_DEST       RFCDEST,
+               BACKDAYS      INT4,
+               MANAGE_IN_UTC CHAR1,
+               DATE_REF_FLD  NAME_FELD,
+               DIV_ALERT_CHK FLAG.
+  LV_BACKDAYS     = 1.
+  LV_DATE_REF_FLD = 'ERDAT'. " Created on
+  SELECT_SINGLE: SW_DEST,
+                 BACKDAYS,
+                 MANAGE_IN_UTC,
+                 DATE_REF_FLD,
+                 DIV_ALERT_CHK.
+  DATA_MULTY: MATNR  MATNR,
+              VBELN  VBELN_VA,
+              WERKS  WERKS_EXT,
+              VBTYP  VBTYP,
+              AUART  AUART,
+              KUNNR  KUNAG,
+              PSTYV  PSTYV,
+              ERDAT  ERDAT_RF,
+              AEDAT  AEDAT,
+              DATUM  SY-DATUM.
+  SELECT_MULTY: MATNR,
+                VBELN,
+                WERKS,
+                ERDAT,
+                AEDAT,
+                DATUM.
+  CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+*  convert_multy: lifnr alpha.
+  DATA: LV_MOD   TYPE I,
+        LV_TABIX TYPE SYTABIX.
+  DATA: LS_DATA  LIKE LINE OF T_DATA[].
+  DATA: BACKDAYS  TYPE I,
+        DATE_FROM LIKE SY-DATUM,
+        DATE_TO   LIKE SY-DATUM,
+        REF_DATE  TYPE D.
+  FIELD-SYMBOLS: <FS_DATA> TYPE /SKN/S_SW_10_01_MIN_ORD_CHK.
+* if sw_dest is empty then on premise, else on cloud
+  IF LV_SW_DEST IS NOT INITIAL.
+    DATA: LV_IS_HANA(1) TYPE C.
+    CALL FUNCTION '/SKN/F_SW_IS_RFCDEST_HANA'
+      EXPORTING
+        DEST          = LV_SW_DEST
+      IMPORTING
+        IS_HANA       =  LV_IS_HANA.
+   IF LV_IS_HANA IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FH_SW_10_01_MIN_ORD_CHK'
+      EXPORTING
+        DIV_ALERT_CHK = LV_DIV_ALERT_CHK
+      IMPORTING
+        IS_ALERT      = IS_ALERT
+      TABLES
+        T_SELECT      = T_SELECT
+        T_DATA        = T_DATA.
+   ELSE.
+    CALL FUNCTION '/SKN/FC_SW_10_01_MIN_ORD_CHK'
+      EXPORTING
+        DIV_ALERT_CHK = LV_DIV_ALERT_CHK
+      IMPORTING
+        IS_ALERT      = IS_ALERT
+      TABLES
+        T_SELECT      = T_SELECT
+        T_DATA        = T_DATA.
+   ENDIF.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+*"--- Run Cloud Mode -----
+  IF R_ERDAT[] IS INITIAL AND R_AEDAT[] IS INITIAL.
+    IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN   = 'I' .
+      RS_DATUM-OPTION = 'BT' .
+      DATE_FROM       = SY-DATUM - LV_BACKDAYS .
+      RS_DATUM-LOW    = DATE_FROM .
+      RS_DATUM-HIGH   = SY-DATUM.
+      APPEND RS_DATUM TO R_DATUM.
+    ENDIF.
+    "--- Set Reference Date Field
+    CASE LV_DATE_REF_FLD.
+      WHEN 'ERDAT'.
+        R_ERDAT[] = R_DATUM[]. "Document created
+      WHEN 'AEDAT'.
+        R_AEDAT[] = R_DATUM[]. "changed on
+    ENDCASE.
+  ENDIF.
+*--- Retrieve data
+  CLEAR: IS_ALERT. "lt_vbak, lt_mvke.
+  REFRESH T_DATA.
+  IF LV_DIV_ALERT_CHK EQ 'X'.
+    SELECT VBAK~VBELN VBAK~VBTYP VBAK~AUART VBAK~KUNNR
+           VBAK~ERDAT VBAK~VKORG VBAK~VTWEG
+           VBAP~MATNR VBAP~WERKS VBAP~KWMENG VBAP~KLMENG VBAP~PSTYV VBAP~AEDAT
+           VBUP~BESTA VBUP~ABSTA
+           MVKE~AUMNG
+           KNA1~LAND1 KNA1~NAME1 KNA1~NAME2 KNA1~ORT01 KNA1~PSTLZ
+           KNA1~TELF1
+      FROM VBAK
+      INNER JOIN VBAP ON VBAK~VBELN EQ VBAP~VBELN
+      INNER JOIN VBUP ON VBAP~VBELN EQ VBUP~VBELN
+                     AND VBAP~POSNR EQ VBUP~POSNR
+      INNER JOIN MVKE ON VBAP~MATNR EQ MVKE~MATNR
+      INNER JOIN KNA1 ON VBAK~KUNNR EQ KNA1~KUNNR
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA[]
+      WHERE VBAK~VKORG  EQ MVKE~VKORG
+      AND   VBAK~VTWEG  EQ MVKE~VTWEG
+      AND   VBAK~VBELN  IN R_VBELN
+      AND   VBAK~VBTYP  IN R_VBTYP
+      AND   VBAK~AUART  IN R_AUART
+      AND   VBAK~KUNNR  IN R_KUNNR
+      AND   VBAP~MATNR  IN R_MATNR
+      AND   VBAP~PSTYV  IN R_PSTYV
+      AND   VBAP~WERKS  IN R_WERKS
+      AND   VBAP~ERDAT  IN R_ERDAT
+      AND   VBAP~AEDAT  IN R_AEDAT
+      AND   VBUP~BESTA  NE 'A'
+      AND   VBUP~ABSTA  NE 'C'
+      AND   MVKE~AUMNG  >  1.
+** Check if Cumulative orders quan.is divisible by min. order quan.
+** by no remainder
+    LOOP AT T_DATA ASSIGNING <FS_DATA>.
+      LV_TABIX = SY-TABIX.
+      IF <FS_DATA>-KLMENG IS NOT INITIAL AND
+            <FS_DATA>-AUMNG IS NOT INITIAL.
+        CLEAR LV_MOD.
+        LV_MOD = <FS_DATA>-KLMENG MOD <FS_DATA>-AUMNG.
+        IF LV_MOD = 0.
+          DELETE T_DATA INDEX LV_TABIX.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ELSE.
+    SELECT VBAK~VBELN VBAK~VBTYP VBAK~AUART VBAK~KUNNR
+           VBAK~ERDAT VBAK~VKORG VBAK~VTWEG
+           VBAP~MATNR VBAP~WERKS VBAP~KWMENG VBAP~KLMENG VBAP~PSTYV VBAP~AEDAT
+           VBUP~BESTA VBUP~ABSTA
+           MVKE~AUMNG
+           KNA1~LAND1 KNA1~NAME1 KNA1~NAME2 KNA1~ORT01 KNA1~PSTLZ
+           KNA1~TELF1
+      FROM VBAK
+      INNER JOIN VBAP ON VBAK~VBELN EQ VBAP~VBELN
+      INNER JOIN VBUP ON VBAP~VBELN EQ VBUP~VBELN
+                     AND VBAP~POSNR EQ VBUP~POSNR
+      INNER JOIN MVKE ON VBAP~MATNR EQ MVKE~MATNR
+      INNER JOIN KNA1 ON VBAK~KUNNR EQ KNA1~KUNNR
+      INTO CORRESPONDING FIELDS OF TABLE T_DATA[]
+      WHERE VBAK~VKORG  EQ MVKE~VKORG
+      AND   VBAK~VTWEG  EQ MVKE~VTWEG
+      AND   VBAK~VBELN  IN R_VBELN
+      AND   VBAP~MATNR  IN R_MATNR
+      AND   VBAP~WERKS  IN R_WERKS
+      AND   VBAP~ERDAT  IN R_ERDAT
+      AND   ( VBAP~ERDAT IN R_ERDAT OR VBAP~AEDAT IN R_ERDAT )
+      AND   VBUP~BESTA  NE 'A'
+      AND   VBUP~ABSTA  NE 'C'
+      AND   MVKE~AUMNG  >  1
+      AND   VBAP~KLMENG <  MVKE~AUMNG.
+  ENDIF.
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

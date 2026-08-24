@@ -221,13 +221,13 @@ One option per bullet line. No multi-option single lines.
 ## Inputs
 
 **1. Output structure / fields file** (path or paste):
-C:\vibe code dev\ei_auto_doc\input\Structure_SKN_S_SW_10_03_OPEN_PO_DET.xlsx
+C:\vibe code dev\ei_auto_doc\input\Structure_SKN_S_SW_01_01_SOURCE_SCAN.xlsx
 
 **2. Parameters file (Parameters sheet)** (path or paste):
-C:\vibe code dev\ei_auto_doc\input\Available fields_SKN_S_SW_10_03_OPEN_PO_DET.xlsx
+C:\vibe code dev\ei_auto_doc\input\Available fields_SKN_S_SW_01_01_SOURCE_SCAN.xlsx
 
 **3. ABAP code file** (path or paste):
-C:\vibe code dev\ei_auto_doc\input\Code_SKN_S_SW_10_03_OPEN_PO_DET.txt
+C:\vibe code dev\ei_auto_doc\input\Code_SKN_S_SW_01_01_SOURCE_SCAN.txt
 
 **4. Selected parameters file**:
 Selected parameters file: [Path or "not provided"]

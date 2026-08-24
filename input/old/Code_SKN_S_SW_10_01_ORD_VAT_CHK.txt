@@ -1,0 +1,309 @@
+FUNCTION /SKN/F_SW_10_01_ORD_VAT_CHK .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_ORD_VAT_CHK OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: MANAGE_IN_UTC  CHAR1 ,
+               LANGU  LANGU,
+               BACKDAYS INT4,
+               FORWDAYS INT4,
+               DATE_REF_FLD NAME_FELD,
+               DURATION_UNIT  /SKN/E_SW_DURATION_UNIT,
+               VAT_CONV /SKN/E_VAT,  " Convential Vat to be Defined Mandatory
+               ZERO_VAT_EXPLICITLY CHAR1.  " if 'X' - required 0-VAT definition by vat_conv parameter
+** Default values
+  LV_BACKDAYS = 0.
+  LV_DATE_REF_FLD = 'VDATU'.  "'ERDAT'.
+  LV_DURATION_UNIT = 'D'.
+  LV_LANGU = SY-LANGU. """5-6-19
+  SELECT_SINGLE: MANAGE_IN_UTC,
+                 LANGU,
+                 BACKDAYS,
+                 FORWDAYS,
+                 DATE_REF_FLD,
+                 DURATION_UNIT,
+                 VAT_CONV,
+                 ZERO_VAT_EXPLICITLY.
+  DATA_MULTY: KUNNR        VBAK-KUNNR,
+              VBELN        VBAK-VBELN,
+              VKORG        VBAK-VKORG,
+              VTWEG        VBAK-VTWEG,
+              BSTNK        VBAK-BSTNK,
+              VBTYP        VBAK-VBTYP,
+*            NETWR_USD    VBAK-NETWR,
+              AUART        VBAK-AUART,
+              ERDAT        VBAK-ERDAT,
+              AEDAT        VBAK-AEDAT,
+              AUDAT        VBAK-AUDAT,
+              VDATU        VBAK-VDATU,
+              DATUM        SY-DATUM,
+              VAT_RATE     /SKN/E_VAT,  " Not in Use !!!
+              TAX_DIFF    MWSBP,
+              DURATION    /SKN/E_SW_DURATION,
+              MPROK       MPROK,  """"5-6-19
+              WAVWR       WAVWR
+              .
+  SELECT_MULTY: KUNNR,
+              VBELN,
+              VKORG ,
+              VTWEG ,
+              BSTNK,
+              VBTYP,
+*              netwr_usd,
+              AUART,
+              ERDAT,
+              AEDAT,
+              AUDAT,
+              VDATU,
+              DATUM,
+              VAT_RATE,
+              DURATION,
+              TAX_DIFF,
+              MPROK,  """ 5-6-19
+              WAVWR.
+  CONVERT_MULTY: KUNNR ALPHA,
+                 VBELN ALPHA.
+  CONVERT_MULTY:  AUART AUART . """Tanya 14/11/18
+""" 5-6-19
+DATA: LV_DOMNAME LIKE  DD07V-DOMNAME,
+      LV_DOMVALUE LIKE  DD07V-DOMVALUE_L,
+      LV_DDTEXT LIKE  DD07V-DDTEXT.
+"--- Run Cloud Mode -----
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_ORD_VAT_CHK'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+  RANGES : R_FLD_NAME FOR DD03P-FIELDNAME,
+           R_FLD_VAL FOR DD03P-FIELDNAME .
+  DATA :   FLD_NAME TYPE FIELDNAME.
+  DATA : I TYPE I,
+         CI(1) TYPE C,
+         NFIELDS TYPE I VALUE 3.   "
+  DATA : BACKDAYS  TYPE I ,
+         FORWDAYS TYPE I,
+         DATE_FROM LIKE SY-DATUM,
+         DATE_TO LIKE SY-DATUM .
+  DATA : LANGU LIKE SY-LANGU .
+  DATA : IS_OUT(1) TYPE C.
+  DATA : TIME_DIFF TYPE  INT4 .
+  DATA : W_DATA LIKE LINE OF T_DATA .
+  DATA : WA_VBPA TYPE VBPA.
+  DATA : LV_VBELN TYPE VBELN,
+         LV_POSNR TYPE POSNR,
+         LV_PARVW TYPE PARVW,
+         LV_KUNNR TYPE  KUNNR,
+         LV_KUNNR_NAME TYPE  NAME1_GP,
+         LV_LIFNR TYPE  LIFNR,
+         LV_LIFNR_NAME TYPE  NAME1_GP,
+         LV_PERNR TYPE  PERNR_D,
+         LV_PERNR_NAME TYPE  NAME1_GP,
+         LV_NRART TYPE NRART.
+  DATA: LV_VBTYP TYPE VBTYP.
+  DATA : SY_TABIX LIKE SY-TABIX .
+  DATA : FLD(60) TYPE C .
+  DATA : REF_DATE TYPE D.
+  FIELD-SYMBOLS:  TYPE ANY ,
+                 <FS_V> TYPE ANY .
+  DATA : BEGIN OF SW_STRUCTURE OCCURS 0.
+          INCLUDE STRUCTURE /SKN/S_SW_S_FCAT .
+  DATA : END OF SW_STRUCTURE .
+  DATA : LS_VBPA TYPE VBPA,
+         LT_VBPA LIKE TABLE OF LS_VBPA.
+  DATA : LV_DATA_POSNR TYPE POSNR.
+  IF NOT LV_FORWDAYS  IS INITIAL.
+    LV_BACKDAYS = LV_FORWDAYS * ( -1 ).
+  ENDIF.
+  IF R_DATUM[] IS INITIAL .
+    RS_DATUM-SIGN = 'I' .
+    RS_DATUM-OPTION = 'GE' .
+    DATE_FROM = SY-DATUM - LV_BACKDAYS .
+    RS_DATUM-LOW = DATE_FROM .
+    APPEND RS_DATUM TO R_DATUM.
+  ENDIF.
+  "--- Set Reference Date Field
+  DATE_FROM = SY-DATUM.
+  READ TABLE R_DATUM INTO RS_DATUM INDEX 1.
+  IF SY-SUBRC IS INITIAL.
+    DATE_FROM = RS_DATUM-LOW.
+    DATE_TO = RS_DATUM-HIGH.
+    IF DATE_TO < DATE_FROM.
+      DATE_TO = DATE_FROM.
+    ENDIF.
+  ENDIF.
+  "--- Check Quatetion or Contracts types
+  IF LV_DATE_REF_FLD IS INITIAL.
+    READ TABLE R_VBTYP INTO RS_VBTYP INDEX 1.
+    IF SY-TFILL = 1. " the single record only
+      IF RS_VBTYP-OPTION = 'EQ'.
+        LV_VBTYP = RS_VBTYP-LOW.
+      ENDIF.
+    ENDIF.
+    IF LV_VBTYP = 'G'.
+      LV_DATE_REF_FLD = 'GUEBG'.
+    ELSEIF LV_VBTYP = 'B'.
+      LV_DATE_REF_FLD = 'ANGDT'.
+    ENDIF.
+    "    endif.
+  ENDIF.
+  "---
+  CASE LV_DATE_REF_FLD.
+    WHEN 'ERDAT'.
+      R_ERDAT[] = R_DATUM[]. "Date on Which Record Was Created
+    WHEN 'AEDAT'.
+      R_AEDAT[] = R_DATUM[]. "Changed On
+    WHEN 'AUDAT'.
+      R_AUDAT[] = R_DATUM[]. "Document Date (Date Received/Sent)
+    WHEN 'VDATU'.
+      R_VDATU[] = R_DATUM[].
+    WHEN OTHERS.
+      R_ERDAT[] = R_DATUM[]. "Document created
+  ENDCASE.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+  SELECT
+    VBAK~VBELN VBAP~POSNR VBAK~ERDAT VBAK~ERZET VBAK~ERNAM VBAK~AUDAT VBAK~VBTYP VBAK~AUART VBAK~AEDAT VBAK~NETWR
+    VBAK~WAERK VBAK~KUNNR VBAK~VKORG VBAK~VTWEG VBAK~SPART VBAK~VKGRP VBAK~VKBUR VBAK~BSTNK VBAP~MWSBP VBAK~AEDAT VBAK~VDATU
+    VBAP~MPROK VBAP~WAVWR VBAP~NETWR AS NETWR_ITEM
+    FROM VBAK
+    INNER JOIN VBAP ON
+    VBAK~VBELN = VBAP~VBELN
+    INTO CORRESPONDING FIELDS OF TABLE T_DATA
+    WHERE VBAK~VBELN IN R_VBELN
+      AND KUNNR IN R_KUNNR
+      AND VKORG IN R_VKORG
+      AND VTWEG IN R_VTWEG
+      AND BSTNK IN R_BSTNK
+      AND AUART IN R_AUART
+      AND VBAK~ERDAT IN R_ERDAT
+      AND VBTYP IN R_VBTYP
+      AND VBAK~AUDAT IN R_AUDAT
+      AND VBAK~AEDAT IN R_AEDAT
+      AND VBAK~VDATU IN R_VDATU
+      AND MPROK IN R_MPROK  """ 5-6-19
+      AND WAVWR IN R_WAVWR.
+**********************************************************************
+**********************************************************************
+**********************************************************************
+**********************************************************************
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CONCATENATE 'T_DATA-' LV_DATE_REF_FLD INTO FLD .
+    ASSIGN (FLD) TO .
+    IF  IS NOT ASSIGNED.
+      CONTINUE.
+    ENDIF.
+    REF_DATE =  .
+    IF NOT REF_DATE IS INITIAL.
+      T_DATA-DURATION_UNIT = LV_DURATION_UNIT.
+      CALL FUNCTION '/SKN/F_SW_GET_TIME_DIFF'
+        EXPORTING
+          D_FROM      = REF_DATE
+          T_FROM      = SY-UZEIT
+          D_TO        = SY-DATUM
+          T_TO        = SY-UZEIT
+          TIME_UNIT   = LV_DURATION_UNIT
+        IMPORTING
+          TIME_DIFF   = TIME_DIFF
+        EXCEPTIONS
+          WRONG_VALUE = 1
+          OTHERS      = 2.
+      IF SY-SUBRC = 0.
+        IF TIME_DIFF < '999999'.
+          T_DATA-DURATION = TIME_DIFF .
+        ELSE.
+          T_DATA-DURATION = '999999'.
+        ENDIF.
+      ENDIF.
+      MODIFY T_DATA INDEX SY_TABIX.
+    ENDIF.
+  ENDLOOP.
+  DELETE T_DATA WHERE DURATION NOT IN R_DURATION.
+**********************************************************************
+**********************************************************************
+  DATA: LT_DATA LIKE T_DATA[],
+        LWA_DATA LIKE LINE OF T_DATA,
+        LV_NETWR LIKE VBAP-NETWR,
+        LV_VAT TYPE MWSBP,
+        LV_VAT_RATE_CONV TYPE /SKN/E_VAT.
+  LT_DATA[] = T_DATA[].
+  REFRESH T_DATA[].
+  "--- Calculate Vat Values
+  LOOP AT LT_DATA INTO LWA_DATA.
+    CLEAR LV_VAT.
+    LV_VAT_RATE_CONV = LV_VAT_CONV.
+    LV_VAT = ( LWA_DATA-NETWR_ITEM * LV_VAT_CONV ) / 100.
+    IF LWA_DATA-MWSBP IS INITIAL.
+      IF LV_ZERO_VAT_EXPLICITLY IS INITIAL.
+        CLEAR LV_VAT.   " Based on Existing content
+        CLEAR LV_VAT_RATE_CONV.
+      ENDIF.
+    ENDIF.
+    LWA_DATA-MWSBP_CALC = LV_VAT.
+    LWA_DATA-MWSBP_DIFF = LWA_DATA-MWSBP - LWA_DATA-MWSBP_CALC.
+    IF LWA_DATA-MWSBP_DIFF IN R_TAX_DIFF.
+      LWA_DATA-VAT_RATE = LV_VAT_RATE_CONV.
+      APPEND LWA_DATA TO T_DATA.
+    ENDIF.
+  ENDLOOP.
+***  LOOP AT lt_data INTO lwa_data.
+***
+*****  Calculate vat rate
+***    CLEAR lv_netwr.
+***    lv_netwr = ( lwa_data-mwsbp / lwa_data-netwr_item ) * 100.
+***    lwa_data-vat_rate = lv_netwr.
+***
+***    IF lwa_data-vat_rate IN r_vat_rate.
+*****   Stay with the records that the VAT rate isn't in range
+***      APPEND lwa_data TO t_data.
+***    ENDIF.
+***
+***  ENDLOOP.
+  LOOP AT T_DATA .
+    SY_TABIX = SY-TABIX .
+    CALL FUNCTION '/SKN/F_SW_10_CUST_DESC'
+      EXPORTING
+        KUNNR          = T_DATA-KUNNR
+      IMPORTING
+        CUST_DESC      = T_DATA-CUST_DESC
+      EXCEPTIONS
+        WRONG_CUSTOMER = 1
+        OTHERS         = 2.
+    IF SY-SUBRC <> 0.
+    ENDIF.
+    LV_DOMNAME = 'MPROK'.
+    LV_DOMVALUE = T_DATA-MPROK.
+      CALL FUNCTION '/SKN/F_SW_GET_DOMAIN_VALUE'
+        EXPORTING
+          I_DOMNAME        = LV_DOMNAME
+          I_DOMVALUE       = LV_DOMVALUE
+          LANGU            = LV_LANGU
+*         SW_DEST          =
+       IMPORTING
+         E_DDTEXT          = LV_DDTEXT
+       EXCEPTIONS
+         NOT_EXIST        = 1
+         OTHERS           = 2
+                .
+     IF SY-SUBRC = 0.
+      T_DATA-MPROK_DESC = LV_DDTEXT.
+     ENDIF.
+    MODIFY T_DATA INDEX SY_TABIX.
+  ENDLOOP.
+*--- Check Alert Information
+  READ TABLE T_DATA INDEX 1.
+  CHECK NOT SY-TFILL  IS INITIAL .
+  IS_ALERT = 'X' .
+ENDFUNCTION.

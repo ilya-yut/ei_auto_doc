@@ -1,0 +1,273 @@
+FUNCTION /SKN/F_SW_10_01_CRDT_CHNG_APP .
+*"----------------------------------------------------------------------
+*"*"Local Interface:
+*"  EXPORTING
+*"     VALUE(IS_ALERT) TYPE  CHAR1
+*"  TABLES
+*"      T_SELECT STRUCTURE  RSSELECT OPTIONAL
+*"      T_DATA STRUCTURE  /SKN/S_SW_10_01_CRDT_CHNG_APP OPTIONAL
+*"----------------------------------------------------------------------
+  DATA_SINGLE: MANAGE_IN_UTC       CHAR1 ,
+               LANGU               LANGU,
+               BACKDAYS            INT4,
+               CHANGECNT           INT4,
+               CONVERT_KEY         CHAR1 .
+  SELECT_SINGLE: LANGU,
+                BACKDAYS,
+                CHANGECNT.
+  DATA_MULTY:     OBJECTCLAS        CDOBJECTCL,
+                  OBJECTID          CDOBJECTV,
+                  USERNAME          CDUSERNAME,
+                  TCODE             CDTCODE,
+                  CHANGE_IND        CDCHNGINDH,
+                  TABNAME           TABNAME,
+                  FNAME             FIELDNAME,
+                  CHNGIND           CDCHNGIND,
+                  UDATE             CDDATUM,
+                  DURATION_D       /SKN/E_SW_DURATION_D,
+                  DATUM            SYDATUM , " Paased by SW Online Monitor
+                  VBELN            VBELN,
+                  VBELN2           VBELN,"""9-7-19
+                  VBELN3           VBELN . """9-7-19         vblen.
+  SELECT_MULTY:  OBJECTCLAS,
+                 OBJECTID,
+                 USERNAME,
+                 TCODE,
+                 CHANGE_IND,
+                 TABNAME,
+                 FNAME,
+                 CHNGIND,
+                 UDATE,
+                 DURATION_D,
+                 DATUM .
+  LV_LANGU = SY-LANGU.
+  LV_BACKDAYS = 7.
+  LV_CHANGECNT = 0.
+  SELECT_SINGLE: LANGU,
+                 MANAGE_IN_UTC,
+                 BACKDAYS,
+                 CONVERT_KEY.
+  DATA: T_DATA_CHLOG TYPE TABLE OF /SKN/S_SW_10_06_MD_CHNG_LOG,
+        LS_DATA_CHLOG LIKE LINE OF T_DATA_CHLOG,
+        LS_PREV_REC LIKE LINE OF T_DATA,
+        LV_CHNG_COUNT TYPE I,
+        LS_DATA LIKE LINE OF T_DATA,
+        SY_TABIX LIKE SY-TABIX,
+        SY_TABIX2 LIKE SY-TABIX,
+        REL_VAL TYPE F,
+        TMP_CUR TYPE WAERK,
+        DATE_FROM LIKE SY-DATUM,""""9-7-19
+        DATE_TO LIKE SY-DATUM.",
+  DATA: LV_KEY TYPE VBELN.
+  TYPES : BEGIN OF  DELIVERY_DATA_TYPE,
+            VBELN TYPE VBELN_VL,
+            POSNR	TYPE POSNR_VL,
+            VGBEL	TYPE VGBEL,
+            VGPOS	TYPE VGPOS,
+            LFIMG TYPE LFIMG,
+            KWMENG TYPE KWMENG,
+            NETWR	TYPE NETWR_AP,
+            WAERK	TYPE WAERK,
+          END OF DELIVERY_DATA_TYPE,
+          BEGIN OF  VBPA_TYPE,
+            VBELN TYPE VBELN_VL,
+            POSNR	TYPE POSNR_VL,
+            KUNNR TYPE KUNNR,
+            NAME1	TYPE NAME1_GP,
+            NAME2	TYPE NAME2_GP,
+          END OF VBPA_TYPE.
+  DATA:T_VBPA TYPE TABLE OF VBPA_TYPE,
+       LS_VBPA LIKE LINE OF T_VBPA,
+       T_DELIVERY TYPE TABLE OF DELIVERY_DATA_TYPE,
+       LS_DELIVERY LIKE LINE OF T_DELIVERY,
+       T_VBAK TYPE TABLE OF VBAK,
+       LS_VBAK LIKE LINE OF T_VBAK.
+  DATA_SINGLE: SW_DEST RFCDEST.             .
+  SELECT_SINGLE: SW_DEST.
+FIELD-SYMBOLS: <RES_FIELDS> TYPE /SKN/S_SW_10_01_CRDT_CHNG_APP ,
+               <FS_V> TYPE ANY .
+"--- Run Cloud Mode -----
+  IF LV_SW_DEST IS NOT INITIAL.
+    CALL FUNCTION '/SKN/FC_SW_10_01_CRDT_CHNG_APP'
+      IMPORTING
+        IS_ALERT       = IS_ALERT
+      TABLES
+        T_SELECT       = T_SELECT
+        T_DATA         = T_DATA.
+  ENDIF.
+  CHECK LV_SW_DEST IS INITIAL.
+"--- Run Cloud Mode -----
+   IF R_DATUM[] IS INITIAL .
+      RS_DATUM-SIGN = 'I' .
+      RS_DATUM-OPTION = 'BT' .
+      IF LV_BACKDAYS > 0 .
+        DATE_FROM = SY-DATUM - LV_BACKDAYS .
+        DATE_TO = SY-DATUM .
+      ELSE.
+        DATE_FROM = SY-DATUM .
+        DATE_TO = SY-DATUM - LV_BACKDAYS.
+      ENDIF.
+      RS_DATUM-LOW = DATE_FROM .
+      RS_DATUM-HIGH = DATE_TO .
+      APPEND RS_DATUM TO R_DATUM.
+   ENDIF.
+*--- Retrieve data
+  CLEAR IS_ALERT .
+  REFRESH T_DATA.
+   CALL FUNCTION '/SKN/F_SW_10_06_MD_CHNG_LOG'
+*    IMPORTING
+*      IS_ALERT       =
+     TABLES
+       T_SELECT       = T_SELECT
+       T_DATA         = T_DATA_CHLOG
+             .
+*********************************************************************************
+*-- Calculate the value of change counter
+  CHECK NOT T_DATA_CHLOG[] IS INITIAL.
+*  if t_data_chlog[] is not initial.
+    REFRESH R_VBELN.
+    CLEAR RS_VBELN.
+    RS_VBELN-SIGN = 'I'.
+    RS_VBELN-OPTION = 'EQ'.
+    """"Comented 9-7-19
+**    MOVE-CORRESPONDING rs_vbeln to rs_vbeln2.
+**    MOVE-CORRESPONDING rs_vbeln to rs_vbeln3
+**    .
+    """""""
+    SORT T_DATA_CHLOG BY OBJECTCLAS OBJECTID.
+    CLEAR LS_PREV_REC.
+    READ TABLE T_DATA_CHLOG INDEX 1 INTO LS_DATA_CHLOG.
+    IF SY-SUBRC = 0.
+      MOVE-CORRESPONDING LS_DATA_CHLOG TO LS_PREV_REC.
+      LS_PREV_REC-CHNG_COUNT = 1.
+      LOOP AT T_DATA_CHLOG INTO LS_DATA_CHLOG.
+        """Comented 9-7-19
+**        clear rs_vbeln2-low.
+**        clear rs_vbeln3-low.
+        """""
+        SY_TABIX = SY-TABIX .
+          " filling the range for relevant document numbers
+          RS_VBELN-LOW = LS_DATA_CHLOG-OBJECTID.
+          IF LS_DATA_CHLOG-OBJECTCLAS = 'VERKBELEG'.
+            APPEND RS_VBELN TO R_VBELN. "orders
+          ELSE .
+            """09-7-19 comented and copied from FC
+**            rs_vbeln2-low = ls_data_chlog-objectid.
+              MOVE-CORRESPONDING RS_VBELN TO RS_VBELN2.
+              APPEND RS_VBELN2 TO R_VBELN2. " deliveries
+          ENDIF.
+          """"Comented 9-7-19, copy from FC
+**          rs_vbeln3-low = ls_data_chlog-objectid.
+           MOVE-CORRESPONDING RS_VBELN TO RS_VBELN3.
+          "!!!!!!!!!!! somehow check overflow conversion  DUMP
+          APPEND RS_VBELN3 TO R_VBELN3. "orders
+        IF LS_DATA_CHLOG-OBJECTID = LS_PREV_REC-OBJECTID.
+          LV_CHNG_COUNT = LV_CHNG_COUNT  + 1.
+        ELSE.
+          MOVE-CORRESPONDING LS_PREV_REC TO LS_DATA.
+          LS_DATA-CHNG_COUNT = LV_CHNG_COUNT.
+          APPEND LS_DATA TO T_DATA.
+          MOVE-CORRESPONDING  LS_DATA_CHLOG TO LS_PREV_REC .
+          LV_CHNG_COUNT = 1.
+          CLEAR LS_DATA.
+        ENDIF.
+      ENDLOOP.
+      SORT R_VBELN BY LOW.
+      SORT R_VBELN2 BY LOW.
+      SORT R_VBELN3 BY LOW.
+      DELETE ADJACENT DUPLICATES FROM R_VBELN.
+      DELETE ADJACENT DUPLICATES FROM R_VBELN2.
+      DELETE ADJACENT DUPLICATES FROM R_VBELN3.
+      MOVE-CORRESPONDING LS_PREV_REC TO LS_DATA.
+      LS_DATA-CHNG_COUNT = LV_CHNG_COUNT.
+      APPEND LS_DATA TO T_DATA.
+      DELETE T_DATA WHERE CHNG_COUNT LT LV_CHANGECNT.
+    ENDIF.
+    """"""""""""""""""""""""""""""""""""""""""""""""""""
+    REFRESH T_VBPA.
+    IF R_VBELN3[] IS NOT INITIAL.
+*      "retrieving KUNNRS from partners tab
+      SELECT A~VBELN A~POSNR A~KUNNR B~NAME1 B~NAME2 INTO TABLE T_VBPA
+         FROM VBPA AS A INNER JOIN KNA1 AS B ON
+          A~KUNNR = B~KUNNR
+        WHERE A~VBELN IN  R_VBELN3 AND
+              PARVW = 'RG' AND
+              POSNR = '000000'
+        ORDER BY VBELN .
+    ENDIF.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
+*      select * from vbak into table t_vbak
+*      where vbeln in r_vbeln
+*      order by vbeln  .
+*    " retrieve deliveries
+      " retrieving vbak relevant data
+    REFRESH T_VBAK.
+    IF R_VBELN[] IS NOT INITIAL.
+      SELECT * FROM VBAK INTO TABLE T_VBAK
+      WHERE VBELN IN R_VBELN
+      ORDER BY VBELN  .
+    ENDIF.
+    REFRESH T_DELIVERY.
+      " retrieving lips relevant data
+    IF R_VBELN2[] IS NOT INITIAL.
+      SELECT A~VBELN A~POSNR A~VGBEL A~VGPOS A~LFIMG B~KWMENG B~NETWR B~WAERK
+        INTO CORRESPONDING FIELDS OF TABLE T_DELIVERY
+         FROM LIPS AS A INNER JOIN VBAP AS B
+          ON A~VGBEL = B~VBELN AND A~VGPOS = B~POSNR
+        WHERE A~VBELN IN R_VBELN2 AND
+              A~VGTYP = 'C'
+        ORDER BY A~VBELN.
+   ENDIF.
+*  *****************************************************************************
+    LOOP AT T_DATA ASSIGNING <RES_FIELDS>.
+      "sy_tabix = sy-tabix .
+      CASE <RES_FIELDS>-OBJECTCLAS.
+        WHEN 'VERKBELEG'.
+        LV_KEY = <RES_FIELDS>-OBJECTID.
+        " reading the release value
+        READ TABLE T_VBAK INTO LS_VBAK BINARY SEARCH WITH KEY
+          VBELN = <RES_FIELDS>-OBJECTID.
+        IF SY-SUBRC = 0.
+          "case of sales document
+          <RES_FIELDS>-NETWR = LS_VBAK-NETWR.
+          <RES_FIELDS>-WAERK = LS_VBAK-WAERK.
+        ENDIF.
+        WHEN 'LIEFERUNG'.
+          LV_KEY = <RES_FIELDS>-OBJECTID.
+          READ TABLE T_DELIVERY INTO LS_DELIVERY BINARY SEARCH WITH KEY
+            VBELN = <RES_FIELDS>-OBJECTID.
+          IF SY-SUBRC = 0.
+            " running trhrough delivery lines
+            TMP_CUR = LS_DELIVERY-WAERK.
+            SY_TABIX = SY-TABIX.
+            CLEAR REL_VAL.
+            LOOP AT T_DELIVERY INTO LS_DELIVERY FROM SY_TABIX.
+              IF LS_DELIVERY-VBELN = <RES_FIELDS>-OBJECTID.
+                 REL_VAL = REL_VAL + LS_DELIVERY-NETWR * LS_DELIVERY-LFIMG / LS_DELIVERY-KWMENG.
+                  IF TMP_CUR <> LS_DELIVERY-WAERK .
+                    TMP_CUR = '*'.
+                  ELSE .
+                    TMP_CUR = LS_DELIVERY-WAERK.
+                  ENDIF.
+              ELSE.
+                EXIT.
+              ENDIF.
+            ENDLOOP.
+            <RES_FIELDS>-WAERK = TMP_CUR.
+            <RES_FIELDS>-NETWR = REL_VAL.
+          ENDIF.
+        WHEN OTHERS .
+          CONTINUE.
+      ENDCASE.
+      READ TABLE T_VBPA INTO LS_VBPA BINARY SEARCH WITH KEY VBELN = LV_KEY.
+      IF SY-SUBRC = 0 .
+        <RES_FIELDS>-KUNNR = LS_VBPA-KUNNR.
+        <RES_FIELDS>-NAME1 = LS_VBPA-NAME1.
+        <RES_FIELDS>-NAME2 = LS_VBPA-NAME2.
+      ENDIF.
+    ENDLOOP.
+*--- Check Alert Information
+ READ TABLE T_DATA INDEX 1.
+ CHECK NOT SY-TFILL  IS INITIAL .
+ IS_ALERT = 'X' .
+ENDFUNCTION.
